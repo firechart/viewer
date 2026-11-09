@@ -4,7 +4,7 @@ using FireChart.Viewer.Core.Forms;
 
 namespace FireChart.Viewer.Tests.Viewer;
 
-// The files of the Viewer: reading and writing again gives the same text, and reading is strict (.tasks/viewer/viewer.md, 4.2)
+// The files of the Viewer: reading and writing again gives the same text, and reading is strict
 public class ViewerJsonTests
 {
     [Test]

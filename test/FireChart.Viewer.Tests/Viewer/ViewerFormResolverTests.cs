@@ -3,7 +3,7 @@ using FireChart.Viewer.Library;
 
 namespace FireChart.Viewer.Tests.Viewer;
 
-// The resolver of forms (.tasks/viewer/viewer.md, 4.13): designed beats generated, then the lower order; a failing provider is skipped and its
+// The resolver of forms: designed beats generated, then the lower order; a failing provider is skipped and its
 // answer asked again; Changed forgets
 public class ViewerFormResolverTests
 {

@@ -8,6 +8,6 @@ public static class BackgroundTaskTypes
 
     public const string ImportPackage = "ImportPackage";
 
-    // Indexes a raw FHIR package into the fhir_index Postgres schema (FireChart.PackageCompiler.Postgres.PostgresPackageIndexer)
+    // Indexes a raw FHIR package into the fhir_index Postgres schema
     public const string IndexFhirPackagePostgres = "IndexFhirPackagePostgres";
 }

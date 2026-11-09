@@ -8,8 +8,6 @@
     <PackageTags>fhir;hl7;liquid;fluid;rendering;healthcare;viewer</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageProjectUrl>https://git.firechart.org/firechart/firechart</PackageProjectUrl>
-    <RepositoryUrl>https://git.firechart.org/firechart/firechart.git</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="FireChart.Fhir.Tests" />
     <InternalsVisibleTo Include="FireChart.Viewer.Tests" />
   </ItemGroup>
 

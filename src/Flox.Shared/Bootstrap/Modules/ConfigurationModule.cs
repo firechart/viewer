@@ -15,7 +15,7 @@ public class ConfigurationModule : BootstrapModule
             // FloxBootstrapper/BootstrapModule at all (Program.cs calls WebApplication.CreateBuilder
             // (args) directly, which already loads appsettings.json/appsettings.{env}.json, User
             // Secrets in Development and environment variables, in the correct precedence order -
-            // see Flox.AppServer.Shared/FloxServerHost.cs). Historically, when the server DID run
+            // see the server host). Historically, when the server DID run
             // this module, re-adding the json files as later (= higher-priority) sources here shadowed
             // User Secrets and the environment variables CreateBuilder already read with whatever was
             // still in appsettings.{env}.json for the same key - a config value from a file silently
@@ -35,7 +35,7 @@ public class ConfigurationModule : BootstrapModule
 
             // WASM: AddJsonFile works here because WebAssemblyHostBuilder.Configuration wires an
             // HTTP-based file provider under the hood (fetches from wwwroot), not a physical one.
-            // MAUI does NOT get this branch - see MauiConfigurationModule (Flox.Client.Shared.Maui),
+            // MAUI does NOT get this branch - see MauiConfigurationModule (the MAUI client library),
             // which FloxMauiBootstrapper always swaps in via ReplaceModule instead: no MAUI target
             // reliably exposes appsettings.*.json as a loose physical file next to the executable
             // (confirmed: this exact FileNotFoundException on a real Windows run), so MAUI reads

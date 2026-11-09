@@ -1,7 +1,7 @@
 /*
  * FloxWind palette: the color roles (neutral scale, accent, status colors) as the Radzen variables, for light
  * and dark (data-theme on <html>). Imported by Flox.Shared's site.css and by every stylesheet that must look
- * like the application without Radzen (the client pages of Flox.AppServer.Shared). The neutral scale is Tailwind's
+ * like the application without Radzen (pages of the server). The neutral scale is Tailwind's
  * warm stone, to go with the orange accent.
  */
 

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 namespace FireChart.Viewer.Core.Forms;
 
 /// <summary>
-/// The resolver of the forms of one kind over a chain of providers (<c>.tasks/viewer/viewer.md</c>, 4.13).
+/// The resolver of the forms of one kind over a chain of providers.
 /// </summary>
 /// <typeparam name="TKey">The key: <see cref="SearchFormKey"/> or <see cref="SummaryFormKey"/>; a record, compared by value.</typeparam>
 /// <typeparam name="TDefinition">The form.</typeparam>

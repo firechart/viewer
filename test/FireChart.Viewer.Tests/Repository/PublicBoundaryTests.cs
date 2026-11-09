@@ -60,6 +60,57 @@ public partial class PublicBoundaryTests
         Assert.That(found, Is.Empty);
     }
 
+    // Every file the public repository shows: the closed part is not named there and its hosts are not linked
+    private static readonly string[] s_textExtensions = [.. s_extensions, ".cs", ".razor", ".md", ".liquid", ".ts", ".xml", ".resx", ".txt"];
+
+    // The public hosts of firechart.org
+    private static readonly string[] s_publicHosts = ["firechart.org", "www.firechart.org", "app.firechart.org", "viewer.firechart.org"];
+
+    // It names the projects that must stay out on purpose
+    private const string IsolationTests = "ViewerIsolationTests.cs";
+
+    [GeneratedRegex(@"\b(?:Flox|FireChart)(?:\.[A-Z][A-Za-z0-9]*)+")]
+    private static partial Regex ProjectLikeName();
+
+    [GeneratedRegex(@"^\s*@?namespace\s+([\w.]+)", RegexOptions.Multiline)]
+    private static partial Regex NamespaceDeclaration();
+
+    [GeneratedRegex(@"https?://([a-z0-9.-]*firechart\.org)\b", RegexOptions.IgnoreCase)]
+    private static partial Regex FireChartHost();
+
+    [Test]
+    public void ThePublicPart_NamesOnlyItsOwnProjects_AndLinksOnlyPublicHosts()
+    {
+        var root = Root();
+        var files = Files(root, s_textExtensions).ToList();
+        var known = Directory.EnumerateFiles(root, "*.csproj", System.IO.SearchOption.AllDirectories)
+                             .Select(file => Path.GetFileNameWithoutExtension(file))
+                             .Concat(files.Where(file => file.EndsWith(".cs", StringComparison.OrdinalIgnoreCase) || file.EndsWith(".razor", StringComparison.OrdinalIgnoreCase))
+                                          .SelectMany(file => NamespaceDeclaration().Matches(File.ReadAllText(file)).Select(match => match.Groups[1].Value)))
+                             .ToHashSet(StringComparer.Ordinal);
+        var found = new List<string>();
+        foreach (var file in files)
+        {
+            var text = File.ReadAllText(file);
+            var relative = Path.GetRelativePath(root, file);
+            if (Path.GetFileName(file) != IsolationTests)
+            {
+                found.AddRange(ProjectLikeName().Matches(text)
+                                                .Select(match => match.Value)
+                                                .Where(name => !known.Any(own => name == own || name.StartsWith(own + ".", StringComparison.Ordinal)
+                                                                                  || own.StartsWith(name + ".", StringComparison.Ordinal)))
+                                                .Select(name => $"{relative}: {name}"));
+            }
+
+            found.AddRange(FireChartHost().Matches(text)
+                                          .Select(match => match.Groups[1].Value)
+                                          .Where(host => !s_publicHosts.Contains(host, StringComparer.OrdinalIgnoreCase))
+                                          .Select(host => $"{relative}: {host}"));
+        }
+
+        Assert.That(found.Distinct(), Is.Empty);
+    }
+
     private static bool IsBuildFile(string file)
     {
         return s_names.Contains(Path.GetFileName(file), StringComparer.Ordinal)
@@ -68,8 +119,13 @@ public partial class PublicBoundaryTests
 
     private static IEnumerable<string> Files(string root)
     {
+        return Files(root, s_extensions);
+    }
+
+    private static IEnumerable<string> Files(string root, string[] extensions)
+    {
         return Directory.EnumerateFiles(root, "*", System.IO.SearchOption.AllDirectories)
-                        .Where(file => s_extensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase)
+                        .Where(file => extensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase)
                                        || s_names.Contains(Path.GetFileName(file), StringComparer.Ordinal))
                         .Where(file =>
                         {

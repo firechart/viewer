@@ -63,7 +63,7 @@ public class FloxLogLevelsTests
         var levels = FloxLogLevels.FromConfiguration(Configuration([]));
         var (logger, sink) = Build(levels);
         var microsoft = logger.ForContext(Constants.SourceContextPropertyName, "Microsoft.AspNetCore.Routing");
-        var own = logger.ForContext(Constants.SourceContextPropertyName, "FireChart.Services.Thing");
+        var own = logger.ForContext(Constants.SourceContextPropertyName, "FireChart.Viewer.Thing");
 
         own.Debug("own, before");
         Assert.That(sink.Events, Is.Empty, "Information is the default");

@@ -1,8 +1,8 @@
 namespace Flox.Core.Branding;
 
 // Deliberately separate from IFloxModule/IFloxShell: branding needs exactly one unambiguous owner
-// per app, which IFloxModule.Main/IFloxShell.MainModule never actually got (no module in this repo
-// ever sets Main=true, so MainModule is always null at runtime - see src/Flox.AppServer.Shared/Docs/internal).
+// per app, which IFloxModule.Main/IFloxShell.MainModule never actually got (no module
+// ever sets Main=true, so MainModule is always null at runtime).
 public interface IFloxBrandingProvider
 {
     // The Flox platform's own identity - fixed, never overridden. Always non-null, so "About

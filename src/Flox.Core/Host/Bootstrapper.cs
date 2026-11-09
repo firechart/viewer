@@ -100,7 +100,7 @@ public class Bootstrapper : IBootstrapper
         // AssemblyLoadContext.Default.Assemblies - the runtime only loads an assembly once
         // something actually needs a type from it. ScanFloxAssemblies() below only sees already-
         // loaded assemblies, so a [FloxService] living in an assembly nothing on the eager startup
-        // path touches yet (e.g. FireChart.Fhir's CorePackageListProvider, only referenced from
+        // path touches yet (e.g. a provider only referenced from
         // a lazily-rendered admin page) never gets registered - not until the page that finally
         // references it renders, by which point DI registration already happened and it's too
         // late (confirmed: exactly this gap, reproduced via a real Release publish). Walk the
@@ -206,13 +206,11 @@ public class Bootstrapper : IBootstrapper
     public IServiceCollection Services { get; }
 
     // An assembly "is a Flox assembly" if it IS Flox.Core, or transitively references it -
-    // replaces the old opt-in [FloxAssembly] attribute (easy to forget on a new project; e.g. the
-    // Flox.Client.Shared.Wasm 404-on-login bug this exact gap caused, since nobody remembered to
-    // tag that project). A direct-reference-only check isn't enough: the C# compiler only emits an
+    // replaces the old opt-in [FloxAssembly] attribute (easy to forget on a new project; a
+    // 404-on-login bug was caused by exactly this gap). A direct-reference-only check isn't enough: the C# compiler only emits an
     // AssemblyRef for an assembly a project's own code actually uses a type from, so a thin
-    // pass-through project (Flox.Web today - just Program.cs calling FloxServerBootstrapper) can
-    // transitively depend on Flox.Core via Flox.AppServer.Shared without Flox.Core ever appearing
-    // in Flox.Web's own metadata - confirmed via reflection before relying on this. The recursive
+    // pass-through host project (just Program.cs) can transitively depend on Flox.Core through
+    // another library without Flox.Core ever appearing in its own metadata - confirmed via reflection before relying on this. The recursive
     // walk over GetReferencedAssemblies() handles that correctly, no deps.json/DependencyModel
     // package needed.
     private void ScanFloxAssemblies()

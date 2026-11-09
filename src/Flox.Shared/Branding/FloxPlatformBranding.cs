@@ -4,8 +4,7 @@ using B = Flox.Shared.Resources;
 namespace Flox.Shared.Branding;
 
 // The Flox platform's own identity, used as IFloxBrandingProvider.Platform (always) and as the
-// IFloxBrandingProvider.App default for any host that doesn't register its own branding (Flox/
-// Flox.Web/Flox.Web.Client - see src/Flox.AppServer.Shared/Docs/internal/layout.md on those being demo hosts).
+// IFloxBrandingProvider.App default for any host that doesn't register its own branding.
 public static class FloxPlatformBranding
 {
     private static FloxBranding? _default;

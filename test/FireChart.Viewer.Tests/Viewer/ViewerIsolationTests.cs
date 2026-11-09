@@ -5,8 +5,7 @@ using FireChart.Viewer.Library;
 namespace FireChart.Viewer.Tests.Viewer;
 
 // The Viewer is a component of its own over the public client libraries of Flox: its assemblies know nothing of the rest of Flox and of
-// FireChart except its texts (.tasks/viewer/viewer.md, 5.1; corrected 2026-11-07). Since 2026-11-08 it is also the boundary of the public
-// part: the allowed names are exactly the public projects
+// FireChart except its texts. It is also the boundary of the public part: the allowed names are exactly the public projects
 public class ViewerIsolationTests
 {
     private static readonly Assembly[] s_viewer = [typeof(FhirRenderer).Assembly, typeof(VendorTemplates).Assembly, typeof(FireChart.Viewer.ViewerSession).Assembly];
@@ -37,10 +36,8 @@ public class ViewerIsolationTests
         {
             Assert.That(IsForbidden("Flox.Core"), Is.False);
             Assert.That(IsForbidden("Flox.Shared"), Is.False);
-            Assert.That(IsForbidden("Flox.AppServer.Shared"), Is.True);
-            Assert.That(IsForbidden("Flox.Marten"), Is.True);
-            Assert.That(IsForbidden("Flox.Client.Shared"), Is.True, "the client shell of the applications is not public");
-            Assert.That(IsForbidden("FireChart.Interfaces"), Is.True);
+            Assert.That(IsForbidden("Flox.Server"), Is.True, "any other library of Flox");
+            Assert.That(IsForbidden("FireChart.Server"), Is.True, "any other project of FireChart");
             Assert.That(IsForbidden("FireChart.Resources"), Is.False, "the texts are kept in one place");
             Assert.That(IsForbidden("FireChart.Viewer.Core"), Is.False);
         });

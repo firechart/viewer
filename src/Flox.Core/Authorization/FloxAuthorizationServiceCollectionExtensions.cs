@@ -7,7 +7,7 @@ namespace Flox.Core.Authorization;
 // Single source of truth for Flox's own authorization policies (ADMIN/AUTHENTICATED/ANONYMOUS/
 // DEVELOPER, the dynamic "perm:<Operation>" policy) - called from both the client's
 // AuthorizationPoliciesModule (a BootstrapModule) and the server's AuthorizationPoliciesStartup
-// (an Orchard StartupBase, Flox.AppServer.Shared), which otherwise had this exact policy setup
+// (an Orchard StartupBase of the server), which otherwise had this exact policy setup
 // duplicated verbatim. Deliberately framework-agnostic (no Blazor-specific registration such as
 // AddCascadingAuthenticationState) - callers add that themselves alongside this call, since not
 // every IServiceCollection this runs against is building a Blazor render pipeline.
