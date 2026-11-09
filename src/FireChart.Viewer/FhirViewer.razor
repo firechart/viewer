@@ -1,0 +1,210 @@
+@* The Viewer: the page of its address below RoutePrefix. Client side only (WebAssembly, Hybrid); the routing is experimental *@
+@implements IAsyncDisposable
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject Radzen.ThemeService RadzenThemes
+@using Microsoft.Extensions.Logging
+@inject ILogger<FhirViewer> Logger
+
+@if (!IsClientSide)
+{
+    <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" AllowClose="false" data-error="viewer_client_only">
+        @Strings.Message_ViewerClientOnly
+    </RadzenAlert>
+}
+else if (_session is not null)
+{
+    @if (_stylesheet.Css.Length > 0)
+    {
+        <style>@((MarkupString)_stylesheet.Css)</style>
+    }
+
+    var route = ViewerRoutes.Parse(_session.Location.Location);
+    <CascadingValue Value="_session" IsFixed="false">
+        @if (ShowBreadcrumbs)
+        {
+            <ViewerBreadcrumbs Route=@route/>
+        }
+
+        @switch (route)
+        {
+            case { Page: ViewerPage.ResourceTypes }:
+                <ResourceTypesView/>
+                break;
+            case { Page: ViewerPage.ResourceList } list:
+                <ResourceListView ResourceType=@(list.ResourceType!) Query=@list.Query/>
+                break;
+            case { Page: ViewerPage.Resource } resource:
+                <ResourceDetailView ResourceType=@(resource.ResourceType!) ResourceId=@(resource.Id!)/>
+                break;
+            case { Page: ViewerPage.ClinicalSummary, Id: { } patient }:
+                <ClinicalSummaryView PatientId=@patient/>
+                break;
+            case { Page: ViewerPage.ClinicalSummary, Id: null } summary:
+                <ResourceListView ResourceType="Patient" Query=@summary.Query ClinicalSummary/>
+                break;
+            default:
+                <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" data-error="invalid_location">
+                    @Strings.Message_ViewerUnknownAddress
+                </RadzenAlert>
+                break;
+        }
+    </CascadingValue>
+}
+
+@code {
+
+    private ViewerSession? _session;
+    private string? _sessionKey;
+    private ViewerAppearance? _composedFor;
+    private AppearanceStylesheet _stylesheet = new(string.Empty, []);
+    private ViewerTheme? _appliedTheme;
+    private IJSObjectReference? _themeModule;
+    private DotNetObjectReference<SystemThemeListener>? _systemTheme;
+
+    /// <summary>How the Viewer looks; none in a Flox application, where it inherits the styles of the host. Another instance is applied live.</summary>
+    [Parameter]
+    public ViewerAppearance? Appearance { get; set; }
+
+    /// <summary>The chain server &gt; type &gt; id above the page; <see langword="true"/> by default. A host with crumbs of its own (FireChart) turns it
+    /// off.</summary>
+    [Parameter]
+    public bool ShowBreadcrumbs { get; set; } = true;
+
+    /// <summary>Raised for an option of the configuration that cannot be used and is left out.</summary>
+    [Parameter]
+    public EventCallback<ViewerConfigError> OnConfigError { get; set; }
+
+    /// <summary>The FHIR server the Viewer reads; required. Another server starts a new session.</summary>
+    [Parameter, EditorRequired]
+    public IViewerServer Server { get; set; } = null!;
+
+    /// <summary>The path below the base of the application the Viewer owns (<c>server/42/</c>). The routing is experimental.</summary>
+    [Parameter]
+    public string? RoutePrefix { get; set; }
+
+    /// <summary>The callback address of the host for a SMART sign-in, as registered with the authorization servers (FireChart: its route
+    /// <c>smart/callback</c>); none: a server that needs a sign-in cannot be read. Another one starts a new session.</summary>
+    [Parameter]
+    public string? SmartRedirectUri { get; set; }
+
+    /// <summary>How a SMART sign-in leaves the page: <see cref="SmartFlow.Redirect"/> (the default) or <see cref="SmartFlow.Popup"/> (a frame whose
+    /// authorization server refuses to be framed; see the README).</summary>
+    [Parameter]
+    public SmartFlow SmartFlow { get; set; }
+
+    /// <summary>The return page of a sign-in in a popup; by default <c>_content/FireChart.Viewer/smart-callback.html</c> of the application. Register
+    /// it with the authorization servers.</summary>
+    [Parameter]
+    public string? SmartPopupRedirectUri { get; set; }
+
+    /// <summary>The terminology server for the displays of bare codes; none: the codes are shown as they are. Another one starts a new session.</summary>
+    [Parameter]
+    public string? TerminologyServer { get; set; }
+
+    /// <summary>The code of the clinical summary form of the server; none is <c>default</c>. Another one starts a new session.</summary>
+    [Parameter]
+    public string? ClinicalSummaryForm { get; set; }
+
+
+    // WebAssembly in a browser, WebView in MAUI; never a server
+    private bool IsClientSide => RendererInfo.IsInteractive && RendererInfo.Name is "WebAssembly" or "WebView";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ArgumentNullException.ThrowIfNull(Server);
+        if (!ReferenceEquals(_composedFor, Appearance))
+        {
+            _composedFor = Appearance;
+            _stylesheet = AppearanceCss.Compose(Appearance);
+            foreach (var error in _stylesheet.Errors)
+            {
+                Logger.LogWarning("Appearance: {Param}: {Message}", error.Param, error.Message);
+                await OnConfigError.InvokeAsync(error);
+            }
+        }
+
+        var key = $"{Server.Key}|{Server.BaseUrl}|{RoutePrefix}|{TerminologyServer}|{ClinicalSummaryForm}|{SmartRedirectUri}|{SmartFlow}|{SmartPopupRedirectUri}";
+        if (key == _sessionKey)
+        {
+            return;
+        }
+
+        Close();
+        _sessionKey = key;
+        var location = new UrlLocationStore(NavigationManager, RoutePrefix);
+        location.LocationChanged += OnLocationChanged;
+        var popupCallback = SmartPopupRedirectUri ?? NavigationManager.ToAbsoluteUri("_content/FireChart.Viewer/smart-callback.html").ToString();
+        _session = new ViewerSession(Server, location, SmartRedirectUri, TerminologyServer, ClinicalSummaryForm, SmartFlow, popupCallback);
+    }
+
+    private void OnLocationChanged(object? sender, EventArgs e)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void Close()
+    {
+        if (_session is not null)
+        {
+            _session.Location.LocationChanged -= OnLocationChanged;
+            _session.Location.Dispose();
+            _session = null;
+        }
+    }
+
+    // The theme is set on the document only when the appearance asks for one: in a Flox application the host owns it. The base theme of Radzen follows,
+    // dark or light, or the Radzen components stay light on a dark page
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var theme = Appearance?.Theme ?? ViewerTheme.Inherit;
+        if (!IsClientSide || theme == ViewerTheme.Inherit || theme == _appliedTheme)
+        {
+            return;
+        }
+
+        _appliedTheme = theme;
+        _themeModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./_content/FireChart.Viewer/js/viewer-theme.js");
+        _systemTheme ??= DotNetObjectReference.Create(new SystemThemeListener(dark => InvokeAsync(() => ApplyBaseTheme(dark))));
+        ApplyBaseTheme(await _themeModule.InvokeAsync<bool>("setTheme", theme.ToString().ToLowerInvariant(), _systemTheme));
+    }
+
+    private void ApplyBaseTheme(bool dark)
+    {
+        var name = Flox.Shared.Theming.ThemeService.ThemeName(dark);
+        if (RadzenThemes.Theme != name)
+        {
+            RadzenThemes.SetTheme(name);
+        }
+    }
+
+    /// <summary>Stops following the address and releases the script of the theme.</summary>
+    /// <returns>A task that completes when it is done.</returns>
+    public async ValueTask DisposeAsync()
+    {
+        Close();
+        _systemTheme?.Dispose();
+        if (_themeModule is not null)
+        {
+            try
+            {
+                await _themeModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // the page is gone
+            }
+        }
+    }
+
+    // The operating system changed between light and dark under the theme "auto"
+    private sealed class SystemThemeListener(Func<bool, Task> changed)
+    {
+        [JSInvokable]
+        public Task OnSystemThemeChanged(bool dark)
+        {
+            return changed(dark);
+        }
+    }
+
+}

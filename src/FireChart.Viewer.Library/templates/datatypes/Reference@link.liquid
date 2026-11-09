@@ -1,0 +1,16 @@
+{%- assign target = self | resolve -%}
+{%- assign href = self | fhir_href -%}
+
+{%- capture label -%}
+  {%- if target -%}
+    {%- apply target mode: "text" -%}
+  {%- else -%}
+    {{- self.display | default: self.reference -}}
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- if href -%}
+  <a href="{{ href }}">{{ label }}</a>
+{%- else -%}
+  {{- label -}}
+{%- endif -%}

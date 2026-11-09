@@ -1,0 +1,234 @@
+@page "/embed"
+@page "/embed/{*Path}"
+@using System.Globalization
+@using System.Text.Json.Nodes
+@implements IAsyncDisposable
+@inject ViewerAppConfigLoader ConfigLoader
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@* The frame: one Viewer, the whole page. Its configuration is viewer.json, or the messages of the parent that hosts it (the sandbox, ViewerFrameChannel) *@
+<PageTitle>@(_setup?.Server?.Name ?? "FireChart Viewer")</PageTitle>
+
+@if (_setup is null)
+{
+    <div class="p-4"><RadzenProgressBarCircular ShowValue="false" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Small"/></div>
+}
+else if (_setup.Server is null)
+{
+    <ConfigErrors Errors=@_setup.Errors/>
+}
+else
+{
+    <div class="p-2">
+        @* Another language renders the Viewer anew; its address is in the URL and stays *@
+        <FhirViewer @key=@_culture.Name
+                    Server=@_setup.Server
+                    RoutePrefix=@Prefix
+                    SmartRedirectUri=@NavigationManager.ToAbsoluteUri(SmartCallbackPage.Route).ToString()
+                    SmartFlow=@_setup.SmartFlow
+                    TerminologyServer=@_setup.TerminologyServer
+                    ClinicalSummaryForm=@_setup.ClinicalSummaryForm
+                    Appearance=@_setup.Appearance
+                    OnConfigError=@ReportAsync/>
+    </div>
+}
+
+@code {
+
+    public const string Prefix = "embed/";
+
+    private static readonly CultureInfo s_browserCulture = CultureInfo.CurrentUICulture;
+
+    private ViewerAppSetup? _setup;
+    private string? _configText;
+    private CultureInfo _culture = s_browserCulture;
+    private ViewerFrameChannel? _channel;
+    private bool _hostNavigation;
+
+    [Parameter]
+    public string? Path { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+        _channel = await ViewerFrameChannel.OpenAsync(JS, OnParentMessageAsync);
+        if (_channel is null)
+        {
+            Apply(await ConfigLoader.LoadAsync());
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (_setup?.Server is not null && string.IsNullOrEmpty(Path))
+        {
+            GoToStart();
+        }
+    }
+
+    private Task OnParentMessageAsync(FrameRequest request)
+    {
+        return InvokeAsync(async () =>
+        {
+            switch (request.Type)
+            {
+                case "init":
+                case "restart":
+                    await ConfigureAsync(request, request.Type == "restart");
+                    break;
+                case "update":
+                    await UpdateAsync(request);
+                    break;
+                case "navigate":
+                    await NavigateAsync(request);
+                    break;
+                default:
+                    await _channel!.FailAsync(request, "protocol_error", [new ViewerConfigError("unknown_message", "type", $"'{request.Type}' is not a message of the frame.")]);
+                    break;
+            }
+
+            StateHasChanged();
+        });
+    }
+
+    private async Task ConfigureAsync(FrameRequest request, bool restart)
+    {
+        if (request.Payload["config"] is not JsonObject config)
+        {
+            await _channel!.FailAsync(request, "config_error", [new ViewerConfigError("missing_option", "config", "The message carries no configuration object.")]);
+            return;
+        }
+
+        if (restart)
+        {
+            await _channel!.PostAsync("restarting");
+        }
+
+        var text = config.ToJsonString();
+        var setup = ViewerAppConfigLoader.Parse(text);
+        Apply(setup);
+        if (setup.Server is null)
+        {
+            _configText = null;
+            await _channel!.FailAsync(request, "config_error", setup.Errors);
+            return;
+        }
+
+        _configText = text;
+        var location = CurrentLocation();
+        if (restart || string.IsNullOrEmpty(Path))
+        {
+            _hostNavigation = true;
+            GoToStart();
+            location = StartLocation;
+        }
+
+        var ready = new JsonObject { ["location"] = location, ["server"] = setup.Server.BaseUrl };
+        await _channel!.PostAsync("ready", ready);
+        await _channel.SucceedAsync(request, ready.DeepClone().AsObject());
+    }
+
+    private async Task UpdateAsync(FrameRequest request)
+    {
+        if (_configText is null || _setup?.Server is null)
+        {
+            await _channel!.FailAsync(request, "config_error", [new ViewerConfigError("not_ready", "config", "The frame has no configuration to update yet: send init or restart.")]);
+            return;
+        }
+
+        if (request.Payload["config"] is not JsonObject changes)
+        {
+            await _channel!.FailAsync(request, "config_error", [new ViewerConfigError("missing_option", "config", "The message carries no configuration object.")]);
+            return;
+        }
+
+        var result = ViewerConfigPatch.Apply(_configText, changes);
+        if (result.Error is not null)
+        {
+            await _channel!.FailAsync(request, "config_error", [result.Error]);
+            return;
+        }
+
+        var setup = ViewerAppConfigLoader.Parse(result.Text!);
+        if (setup.Server is null)
+        {
+            await _channel!.FailAsync(request, "config_error", setup.Errors);
+            return;
+        }
+
+        _configText = result.Text;
+        Apply(setup);
+        var applied = new JsonObject { ["applied"] = new JsonArray([.. result.Applied.Select(a => (JsonNode)JsonValue.Create(a))]) };
+        await _channel!.PostAsync("updated", applied);
+        await _channel.SucceedAsync(request, applied.DeepClone().AsObject());
+    }
+
+    // The address goes into the history of the frame (replace: instead of its last entry); the event navigate says source "host"
+    private async Task NavigateAsync(FrameRequest request)
+    {
+        var location = request.Payload["location"] is JsonValue value && value.TryGetValue<string>(out var text) ? text : null;
+        if (location is null || !ViewerRoutes.IsSafe(location))
+        {
+            await _channel!.FailAsync(request, "navigation_error", [new ViewerConfigError("invalid_location", "location", $"'{location}' is not an address of the Viewer.")]);
+            return;
+        }
+
+        var replace = request.Payload["replace"] is JsonValue flag && flag.TryGetValue<bool>(out var r) && r;
+        _hostNavigation = true;
+        NavigationManager.NavigateTo(Prefix + location, replace: replace);
+        await _channel!.SucceedAsync(request, new JsonObject { ["location"] = location });
+    }
+
+    private void Apply(ViewerAppSetup setup)
+    {
+        _setup = setup;
+        _culture = setup.Culture ?? s_browserCulture;
+        CultureInfo.DefaultThreadCurrentCulture = _culture;
+        CultureInfo.DefaultThreadCurrentUICulture = _culture;
+        CultureInfo.CurrentCulture = _culture;
+        CultureInfo.CurrentUICulture = _culture;
+    }
+
+    private static string StartLocation => new ViewerRoute(ViewerPage.ResourceTypes).Location;
+
+    private void GoToStart()
+    {
+        NavigationManager.NavigateTo(Prefix + StartLocation, replace: true);
+    }
+
+    private string? CurrentLocation()
+    {
+        var relative = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        return relative.StartsWith(Prefix, StringComparison.OrdinalIgnoreCase) ? relative[Prefix.Length..] : null;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (_channel is not null && _setup?.Server is not null && CurrentLocation() is { } location)
+        {
+            var source = _hostNavigation ? "host" : "user";
+            _hostNavigation = false;
+            _ = _channel.PostAsync("navigate", new JsonObject { ["location"] = location, ["source"] = source }).AsTask();
+        }
+    }
+
+    private async Task ReportAsync(ViewerConfigError error)
+    {
+        Console.Error.WriteLine($"config_error {error.Code} {error.Param}: {error.Message}");
+        if (_channel is not null)
+        {
+            await _channel.PostErrorsAsync("config_error", [error]);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+        if (_channel is not null)
+        {
+            await _channel.DisposeAsync();
+        }
+    }
+
+}

@@ -1,0 +1,495 @@
+/* The vendor style of the FHIR visualization (fx-*). Do not edit it in an installation: the customer changes the tokens and the rules in fx.custom.css,
+   which is applied after this one. The tokens follow the Radzen theme of the application, so the kit goes with its light and dark themes. */
+
+.fx-root {
+  --fx-font: var(--rz-text-font-family, system-ui, sans-serif);
+  --fx-color-text: var(--rz-text-color, #1f2933);
+  --fx-color-muted: var(--rz-text-secondary-color, #5f6b7a);
+  --fx-color-surface: var(--rz-base-background-color, #ffffff);
+  --fx-color-surface-alt: color-mix(in oklab, var(--fx-color-text) 6%, var(--fx-color-surface));
+  --fx-color-border: color-mix(in oklab, var(--fx-color-text) 18%, var(--fx-color-surface));
+  --fx-color-accent: var(--rz-primary, #1565c0);
+  --fx-color-info: var(--rz-info, #0277bd);
+  --fx-color-success: var(--rz-success, #2e7d32);
+  --fx-color-warning: var(--rz-warning, #b26a00);
+  --fx-color-danger: var(--rz-danger, #c62828);
+  --fx-radius: 6px;
+  --fx-gap: 0.75rem;
+  --fx-gap-lg: 1.25rem;
+  --fx-size-title: 1.35rem;
+  --fx-size-body: 0.9375rem;
+  --fx-size-small: 0.8125rem;
+
+  font-family: var(--fx-font);
+  font-size: var(--fx-size-body);
+  color: var(--fx-color-text);
+  line-height: 1.45;
+}
+
+/* A line of a list row (inside the text of the row): the badges of the kit, the font of the row */
+.fx-inline {
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+}
+
+/* The colours of the daisyUI components (fx.daisy.css has no theme of its own) come from the tokens above, so they follow the theme of the application */
+.fx-root {
+  --color-base-100: var(--fx-color-surface);
+  --color-base-200: var(--fx-color-surface-alt);
+  --color-base-300: color-mix(in oklab, var(--fx-color-text) 14%, var(--fx-color-surface));
+  --color-base-content: var(--fx-color-text);
+  --color-primary: var(--fx-color-accent);
+  --color-primary-content: oklch(98% 0 0);
+  --color-secondary: var(--fx-color-muted);
+  --color-secondary-content: oklch(98% 0 0);
+  --color-accent: var(--fx-color-accent);
+  --color-accent-content: oklch(98% 0 0);
+  --color-neutral: var(--fx-color-text);
+  --color-neutral-content: var(--fx-color-surface);
+  --color-info: var(--fx-color-info);
+  --color-info-content: oklch(98% 0 0);
+  --color-success: var(--fx-color-success);
+  --color-success-content: oklch(98% 0 0);
+  --color-warning: var(--fx-color-warning);
+  --color-warning-content: oklch(98% 0 0);
+  --color-error: var(--fx-color-danger);
+  --color-error-content: oklch(98% 0 0);
+  --radius-selector: 999px;
+  --radius-field: var(--fx-radius);
+  --radius-box: var(--fx-radius);
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+.fx-root *,
+.fx-root *::before,
+.fx-root *::after {
+  box-sizing: border-box;
+}
+
+/* Banner: who or what this is; the identification and the flags that must not be missed */
+.fx-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fx-gap) var(--fx-gap-lg);
+  padding: var(--fx-gap) var(--fx-gap-lg);
+  background: var(--fx-color-surface-alt);
+  border: 1px solid var(--fx-color-border);
+  border-left: 4px solid var(--fx-color-accent);
+  border-radius: var(--fx-radius);
+  margin-bottom: var(--fx-gap-lg);
+}
+
+.fx-banner-title {
+  font-size: var(--fx-size-title);
+  font-weight: 600;
+  margin: 0;
+}
+
+.fx-banner-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem var(--fx-gap-lg);
+  color: var(--fx-color-muted);
+  font-size: var(--fx-size-small);
+}
+
+.fx-banner-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+
+/* A banner under another one: the encounter under the patient */
+.fx-banner-sub {
+  border-left-color: var(--fx-color-border);
+  margin-bottom: var(--fx-gap);
+  padding-top: calc(var(--fx-gap) / 2);
+  padding-bottom: calc(var(--fx-gap) / 2);
+}
+
+.fx-banner-sub .fx-banner-title {
+  font-size: 1.05rem;
+}
+
+/* The title of the resource itself under the banners */
+.fx-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem var(--fx-gap-lg);
+  margin: var(--fx-gap-lg) 0;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--fx-color-border);
+}
+
+.fx-title-text {
+  font-size: var(--fx-size-title);
+  font-weight: 600;
+  margin: 0;
+}
+
+.fx-root a {
+  color: var(--fx-color-accent);
+  text-decoration: none;
+}
+
+.fx-root a:hover {
+  text-decoration: underline;
+}
+
+/* The notices the engine adds about data that the templates did not show: not styled by the customer (see StyleChecks) */
+.fx-notice {
+  margin: 0 0 var(--fx-gap);
+  padding: calc(var(--fx-gap) / 2) var(--fx-gap);
+  border: 1px solid var(--fx-color-border);
+  border-left: 4px solid var(--fx-color-warning);
+  border-radius: var(--fx-radius);
+  background: var(--fx-color-surface-alt);
+  font-size: var(--fx-size-small);
+}
+
+.fx-notice-danger {
+  border-left-color: var(--fx-color-danger);
+}
+
+.fx-notice-title {
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.fx-other {
+  margin-top: var(--fx-gap-lg);
+  padding-top: var(--fx-gap);
+  border-top: 1px solid var(--fx-color-border);
+}
+
+.fx-other > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Section: a titled block with a count and rows */
+.fx-section {
+  margin-bottom: var(--fx-gap-lg);
+}
+
+.fx-section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 0.4rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--fx-color-border);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.fx-count {
+  color: var(--fx-color-muted);
+  font-size: var(--fx-size-small);
+  font-weight: 400;
+}
+
+/* Row: the main value, then the secondary facts */
+.fx-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem var(--fx-gap);
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--fx-color-surface-alt);
+}
+
+.fx-row-main {
+  font-weight: 500;
+}
+
+.fx-row-meta {
+  color: var(--fx-color-muted);
+  font-size: var(--fx-size-small);
+}
+
+/* Field: a label and a value in two columns */
+.fx-field {
+  display: grid;
+  grid-template-columns: minmax(8rem, 12rem) 1fr;
+  gap: var(--fx-gap);
+  padding: 0.3rem 0;
+}
+
+.fx-label {
+  color: var(--fx-color-muted);
+  font-size: var(--fx-size-small);
+}
+
+.fx-value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.fx-muted {
+  color: var(--fx-color-muted);
+}
+
+.fx-empty {
+  color: var(--fx-color-muted);
+  font-style: italic;
+}
+
+/* Badge and the other components of the kit come from daisyUI (fx.daisy.css, classes with the prefix fx-: fx-badge, fx-badge-soft, fx-badge-success...).
+   "danger" is the older name of the tone that daisyUI calls "error" */
+.fx-badge-danger {
+  --fx-badge-color: var(--color-error);
+  --fx-badge-fg: var(--color-error-content);
+}
+
+@media (max-width: 40rem) {
+  .fx-field {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .fx-banner-flags {
+    margin-left: 0;
+  }
+}
+
+/* Clinical summary page: the card of the patient and one list of the blocks, grouped like the lists of a phone. The list draws only the rows near the screen
+   and counts their places from one height of a row: --fx-tile-height (two lines), --fx-tile-height-narrow when the list is under 26rem wide (three lines) */
+.fx-root {
+  --fx-color-divider: color-mix(in oklab, var(--fx-color-text) 10%, transparent);
+  --fx-color-group: color-mix(in oklab, var(--fx-color-text) 8%, var(--fx-color-surface));
+  --fx-summary-inset: 3.25rem;
+  --fx-tile-height: 3.5rem;
+  --fx-tile-height-narrow: 4.75rem;
+}
+
+.fx-summary-patient {
+  margin-bottom: var(--fx-gap-lg);
+}
+
+.fx-summary-patient .fx-banner {
+  margin-bottom: 0.35rem;
+}
+
+.fx-summary-zone {
+  margin: 0;
+  text-align: right;
+  font-size: var(--fx-size-small);
+}
+
+.fx-summary-list {
+  overflow: hidden;
+  border: 1px solid var(--fx-color-border);
+  border-radius: var(--fx-radius);
+  background: var(--fx-color-surface);
+}
+
+.fx-summary-sticky {
+  background: var(--fx-color-surface);
+}
+
+/* The rows of a list (SummaryList): all of one height, so the list counts their places. A narrow list has taller rows, where a tile is laid out on three
+   lines: the layout follows the width of the list only, never the content, so no row is taller than another */
+.fx-summary-rows {
+  container: fx-rows / inline-size;
+}
+
+.fx-summary-rows > * {
+  --summary-row-height: var(--fx-tile-height);
+}
+
+@container fx-rows (width < 26rem) {
+  .fx-summary-rows > * {
+    --summary-row-height: var(--fx-tile-height-narrow);
+  }
+}
+
+/* As tall as a row: the list measures it */
+.fx-summary-probe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: var(--summary-row-height);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.fx-summary-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 0 var(--fx-gap);
+  background: var(--fx-color-group);
+  border-top: 1px solid var(--fx-color-divider);
+  border-bottom: 1px solid var(--fx-color-divider);
+  font-weight: 600;
+}
+
+/* The floating title sits at the top of the list, under the border of the list: its own top line would be a second one */
+.fx-summary-sticky .fx-summary-group {
+  border-top: 0;
+}
+
+.fx-summary-group-empty > * {
+  opacity: 0.45;
+}
+
+.fx-summary-group-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fx-summary-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 0 var(--fx-gap);
+  cursor: pointer;
+}
+
+.fx-summary-row::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: var(--fx-summary-inset);
+  border-bottom: 1px solid var(--fx-color-divider);
+}
+
+.fx-summary-row:hover {
+  background: var(--fx-color-surface-alt);
+}
+
+.fx-summary-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+}
+
+/* No preflight in the kit: a list has no bullets and no margins of the browser */
+.fx-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fx-summary-tile {
+  flex: 1;
+  min-width: 0;
+}
+
+/* The row of a list (the mode tile): a daisyUI list row of one line of height; a row of a summary has its own padding */
+.fx-summary-tile .fx-list-row {
+  gap: 0.5rem;
+  padding: 0;
+  align-items: center;
+}
+
+.fx-summary-tile .fx-list-row::after {
+  display: none;
+}
+
+.fx-tile-title,
+.fx-tile-subtitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fx-tile-title {
+  font-weight: 500;
+}
+
+.fx-tile-subtitle {
+  color: var(--fx-color-muted);
+  font-size: var(--fx-size-small);
+}
+
+.fx-tile-value {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* A tile (partial tile-row): the title and the subtitle, then the end (a value, the badges). In a wide list the end stands on the right of both lines and
+   takes at most half of the row; in a narrow list it is the third line. A badge is never cut, the lines and a value are cut with an ellipsis */
+.fx-tile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.fx-tile-main {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.fx-tile-end {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+  max-width: 50%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.fx-tile-end > * {
+  flex-shrink: 0;
+}
+
+.fx-tile-end > .fx-tile-value {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@container fx-rows (width < 26rem) {
+  .fx-tile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.125rem;
+  }
+
+  .fx-tile-main {
+    flex: none;
+  }
+
+  .fx-tile-end {
+    max-width: none;
+  }
+}
+
+.fx-tile-error {
+  color: var(--fx-color-danger);
+}
+
+.fx-summary-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 0 var(--fx-gap);
+  color: var(--fx-color-muted);
+}

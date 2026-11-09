@@ -1,0 +1,42 @@
+{%- assign type = self.type | first -%}
+{%- assign cls = self.class | as_list | first -%}
+{%- assign period = self.period | default: self.actualPeriod -%}
+
+{%- capture kind -%}
+  {%- if type -%}
+    {%- apply type mode: "text" -%}
+  {%- elsif cls -%}
+    {%- apply cls mode: "text" -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- capture title -%}
+  {{ "Encounter" | t }}
+  {%- if kind != "" -%}
+    {{- ": " -}}
+    {{- kind -}}
+  {%- endif -%}
+{%- endcapture -%}
+
+<header class="fx-banner fx-banner-sub">
+  <h2 class="fx-banner-title">
+    {%- if banner_link -%}
+      <a href="fhir:Encounter/{{ self.id }}">{{ title }}</a>
+    {%- else -%}
+      {{- title -}}
+    {%- endif -%}
+  </h2>
+
+  <div class="fx-banner-facts">
+    {%- if period %}
+    <span>{% apply period mode: "text" -%}</span>
+    {%- endif %}
+    {%- if type and cls %}
+    <span>{% apply cls mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</header>

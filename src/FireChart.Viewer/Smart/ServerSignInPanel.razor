@@ -1,0 +1,172 @@
+@implements IAsyncDisposable
+@inject ISmartAuthorizer Authorizer
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@* The sign-in to a server with OAuth2 (SMART). Redirect: the page leaves for the sign-in page of the server and the callback route of the host brings the
+   user back. Popup: the sign-in page opens in a window of its own, the page stays (a Viewer in a frame whose authorization server refuses to be framed);
+   a blocked or lost window falls back to the redirect *@
+<RadzenStack Gap="var(--gap-lg)" class="max-w-md rz-mt-4">
+    <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0">@Strings.Message_FhirServerSignInAsked</RadzenText>
+    @if (Rejected)
+    {
+        <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" Size="AlertSize.Small">
+            @Strings.Message_CredentialsRejected
+        </RadzenAlert>
+    }
+
+    @if (_failure is not null)
+    {
+        <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" Size="AlertSize.Small">
+            @_failure
+        </RadzenAlert>
+    }
+
+    @if (_waiting)
+    {
+        <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0">@Strings.Message_SmartPopupWaiting</RadzenText>
+    }
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="var(--gap-sm)" Wrap="FlexWrap.Wrap">
+        <RadzenButton ButtonStyle="ButtonStyle.Primary" Text=@(_offerFallback ? Strings.Caption_SmartOpenSignInWindow : FloxStrings.Caption_SignIn) Disabled=@_going Click=@SignInAsync/>
+        @if (_offerFallback)
+        {
+            <RadzenButton ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Text=@Strings.Caption_SmartSignInHere Disabled=@_going Click=@RedirectAsync/>
+        }
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+
+    // How long the window may stay open before the panel gives up on it
+    private static readonly TimeSpan s_popupLimit = TimeSpan.FromMinutes(10);
+
+    private bool _going;
+    private bool _waiting;
+    private bool _offerFallback;
+    private string? _failure;
+    private IJSObjectReference? _popup;
+
+    /// <summary>The instance of the Viewer: the flow and the callback addresses.</summary>
+    [CascadingParameter]
+    public ViewerSession Session { get; set; } = null!;
+
+    /// <summary>The server.</summary>
+    [Parameter, EditorRequired]
+    public IViewerServer? Server { get; set; }
+
+    /// <summary>The server did not accept the token that was given before.</summary>
+    [Parameter]
+    public bool Rejected { get; set; }
+
+    /// <summary>A sign-in in a popup is complete: the page reads the server again (or opens the patient of the context).</summary>
+    [Parameter]
+    public EventCallback<SmartCompletion> OnSignedIn { get; set; }
+
+    // The module is loaded before the click: the window must be opened in the click itself, before any wait, or the browser blocks it
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && Session.SmartFlow == SmartFlow.Popup)
+        {
+            _popup = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/FireChart.Viewer/js/smart-popup.js");
+        }
+    }
+
+    private Task SignInAsync()
+    {
+        return Session.SmartFlow == SmartFlow.Popup && _popup is not null ? PopupAsync(_popup) : RedirectAsync();
+    }
+
+    private async Task RedirectAsync()
+    {
+        if (Server is null)
+        {
+            return;
+        }
+
+        _going = true;
+        _failure = null;
+        try
+        {
+            var redirect = Session.SmartRedirectUri ?? throw new SmartException(SmartFailure.ClientNotConfigured, "The host gave no callback address of the sign-in.");
+            var url = await Authorizer.StartAsync(Server, redirect, ReturnUrl, null);
+            NavigationManager.NavigateTo(url, forceLoad: true);
+        }
+        catch (SmartException ex)
+        {
+            _failure = ex.Failure.ToMessage();
+            _going = false;
+        }
+    }
+
+    private async Task PopupAsync(IJSObjectReference popup)
+    {
+        if (Server is null)
+        {
+            return;
+        }
+
+        _failure = null;
+
+        // First, before any wait: the click is what lets the window through
+        if (!await popup.InvokeAsync<bool>("open"))
+        {
+            _failure = Strings.Message_SmartPopupBlocked;
+            _offerFallback = true;
+            return;
+        }
+
+        _going = true;
+        _waiting = true;
+        try
+        {
+            var url = await Authorizer.StartAsync(Server, Session.SmartPopupRedirectUri, ReturnUrl, null);
+            await popup.InvokeVoidAsync("go", url);
+            StateHasChanged();
+            var result = await popup.InvokeAsync<PopupResult>("wait", (int)s_popupLimit.TotalMilliseconds);
+            if (result.Url is null)
+            {
+                await popup.InvokeVoidAsync("close");
+                _failure = Strings.Message_SmartPopupClosed;
+                _offerFallback = true;
+                return;
+            }
+
+            var completion = await Authorizer.CompleteAsync(result.Url);
+            await OnSignedIn.InvokeAsync(completion);
+        }
+        catch (SmartException ex)
+        {
+            await popup.InvokeVoidAsync("close");
+            _failure = ex.Failure.ToMessage();
+            _offerFallback = true;
+        }
+        finally
+        {
+            _going = false;
+            _waiting = false;
+        }
+    }
+
+    private string ReturnUrl => "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+
+    private sealed record PopupResult(string? Url, bool Closed, bool Timeout);
+
+    /// <summary>Releases the script of the popup.</summary>
+    /// <returns>A task that completes when it is released.</returns>
+    public async ValueTask DisposeAsync()
+    {
+        if (_popup is not null)
+        {
+            try
+            {
+                await _popup.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // the page is gone
+            }
+        }
+    }
+
+}

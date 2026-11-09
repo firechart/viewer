@@ -1,0 +1,18 @@
+P:System.Threading.Tasks.Task`1.Result;Do not block on a task: await it (blocking deadlocks Blazor WebAssembly and the Orchard shell lock)
+M:System.Threading.Tasks.Task.Wait();Do not block on a task: await it
+M:System.Threading.Tasks.Task.Wait(System.Int32);Do not block on a task: await it
+M:System.Threading.Tasks.Task.Wait(System.TimeSpan);Do not block on a task: await it
+M:System.Threading.Tasks.Task.WaitAll(System.Threading.Tasks.Task[]);Do not block on tasks: await Task.WhenAll
+M:System.Threading.Tasks.Task.WaitAny(System.Threading.Tasks.Task[]);Do not block on tasks: await Task.WhenAny
+M:System.Runtime.CompilerServices.TaskAwaiter.GetResult();Do not block on a task: await it
+P:System.DateTime.Now;Use DateTime.UtcNow or TimeProvider: local time is not for storage or comparison
+P:System.DateTime.Today;Use DateTime.UtcNow or TimeProvider
+P:System.DateTimeOffset.Now;Use DateTimeOffset.UtcNow or TimeProvider
+M:System.Console.Write(System.String);Log through ILogger
+M:System.Console.WriteLine();Log through ILogger
+M:System.Console.WriteLine(System.String);Log through ILogger
+M:System.Console.WriteLine(System.String,System.Object);Log through ILogger
+M:System.Console.WriteLine(System.Object);Log through ILogger
+M:System.Net.Http.HttpClient.#ctor();Create clients with IHttpClientFactory (socket exhaustion, DNS changes, no handlers)
+M:System.Net.Http.HttpClient.#ctor(System.Net.Http.HttpMessageHandler);Create clients with IHttpClientFactory
+M:System.Net.Http.HttpClient.#ctor(System.Net.Http.HttpMessageHandler,System.Boolean);Create clients with IHttpClientFactory

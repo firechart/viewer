@@ -1,0 +1,29 @@
+{%- if patient -%}
+  {%- assign banner_link = true -%}
+  {%- apply patient mode: "banner" %}
+{%- elsif subject %}
+  <header class="fx-banner fx-banner-sub">
+    <h2 class="fx-banner-title">
+      {%- assign gone = subject | missing -%}
+      {%- if gone -%}{% render "badge", text: "Patient could not be found", tone: "warning" %}{%- else -%}{%- apply subject mode: "link,text" -%}{%- endif -%}
+    </h2>
+    <span class="fx-muted">{{ "Patient" | t }}</span>
+  </header>
+{%- endif -%}
+
+{%- if encounter -%}
+  {%- if own == "Encounter" -%}
+    {%- assign banner_link = false -%}
+  {%- else -%}
+    {%- assign banner_link = true -%}
+  {%- endif -%}
+  {%- apply encounter mode: "banner" %}
+{%- elsif visit %}
+  <header class="fx-banner fx-banner-sub">
+    <h2 class="fx-banner-title">
+      {%- assign gone = visit | missing -%}
+      {%- if gone -%}{% render "badge", text: "Encounter could not be loaded", tone: "warning" %}{%- else -%}{%- apply visit mode: "link,text" -%}{%- endif -%}
+    </h2>
+    <span class="fx-muted">{{ "Encounter" | t }}</span>
+  </header>
+{%- endif -%}

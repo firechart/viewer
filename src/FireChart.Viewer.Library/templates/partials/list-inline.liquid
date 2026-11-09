@@ -1,0 +1,9 @@
+{%- assign items = node | as_list -%}
+{%- assign m = mode | default: "link,text" -%}
+
+{%- for item in items -%}
+  {%- unless forloop.first -%}
+    {{- ", " -}}
+  {%- endunless -%}
+  {%- apply item mode: m -%}
+{%- endfor -%}

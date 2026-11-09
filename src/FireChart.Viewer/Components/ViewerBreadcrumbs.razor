@@ -1,0 +1,51 @@
+@* The chain of a Viewer on its own (a frame, a Blazor host without crumbs of its own): server > type > id. FireChart draws its own *@
+@if (Items.Count > 0)
+{
+    <RadzenBreadCrumb class="rz-my-1 rz-px-2 text-xs max-w-full overflow-x-auto [&>.rz-breadcrumb-list]:flex-nowrap [&_.rz-breadcrumb-item]:shrink-0 [&_.rz-breadcrumb-item]:whitespace-nowrap"
+                      data-viewer="breadcrumbs">
+        @for (var i = 0; i < Items.Count; i++)
+        {
+            var item = Items[i];
+            <RadzenBreadCrumbItem>
+                @if (i == Items.Count - 1 || item.Href is null)
+                {
+                    <span>@item.Text</span>
+                }
+                else
+                {
+                    <a href=@item.Href class="text-inherit no-underline">@item.Text</a>
+                }
+            </RadzenBreadCrumbItem>
+        }
+    </RadzenBreadCrumb>
+}
+
+@code {
+
+    [CascadingParameter]
+    private ViewerSession Session { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public ViewerRoute? Route { get; set; }
+
+    private List<Crumb> Items
+    {
+        get
+        {
+            var server = new Crumb(Session.Server.Name, Session.HrefOf(new ViewerRoute(ViewerPage.ResourceTypes)));
+            return Route switch
+            {
+                { Page: ViewerPage.ResourceList, ResourceType: { } type } => [server, new Crumb(type, null)],
+                { Page: ViewerPage.Resource, ResourceType: { } type, Id: { } id } =>
+                    [server, new Crumb(type, Session.HrefOf(new ViewerRoute(ViewerPage.ResourceList, type))), new Crumb(id, null)],
+                { Page: ViewerPage.ClinicalSummary, Id: { } patient } =>
+                    [server, new Crumb(Strings.Caption_ClinicalSummary, Session.HrefOf(new ViewerRoute(ViewerPage.ClinicalSummary))), new Crumb(patient, null)],
+                { Page: ViewerPage.ClinicalSummary } => [server, new Crumb(Strings.Caption_ClinicalSummary, null)],
+                _ => [server]
+            };
+        }
+    }
+
+    private sealed record Crumb(string Text, string? Href);
+
+}

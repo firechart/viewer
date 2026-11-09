@@ -1,0 +1,5 @@
+{%- assign dose = self.dosage | first -%}
+{%- capture t0 -%}{% apply self.medication mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 -%}
+{%- if title == "" -%}{%- assign title = self.id -%}{%- endif -%}
+{{- title -}}

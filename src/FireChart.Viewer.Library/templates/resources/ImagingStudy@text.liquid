@@ -1,0 +1,7 @@
+{%- assign mod = self.modality | first -%}
+{%- capture t0 -%}{{ self.description }}{%- endcapture -%}
+{%- capture t1 -%}{% if mod %}{{ mod | coding_display | default: mod.code }}{% endif %}{%- endcapture -%}
+{%- assign title = t0 -%}
+{%- if title == "" -%}{%- assign title = t1 -%}{%- endif -%}
+{%- if title == "" -%}{%- assign title = self.id -%}{%- endif -%}
+{{- title -}}

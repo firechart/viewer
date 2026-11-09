@@ -1,0 +1,22 @@
+{%- comment -%} The patient of a row (ref: a Reference): the name, the gender, the birth date and the first identifier, joined by ", ";
+nothing when the page shows the patient above (fhir_context); what the reference says when the patient is not in the pool {%- endcomment -%}
+{%- assign r = ref | as_list | first -%}
+{%- assign shown = r | in_context -%}
+{%- unless shown -%}
+  {%- assign p = r | resolve -%}
+  {%- assign gone = r | missing -%}
+  {%- if gone -%}
+    {%- render "badge", text: "Patient could not be found", tone: "warning" -%}
+  {%- elsif p -%}
+    {%- assign nm = p.name | as_list | first -%}
+    {%- assign mrn = p.identifier | as_list | first -%}
+    {%- capture s0 -%}{% if nm %}{% apply nm mode: "text" %}{% else %}{{ p.id }}{% endif %}{%- endcapture -%}
+    {%- capture s1 -%}{{ p.gender }}{%- endcapture -%}
+    {%- capture s2 -%}{% if p.birthDate %}{{ p.birthDate | fhir_date }}{% endif %}{%- endcapture -%}
+    {%- capture s3 -%}{% if mrn %}{{ mrn.value }}{% endif %}{%- endcapture -%}
+    {%- render "parts", p1: s0, p2: s1, p3: s2, p4: s3, sep: ", " -%}
+  {%- elsif r -%}
+    {%- capture said -%}{% apply r mode: "text" %}{%- endcapture -%}
+    {{- said | default: r.reference -}}
+  {%- endif -%}
+{%- endunless -%}

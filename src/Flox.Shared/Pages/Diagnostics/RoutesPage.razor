@@ -1,0 +1,36 @@
+@attribute [Route("/diagnostics/routes")]
+
+@inherits StatefulWidget<RoutesPageState>
+
+<AppBarTitle>Routes</AppBarTitle>
+
+@if (!State.Routes.Any())
+{
+    <RadzenText class="rz-m-4">No routes found. Make sure assemblies are registered via AddBlazorAssembly&lt;T&gt;().</RadzenText>
+}
+else
+{
+    <RadzenStack Gap="var(--gap-sm)" class="rz-p-3">
+        <Search Value="@State.Filter"
+                ValueChanged="@(v =>
+                              {
+                                  State.Filter = v;
+                                  StateHasChanged();
+                              })"
+                Placeholder="Filter routes..."/>
+
+        <RadzenText TextStyle="TextStyle.Caption">
+            @State.FilteredRoutes.Count() of @State.Routes.Count routes across @State.Routes.Select(r => r.Assembly).Distinct().Count() assemblies
+        </RadzenText>
+    </RadzenStack>
+
+    <ListSection>
+        @foreach (var route in State.FilteredRoutes)
+        {
+            <ListTile TitleText=@route.Template SubtitleText=@(route.ComponentType.FullName + " | " + route.Assembly.GetName()
+                                                                                                            .Name)/>
+        }
+    </ListSection>
+}
+
+

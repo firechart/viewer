@@ -1,0 +1,11 @@
+/* The utilities of the Razor files of the Viewer; the tokens (colors, variants) are those of the platform. A host that is not FireChart links
+   _content/FireChart.Viewer/css/FireChart.Viewer.Tailwind.css after the stylesheets of Flox.Shared */
+@import "../../../Flox.Shared/Assets/Styles/tokens.css";
+
+@source "../../Appearance";
+@source "../../Components";
+@source "../../Pages";
+@source "../../Routing";
+@source "../../SearchForms";
+@source "../../Smart";
+@source "../../FhirViewer.razor";

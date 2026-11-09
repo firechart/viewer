@@ -1,0 +1,4 @@
+{%- if self.value -%}
+  {{- self.value | fhir_number -}}
+  {%- if self.currency %} {{ self.currency }}{% endif -%}
+{%- endif -%}

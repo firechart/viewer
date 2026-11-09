@@ -1,0 +1,18 @@
+@* The filter of a list: a quiet button with a funnel; the number of conditions is a small badge next to it *@
+<RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" title=@Strings.Caption_Filter Click=@OnClick>
+    <FloxIcon Icon="filter_alt"/>
+    @if (Count > 0)
+    {
+        <RadzenBadge BadgeStyle="Radzen.BadgeStyle.Primary" Text=@Count.ToString(System.Globalization.CultureInfo.CurrentCulture)/>
+    }
+</RadzenButton>
+
+@code {
+
+    [Parameter]
+    public int Count { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+}

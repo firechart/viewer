@@ -1,0 +1,42 @@
+.page-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.375rem 1rem;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+/* a veil of the color of the text: light on a dark theme, dark on a light one */
+.page-menu-item:hover {
+    background-color: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.page-menu-item:focus-visible {
+    background-color: color-mix(in srgb, currentColor 8%, transparent);
+    outline: 2px solid var(--rz-primary);
+    outline-offset: -2px;
+}
+
+.page-menu-item:focus:not(:focus-visible) {
+    outline: none;
+}
+
+.page-menu-item-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.page-menu-item-note {
+    color: var(--rz-text-tertiary-color);
+    font-size: 0.875em;
+}

@@ -1,0 +1,18 @@
+@* The errors of viewer.json: the frame does not start with a wrong configuration *@
+<div class="p-4" data-error="config_error">
+    <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" AllowClose="false" Title="The configuration of the Viewer is not valid">
+        <ul class="m-0 pl-4">
+            @foreach (var error in Errors)
+            {
+                <li><code>@error.Param</code> (@error.Code): @error.Message</li>
+            }
+        </ul>
+    </RadzenAlert>
+</div>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<ViewerConfigError> Errors { get; set; } = [];
+
+}

@@ -1,0 +1,38 @@
+﻿@using Flox.Shared.Errors
+@using Microsoft.Extensions.Logging
+@inherits ErrorBoundary
+
+@inject IServiceProvider Services
+@inject ILogger<AppErrorBoundary> Logger
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else if (ErrorContent is not null)
+{
+    @ErrorContent(CurrentException)
+}
+
+@code {
+
+    /// <summary>
+    /// Reference id of the last error, shown on the error page and written to the log.
+    /// </summary>
+    public string? CorrelationId { get; private set; }
+
+    // The handler may be unavailable when the failure is in startup itself
+    protected override async Task OnErrorAsync(Exception ex)
+    {
+        if (Services.GetService<IUiExceptionHandler>() is { } handler)
+        {
+            var context = await handler.HandleAsync(ex, nameof(AppErrorBoundary), UiExceptionSource.Boundary);
+            CorrelationId = context.CorrelationId;
+        }
+        else
+        {
+            Logger.LogError(ex, "ErrorBoundary exception: {Message}", ex.Message);
+        }
+    }
+
+}

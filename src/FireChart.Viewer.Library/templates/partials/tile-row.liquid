@@ -1,0 +1,23 @@
+{%- comment -%} A row of a list (the mode tile): a daisyUI list row. title and subtitle are the lines, trailing is what stands at the end (badges, a value):
+on the right of both lines in a wide list, the third line in a narrow one (fx.css, .fx-tile). status: the badge of the status, shown when fhir_options.show_status.
+patient, encounter: the References of the record, named on the second line unless the page shows them above (fhir_context). at: the moment of the record,
+the age of the patient at it follows the subtitle when fhir_options.show_age {%- endcomment -%}
+{%- capture age -%}{% if fhir_options.show_age and patient and at %}{% render "age-at", patient: patient, when: at %}{% endif %}{%- endcapture -%}
+{%- capture own -%}{% render "parts", p1: subtitle, p2: age, sep: " " %}{%- endcapture -%}
+{%- capture who -%}{% if patient %}{% render "tile-patient", ref: patient %}{% endif %}{%- endcapture -%}
+{%- capture visit -%}{% if encounter %}{% render "tile-encounter", ref: encounter %}{% endif %}{%- endcapture -%}
+{%- capture line -%}{% render "parts", p1: own, p2: who, p3: visit, sep: " · " %}{%- endcapture -%}
+{%- capture ending -%}{{ trailing }}{% if fhir_options.show_status %}{{ status }}{% endif %}{%- endcapture -%}
+<li class="fx-list-row">
+  <div class="fx-list-col-grow fx-tile">
+    <div class="fx-tile-main">
+      <div class="fx-tile-title">{{ title }}</div>
+      {%- if line != blank %}
+      <div class="fx-tile-subtitle">{{ line }}</div>
+      {%- endif %}
+    </div>
+    {%- if ending != blank %}
+    <div class="fx-tile-end">{{- ending -}}</div>
+    {%- endif %}
+  </div>
+</li>

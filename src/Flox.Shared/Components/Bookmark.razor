@@ -1,0 +1,11 @@
+<FloxIcon Icon="bookmark" Filled=@Bookmarked Size=@Size Color="var(--rz-warning)"/>
+
+@code {
+
+    [Parameter]
+    public bool Bookmarked { get; set; }
+
+    [Parameter]
+    public string? Size { get; set; }
+
+}

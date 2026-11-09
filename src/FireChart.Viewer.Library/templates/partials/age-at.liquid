@@ -1,0 +1,7 @@
+{%- assign who = patient | resolve -%}
+{%- if who and when -%}
+  {%- assign years = who.birthDate | age_at: when -%}
+  {%- if years %}
+<span class="fx-muted">({{ years }})</span>
+  {%- endif -%}
+{%- endif -%}

@@ -1,0 +1,44 @@
+
+{%- assign nm = self.name | as_list | first -%}{%- assign act = self.active | append: "" -%}{%- assign quals = self.qualification | as_list -%}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% if nm %}{% apply nm mode: "text" %}{% else %}{{ self.id }}{% endif %}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.gender %}
+    <span>{% apply self.gender mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.birthDate %}
+    <span>{{ "Born" | t }} {% apply self.birthDate mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- if act == "false" -%}{%- render "badge", text: "inactive", tone: "danger" -%}{%- endif -%}
+  </div>
+</div>
+
+{%- if self.telecom or self.address %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Contact" | t }}</h3>
+  {% render "field", label: "Phone and email", node: self.telecom, mode: "text" %}
+  {% render "field", label: "Address", node: self.address, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if quals.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Qualifications" | t }}</h3>
+  {%- for q in quals %}
+  <div class="fx-row"><span class="fx-row-main">{% apply q.code mode: "text" -%}</span><span class="fx-row-meta">{% if q.period %}{% apply q.period mode: "text" -%}{% endif %}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if self.communication or self.identifier %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Other" | t }}</h3>
+  {% render "field", label: "Languages", node: self.communication, mode: "text" %}
+  {% render "field", label: "Identifier", node: self.identifier, mode: "text" %}
+</section>
+{%- endif %}

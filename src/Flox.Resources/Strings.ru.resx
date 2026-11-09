@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Nav_Home" xml:space="preserve">
+    <value>Главная</value>
+  </data>
+  <data name="Settings_PageTitle" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="Auth_CompletingSignIn_Message" xml:space="preserve">
+    <value>Завершение входа в систему...</value>
+  </data>
+  <data name="NotFound_Message" xml:space="preserve">
+    <value>К сожалению, искомый контент не существует.</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>О программе</value>
+  </data>
+  <data name="Caption_Login" xml:space="preserve">
+    <value>Войти</value>
+  </data>
+  <data name="Caption_Logout" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+  <data name="Caption_Profile" xml:space="preserve">
+    <value>Аккаунт</value>
+  </data>
+  <data name="Caption_Error" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="Caption_ErrorNotification" xml:space="preserve">
+    <value>Что-то пошло не так. Повторите действие; если ошибка повторяется, обратитесь к администратору.</value>
+  </data>
+  <data name="Caption_Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="Caption_Saved" xml:space="preserve">
+    <value>Сохранено</value>
+  </data>
+  <data name="Caption_Information" xml:space="preserve">
+    <value>Информация</value>
+  </data>
+  <data name="Caption_Confirm" xml:space="preserve">
+    <value>Подтверждение</value>
+  </data>
+  <data name="Caption_Yes" xml:space="preserve">
+    <value>Да</value>
+  </data>
+  <data name="Caption_No" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="Caption_ConfirmDelete" xml:space="preserve">
+    <value>Удалить?</value>
+  </data>
+  <data name="Caption_Filter" xml:space="preserve">
+    <value>Фильтр</value>
+  </data>
+  <data name="Caption_Search" xml:space="preserve">
+    <value>Поиск</value>
+  </data>
+  <data name="Caption_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Caption_Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="Message_FormInvalid" xml:space="preserve">
+    <value>Пожалуйста, исправьте ошибки, отмеченные красным, перед сохранением формы.</value>
+  </data>
+  <data name="Message_FormSaveFailed" xml:space="preserve">
+    <value>Не удалось сохранить запись. Пожауйста, попробуйте ещё раз.</value>
+  </data>
+  <data name="Message_DeleteSucceeded" xml:space="preserve">
+    <value>Запись была успешно удалена.</value>
+  </data>
+  <data name="Message_RecordIsUndefined" xml:space="preserve">
+    <value>Запись не может быть найдена или была удалена.</value>
+  </data>
+  <data name="Message_CreateFailed" xml:space="preserve">
+    <value>Не удалось создать запись. Пожалуйста, повторите попытку.</value>
+  </data>
+  <data name="Caption_Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Caption_BackgroundTasks" xml:space="preserve">
+    <value>Фоновые задачи</value>
+  </data>
+  <data name="Caption_BackgroundTask" xml:space="preserve">
+    <value>Фоновая задача</value>
+  </data>
+  <data name="Caption_ImportTasks" xml:space="preserve">
+    <value>Задачи импорта</value>
+  </data>
+  <data name="Caption_ImportTask" xml:space="preserve">
+    <value>Задача импорта</value>
+  </data>
+  <data name="Caption_Properties" xml:space="preserve">
+    <value>Свойства</value>
+  </data>
+  <data name="Caption_Add" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="Caption_Installed" xml:space="preserve">
+    <value>Установлен</value>
+  </data>
+  <data name="Sync_Title" xml:space="preserve">
+    <value>Синхронизация</value>
+  </data>
+  <data name="Sync_Now" xml:space="preserve">
+    <value>Синхронизировать</value>
+  </data>
+  <data name="Sync_StatusSynced" xml:space="preserve">
+    <value>Всё синхронизировано</value>
+  </data>
+  <data name="Sync_StatusSyncing" xml:space="preserve">
+    <value>Синхронизация…</value>
+  </data>
+  <data name="Sync_StatusPending" xml:space="preserve">
+    <value>Ожидают отправки изменений: {0}</value>
+  </data>
+  <data name="Sync_StatusError" xml:space="preserve">
+    <value>Последняя синхронизация не удалась</value>
+  </data>
+  <data name="Sync_LastSynced" xml:space="preserve">
+    <value>Последняя синхронизация: {0}</value>
+  </data>
+  <data name="Sync_Never" xml:space="preserve">
+    <value>Ещё не синхронизировалось</value>
+  </data>
+  <data name="Sync_NotAvailable" xml:space="preserve">
+    <value>Синхронизация в этом приложении недоступна</value>
+  </data>
+  <data name="Sync_Failures" xml:space="preserve">
+    <value>Изменения, которые сервер не принял</value>
+  </data>
+  <data name="Sync_Retry" xml:space="preserve">
+    <value>Повторить</value>
+  </data>
+  <data name="Sync_Technical" xml:space="preserve">
+    <value>Технические детали</value>
+  </data>
+  <data name="Caption_More" xml:space="preserve">
+    <value>Ещё</value>
+  </data>
+  <data name="Caption_Bookmarks" xml:space="preserve">
+    <value>Закладки</value>
+  </data>
+  <data name="Caption_Settings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="Caption_Appearance" xml:space="preserve">
+    <value>Внешний вид</value>
+  </data>
+  <data name="Caption_Theme" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="Caption_ThemeDark" xml:space="preserve">
+    <value>Тёмная</value>
+  </data>
+  <data name="Caption_ThemeLight" xml:space="preserve">
+    <value>Светлая</value>
+  </data>
+  <data name="Caption_ThemeSystem" xml:space="preserve">
+    <value>Как в системе</value>
+  </data>
+  <data name="Caption_Language" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="Caption_DefaultPageSize" xml:space="preserve">
+    <value>Размер страницы по умолчанию</value>
+  </data>
+  <data name="Caption_DataAndPrivacy" xml:space="preserve">
+    <value>Данные и безопасность</value>
+  </data>
+  <data name="Caption_AllowTelemetry" xml:space="preserve">
+    <value>Разрешить сбор телеметрии</value>
+  </data>
+  <data name="Caption_Reset" xml:space="preserve">
+    <value>Сбросить</value>
+  </data>
+  <data name="Caption_Retry" xml:space="preserve">
+    <value>Повторить</value>
+  </data>
+  <data name="Caption_Edit" xml:space="preserve">
+    <value>Изменить</value>
+  </data>
+  <data name="Caption_Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="Caption_Source" xml:space="preserve">
+    <value>Источник</value>
+  </data>
+  <data name="Caption_Roles" xml:space="preserve">
+    <value>Роли</value>
+  </data>
+  <data name="Caption_User" xml:space="preserve">
+    <value>Пользователь</value>
+  </data>
+  <data name="Caption_UserName" xml:space="preserve">
+    <value>Имя пользователя</value>
+  </data>
+  <data name="Caption_AboutThisApp" xml:space="preserve">
+    <value>О программе</value>
+  </data>
+  <data name="Caption_Authors" xml:space="preserve">
+    <value>Авторы</value>
+  </data>
+  <data name="Caption_UsedComponents" xml:space="preserve">
+    <value>Используемые библиотеки</value>
+  </data>
+  <data name="Caption_License" xml:space="preserve">
+    <value>Лицензия</value>
+  </data>
+  <data name="Caption_SourceCode" xml:space="preserve">
+    <value>Исходный код</value>
+  </data>
+  <data name="Caption_GeneralCategory" xml:space="preserve">
+    <value>Общие</value>
+  </data>
+  <data name="Caption_AboutPlatform" xml:space="preserve">
+    <value>О платформе</value>
+  </data>
+  <data name="Caption_ConfirmPurgeTasks" xml:space="preserve">
+    <value>Удалить завершённые задачи?</value>
+  </data>
+  <data name="Caption_AddBookmark" xml:space="preserve">
+    <value>В закладки</value>
+  </data>
+  <data name="Caption_RemoveBookmark" xml:space="preserve">
+    <value>Удалить из закладок</value>
+  </data>
+  <data name="Caption_Admin" xml:space="preserve">
+    <value>Администрирование</value>
+  </data>
+  <data name="Caption_Version" xml:space="preserve">
+    <value>Версия</value>
+  </data>
+  <data name="Caption_Home" xml:space="preserve">
+      <value>Главная</value>
+  </data>
+  <data name="Error_Reference" xml:space="preserve">
+    <value>Код ошибки: {0}</value>
+  </data>
+  <data name="Error_AccessDenied" xml:space="preserve">
+    <value>У вас нет доступа к этой операции.</value>
+  </data>
+  <data name="Error_NetworkUnavailable" xml:space="preserve">
+    <value>Сервер недоступен. Проверьте подключение и повторите попытку.</value>
+  </data>
+  <data name="Caption_MoreFilters" xml:space="preserve">
+    <value>Дополнительные фильтры</value>
+  </data>
+  <data name="Caption_Any" xml:space="preserve">
+    <value>Любое</value>
+  </data>
+  <data name="Message_FieldRequired" xml:space="preserve">
+    <value>Поле обязательно для заполнения</value>
+  </data>
+  <data name="Message_InvalidValue" xml:space="preserve">
+    <value>Недопустимое значение</value>
+  </data>
+  <data name="Message_BookmarkQueryString" xml:space="preserve">
+    <value>Закладка хранит место, а не поиск: в адресе есть строка запроса, а она может содержать данные пациента.</value>
+  </data>
+  <data name="Consent_Title" xml:space="preserve">
+    <value>Диагностика и конфиденциальность</value>
+  </data>
+  <data name="Consent_Description" xml:space="preserve">
+    <value>С вашего разрешения приложение отправляет на сервер технические журналы и трассы своей работы, чтобы помогать находить и исправлять ошибки. Это можно изменить в любой момент в настройках.</value>
+  </data>
+  <data name="Consent_Accept" xml:space="preserve">
+    <value>Разрешить</value>
+  </data>
+  <data name="Consent_Reject" xml:space="preserve">
+    <value>Отклонить</value>
+  </data>
+  <data name="Consent_Manage" xml:space="preserve">
+    <value>Настроить</value>
+  </data>
+  <data name="Consent_PreferencesTitle" xml:space="preserve">
+    <value>Настройки конфиденциальности</value>
+  </data>
+  <data name="Consent_Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="Consent_Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="Consent_NecessaryTitle" xml:space="preserve">
+    <value>Строго необходимое</value>
+  </data>
+  <data name="Consent_NecessaryDescription" xml:space="preserve">
+    <value>Нужно для работы приложения: вход и ваши настройки. Отключить нельзя.</value>
+  </data>
+  <data name="Consent_TelemetryTitle" xml:space="preserve">
+    <value>Телеметрия</value>
+  </data>
+  <data name="Consent_TelemetryDescription" xml:space="preserve">
+    <value>Технические журналы и трассы приложения отправляются на сервер. По умолчанию выключено.</value>
+  </data>
+  <data name="Connection_Title" xml:space="preserve">
+    <value>Нет связи с сервером</value>
+  </data>
+  <data name="Connection_Description" xml:space="preserve">
+    <value>Проверьте подключение к интернету. Приложение повторит попытку автоматически.</value>
+  </data>
+  <data name="Connection_RetryIn" xml:space="preserve">
+    <value>Повтор через {0} с</value>
+  </data>
+  <data name="Connection_Details" xml:space="preserve">
+    <value>Подробности</value>
+  </data>
+  <data name="List_NoData" xml:space="preserve">
+    <value>Данные не найдены</value>
+  </data>
+  <data name="List_LoadFailed" xml:space="preserve">
+    <value>Не удалось загрузить данные.</value>
+  </data>
+  <data name="List_Stale" xml:space="preserve">
+    <value>Данные могли устареть.</value>
+  </data>
+  <data name="List_SelectedCount" xml:space="preserve">
+    <value>Выбрано: {0}</value>
+  </data>
+  <data name="Message_ConfirmResetSettings" xml:space="preserve">
+    <value>Сбросить эти настройки на значения по умолчанию?</value>
+  </data>
+  <data name="Message_DiscardUnsavedChanges" xml:space="preserve">
+    <value>Есть несохранённые изменения. Покинуть страницу и отбросить их?</value>
+  </data>
+  <data name="Identity_Unavailable" xml:space="preserve">
+    <value>Сервер входа недоступен, поэтому сессию не удаётся продлить.</value>
+  </data>
+  <data name="Caption_New" xml:space="preserve">
+    <value>Новый</value>
+  </data>
+  <data name="Caption_View" xml:space="preserve">
+    <value>Просмотр</value>
+  </data>
+  <data name="Caption_ShowTotal" xml:space="preserve">
+    <value>Показать количество</value>
+  </data>
+  <data name="Caption_TotalCount" xml:space="preserve">
+    <value>Всего: {0}</value>
+  </data>
+  <data name="Caption_Connect" xml:space="preserve">
+    <value>Подключиться</value>
+  </data>
+  <data name="Caption_Password" xml:space="preserve">
+    <value>Пароль</value>
+  </data>
+  <data name="Sync_Rejected" xml:space="preserve">
+    <value>Сервер не принял изменение {0}: {1}</value>
+  </data>
+  <data name="Sync_Reason_Invalid" xml:space="preserve">
+    <value>Данные недопустимы</value>
+  </data>
+  <data name="Sync_Reason_Forbidden" xml:space="preserve">
+    <value>У вас нет прав это изменять</value>
+  </data>
+  <data name="Sync_Reason_ReadOnly" xml:space="preserve">
+    <value>Эти данные нельзя изменять</value>
+  </data>
+  <data name="Sync_Reason_Conflict" xml:space="preserve">
+    <value>Изменено на другом устройстве</value>
+  </data>
+  <data name="Sync_Reason_Unknown" xml:space="preserve">
+    <value>Сервер отклонил изменение</value>
+  </data>
+  <data name="Sync_NotSynced" xml:space="preserve">
+    <value>Не синхронизировано: {0}</value>
+  </data>
+  <data name="Caption_SignIn" xml:space="preserve">
+    <value>Войти</value>
+  </data>
+  <data name="Notice_AnonymousMemory" xml:space="preserve">
+    <value>Вы не вошли: изменения сохраняются до перезагрузки страницы.</value>
+  </data>
+  <data name="Notice_AnonymousRefuse" xml:space="preserve">
+    <value>Войдите, чтобы пользоваться этим разделом: данные хранятся на сервере.</value>
+  </data>
+  <data name="Notice_AnonymousReadShared" xml:space="preserve">
+    <value>Вы не вошли: видны серверы организации. Войдите, чтобы добавить свои.</value>
+  </data>
+  <data name="Caption_Name" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="Caption_Type" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="Caption_Status" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Caption_Date" xml:space="preserve">
+    <value>Дата</value>
+  </data>
+  <data name="Caption_Code" xml:space="preserve">
+    <value>Код</value>
+  </data>
+  <data name="Diagnostics_Title" xml:space="preserve">
+    <value>Диагностика</value>
+  </data>
+  <data name="Diagnostics_Routes" xml:space="preserve">
+    <value>Известные маршруты</value>
+  </data>
+  <data name="Diagnostics_Errors" xml:space="preserve">
+    <value>Обработка ошибок</value>
+  </data>
+  <data name="Diagnostics_Sheets" xml:space="preserve">
+    <value>Панели</value>
+  </data>
+  <data name="Diagnostics_CodeEditor" xml:space="preserve">
+    <value>Редактор кода</value>
+  </data>
+  <data name="Diagnostics_Lists" xml:space="preserve">
+    <value>Списки</value>
+  </data>
+  <data name="Caption_WordWrap" xml:space="preserve">
+    <value>Перенос строк</value>
+  </data>
+  <data name="Caption_BookmarkedOnly" xml:space="preserve">
+    <value>Только закладки</value>
+  </data>
+  <data name="Caption_ExpandAll" xml:space="preserve">
+    <value>Развернуть все</value>
+  </data>
+  <data name="Caption_CollapseAll" xml:space="preserve">
+    <value>Свернуть все</value>
+  </data>
+</root>

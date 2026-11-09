@@ -1,0 +1,15 @@
+<Center Gap="var(--gap-lg)" Class="rz-text-align-center">
+    <RadzenText TextStyle="TextStyle.H1">404</RadzenText>
+    <RadzenText>@(Message ?? Strings.NotFound_Message)</RadzenText>
+    <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Text=@Strings.Nav_Home Click=@(() => NavigationManager.NavigateToRoute("/"))/>
+</Center>
+
+@code {
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    [Parameter]
+    public string? Message { get; set; }
+
+}

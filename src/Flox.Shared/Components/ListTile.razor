@@ -1,0 +1,283 @@
+@using System.ComponentModel
+@inherits StatelessWidget
+
+@{
+    RenderFragment leadingContent = @<text>
+                                        @if (Leading != null)
+                                        {
+                                            @Leading
+                                        }
+                                        else if (Icon != null)
+                                        {
+                                            <FloxIcon Icon=@Icon Color=@IconColor/>
+                                        }
+                                    </text>;
+
+    RenderFragment tileContent = @<RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-md)"
+                                               class=@GetOuterClass() Style=@Style @onclick=@HandleStackClick>
+                                     @if (IsSelectable)
+                                     {
+                                         <div class="group/lead relative flex size-8 shrink-0 cursor-pointer items-center justify-center"
+                                              role="checkbox" aria-checked=@(IsSelected ? "true" : "false")
+                                              @onclick=@ToggleSelectedAsync @onclick:stopPropagation @onclick:preventDefault>
+                                             @leadingContent
+                                             <span aria-hidden="true" class=@GetSelectionMarkClass()>
+                                                 <FloxIcon Icon="done" Size="1.25rem"/>
+                                             </span>
+                                         </div>
+                                     }
+                                     else if (Leading != null || Icon != null)
+                                     {
+                                         @* A box of a fixed size, the same as of a selectable row: the icons of the rows of a list are in one column *@
+                                         <div class="flex size-8 shrink-0 items-center justify-center">
+                                             @leadingContent
+                                         </div>
+                                     }
+
+                                     @* The text of the row: the trailing text stays on the line of the title while both fit, then goes under the subtitle;
+                                        then takes up to three lines (an address breaks anywhere). The leading box and the controls keep their places *@
+                                     <RadzenStack Orientation="Radzen.Orientation.Horizontal" Wrap="Radzen.FlexWrap.Wrap" AlignItems="Radzen.AlignItems.Center" Gap="0"
+                                                  class="min-w-0 flex-1 gap-x-3">
+                                         <RadzenStack Gap="0" class="min-w-0 flex-auto">
+                                             @if (Title != null)
+                                             {
+                                                 @Title
+                                             }
+                                             else if (!string.IsNullOrEmpty(TitleText))
+                                             {
+                                                 <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.Div" class="rz-text-truncate" Style="color: var(--rz-text-title-color)">@TitleText</RadzenText>
+                                             }
+                                             @if (Subtitle != null)
+                                             {
+                                                 @Subtitle
+                                             }
+                                             else if (!string.IsNullOrEmpty(SubtitleText))
+                                             {
+                                                 <RadzenText TextStyle="TextStyle.Caption" TagName="TagName.Div" class="rz-text-truncate">@SubtitleText</RadzenText>
+                                             }
+                                         </RadzenStack>
+
+                                         @if (Trailing == null && !string.IsNullOrEmpty(TrailingText))
+                                         {
+                                             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.Div" class="rz-m-0 min-w-0 max-w-full flex-initial line-clamp-3 wrap-anywhere" title=@TrailingText>@TrailingText</RadzenText>
+                                         }
+                                     </RadzenStack>
+
+                                     @* A control (a switch, a button, a counter) is not text: it stays at the end of the row *@
+                                     @if (Trailing != null)
+                                     {
+                                         @Trailing
+                                     }
+
+                                     @if (!string.IsNullOrEmpty(Warning))
+                                     {
+                                         <span class="flex shrink-0" title=@Warning aria-label=@Warning>
+                                             <FloxIcon Icon="sync_problem" Color="var(--rz-danger)"/>
+                                         </span>
+                                     }
+
+                                     @if (Bookmarked is { } bookmarked)
+                                     {
+                                         <BookmarkToggle Bookmarked=@bookmarked OnToggle=@OnBookmark/>
+                                     }
+
+                                     @if (Chevron || !string.IsNullOrEmpty(Href))
+                                     {
+                                         <Chevron/>
+                                     }
+                                 </RadzenStack>;
+
+    RenderFragment tileHrefContent = null!;
+    if (!string.IsNullOrWhiteSpace(Href))
+    {
+        tileHrefContent = @<a href=@AppUrl.ToHref(Href) class="block text-inherit no-underline" @onclick=@HandleAnchorClick @onclick:preventDefault=@TapSelects>@tileContent</a>;
+    }
+    else
+    {
+        tileHrefContent = tileContent;
+    }
+}
+
+@tileHrefContent
+
+@code {
+
+    private bool HasHref => !string.IsNullOrWhiteSpace(Href);
+
+    // Rows are being selected: a tap on the row selects it instead of opening it
+    private bool IsSelectable => Row?.Selectable ?? Selectable;
+
+    private bool IsSelected => Row?.Selected ?? Selected;
+
+    private bool IsSelectionActive => Row?.SelectionActive ?? SelectionActive;
+
+    private bool TapSelects => IsSelectable && IsSelectionActive;
+
+    // With a link the anchor owns the click, without one the stack does
+    private async Task HandleStackClick()
+    {
+        if (!HasHref)
+        {
+            await HandleClick();
+        }
+    }
+
+    private async Task HandleAnchorClick()
+    {
+        await HandleClick();
+    }
+
+    private async Task ToggleSelectedAsync()
+    {
+        var selected = !IsSelected;
+        if (Row != null)
+        {
+            await Row.SetSelectedAsync(selected);
+        }
+        else
+        {
+            Selected = selected;
+        }
+
+        await SelectedChanged.InvokeAsync(selected);
+    }
+
+    private async Task HandleClick()
+    {
+        if (TapSelects)
+        {
+            await ToggleSelectedAsync();
+            return;
+        }
+
+        if (OnSelected.HasDelegate)
+        {
+            await OnSelected.InvokeAsync();
+        }
+
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync();
+        }
+    }
+
+    [Parameter]
+    public EventCallback OnSelected { get; set; }
+
+    [Parameter]
+    public bool Chevron { get; set; } = false;
+
+    // The bookmark mark at the end of the row: filled when bookmarked, outlined when not; null shows none. A tap on it calls OnBookmark and does not open the row
+    [Parameter]
+    public bool? Bookmarked { get; set; }
+
+    // A problem with the row that the user should see (the server did not accept the row): an icon with the text as its title
+    [Parameter]
+    public string? Warning { get; set; }
+
+    [Parameter]
+    public EventCallback OnBookmark { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    // Tighter rows for tiles that carry a control (dropdown, switch, slider)
+    [Parameter]
+    public bool Dense { get; set; } = false;
+
+    // The leading slot becomes a checkbox: the mark is drawn over the leading content, so the row keeps its shape
+    // The row of a DataList: it says whether the tile is selectable and selected, and takes the changes
+    [Parameter]
+    public IListRow? Row { get; set; }
+
+    [Parameter]
+    public bool Selectable { get; set; }
+
+    [Parameter]
+    public bool Selected { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> SelectedChanged { get; set; }
+
+    // Some rows of the list are selected: the marks stay visible and a tap on a row toggles it
+    [Parameter]
+    public bool SelectionActive { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; } = false;
+
+    [Parameter]
+    public string? Href { get; set; }
+
+    [Parameter]
+    public RenderFragment? Leading { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? IconColor { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter]
+    public RenderFragment? Subtitle { get; set; }
+
+    [Parameter]
+    public string? SubtitleText { get; set; }
+
+    [Parameter]
+    public RenderFragment? Title { get; set; }
+
+    [Parameter]
+    public string? TitleText { get; set; }
+
+    [Parameter]
+    public RenderFragment? Trailing { get; set; }
+
+    [Parameter]
+    public string? TrailingText { get; set; }
+
+    private string GetSelectionMarkClass()
+    {
+        const string Base = "absolute inset-0 flex items-center justify-center rounded-full transition-opacity";
+        if (IsSelected)
+        {
+            return $"{Base} bg-accent text-white";
+        }
+
+        return IsSelectionActive ? $"{Base} border-2 border-line bg-surface" : $"{Base} border-2 border-line bg-surface opacity-0 group-hover/lead:opacity-100";
+    }
+
+    protected string GetOuterClass()
+    {
+        var result = new List<string> { "rz-px-3", Dense ? "min-h-10 rz-py-2" : "min-h-12 rz-py-2" };
+
+        if (!string.IsNullOrEmpty(Class))
+        {
+            result.Add(Class);
+        }
+
+        if (!string.IsNullOrEmpty(Href) || OnClick.HasDelegate || OnSelected.HasDelegate || TapSelects || Row is { Clickable: true })
+        {
+            result.Add("cursor-pointer transition-colors hover:bg-hover");
+        }
+
+        if (IsSelectable && IsSelected)
+        {
+            result.Add("bg-accent-soft");
+        }
+
+        if (Disabled)
+        {
+            result.Add("pointer-events-none opacity-50");
+        }
+
+        return string.Join(" ", result);
+    }
+
+}

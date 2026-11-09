@@ -1,0 +1,42 @@
+@using System.Numerics
+@typeparam T where T : struct, INumber<T>
+
+<RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.End" Gap="var(--gap-lg)" Style=@Style>
+    <RadzenText TextStyle="TextStyle.Body2">@_value</RadzenText>
+    <RadzenSlider TValue=@T Value=@_value ValueChanged=@OnValueChanged Min=@decimal.CreateChecked(Min) Max=@decimal.CreateChecked(Max) Step=@Step.ToString(null, System.Globalization.CultureInfo.InvariantCulture) class="min-w-32 flex-1"/>
+</RadzenStack>
+
+@code {
+
+    [Parameter][EditorRequired]
+    public T Value { get; set; }
+
+    [Parameter]
+    public EventCallback<T> ValueChanged { get; set; }
+
+    [Parameter]
+    public T Min { get; set; }
+
+    [Parameter]
+    public T Max { get; set; }
+
+    [Parameter]
+    public T Step { get; set; } = T.One;
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    private T _value;
+
+    protected override void OnParametersSet()
+    {
+        _value = Value;
+    }
+
+    private async Task OnValueChanged(T newValue)
+    {
+        _value = newValue;
+        await ValueChanged.InvokeAsync(newValue);
+    }
+
+}

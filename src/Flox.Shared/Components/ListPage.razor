@@ -1,0 +1,51 @@
+@*
+    AppBar + AppBarCommands + Breadcrumbs
+
+    Typically contains a single DataList as the only child component
+*@
+
+@inherits StatelessWidget
+
+<AppBarTitle>@Title</AppBarTitle>
+<AppBarCommands>
+    @if (OnRefresh.HasDelegate)
+    {
+        <AppBarCommand Icon="refresh" OnClick=@OnRefresh/>
+    }
+    @Commands
+    @if (MenuItems != null)
+    {
+        <AppBarMenu>
+            @MenuItems
+        </AppBarMenu>
+    }
+</AppBarCommands>
+
+<div class=@(Layout == ListLayout.Fill ? "flex h-[calc(100dvh-var(--rz-header-min-height)-2*var(--rz-layout-body-padding))] flex-col gap-1" : "flex flex-col gap-1")>
+    <Breadcrumbs Items=@Breadcrumbs/>
+    @ChildContent
+</div>
+
+@code {
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    // Shows the refresh command in the app bar
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
+
+    // Fill: the page is as high as the screen and the list in it scrolls; Content: the page scrolls
+    [Parameter]
+    public ListLayout Layout { get; set; } = ListLayout.Fill;
+
+    [Parameter]
+    public RenderFragment? Commands { get; set; }
+
+    [Parameter]
+    public RenderFragment? MenuItems { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+}

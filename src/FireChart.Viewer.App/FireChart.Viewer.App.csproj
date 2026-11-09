@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <!-- The application of the Viewer and the content of its Docker image: the sandbox at /, the frame /embed that another application embeds -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- The language follows the browser or the configuration, not only the subset of cultures the browser language picks -->
+    <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+  </PropertyGroup>
+
+  <!-- No AOT (measured 2026-11-09, README.md, Performance). Not RunAOTCompilation=false: a value other than the runtime pack's forces a native relink -->
+  <Target Name="RefuseAot" BeforeTargets="Build" Condition="'$(RunAOTCompilation)' == 'true'">
+    <Error Text="FireChart.Viewer.App is not compiled with AOT: it nearly doubles the download (13 MB more with Brotli), the publish takes 24 minutes instead of 2, and most of the time goes to the FHIR server, not to .NET. See README.md (Performance)." />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
+    <PackageReference Include="Radzen.Blazor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FireChart.Viewer\FireChart.Viewer.csproj" />
+    <ProjectReference Include="..\FireChart.Viewer.Core\FireChart.Viewer.Core.csproj" />
+    <ProjectReference Include="..\FireChart.Viewer.Library\FireChart.Viewer.Library.csproj" />
+    <ProjectReference Include="..\Flox.Core\Flox.Core.csproj" />
+    <ProjectReference Include="..\Flox.Shared\Flox.Shared.csproj" />
+  </ItemGroup>
+
+  <!-- The SDK of a release other than R4 is fetched when the first server of that release is opened (WasmReleaseAssemblyLoader) -->
+  <ItemGroup>
+    <BlazorWebAssemblyLazyLoad Include="Hl7.Fhir.STU3.wasm" />
+    <BlazorWebAssemblyLazyLoad Include="Hl7.Fhir.R4B.wasm" />
+    <BlazorWebAssemblyLazyLoad Include="Hl7.Fhir.R5.wasm" />
+    <BlazorWebAssemblyLazyLoad Include="Hl7.Fhir.R6.wasm" />
+  </ItemGroup>
+
+</Project>

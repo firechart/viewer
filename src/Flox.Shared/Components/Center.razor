@@ -1,0 +1,16 @@
+<RadzenStack AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.Center" Gap=@Gap class=@($"min-h-[70vh] rz-px-4 {Class}")>
+    @ChildContent
+</RadzenStack>
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Gap { get; set; }
+
+}

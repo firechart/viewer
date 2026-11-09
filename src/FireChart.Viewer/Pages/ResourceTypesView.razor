@@ -1,0 +1,74 @@
+@* The resource types of the server, with the clinical summary first when the server has patients *@
+@inherits StatefulWidget<ResourceTypesViewState>
+
+<BusyOverlay Busy=@State.IsBusy Concealed=@State.Activating>
+    @if (State.Server is not null)
+    {
+        @if (State.Access == ServerAccess.NotSupported)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+                @Strings.Message_FhirServerAuthenticationNotSupported
+            </RadzenAlert>
+        }
+        else if (State.Access is ServerAccess.NeedsAuthorization or ServerAccess.NeedsCredentials)
+        {
+            <ServerAccessPanel Server=@State.Server Access=@State.Access Rejected=@State.CredentialsRejected OnRetry=@State.RetryAsync/>
+        }
+        else if (State.Failed)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+                @Strings.Message_FhirServerUnavailable
+                <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Text=@FloxStrings.Caption_Retry Click=@State.RetryAsync/>
+            </RadzenAlert>
+        }
+        else
+        {
+            <RadzenStack Gap="var(--gap-sm)">
+                <Search Value=@State.Filter ValueChanged=@(text => State.SetFilter(text)) Placeholder=@FloxStrings.Caption_Search/>
+                @if (!string.IsNullOrEmpty(State.Release))
+                {
+                    <RadzenText TextStyle="TextStyle.Caption" TagName="TagName.Div" class="rz-m-0">FHIR @State.Release</RadzenText>
+                }
+                <DataList TItem="string" Items=@State.Visible Layout="ListLayout.Content" ShowSearch="false" PullToRefresh="false"
+                          OnRowClick=@Open>
+                    <ItemTemplate Context="row">
+                        @if (row.Item == ResourceTypesViewState.ClinicalSummaryEntry)
+                        {
+                            <ListTile Row=@row TitleText=@Strings.Caption_ClinicalSummary Chevron>
+                                <Leading>
+                                    <FloxIcon Icon="history" Title=@Strings.Caption_ClinicalSummary/>
+                                </Leading>
+                            </ListTile>
+                        }
+                        else
+                        {
+                            <ListTile Row=@row TitleText=@row.Item Chevron>
+                                <Leading>
+                                    <IconResource ResourceType=@row.Item Autocolor/>
+                                </Leading>
+                            </ListTile>
+                        }
+                    </ItemTemplate>
+                </DataList>
+            </RadzenStack>
+        }
+    }
+</BusyOverlay>
+
+@code {
+
+    /// <summary>The instance of the Viewer.</summary>
+    [CascadingParameter]
+    public ViewerSession Session { get; set; } = null!;
+
+
+    protected override object? ActivationKey => Session;
+
+    private void Open(string type)
+    {
+        Session.Navigate(type == ResourceTypesViewState.ClinicalSummaryEntry
+                             ? new ViewerRoute(ViewerPage.ClinicalSummary)
+                             : new ViewerRoute(ViewerPage.ResourceList, type));
+    }
+
+}

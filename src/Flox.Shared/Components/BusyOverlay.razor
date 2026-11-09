@@ -1,0 +1,26 @@
+@* Wraps the working part of a page: while busy a circular indicator covers it (see BusyIndicator) and the content stays where it is; while Concealed (the page
+   is started for another key) the content is not drawn at all, so the data of the previous key is not on screen *@
+<div class="relative @(Busy ? "min-h-24" : null) @Class" aria-busy=@(Busy ? "true" : null)>
+    @if (!Concealed)
+    {
+        @ChildContent
+    }
+
+    <BusyIndicator Visible=@Busy/>
+</div>
+
+@code {
+
+    [Parameter]
+    public bool Busy { get; set; }
+
+    [Parameter]
+    public bool Concealed { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+}

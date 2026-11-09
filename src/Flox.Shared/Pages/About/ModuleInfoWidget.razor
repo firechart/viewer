@@ -1,0 +1,87 @@
+@inject IJSRuntime JS
+
+@if (Branding == null)
+{
+    return;
+}
+
+<RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-xs)" class="rz-mt-4 rz-mb-6">
+    <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-md)">
+        <RadzenImage Path=@Branding.Icon class="size-16 shrink-0 rounded-lg object-contain" AlternateText=@Branding.Title/>
+        <RadzenText TextStyle="TextStyle.H5" class="text-accent-ink"><b>@Branding.Title</b></RadzenText>
+        @if (!string.IsNullOrEmpty(Branding.Version))
+        {
+            <RadzenBadge Variant="Radzen.Variant.Flat" BadgeStyle="Radzen.BadgeStyle.Secondary" IsPill="true" Text=@($"v{Branding.Version}")/>
+        }
+    </RadzenStack>
+
+    <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mt-2 rz-text-align-center">@Branding.Subtitle</RadzenText>
+</RadzenStack>
+
+<ListSection Caption=@Strings.Caption_AboutThisApp>
+    <ListTile TitleText=@Strings.Caption_Authors SubtitleText=@Branding.Authors/>
+    @if (!string.IsNullOrEmpty(Branding.SourceCodeUrl))
+    {
+        <ListTile TitleText=@Strings.Caption_SourceCode SubtitleText=@Branding.SourceCodeUrl OnClick="() => OpenPackageUrl(Branding.SourceCodeUrl)">
+            <Trailing>
+                <FloxIcon Icon="open_in_new" Size="1.25rem" Color="var(--rz-text-secondary-color)"/>
+            </Trailing>
+        </ListTile>
+    }
+    <ListTile TitleText=@Strings.Caption_License SubtitleText=@(Branding.LicenseType ?? Branding.LicenseUrl) OnClick="() => OpenPackageUrl(Branding.LicenseUrl)">
+        <Trailing>
+            @if (!string.IsNullOrEmpty(Branding.LicenseUrl))
+            {
+                <FloxIcon Icon="open_in_new" Size="1.25rem" Color="var(--rz-text-secondary-color)"/>
+            }
+        </Trailing>
+    </ListTile>
+</ListSection>
+
+<ListSection Caption=@Strings.Caption_UsedComponents>
+    @if (Branding.Licenses.Count == 0)
+    {
+        <RadzenText TextStyle="TextStyle.Body2" class="rz-p-4">No license information available.</RadzenText>
+    }
+    else
+    {
+        @for (var i = 0; i < Branding.Licenses.Count; i++)
+        {
+            var entry = Branding.Licenses[i];
+            <ListTile TitleText="@entry.PackageId"
+                      OnClick="() => OpenPackageUrl(entry.PackageProjectUrl)"
+            >
+                <Subtitle>
+                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)">
+                        <RadzenBadge Variant="Radzen.Variant.Outlined" BadgeStyle="Radzen.BadgeStyle.Info" Text=@entry.License/>
+                        <RadzenBadge Variant="Radzen.Variant.Outlined" BadgeStyle="Radzen.BadgeStyle.Success" Text=@entry.PackageVersion/>
+                    </RadzenStack>
+                </Subtitle>
+                <Trailing>
+                    @if (!string.IsNullOrEmpty(entry.PackageProjectUrl))
+                    {
+                        <FloxIcon Icon="open_in_new" Size="1.25rem" Color="var(--rz-text-secondary-color)"/>
+                    }
+                </Trailing>
+            </ListTile>
+        }
+    }
+</ListSection>
+
+@code {
+
+    [Parameter]
+    public FloxBranding? Branding { get; set; }
+
+    private Task OpenPackageUrl(string? url)
+    {
+        if (string.IsNullOrEmpty(url))
+        {
+            return Task.CompletedTask;
+        }
+
+        return JS.InvokeVoidAsync("window.open", url, "_blank")
+                  .AsTask();
+    }
+
+}

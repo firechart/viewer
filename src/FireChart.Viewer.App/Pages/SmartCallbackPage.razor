@@ -1,0 +1,43 @@
+@page "/smart/callback"
+@inject ISmartAuthorizer Authorizer
+@inject NavigationManager NavigationManager
+
+@* The way back of a SMART sign-in in the frame (redirect): the code is exchanged for a token; the patient of the launch context opens the clinical summary,
+   else the frame returns where the sign-in began *@
+<div class="p-4">
+    @if (_failure is null)
+    {
+        <RadzenProgressBarCircular ShowValue="false" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Small"/>
+    }
+    else
+    {
+        <RadzenStack Gap="var(--gap-lg)" class="max-w-md">
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false">@_failure</RadzenAlert>
+            <RadzenButton ButtonStyle="ButtonStyle.Base" Text="Back to the viewer" Click=@(() => NavigationManager.NavigateTo(EmbedPage.Prefix))/>
+        </RadzenStack>
+    }
+</div>
+
+@code {
+
+    public const string Route = "smart/callback";
+
+    private string? _failure;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var completion = await Authorizer.CompleteAsync(NavigationManager.Uri);
+            var target = completion.PatientId is { Length: > 0 } patient
+                ? EmbedPage.Prefix + new ViewerRoute(ViewerPage.ClinicalSummary, "Patient", patient).Location
+                : completion.ReturnUrl.TrimStart('/');
+            NavigationManager.NavigateTo(target, replace: true);
+        }
+        catch (SmartException ex)
+        {
+            _failure = ex.Failure.ToMessage();
+        }
+    }
+
+}

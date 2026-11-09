@@ -1,0 +1,4 @@
+.page-menu-separator {
+    margin: 0.25rem 0;
+    border-top: 1px solid var(--rz-base-300);
+}

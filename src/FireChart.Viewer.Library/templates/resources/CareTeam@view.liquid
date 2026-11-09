@@ -1,0 +1,36 @@
+{% fhir_include "CareTeam:subject" %}
+
+{%- assign members = self.participant | as_list -%}
+{%- assign patient = self.subject | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, own: "CareTeam" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{{ self.name | default: self.id }}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.period %}
+    <span>{% apply self.period mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if members.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Members" | t }}</h3>
+  {%- for m in members %}
+  <div class="fx-row"><span class="fx-row-main">{% apply m.member mode: "link,text" -%}</span><span class="fx-row-meta">{% if m.role %}{% render "list-inline", node: m.role, mode: "text" %}{% endif %}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if self.category or self.managingOrganization %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Category", node: self.category, mode: "text" %}
+  {% render "field", label: "Managing organization", node: self.managingOrganization %}
+</section>
+{%- endif %}

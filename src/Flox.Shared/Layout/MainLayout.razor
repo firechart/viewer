@@ -1,0 +1,63 @@
+@using Flox.Shared.Errors
+@using Flox.Shared.Extensions
+@inherits LayoutComponentBase
+
+<FloxThemeHost Dark=@_isDarkMode/>
+<RadzenComponents/>
+<ConnectivityMonitor/>
+<IdentityProviderMonitor/>
+<ReplicationHost/>
+
+<AppErrorBoundary @ref=@_bodyErrorBoundary>
+    <ChildContent>
+        @if (_initializationException is not null)
+        {
+            @if (ConnectionErrors.IsConnectionLost(_initializationException))
+            {
+                <ConnectionLostDisplay Exception=@_initializationException OnRetry=@RetryInitialization/>
+            }
+            else
+            {
+                <ErrorDisplay Exception=@_initializationException OnRetry=@RetryInitialization ErrorBoundary=@_bodyErrorBoundary/>
+            }
+        }
+        else if (_isLoading)
+        {
+            <Splash Message=@_progressMessage/>
+        }
+        else if (NavigationManager.IsEmbedded())
+        {
+            <div id="embedded-layout" class="rz-p-2" @key=_cultureVersion>@Body</div>
+        }
+        else
+        {
+            <RadzenLayout id="main-layout" @key=_cultureVersion>
+                <AppBar/>
+                <RadzenBody>
+                    <PageWidth>@Body</PageWidth>
+                </RadzenBody>
+            </RadzenLayout>
+
+        }
+    </ChildContent>
+
+    <ErrorContent>
+        <PageWidth>
+            <ErrorDisplay Exception=@context OnRetry=@RetryInitialization ErrorBoundary=@_bodyErrorBoundary/>
+        </PageWidth>
+    </ErrorContent>
+</AppErrorBoundary>
+
+@if (_initializationException is not null || !_isLoading)
+{
+    <div hidden data-app-ready></div>
+}
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+}

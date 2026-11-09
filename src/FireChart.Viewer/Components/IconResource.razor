@@ -1,0 +1,167 @@
+﻿@* Icon that reflects the semantic meaning of a FHIR resource type *@
+
+<FloxIcon Icon=@GetIcon(ResourceType) Title=@ResourceType Color=@(Color ?? (Autocolor ? ResourceTypeColors.Of(ResourceType) : null)) Size=@Size Class=@Class/>
+
+@code {
+
+    [Parameter]
+    public string ResourceType { get; set; } = string.Empty;
+
+    // Wins over Autocolor
+    [Parameter]
+    public string? Color { get; set; }
+
+    // The colour of the type from the rainbow table of ResourceTypeColors, when no Color is given
+    [Parameter]
+    public bool Autocolor { get; set; }
+
+    [Parameter]
+    public string? Size { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private static readonly Dictionary<string, string> s_iconMap = new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Individuals
+        ["Patient"]                         = "person",
+        ["RelatedPerson"]                   = "people_alt",
+        ["Practitioner"]                    = "local_hospital",
+        ["PractitionerRole"]                = "badge",
+        ["Person"]                          = "account_circle",
+        ["Group"]                           = "groups",
+
+        // Entities / Organizations
+        ["Organization"]                    = "business",
+        ["OrganizationAffiliation"]         = "account_tree",
+        ["Location"]                        = "place",
+        ["Endpoint"]                        = "hub",
+        ["HealthcareService"]               = "medical_services",
+        ["Device"]                          = "devices",
+        ["DeviceDefinition"]                = "devices_other",
+        ["DeviceMetric"]                    = "monitor_heart",
+        ["DeviceRequest"]                   = "phonelink_setup",
+        ["DeviceUseStatement"]              = "health_and_safety",
+        ["Substance"]                       = "science",
+        ["BiologicallyDerivedProduct"]      = "bloodtype",
+        ["NutritionProduct"]                = "restaurant",
+
+        // Observations & Diagnostics
+        ["Observation"]                     = "insights",
+        ["DiagnosticReport"]                = "article",
+        ["ImagingStudy"]                    = "image_search",
+        ["ImagingSelection"]                = "crop_original",
+        ["Media"]                           = "image",
+        ["Specimen"]                        = "colorize",
+        ["BodyStructure"]                   = "accessibility_new",
+        ["MolecularSequence"]               = "pie_chart",
+
+        // Conditions & Problems
+        ["Condition"]                       = "warning",
+        ["AllergyIntolerance"]              = "warning",
+        ["FamilyMemberHistory"]             = "family_restroom",
+        ["ClinicalImpression"]              = "psychology",
+        ["DetectedIssue"]                   = "bug_report",
+        ["RiskAssessment"]                  = "assignment_late",
+
+        // Medications
+        ["Medication"]                      = "medication",
+        ["MedicationRequest"]               = "medication_liquid",
+        ["MedicationAdministration"]        = "vaccines",
+        ["MedicationDispense"]              = "local_pharmacy",
+        ["MedicationStatement"]             = "assignment",
+        ["MedicationKnowledge"]             = "menu_book",
+        ["Immunization"]                    = "vaccines",
+        ["ImmunizationRecommendation"]      = "event_available",
+        ["ImmunizationEvaluation"]          = "fact_check",
+
+        // Procedures & Encounters
+        ["Encounter"]                       = "meeting_room",
+        ["EpisodeOfCare"]                   = "timeline",
+        ["Procedure"]                       = "content_cut",
+        ["ServiceRequest"]                  = "assignment_turned_in",
+        ["NutritionOrder"]                  = "set_meal",
+        ["VisionPrescription"]              = "visibility",
+        ["Appointment"]                     = "calendar_month",
+        ["AppointmentResponse"]             = "event_available",
+        ["Schedule"]                        = "calendar_today",
+        ["Slot"]                            = "schedule",
+
+        // Documents & Summaries
+        ["Composition"]                     = "description",
+        ["DocumentReference"]               = "attach_file",
+        ["DocumentManifest"]                = "folder_open",
+        ["ClinicalDocument"]                = "content_copy",
+        ["QuestionnaireResponse"]           = "quiz",
+        ["Communication"]                   = "chat",
+        ["CommunicationRequest"]            = "mark_chat_unread",
+
+        // Workflow
+        ["Task"]                            = "task",
+        ["RequestGroup"]                    = "list_alt",
+        ["CarePlan"]                        = "edit_note",
+        ["CareTeam"]                        = "diversity_3",
+        ["Goal"]                            = "flag",
+        ["GuidanceResponse"]                = "lightbulb",
+        ["SupplyRequest"]                   = "shopping_cart",
+        ["SupplyDelivery"]                  = "local_shipping",
+        ["InventoryReport"]                 = "inventory",
+
+        // Financial
+        ["Coverage"]                        = "card_membership",
+        ["CoverageEligibilityRequest"]      = "contact_mail",
+        ["CoverageEligibilityResponse"]     = "mark_email_read",
+        ["Claim"]                           = "receipt",
+        ["ClaimResponse"]                   = "receipt_long",
+        ["Invoice"]                         = "request_quote",
+        ["ExplanationOfBenefit"]            = "summarize",
+        ["PaymentNotice"]                   = "notifications_active",
+        ["PaymentReconciliation"]           = "account_balance",
+        ["EnrollmentRequest"]               = "app_registration",
+        ["EnrollmentResponse"]              = "how_to_reg",
+        ["Contract"]                        = "gavel",
+        ["Account"]                         = "manage_accounts",
+        ["ChargeItem"]                      = "price_change",
+        ["ChargeItemDefinition"]            = "sell",
+
+        // Conformance & Terminology
+        ["CapabilityStatement"]             = "rule",
+        ["StructureDefinition"]             = "schema",
+        ["StructureMap"]                    = "account_tree",
+        ["ImplementationGuide"]             = "menu_book",
+        ["SearchParameter"]                 = "manage_search",
+        ["OperationDefinition"]             = "code",
+        ["CompartmentDefinition"]           = "category",
+        ["MessageDefinition"]               = "message",
+        ["GraphDefinition"]                 = "share",
+        ["ExampleScenario"]                 = "play_circle",
+        ["ValueSet"]                        = "format_list_bulleted",
+        ["CodeSystem"]                      = "library_books",
+        ["ConceptMap"]                      = "compare_arrows",
+        ["NamingSystem"]                    = "label",
+        ["TerminologyCapabilities"]         = "spellcheck",
+        ["Questionnaire"]                   = "quiz",
+
+        // Infrastructure
+        ["Bundle"]                          = "all_inbox",
+        ["MessageHeader"]                   = "outbox",
+        ["OperationOutcome"]                = "error",
+        ["Parameters"]                      = "tune",
+        ["Subscription"]                    = "notifications",
+        ["SubscriptionStatus"]              = "notifications_active",
+        ["SubscriptionTopic"]               = "topic",
+        ["AuditEvent"]                      = "security",
+        ["Provenance"]                      = "verified_user",
+        ["Binary"]                          = "data_object",
+        ["Linkage"]                         = "link",
+        ["Basic"]                           = "extension",
+        ["TestReport"]                      = "bug_report",
+        ["TestScript"]                      = "terminal",
+    };
+
+    private static string GetIcon(string resourceType)
+    {
+        return s_iconMap.TryGetValue(resourceType, out var icon) ? icon : "folder_special";
+    }
+
+}

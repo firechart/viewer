@@ -1,0 +1,66 @@
+@implements IDisposable
+@inject NavigationManager Navigation
+
+@* The menu of a page: the button with the vertical ellipsis at the right of the app bar and a popup with what the page puts in it (any markup: a list
+   of the sections of the page, switches, commands); PageMenuItem and PageMenuSeparator give the rows the common look. A page without it has no button.
+   The content gets the menu as its context to close it after a choice of its own; the popup closes itself after a PageMenuItem, on a click outside,
+   on Escape and when the page changes *@
+<SectionContent SectionName="appbar-menu">
+    <RadzenButton @ref=_button Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" title=@(Title ?? Strings.Caption_More)
+                  aria-haspopup="true" Click=@ToggleAsync>
+        <FloxIcon Icon="more_vert"/>
+    </RadzenButton>
+    <RadzenPopup @ref=_popup Lazy="false" class="flox-page-menu" Style=@PopupStyle>
+        <div role="menu" @onkeydown=@OnKeyDownAsync>
+            <CascadingValue Value="this" IsFixed="true">
+                @ChildContent?.Invoke(this)
+            </CascadingValue>
+        </div>
+    </RadzenPopup>
+</SectionContent>
+
+@code {
+    private const string PopupStyle = "display: none; position: absolute; width: min(22rem, calc(100vw - 1rem)); max-height: min(70vh, 36rem); overflow-y: auto;"
+                                      + " padding: var(--rz-panel-padding, 0.5rem) 0; background-color: var(--rz-panel-background-color);"
+                                      + " border: var(--rz-panel-border); border-radius: var(--rz-border-radius); box-shadow: var(--rz-panel-shadow); z-index: 1001";
+
+    private RadzenButton? _button;
+    private RadzenPopup? _popup;
+
+    // The tooltip of the button; "More" when not given
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public RenderFragment<PageMenu>? ChildContent { get; set; }
+
+    public Task CloseAsync()
+    {
+        return _popup?.CloseAsync() ?? Task.CompletedTask;
+    }
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    private Task ToggleAsync()
+    {
+        return _popup is not null && _button is not null ? _popup.ToggleAsync(_button.Element) : Task.CompletedTask;
+    }
+
+    private Task OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        return args.Key == "Escape" ? CloseAsync() : Task.CompletedTask;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _ = InvokeAsync(CloseAsync);
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+}

@@ -1,0 +1,31 @@
+{% fhir_include "Location:organization" %}
+{% fhir_include "Location:partof" %}
+
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{{ self.name | default: self.id }}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.type %}
+    <span>{% apply self.type mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.physicalType %}
+    <span>{% apply self.physicalType mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.address or self.managingOrganization or self.partOf or self.telecom or self.description %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Where" | t }}</h3>
+  {% render "field", label: "Address", node: self.address, mode: "text" %}
+  {% render "field", label: "Managing organization", node: self.managingOrganization %}
+  {% render "field", label: "Part of", node: self.partOf %}
+  {% render "field", label: "Phone and email", node: self.telecom, mode: "text" %}
+  {% render "field", label: "Description", node: self.description, mode: "text" %}
+</section>
+{%- endif %}

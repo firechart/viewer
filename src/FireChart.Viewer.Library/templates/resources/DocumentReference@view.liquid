@@ -1,0 +1,44 @@
+{% fhir_include "DocumentReference:subject" %}
+{% fhir_include "DocumentReference:author" %}
+{% fhir_include "DocumentReference:authenticator" %}
+{% fhir_include "DocumentReference:custodian" %}
+
+{%- assign contents = self.content | as_list -%}
+{%- assign patient = self.subject | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, own: "DocumentReference" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% if self.description %}{{ self.description }}{% else %}{% apply self.type mode: "text" %}{% endif %}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.date %}
+    <span>{% apply self.date mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+    {%- assign ds = self.docStatus | append: "" -%}{%- if ds != "" -%}{%- render "status-badge", code: ds -%}{%- endif -%}
+  </div>
+</div>
+
+{%- if self.type or self.category or self.author or self.authenticator or self.custodian or self.securityLabel %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Type", node: self.type, mode: "text" %}
+  {% render "field", label: "Category", node: self.category, mode: "text" %}
+  {% render "field", label: "Author", node: self.author %}
+  {% render "field", label: "Authenticator", node: self.authenticator %}
+  {% render "field", label: "Custodian", node: self.custodian %}
+  {% render "field", label: "Security", node: self.securityLabel, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if contents.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Content" | t }}</h3>
+  {%- for c in contents %}
+  <div class="fx-row"><span class="fx-row-main">{{ c.attachment.title | default: c.attachment.url | default: "document" }}</span><span class="fx-row-meta">{{ c.attachment.contentType }}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

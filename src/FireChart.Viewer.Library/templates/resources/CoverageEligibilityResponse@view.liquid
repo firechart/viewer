@@ -1,0 +1,35 @@
+{% fhir_include "CoverageEligibilityResponse:patient" %}
+{% fhir_include "CoverageEligibilityResponse:insurer" %}
+{% fhir_include "CoverageEligibilityResponse:requestor" %}
+{% fhir_include "CoverageEligibilityResponse:request" %}
+
+{%- assign outcome = self.outcome | append: "" -%}
+{%- assign patient = self.patient | resolve -%}
+{%- render "view-header", patient: patient, subject: self.patient, own: "CoverageEligibilityResponse" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{{ "Eligibility response" | t }}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.created %}
+    <span>{{ "Created" | t }} {% apply self.created mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+    {%- if outcome != "" -%}{%- render "status-badge", code: outcome -%}{%- endif -%}
+  </div>
+</div>
+
+{%- if self.purpose or self.insurer or self.requestor or self.request or self.disposition or self.serviced %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Purpose", node: self.purpose, mode: "text" %}
+  {% render "field", label: "Insurer", node: self.insurer %}
+  {% render "field", label: "Requestor", node: self.requestor %}
+  {% render "field", label: "Request", node: self.request %}
+  {% render "field", label: "Disposition", node: self.disposition, mode: "text" %}
+  {% render "field", label: "Serviced", node: self.serviced, mode: "text" %}
+</section>
+{%- endif %}

@@ -1,0 +1,181 @@
+@using Radzen.Blazor
+@using Microsoft.Extensions.DependencyInjection
+@inject IServiceProvider Services
+
+<RadzenStack Gap="var(--gap-xs)">
+    <RadzenLabel Text=@Caption/>
+    @switch (Field.Control)
+    {
+        case SearchFieldControl.Number:
+            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)">
+                @ComparatorPicker
+                <RadzenNumeric TValue="decimal?" @bind-Value=Value.Number Placeholder=@Placeholder ShowUpDown="false" class="rz-w-100"/>
+            </RadzenStack>
+            break;
+        case SearchFieldControl.NumberRange:
+            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)" AlignItems="Radzen.AlignItems.Center">
+                <RadzenNumeric TValue="decimal?" @bind-Value=Value.Number Placeholder=@Placeholder ShowUpDown="false" class="rz-w-100"/>
+                <RadzenText>&ndash;</RadzenText>
+                <RadzenNumeric TValue="decimal?" @bind-Value=Value.NumberTo ShowUpDown="false" class="rz-w-100"/>
+            </RadzenStack>
+            break;
+        case SearchFieldControl.Date:
+            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)">
+                @ComparatorPicker
+                <RadzenDatePicker TValue="DateTime?" @bind-Value=Value.Date DateFormat=@SearchFhirFormat.DateFormat AllowClear="true" Placeholder=@(Placeholder ?? string.Empty) class="rz-w-100"/>
+            </RadzenStack>
+            break;
+        case SearchFieldControl.DateRange:
+            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)" AlignItems="Radzen.AlignItems.Center">
+                <RadzenDatePicker TValue="DateTime?" @bind-Value=Value.Date DateFormat=@SearchFhirFormat.DateFormat AllowClear="true" Placeholder=@(Placeholder ?? string.Empty) class="rz-w-100"/>
+                <RadzenText>&ndash;</RadzenText>
+                <RadzenDatePicker TValue="DateTime?" @bind-Value=Value.DateTo DateFormat=@SearchFhirFormat.DateFormat AllowClear="true" class="rz-w-100"/>
+            </RadzenStack>
+            break;
+        case SearchFieldControl.Boolean:
+            <RadzenDropDown TValue="string" Data=@_booleans TextProperty="Text" ValueProperty="Value" @bind-Value=Value.Text class="rz-w-100"/>
+            break;
+        case SearchFieldControl.Select when _options.Count > 0 && !Field.AllowFreeText:
+            <RadzenDropDown TValue="string" Data=@_options TextProperty="Caption" ValueProperty="Key" AllowClear="true" AllowFiltering="true"
+                            Placeholder=@Placeholder class="rz-w-100"
+                            Value=@Value.Selected.FirstOrDefault() ValueChanged=@(v => { Value.Selected.Clear(); Value.Selected.AddRange(v is null ? [] : [v]); })/>
+            break;
+        case SearchFieldControl.MultiSelect when _options.Count > 0:
+            <RadzenDropDown TValue="IEnumerable<string>" Multiple="true" Chips="true" Data=@_options TextProperty="Caption" ValueProperty="Key"
+                            AllowClear="true" AllowFiltering="true" Placeholder=@Placeholder class="rz-w-100"
+                            Value=@Value.Selected ValueChanged=@(v => { Value.Selected.Clear(); Value.Selected.AddRange(v?.ToList() ?? []); })/>
+            break;
+        case SearchFieldControl.Select or SearchFieldControl.Autocomplete when _options.Count > 0:
+            <RadzenAutoComplete Data=@_options TextProperty="Code" @bind-Value=Value.Text Placeholder=@Placeholder class="rz-w-100"/>
+            break;
+        case SearchFieldControl.Quantity:
+            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)">
+                @ComparatorPicker
+                <RadzenNumeric TValue="decimal?" @bind-Value=Value.Number Placeholder=@Placeholder ShowUpDown="false" class="rz-w-100"/>
+                @if (Field.Units.Count > 0)
+                {
+                    <RadzenDropDown TValue="string" Data=@_units TextProperty="Text" ValueProperty="Value" AllowClear="true" @bind-Value=Value.Unit Style="min-width: 7rem"/>
+                }
+            </RadzenStack>
+            break;
+        case SearchFieldControl.Identifier:
+            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)">
+                <RadzenTextBox @bind-Value=Value.System Placeholder="system" class="rz-w-100"/>
+                <RadzenTextBox @bind-Value=Value.Text Placeholder=@Placeholder class="rz-w-100"/>
+            </RadzenStack>
+            break;
+        default:
+            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)">
+                @if (Field.Modifiers.Count > 0)
+                {
+                    <RadzenDropDown TValue="string" Data=@_modifiers TextProperty="Text" ValueProperty="Value" @bind-Value=Value.Modifier Style="min-width: 7rem"/>
+                }
+                <RadzenTextBox @bind-Value=Value.Text Placeholder=@Placeholder MaxLength=@(Field.MaxLength is > 0 ? Field.MaxLength : null) class="rz-w-100"/>
+            </RadzenStack>
+            break;
+    }
+    @if (Hint is { Length: > 0 })
+    {
+        <RadzenText TextStyle="TextStyle.Caption">@Hint</RadzenText>
+    }
+    @if (Error != null)
+    {
+        <RadzenText TextStyle="TextStyle.Caption" class="rz-color-danger">@Error</RadzenText>
+    }
+</RadzenStack>
+
+@code {
+
+    private static readonly Dictionary<string, string> s_comparatorSigns = new Dictionary<string, string>
+    {
+        ["eq"] = "=", ["ne"] = "≠", ["gt"] = ">", ["lt"] = "<", ["ge"] = "≥", ["le"] = "≤",
+        ["sa"] = "sa", ["eb"] = "eb", ["ap"] = "≈"
+    };
+
+    private List<SearchOption> _options = [];
+    private List<ListOption<string>> _booleans = [];
+    private List<ListOption<string>> _units = [];
+    private List<ListOption<string>> _modifiers = [];
+    private List<ListOption<string>> _comparators = [];
+
+    [Parameter][EditorRequired]
+    public SearchFormField Field { get; set; } = null!;
+
+    [Parameter][EditorRequired]
+    public SearchFieldValue Value { get; set; } = null!;
+
+    [Parameter]
+    public string Culture { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Error { get; set; }
+
+    private string Caption
+    {
+        get
+        {
+            var text = Field.Label.Resolve(Culture);
+            text = string.IsNullOrWhiteSpace(text) ? Field.QueryName : text;
+            return Field.Required ? text + " *" : text;
+        }
+    }
+
+    private string? Placeholder => Field.Placeholder.Resolve(Culture) is { Length: > 0 } text ? text : null;
+
+    private string? Hint => Field.Hint.Resolve(Culture);
+
+    private RenderFragment ComparatorPicker =>
+        __builder =>
+        {
+            if (_comparators.Count > 0)
+            {
+                <RadzenDropDown TValue="string" Data=@_comparators TextProperty="Text" ValueProperty="Value" @bind-Value=Value.Comparator Style="min-width: 5rem"/>
+            }
+        };
+
+    private SearchFormField? _listsOf;
+
+    protected override void OnParametersSet()
+    {
+        // The lists are of the field: they are not made again on every render of the form
+        if (ReferenceEquals(_listsOf, Field))
+        {
+            return;
+        }
+
+        _listsOf = Field;
+
+        _booleans =
+        [
+            new ListOption<string>(FloxStrings.Caption_Any, string.Empty),
+            new ListOption<string>(FloxStrings.Caption_Yes, bool.TrueString.ToLowerInvariant()),
+            new ListOption<string>(FloxStrings.Caption_No, bool.FalseString.ToLowerInvariant())
+        ];
+
+        _units = Field.Units
+                      .Select(u => new ListOption<string>(LabelOf(u), u.Code))
+                      .ToList();
+
+        _modifiers = [new ListOption<string>("—", string.Empty), .. Field.Modifiers.Select(m => new ListOption<string>(":" + m, m))];
+
+        _comparators = Field.Comparators
+                             .Select(c => new ListOption<string>(s_comparatorSigns.GetValueOrDefault(c, c), c))
+                             .ToList();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var offersValues = Field.Control is SearchFieldControl.Select or SearchFieldControl.MultiSelect or SearchFieldControl.Autocomplete;
+        if (offersValues && !string.IsNullOrWhiteSpace(Field.ValueSetUrl))
+        {
+            _options = Services.GetService<ISearchFormOptionSource>() is { } source ? [.. await source.GetOptionsAsync(Field.ValueSetUrl, Field.ValueSetVersion)] : [];
+        }
+    }
+
+    private string LabelOf(QuantityUnit unit)
+    {
+        var label = unit.Label.Resolve(Culture);
+        return string.IsNullOrWhiteSpace(label) ? unit.Code : label;
+    }
+
+}

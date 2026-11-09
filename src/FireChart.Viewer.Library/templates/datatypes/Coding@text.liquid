@@ -1,0 +1,3 @@
+{%- assign shown = self | coding_display | append: "" -%}
+{%- if shown == "" -%}{%- assign shown = self.code | append: "" -%}{%- endif -%}
+{{- shown -}}

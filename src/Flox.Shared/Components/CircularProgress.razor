@@ -1,0 +1,11 @@
+@* An indeterminate circular indicator in the color of the text, for a load of unknown length *@
+<span class="circular-progress">
+    <RadzenProgressBarCircular ShowValue="false" Mode="Radzen.ProgressBarMode.Indeterminate" Size=@Size/>
+</span>
+
+@code {
+
+    [Parameter]
+    public Radzen.ProgressBarCircularSize Size { get; set; } = Radzen.ProgressBarCircularSize.Small;
+
+}

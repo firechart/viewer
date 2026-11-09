@@ -1,0 +1,99 @@
+{%- apply self mode: "banner" %}
+
+{%- assign names = self.name | as_list -%}
+{%- assign communications = self.communication | as_list -%}
+{%- assign telecom = self.telecom | as_list -%}
+{%- assign addresses = self.address | as_list -%}
+{%- assign identifiers = self.identifier | as_list -%}
+{%- assign contacts = self.contact | as_list -%}
+{%- assign practitioners = self.generalPractitioner | as_list %}
+
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Name", node: names, mode: "text" %}
+  {% render "field", label: "Gender", node: self.gender %}
+  {% render "field", label: "Birth date", node: self.birthDate %}
+  {% render "field", label: "Marital status", node: self.maritalStatus %}
+  {%- for c in communications %}
+  {% render "field", label: "Language", node: c.language %}
+  {%- endfor %}
+</section>
+
+{%- if telecom.size > 0 or addresses.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">
+    {{ "Contact details" | t }}
+    <span class="fx-count">{{ telecom.size | plus: addresses.size }}</span>
+  </h3>
+  {%- for t in telecom %}
+  <div class="fx-row">
+    <span class="fx-row-main">{{ t.value }}</span>
+    <span class="fx-row-meta">
+      {{- t.system -}}
+      {%- if t.use %}, {{ t.use }}{% endif -%}
+    </span>
+  </div>
+  {%- endfor %}
+  {%- for a in addresses %}
+  <div class="fx-row">
+    <span class="fx-row-main">{% apply a mode: "text" -%}</span>
+    {%- if a.use %}
+    <span class="fx-row-meta">{{ a.use }}</span>
+    {%- endif %}
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if contacts.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">
+    {{ "Related persons" | t }}
+    <span class="fx-count">{{ contacts.size }}</span>
+  </h3>
+  {%- for c in contacts %}
+  <div class="fx-row">
+    <span class="fx-row-main">
+      {%- if c.name -%}
+        {%- apply c.name mode: "text" -%}
+      {%- elsif c.organization -%}
+        {%- apply c.organization mode: "link,text" -%}
+      {%- endif -%}
+    </span>
+    <span class="fx-row-meta">{% render "list-inline", node: c.relationship, mode: "text" %}</span>
+    {%- if c.telecom %}
+    <span class="fx-row-meta">{% render "list-inline", node: c.telecom, mode: "text" %}</span>
+    {%- endif %}
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if practitioners.size > 0 or self.managingOrganization %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Care" | t }}</h3>
+  {% render "field", label: "General practitioner", node: practitioners %}
+  {% render "field", label: "Managing organization", node: self.managingOrganization %}
+</section>
+{%- endif %}
+
+{%- if identifiers.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">
+    {{ "Identifiers" | t }}
+    <span class="fx-count">{{ identifiers.size }}</span>
+  </h3>
+  {%- for i in identifiers %}
+  <div class="fx-row">
+    <span class="fx-row-main">{{ i.value }}</span>
+    <span class="fx-row-meta">
+      {%- if i.type -%}
+        {%- apply i.type mode: "text" -%}
+      {%- else -%}
+        {{- i.system -}}
+      {%- endif -%}
+    </span>
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}

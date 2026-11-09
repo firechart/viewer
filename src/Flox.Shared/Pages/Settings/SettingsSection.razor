@@ -1,0 +1,86 @@
+@using System.Globalization
+@using Flox.Core.Settings
+@implements IDisposable
+
+<EditForm EditContext=@Section.EditContext>
+    <DataAnnotationsValidator/>
+    @* daisyUI's fieldset: the title is the legend on top *@
+    <RadzenFieldset Text=@Section.Descriptor.Title>
+        <ChildContent>
+            <RadzenStack Gap="var(--gap-md)">
+                @if (!string.IsNullOrEmpty(Section.Descriptor.Description))
+                {
+                    <RadzenText TextStyle="TextStyle.Body2">@Section.Descriptor.Description</RadzenText>
+                }
+
+                @foreach (var group in Groups)
+                {
+                    @if (group.Key is not null)
+                    {
+                        <Subtitle>@group.Key</Subtitle>
+                    }
+
+                    @foreach (var setting in group)
+                    {
+                        <SettingField Field=@setting Context=@Section.EditContext/>
+                    }
+                }
+            </RadzenStack>
+        </ChildContent>
+    </RadzenFieldset>
+</EditForm>
+
+@code {
+
+    private EditContext? _subscribed;
+    private EditContext? _renderedContext;
+    private string? _renderedCulture;
+
+    [Parameter][EditorRequired]
+    public SettingsSectionState Section { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnModified { get; set; }
+
+    // Fields without a group come first, groups follow in the order of their first field
+    private IEnumerable<IGrouping<string?, SettingFieldDescriptor>> Groups
+    {
+        get
+        {
+            return Section.Descriptor.Fields.GroupBy(setting => setting.GroupName);
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(_subscribed, Section.EditContext))
+        {
+            _subscribed?.OnFieldChanged -= OnFieldChanged;
+            _subscribed = Section.EditContext;
+            _subscribed.OnFieldChanged += OnFieldChanged;
+        }
+    }
+
+    // The page renders on every change of any field; the fields render themselves, this one only for another form or another language
+    protected override bool ShouldRender()
+    {
+        return !ReferenceEquals(_renderedContext, Section.EditContext) || _renderedCulture != CultureInfo.CurrentUICulture.Name;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        _renderedContext = Section.EditContext;
+        _renderedCulture = CultureInfo.CurrentUICulture.Name;
+    }
+
+    public void Dispose()
+    {
+        _subscribed?.OnFieldChanged -= OnFieldChanged;
+    }
+
+    private void OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        _ = OnModified.InvokeAsync();
+    }
+
+}

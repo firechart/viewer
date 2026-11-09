@@ -1,0 +1,63 @@
+.sandbox {
+    padding: 1rem;
+}
+
+.sandbox-frame {
+    width: 100%;
+    height: 75vh;
+    min-height: 480px;
+    border: 1px solid var(--rz-base-300);
+    border-radius: var(--rz-border-radius);
+    background: var(--rz-base-background-color);
+}
+
+.sandbox-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    text-align: center;
+    color: var(--rz-text-secondary-color);
+}
+
+.sandbox ::deep .sandbox-editor {
+    width: 100%;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.8125rem;
+}
+
+.sandbox-unavailable {
+    color: var(--rz-text-disabled-color);
+}
+
+.sandbox-events {
+    max-height: 18rem;
+    overflow: auto;
+    font-size: 0.8125rem;
+}
+
+.sandbox-event {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    padding: 0.125rem 0;
+    border-bottom: 1px solid var(--rz-base-200);
+}
+
+.sandbox-event code {
+    overflow-wrap: anywhere;
+}
+
+.sandbox-event-time {
+    color: var(--rz-text-tertiary-color);
+}
+
+.sandbox-code {
+    margin: 0;
+    padding: 0.75rem;
+    max-height: 24rem;
+    overflow: auto;
+    font-size: 0.8125rem;
+    background: var(--rz-base-100);
+    border-radius: var(--rz-border-radius);
+}

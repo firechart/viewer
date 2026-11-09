@@ -1,0 +1,97 @@
+@using System.Globalization
+@implements IDisposable
+@inject IFloxRuntime Runtime
+
+<Center Gap="var(--gap-lg)" Class="rz-text-align-center">
+    <FloxIcon Icon="cloud_off" Color="var(--rz-text-disabled-color)" Size="4rem"/>
+    <RadzenText TextStyle="TextStyle.H5" class="rz-m-0">@Strings.Connection_Title</RadzenText>
+    <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 max-w-md">@Strings.Connection_Description</RadzenText>
+
+    @if (_isRetrying)
+    {
+        <CircularProgress/>
+    }
+    else
+    {
+        <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0">@string.Format(CultureInfo.CurrentCulture, Strings.Connection_RetryIn, _secondsLeft)</RadzenText>
+    }
+
+    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Primary" Text=@Strings.Caption_Retry Disabled=@_isRetrying Click="@RetryAsync"/>
+
+    @if (Exception is not null)
+    {
+        <RadzenPanel AllowCollapse="true" Collapsed="true" class="rz-w-100 max-w-2xl rz-text-align-left">
+            <HeaderTemplate>
+                <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0">@Strings.Connection_Details</RadzenText>
+            </HeaderTemplate>
+            <ChildContent>
+                <RadzenText TextStyle="TextStyle.Body2">@Exception.Message</RadzenText>
+                @if (Runtime.IsDevelopment)
+                {
+                    <StackTraceView Trace=@Exception.StackTrace/>
+                }
+            </ChildContent>
+        </RadzenPanel>
+    }
+</Center>
+
+@code {
+
+    private const int RetryIntervalSeconds = 10;
+
+    private Timer? _timer;
+    private int _secondsLeft = RetryIntervalSeconds;
+    private bool _isRetrying;
+
+    [Parameter]
+    public Exception? Exception { get; set; }
+
+    [Parameter]
+    public EventCallback OnRetry { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _timer = new Timer(OnTick, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+    }
+
+    private void OnTick(object? state)
+    {
+        _ = InvokeAsync(TickAsync);
+    }
+
+    private async Task TickAsync()
+    {
+        if (_isRetrying)
+        {
+            return;
+        }
+
+        _secondsLeft--;
+        if (_secondsLeft <= 0)
+        {
+            await RetryAsync();
+        }
+        else
+        {
+            StateHasChanged();
+        }
+    }
+
+    private async Task RetryAsync()
+    {
+        if (_isRetrying)
+        {
+            return;
+        }
+
+        _isRetrying = true;
+        StateHasChanged();
+        await OnRetry.InvokeAsync();
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+
+}

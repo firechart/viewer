@@ -1,0 +1,60 @@
+﻿@using Flox.Core.Authorization
+
+@attribute [Route(SharedRoutes.TASKS)]
+@attribute [Authorize]
+
+@inherits StatefulWidget<BackgroundTasksState>
+@implements IDisposable
+
+<ListPage Title=@Strings.Caption_ImportTasks Breadcrumbs=@Breadcrumbs OnRefresh=@State.RefreshAsync>
+    <MenuItems>
+        <RadzenMenuItem Icon="add" Text="Simple" Click=@(() => State.AddSimpleAsync())/>
+        <RadzenMenuItem Icon="mop" Text="Cleanup" Click=@(() => State.CleanupAsync())/>
+    </MenuItems>
+    <ChildContent>
+        <DataList State=@State Selectable>
+            <ItemTemplate Context="row">
+                <ListTile Row=@row
+                          TitleText=@row.Item.DisplayName
+                          TrailingText=@row.Item.Status.ToString()
+                          SubtitleText=@GetTimes(row.Item)
+                          Href=@NavigationManager.Task(row.Item.Uid).ToUrl()
+                          Chevron>
+                    <Leading>
+                        <IconTask Status=@row.Item.Status/>
+                    </Leading>
+                </ListTile>
+            </ItemTemplate>
+            <RowMenu Context="menu">
+                <RadzenMenuItem Text=@Strings.Caption_Delete Icon="delete" IconColor="var(--rz-danger)" Click=@(() => DeleteAsync(menu.Targets))/>
+            </RowMenu>
+            <SelectionActions Context="selected">
+                <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Click=@(() => DeleteAsync([.. selected]))/>
+            </SelectionActions>
+        </DataList>
+    </ChildContent>
+</ListPage>
+
+@code {
+
+    protected override void InitBreadcrumbs()
+    {
+        Breadcrumbs.Add(Strings.Caption_ImportTasks, href: SharedRoutes.TASKS);
+    }
+
+    private static string GetTimes(Flox.Core.Models.BackgroundTask task)
+    {
+        var started = task.StartedAt?.ToLocalTime().ToString("HH:mm:ss", System.Globalization.CultureInfo.CurrentCulture);
+        var completed = task.CompletedAt?.ToLocalTime().ToString("HH:mm:ss", System.Globalization.CultureInfo.CurrentCulture);
+        return completed is null ? started ?? string.Empty : $"{started} - {completed}";
+    }
+
+    private async Task DeleteAsync(IReadOnlyList<Flox.Core.Models.BackgroundTask> tasks)
+    {
+        if (await this.ConfirmAsync(Strings.Caption_ConfirmDelete))
+        {
+            await TryAsync(() => State.DeleteRowsAsync(tasks));
+        }
+    }
+
+}

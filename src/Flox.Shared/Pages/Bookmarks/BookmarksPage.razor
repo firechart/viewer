@@ -1,0 +1,45 @@
+﻿@attribute [Route(SharedRoutes.BOOKMARKS)]
+@attribute [Authorize]
+
+@using Flox.Core.Authorization
+@using Flox.Core.Models
+
+@inherits StatefulWidget<BookmarksState>
+
+<ListPage Title=@Strings.Caption_Bookmarks Breadcrumbs=@Breadcrumbs OnRefresh=@State.RefreshAsync>
+    <DataList State=@State Selectable>
+        <ItemTemplate Context="row">
+            <ListTile Row=@row TitleText=@row.Item.DisplayName SubtitleText=@row.Item.Category Href=@row.Item.Url>
+                <Leading>
+                    <Bookmark Bookmarked/>
+                </Leading>
+            </ListTile>
+        </ItemTemplate>
+        <RowMenu Context="menu">
+            <RadzenMenuItem Text=@Strings.Caption_Delete Icon="delete" IconColor="var(--rz-danger)" Click=@(() => DeleteAsync(menu.Targets))/>
+        </RowMenu>
+        <SelectionActions Context="selected">
+            <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Click=@(() => DeleteAsync([.. selected]))/>
+        </SelectionActions>
+    </DataList>
+</ListPage>
+
+@code {
+
+    private async Task DeleteAsync(IReadOnlyList<UserBookmark> bookmarks)
+    {
+        if (await this.ConfirmAsync(Strings.Caption_ConfirmDelete))
+        {
+            await TryAsync(() => State.DeleteRowsAsync(bookmarks));
+        }
+    }
+
+    protected override void InitBreadcrumbs()
+    {
+        base.InitBreadcrumbs();
+        Breadcrumbs.Add(Strings.Caption_Bookmarks,
+                        href: NavigationManager.Bookmarks()
+                                                .ToUrl());
+    }
+
+}

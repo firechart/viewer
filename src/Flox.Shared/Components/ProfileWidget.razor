@@ -1,0 +1,46 @@
+@inject IAuthenticationService AuthenticationService
+@inject FloxOidcOptions OidcOptions
+
+@if (OidcOptions.Enabled)
+{
+    <AuthorizeView>
+        <Authorized>
+            <ListSection Caption=@Strings.Caption_User Definitions>
+                <PropertyTile Label=@Strings.Caption_Profile Value=@context.User.GetUserName()/>
+            </ListSection>
+
+            <ListSection Caption=@Strings.Caption_Roles>
+                @{
+                    var roles = context.User.GetRoles();
+                }
+                @foreach (var role in roles)
+                {
+                    <ListTile TitleText="@role"/>
+                }
+            </ListSection>
+
+            @if (context.User.IsAuthenticated())
+            {
+                <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Text=@Strings.Caption_Logout Click="LogoutAsync" class="rz-my-2"/>
+            }
+            else
+            {
+                <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Text=@Strings.Caption_Login Click="LoginAsync" class="rz-my-2"/>
+            }
+        </Authorized>
+    </AuthorizeView>
+}
+
+@code {
+
+    async Task LogoutAsync()
+    {
+        await AuthenticationService.LogoutAsync();
+    }
+
+    async Task LoginAsync()
+    {
+        await AuthenticationService.LoginAsync();
+    }
+
+}

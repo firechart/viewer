@@ -1,0 +1,32 @@
+@attribute [Route("/diagnostics/sheets")]
+
+@inherits StatelessWidget
+
+<AppBarTitle>Sheets</AppBarTitle>
+
+<Breadcrumbs Items=@Breadcrumbs/>
+
+<ListSection Caption="Radzen dialogs declared as components">
+    <ListTile TitleText="Modal sheet" SubtitleText="A centered dialog, full screen on phones" OnSelected=@(() => _modal = true)/>
+    <ListTile TitleText="Bottom sheet" SubtitleText="A side dialog docked to the bottom edge, resizable" OnSelected=@(() => _bottom = true)/>
+</ListSection>
+
+<ModalSheet @bind-IsOpen=@_modal TitleText="Modal sheet">
+    <HeaderCommands>
+        <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Icon="refresh"/>
+    </HeaderCommands>
+    <ChildContent>
+        <RadzenText>The content is declared next to the page and shown by the dialog service.</RadzenText>
+    </ChildContent>
+</ModalSheet>
+
+<BottomSheet @bind-IsOpen=@_bottom TitleText="Bottom sheet" Height="50dvh">
+    <ChildContent>
+        <RadzenText>Drag the upper edge to resize, click the mask or the close button to close.</RadzenText>
+    </ChildContent>
+</BottomSheet>
+
+@code {
+    private bool _modal;
+    private bool _bottom;
+}

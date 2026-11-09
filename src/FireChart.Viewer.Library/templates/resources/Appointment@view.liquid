@@ -1,0 +1,42 @@
+{% fhir_include "Appointment:actor" %}
+
+{%- assign people = self.participant | as_list -%}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% if self.description %}{{ self.description }}{% else %}{% assign svc = self.serviceType | as_list | first %}{% if svc %}{% apply svc mode: "text" %}{% else %}{{ "Appointment" | t }}{% endif %}{% endif %}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.start %}
+    <span>{% apply self.start mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.end %}
+    <span>{{ "to" | t }} {% apply self.end mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.appointmentType or self.serviceType or self.specialty or self.reasonCode or self.priority or self.comment or self.patientInstruction %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Type", node: self.appointmentType, mode: "text" %}
+  {% render "field", label: "Service type", node: self.serviceType, mode: "text" %}
+  {% render "field", label: "Specialty", node: self.specialty, mode: "text" %}
+  {% render "field", label: "Reason", node: self.reasonCode, mode: "text" %}
+  {% render "field", label: "Priority", node: self.priority, mode: "text" %}
+  {% render "field", label: "Comment", node: self.comment, mode: "text" %}
+  {% render "field", label: "Patient instruction", node: self.patientInstruction, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if people.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Participants" | t }}</h3>
+  {%- for p in people %}
+  <div class="fx-row"><span class="fx-row-main">{% apply p.actor mode: "link,text" -%}</span><span class="fx-row-meta">{{ p.status }}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

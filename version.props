@@ -1,0 +1,11 @@
+<Project>
+    <PropertyGroup>
+        <!-- MinVer (see Directory.Build.props): $(Version) is computed from git tags at build time,
+             no manual bump. Tag the repo "X.Y.Z" (no "v" prefix) to release that version; any commit
+             without its own tag gets X.Y.(Z+1)-alpha.0.<commits-since-tag>+<sha>. Old v0.1.x tags
+             predate this decision and are invisible to MinVer now - re-tag without "v" if one of them
+             needs to be the version floor again. -->
+        <!-- No MinVerMinimumMajorMinor: it is a floor, and a tag below it (0.5.2-rc.4) is replaced by 1.0.0-alpha.0.<height>, so such tags
+             would not change the version at all. Without any tag a build is 0.0.0-alpha.0.<height>. -->
+    </PropertyGroup>
+</Project>

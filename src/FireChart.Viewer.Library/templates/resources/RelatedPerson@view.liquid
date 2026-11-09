@@ -1,0 +1,32 @@
+{% fhir_include "RelatedPerson:patient" %}
+
+{%- assign nm = self.name | as_list | first -%}{%- assign act = self.active | append: "" -%}
+{%- assign patient = self.patient | resolve -%}
+{%- render "view-header", patient: patient, subject: self.patient, own: "RelatedPerson" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% if nm %}{% apply nm mode: "text" %}{% else %}{{ self.id }}{% endif %}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.gender %}
+    <span>{% apply self.gender mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.birthDate %}
+    <span>{{ "Born" | t }} {% apply self.birthDate mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- if act == "false" -%}{%- render "badge", text: "inactive", tone: "danger" -%}{%- endif -%}
+  </div>
+</div>
+
+{%- if self.relationship or self.telecom or self.address or self.period %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Relationship", node: self.relationship, mode: "text" %}
+  {% render "field", label: "Phone and email", node: self.telecom, mode: "text" %}
+  {% render "field", label: "Address", node: self.address, mode: "text" %}
+  {% render "field", label: "Period", node: self.period, mode: "text" %}
+</section>
+{%- endif %}

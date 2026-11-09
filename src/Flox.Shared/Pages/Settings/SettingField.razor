@@ -1,0 +1,152 @@
+@using System.Globalization
+@using Flox.Core.Settings
+@implements IDisposable
+
+@switch (Field.Control)
+{
+    case SettingControl.Switch:
+        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-md)">
+            <RadzenSwitch Name=@Field.Name Value=@((bool)GetValue()!) ValueChanged="@((bool value) => SetValue(value))"/>
+            <RadzenLabel Text=@Field.Label Component=@Field.Name/>
+        </RadzenStack>
+        @Hint
+        break;
+
+    case SettingControl.Slider:
+        <div class="fw-label">@Field.Label</div>
+        <SliderWithDisplay T="int" Min=@((int)(Field.Minimum ?? 0)) Max=@((int)(Field.Maximum ?? 100)) Step=@(Math.Max(Field.Step, 1)) Value=@((int)GetValue()!) ValueChanged="@((int value) => SetValue(value))"/>
+        @Hint
+        break;
+
+    case SettingControl.RadioList:
+        <div class="fw-label">@Field.Label</div>
+        <RadzenRadioButtonList TValue="object" Value=@GetValue() ValueChanged="@((object? value) => SetValue(value))" Data=@_options TextProperty="Text" ValueProperty="Value"/>
+        @Hint
+        break;
+
+    default:
+        <RadzenFormField Text=@Field.Label Variant="Radzen.Variant.Text" class="rz-w-100">
+            <ChildContent>
+                @switch (Field.Control)
+                {
+                    case SettingControl.Dropdown:
+                        <RadzenDropDown TValue="object" Name=@Field.Name Value=@GetValue() ValueChanged="@((object? value) => SetValue(value))" Data=@_options TextProperty="Text" ValueProperty="Value"/>
+                        break;
+
+                    case SettingControl.Number:
+                        <RadzenNumeric TValue="decimal" Name=@Field.Name Value=@Convert.ToDecimal(GetValue()) ValueChanged="@((decimal value) => SetValue(value))" Min=@Field.Minimum Max=@Field.Maximum/>
+                        break;
+
+                    case SettingControl.Password:
+                        <RadzenPassword Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" Immediate="true"/>
+                        break;
+
+                    case SettingControl.TextArea:
+                        <RadzenTextArea Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" Immediate="true" Rows="4"/>
+                        break;
+
+                    default:
+                        <RadzenTextBox Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" Immediate="true"/>
+                        break;
+                }
+            </ChildContent>
+            <Helper>@Field.Description</Helper>
+        </RadzenFormField>
+        break;
+}
+
+@foreach (var message in Context.GetValidationMessages(_identifier))
+{
+    <RadzenText TextStyle="TextStyle.Caption" class="rz-color-danger">@message</RadzenText>
+}
+
+@code {
+
+    private FieldIdentifier _identifier;
+    private IReadOnlyList<SettingOption> _options = [];
+    private SettingFieldDescriptor? _optionsField;
+    private string? _optionsCulture;
+    private EditContext? _renderedContext;
+    private SettingFieldDescriptor? _renderedField;
+    private string? _renderedCulture;
+    private bool _force;
+    private EditContext? _subscribed;
+
+    [Parameter][EditorRequired]
+    public EditContext Context { get; set; } = null!;
+
+    [Parameter][EditorRequired]
+    public SettingFieldDescriptor Field { get; set; } = null!;
+
+    private RenderFragment? Hint
+    {
+        get
+        {
+            return string.IsNullOrEmpty(Field.Description) ? null : @<div class="fw-hint">@Field.Description</div>;
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        _identifier = Context.Field(Field.Name);
+
+        // The options are rebuilt only for another field or another language: new lists make Radzen reprocess its data
+        var culture = CultureInfo.CurrentUICulture.Name;
+        if (!ReferenceEquals(_optionsField, Field) || _optionsCulture != culture)
+        {
+            _options = Field.GetOptions();
+            _optionsField = Field;
+            _optionsCulture = culture;
+        }
+
+        if (!ReferenceEquals(_subscribed, Context))
+        {
+            _subscribed?.OnValidationStateChanged -= OnValidationStateChanged;
+            _subscribed = Context;
+            _subscribed.OnValidationStateChanged += OnValidationStateChanged;
+        }
+    }
+
+    // The parent renders on every change of any field: this one renders when it is another field, another form or another language, or by its own change
+    protected override bool ShouldRender()
+    {
+        return _force || !ReferenceEquals(_renderedContext, Context) || !ReferenceEquals(_renderedField, Field) || _renderedCulture != CultureInfo.CurrentUICulture.Name;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        _renderedContext = Context;
+        _renderedField = Field;
+        _renderedCulture = CultureInfo.CurrentUICulture.Name;
+        _force = false;
+    }
+
+    public void Dispose()
+    {
+        _subscribed?.OnValidationStateChanged -= OnValidationStateChanged;
+    }
+
+    private object? GetValue()
+    {
+        return Field.Property.GetValue(Context.Model) ?? (Field.UnderlyingType.IsValueType ? Activator.CreateInstance(Field.UnderlyingType) : null);
+    }
+
+    private void OnValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
+    {
+        _force = true;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void SetValue(object? value)
+    {
+        if (value is not null && value.GetType() != Field.UnderlyingType && !Field.UnderlyingType.IsEnum)
+        {
+            value = Convert.ChangeType(value, Field.UnderlyingType);
+        }
+
+        Field.Property.SetValue(Context.Model, value);
+        _force = true;
+        Context.NotifyFieldChanged(_identifier);
+    }
+
+}

@@ -1,0 +1,84 @@
+{% fhir_include "Condition:subject" %}
+{% fhir_include "Condition:encounter" %}
+
+{%- assign patient = self.subject | resolve -%}
+{%- assign encounter = self.encounter | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, encounter: encounter, visit: self.encounter, own: "Condition" %}
+
+{%- assign onset = self.onset -%}
+{%- assign abatement = self.abatement -%}
+{%- assign stages = self.stage | as_list -%}
+{%- assign evidence = self.evidence | as_list -%}
+{%- assign notes = self.note | as_list %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% apply self.code mode: "text" -%}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if onset %}
+    <span>{{ "Onset" | t }} {% apply onset mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.recordedDate %}
+    <span>{{ "Recorded" | t }} {% apply self.recordedDate mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "concept-badge", concept: self.clinicalStatus -%}
+    {%- render "concept-badge", concept: self.verificationStatus -%}
+    {%- render "concept-badge", concept: self.severity -%}
+  </div>
+</div>
+
+{%- if self.category or self.bodySite or abatement or self.recorder or self.asserter or stages.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Category", node: self.category, mode: "text" %}
+  {% render "field", label: "Body site", node: self.bodySite, mode: "text" %}
+  {% render "field", label: "Abatement", node: abatement, mode: "text" %}
+  {% render "field", label: "Recorded by", node: self.recorder %}
+  {% render "field", label: "Asserted by", node: self.asserter %}
+  {%- for s in stages %}
+  {% render "field", label: "Stage", node: s.summary, mode: "text" %}
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if evidence.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">
+    {{ "Evidence" | t }}
+    <span class="fx-count">{{ evidence.size }}</span>
+  </h3>
+  {%- for e in evidence %}
+  <div class="fx-row">
+    <span class="fx-row-main">
+      {%- if e.code -%}
+        {%- render "list-inline", node: e.code, mode: "text" -%}
+      {%- endif -%}
+      {%- if e.concept -%}
+        {%- apply e.concept mode: "text" -%}
+      {%- endif -%}
+      {%- if e.reference -%}
+        {%- apply e.reference mode: "link,text" -%}
+      {%- endif -%}
+    </span>
+    <span class="fx-row-meta">{% render "list-inline", node: e.detail %}</span>
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if notes.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">
+    {{ "Notes" | t }}
+    <span class="fx-count">{{ notes.size }}</span>
+  </h3>
+  {%- for n in notes %}
+  <div class="fx-row">
+    <span class="fx-row-main">{% apply n mode: "text" -%}</span>
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}

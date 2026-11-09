@@ -1,0 +1,85 @@
+@implements IDisposable
+
+<RadzenFormField Variant="Radzen.Variant.Text" AllowFloatingLabel="false" class="rz-w-100 [--rz-form-field-margin-block:0] [--fw-field-max-width:none]">
+    <Start>
+        <FloxIcon Icon="search" Size="1.25rem" Color="var(--rz-text-secondary-color)"/>
+    </Start>
+    <ChildContent>
+        <RadzenTextBox Value=@_value
+                       Immediate="true"
+                       Placeholder=@Placeholder
+                       AutoFocus=@AutoFocus
+                       ValueChanged=@OnInput
+                       @onkeydown=@OnKeyDown/>
+    </ChildContent>
+    <End>
+        @if (!string.IsNullOrEmpty(_value))
+        {
+            <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Size="Radzen.ButtonSize.Small" Click=@ClearAsync>
+                <FloxIcon Icon="close" Size="1rem"/>
+            </RadzenButton>
+        }
+    </End>
+</RadzenFormField>
+
+@code {
+    private CancellationTokenSource? _debounce;
+    private string? _value;
+
+    [Parameter]
+    public bool AutoFocus { get; set; } = false;
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<KeyboardEventArgs> OnKeyDown { get; set; }
+
+    [Parameter]
+    public string Placeholder { get; set; } = Strings.Caption_Filter;
+
+    [Parameter]
+    public int DebounceInterval { get; set; } = 500;
+
+    protected override void OnParametersSet()
+    {
+        _value = Value;
+    }
+
+    private async Task OnInput(string? text)
+    {
+        _debounce?.Cancel();
+        _debounce?.Dispose();
+        _debounce = new CancellationTokenSource();
+        var token = _debounce.Token;
+
+        try
+        {
+            await Task.Delay(DebounceInterval, token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        _value = text;
+        await ValueChanged.InvokeAsync(text);
+    }
+
+    private async Task ClearAsync()
+    {
+        _debounce?.Cancel();
+        _value = null;
+        await ValueChanged.InvokeAsync(null);
+    }
+
+    public void Dispose()
+    {
+        _debounce?.Cancel();
+        _debounce?.Dispose();
+    }
+
+}

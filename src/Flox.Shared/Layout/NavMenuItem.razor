@@ -1,0 +1,44 @@
+@if (Node.Children.Count == 0 && Node.Item.Href?.StartsWith(AppUrl.ServerRootPrefix, StringComparison.Ordinal) == true)
+{
+    @* A page of the server: the router must not take it, so it is a plain link that opens in its own window *@
+    <RadzenPanelMenuItem>
+        <Template>
+            <a href=@AppUrl.ToHref(Node.Item.Href) target="_blank" rel="noopener" class="rz-display-flex rz-align-items-center rz-w-100" style="color: inherit; text-decoration: none">
+                <FloxIcon Icon=@Node.Item.Icon/>
+                <span class="rz-ms-2 rz-text-nowrap">@Node.Item.Text</span>
+                <FloxIcon Icon="open_in_new" class="rz-ms-2"/>
+            </a>
+        </Template>
+    </RadzenPanelMenuItem>
+}
+else if (Node.Children.Count == 0)
+{
+    <RadzenPanelMenuItem Path=@AppUrl.ToHref(Node.Item.Href) Match="NavLinkMatch.All">
+        <Template>
+            <FloxIcon Icon=@Node.Item.Icon/>
+            <span class="rz-ms-2 rz-text-nowrap">@Node.Item.Text</span>
+        </Template>
+    </RadzenPanelMenuItem>
+}
+else
+{
+    <RadzenPanelMenuItem Expanded="false">
+        <Template>
+            <FloxIcon Icon=@Node.Item.Icon/>
+            <span class="rz-ms-2 rz-text-nowrap">@Node.Item.Text</span>
+        </Template>
+        <ChildContent>
+            @foreach (var child in Node.Children)
+            {
+                <NavMenuItem Node="child"/>
+            }
+        </ChildContent>
+    </RadzenPanelMenuItem>
+}
+
+@code {
+
+    [Parameter][EditorRequired]
+    public NavMenuNode Node { get; set; } = null!;
+
+}

@@ -1,0 +1,67 @@
+@* The page of a resource: its view template and its JSON (read-only: the Viewer only reads FHIR servers) *@
+@inherits StatefulWidget<ResourceDetailViewState>
+
+<BusyOverlay Busy=@State.IsBusy Concealed=@State.Activating>
+    @if (State.NotFound)
+    {
+        <NotFoundWidget/>
+    }
+    else if (State.Server is not null)
+    {
+        @if (State.Access == ServerAccess.NotSupported)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+                @Strings.Message_FhirServerAuthenticationNotSupported
+            </RadzenAlert>
+        }
+        else if (State.Access is ServerAccess.NeedsAuthorization or ServerAccess.NeedsCredentials)
+        {
+            <ServerAccessPanel Server=@State.Server Access=@State.Access Rejected=@State.CredentialsRejected OnRetry=@State.RetryAsync/>
+        }
+        else if (State.Failed)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+                @Strings.Message_FhirServerUnavailable
+                <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Text=@FloxStrings.Caption_Retry Click=@State.RetryAsync/>
+            </RadzenAlert>
+        }
+        else if (State.View is not null)
+        {
+            <style>@State.View.Style</style>
+            <RadzenTabs class="rz-mt-2">
+                <Tabs>
+                    <RadzenTabsItem Text=@FloxStrings.Caption_View>
+                        @* The HTML of the template has passed the white list of FxHtml *@
+                        <div class="fx-root">@((MarkupString)State.View.Html)<p class="fx-muted" title="Times are shown in the time zone of this device">@DisplayZone.Text()</p></div>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text=@FloxStrings.Caption_Source>
+                        <CodeEditor Value=@State.Json ReadOnly="true" WordWrap="true" Height="calc(100dvh - 15rem)"/>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        }
+        else if (State.Json is not null)
+        {
+            <CodeEditor Value=@State.Json ReadOnly="true" WordWrap="true" Height="calc(100dvh - 11rem)"/>
+        }
+    }
+</BusyOverlay>
+
+@code {
+
+    /// <summary>The instance of the Viewer.</summary>
+    [CascadingParameter]
+    public ViewerSession Session { get; set; } = null!;
+
+    /// <summary>The type of the resource.</summary>
+    [Parameter, EditorRequired]
+    public string ResourceType { get; set; } = string.Empty;
+
+    /// <summary>The id of the resource.</summary>
+    [Parameter, EditorRequired]
+    public string ResourceId { get; set; } = string.Empty;
+
+
+    protected override object? ActivationKey => new ResourceDetailKey(Session, ResourceType, ResourceId);
+
+}

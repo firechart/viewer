@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/wwwroot/css/*.Tailwind.css
+artifacts/
+test/
+samples/
+.git/
+.vs/
+.idea/
+.tailwind/
+viewer.json
+host.json

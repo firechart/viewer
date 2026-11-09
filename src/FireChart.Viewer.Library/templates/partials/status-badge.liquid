@@ -1,0 +1,79 @@
+{%- assign v = code | append: "" -%}
+{%- assign shown = label | default: v -%}
+
+{%- if shown != "" -%}
+  {%- case v -%}
+    {%- when "active",
+      "finished",
+      "completed",
+      "complete",
+      "final",
+      "resolved",
+      "confirmed",
+      "amended",
+      "corrected",
+      "accepted",
+      "fulfilled",
+      "permit",
+      "available",
+      "achieved",
+      "sustaining"
+    -%}
+      {%- assign tone = "success" -%}
+    {%- when "in-progress",
+      "planned",
+      "preliminary",
+      "registered",
+      "arrived",
+      "triaged",
+      "onleave",
+      "draft",
+      "requested",
+      "received",
+      "booked",
+      "pending",
+      "proposed",
+      "ready",
+      "queued",
+      "open",
+      "in-use"
+    -%}
+      {%- assign tone = "info" -%}
+    {%- when "on-hold",
+      "unconfirmed",
+      "provisional",
+      "differential",
+      "suspended",
+      "recurrence",
+      "relapse",
+      "preparation",
+      "waitlist",
+      "partial",
+      "urgent",
+      "asap",
+      "unable-to-assess"
+    -%}
+      {%- assign tone = "warning" -%}
+    {%- when "entered-in-error",
+      "cancelled",
+      "stopped",
+      "not-done",
+      "refuted",
+      "inactive",
+      "rejected",
+      "error",
+      "failed",
+      "declined",
+      "noshow",
+      "revoked",
+      "deny",
+      "stat",
+      "high"
+    -%}
+      {%- assign tone = "danger" -%}
+    {%- else -%}
+      {%- assign tone = "" -%}
+  {%- endcase -%}
+
+  {%- render "badge", text: shown, tone: tone -%}
+{%- endif -%}

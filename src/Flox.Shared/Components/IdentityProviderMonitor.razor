@@ -1,0 +1,56 @@
+@implements IDisposable
+@inject IServiceProvider Services
+
+@if (_status is { IsUnavailable: true })
+{
+    <RadzenAlert AlertStyle="Radzen.AlertStyle.Warning" Variant="Radzen.Variant.Flat" AllowClose="false"
+                 class="fixed inset-x-0 bottom-0 z-[9998] rz-border-radius-0">
+        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.Center"
+                     Wrap="Radzen.FlexWrap.Wrap" Gap="var(--gap-md)">
+            <span>@Strings.Identity_Unavailable</span>
+            <RadzenButton Variant="Radzen.Variant.Outlined" ButtonStyle="Radzen.ButtonStyle.Base" Size="Radzen.ButtonSize.Small"
+                          Text=@Strings.Caption_Retry Disabled=@_isRetrying Click=@RetryAsync/>
+        </RadzenStack>
+    </RadzenAlert>
+}
+
+@code {
+    private IIdentityProviderStatus? _status;
+    private bool _isRetrying;
+
+    protected override void OnInitialized()
+    {
+        _status = Services.GetService<IIdentityProviderStatus>();
+        if (_status is not null)
+        {
+            _status.Changed += OnChanged;
+        }
+    }
+
+    private async Task RetryAsync()
+    {
+        _isRetrying = true;
+        try
+        {
+            await _status!.RetryAsync();
+        }
+        finally
+        {
+            _isRetrying = false;
+        }
+    }
+
+    private void OnChanged(object? sender, EventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        if (_status is not null)
+        {
+            _status.Changed -= OnChanged;
+        }
+    }
+
+}

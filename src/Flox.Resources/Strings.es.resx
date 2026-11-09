@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Nav_Home" xml:space="preserve">
+    <value>Inicio</value>
+  </data>
+  <data name="Settings_PageTitle" xml:space="preserve">
+    <value>Configuración</value>
+  </data>
+  <data name="Auth_CompletingSignIn_Message" xml:space="preserve">
+    <value>Completando su inicio de sesión...</value>
+  </data>
+  <data name="NotFound_Message" xml:space="preserve">
+    <value>Lo sentimos, el contenido que busca no existe.</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>Acerca de</value>
+  </data>
+  <data name="Caption_Login" xml:space="preserve">
+    <value>Iniciar sesión</value>
+  </data>
+  <data name="Caption_Logout" xml:space="preserve">
+    <value>Cerrar sesión</value>
+  </data>
+  <data name="Caption_Profile" xml:space="preserve">
+    <value>Perfil</value>
+  </data>
+  <data name="Caption_Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Caption_ErrorNotification" xml:space="preserve">
+    <value>Algo salió mal. Inténtelo de nuevo; si el problema persiste, póngase en contacto con su administrador.</value>
+  </data>
+  <data name="Caption_Save" xml:space="preserve">
+    <value>Guardar</value>
+  </data>
+  <data name="Caption_Saved" xml:space="preserve">
+    <value>Guardado</value>
+  </data>
+  <data name="Caption_Information" xml:space="preserve">
+    <value>Información</value>
+  </data>
+  <data name="Caption_Confirm" xml:space="preserve">
+    <value>Confirmar</value>
+  </data>
+  <data name="Caption_Yes" xml:space="preserve">
+    <value>Sí</value>
+  </data>
+  <data name="Caption_No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="Caption_ConfirmDelete" xml:space="preserve">
+    <value>¿Eliminar?</value>
+  </data>
+  <data name="Caption_Filter" xml:space="preserve">
+    <value>Filtro</value>
+  </data>
+  <data name="Caption_Search" xml:space="preserve">
+    <value>Buscar</value>
+  </data>
+  <data name="Caption_Ok" xml:space="preserve">
+    <value>Aceptar</value>
+  </data>
+  <data name="Caption_Cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="Message_FormInvalid" xml:space="preserve">
+    <value>Corrija los errores marcados en rojo antes de guardar el formulario.</value>
+  </data>
+  <data name="Message_FormSaveFailed" xml:space="preserve">
+    <value>No se pudo guardar el formulario. Inténtelo más tarde.</value>
+  </data>
+  <data name="Message_DeleteSucceeded" xml:space="preserve">
+    <value>El registro se ha eliminado.</value>
+  </data>
+  <data name="Message_RecordIsUndefined" xml:space="preserve">
+    <value>No se encontró el registro o se ha eliminado.</value>
+  </data>
+  <data name="Message_CreateFailed" xml:space="preserve">
+    <value>No se pudo crear el registro. Inténtelo de nuevo.</value>
+  </data>
+  <data name="Caption_Delete" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="Caption_BackgroundTasks" xml:space="preserve">
+    <value>Tareas en segundo plano</value>
+  </data>
+  <data name="Caption_BackgroundTask" xml:space="preserve">
+    <value>Tarea en segundo plano</value>
+  </data>
+  <data name="Caption_ImportTasks" xml:space="preserve">
+    <value>Tareas de importación</value>
+  </data>
+  <data name="Caption_ImportTask" xml:space="preserve">
+    <value>Tarea de importación</value>
+  </data>
+  <data name="Caption_Properties" xml:space="preserve">
+    <value>Propiedades</value>
+  </data>
+  <data name="Caption_Add" xml:space="preserve">
+    <value>Añadir</value>
+  </data>
+  <data name="Caption_Installed" xml:space="preserve">
+    <value>Instalado</value>
+  </data>
+  <data name="Sync_Title" xml:space="preserve">
+    <value>Sincronización</value>
+  </data>
+  <data name="Sync_Now" xml:space="preserve">
+    <value>Sincronizar ahora</value>
+  </data>
+  <data name="Sync_StatusSynced" xml:space="preserve">
+    <value>Todo está sincronizado</value>
+  </data>
+  <data name="Sync_StatusSyncing" xml:space="preserve">
+    <value>Sincronizando…</value>
+  </data>
+  <data name="Sync_StatusPending" xml:space="preserve">
+    <value>Cambios pendientes de enviar: {0}</value>
+  </data>
+  <data name="Sync_StatusError" xml:space="preserve">
+    <value>La última sincronización falló</value>
+  </data>
+  <data name="Sync_LastSynced" xml:space="preserve">
+    <value>Última sincronización: {0}</value>
+  </data>
+  <data name="Sync_Never" xml:space="preserve">
+    <value>Aún no se ha sincronizado</value>
+  </data>
+  <data name="Sync_NotAvailable" xml:space="preserve">
+    <value>La sincronización no está disponible en esta aplicación</value>
+  </data>
+  <data name="Sync_Failures" xml:space="preserve">
+    <value>Cambios que el servidor no aceptó</value>
+  </data>
+  <data name="Sync_Retry" xml:space="preserve">
+    <value>Reintentar</value>
+  </data>
+  <data name="Sync_Technical" xml:space="preserve">
+    <value>Detalles técnicos</value>
+  </data>
+  <data name="Caption_More" xml:space="preserve">
+    <value>Más</value>
+  </data>
+  <data name="Caption_Bookmarks" xml:space="preserve">
+    <value>Marcadores</value>
+  </data>
+  <data name="Caption_Settings" xml:space="preserve">
+    <value>Configuración</value>
+  </data>
+  <data name="Caption_Appearance" xml:space="preserve">
+    <value>Apariencia</value>
+  </data>
+  <data name="Caption_Theme" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="Caption_ThemeDark" xml:space="preserve">
+    <value>Oscuro</value>
+  </data>
+  <data name="Caption_ThemeLight" xml:space="preserve">
+    <value>Claro</value>
+  </data>
+  <data name="Caption_ThemeSystem" xml:space="preserve">
+    <value>Sistema</value>
+  </data>
+  <data name="Caption_Language" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="Caption_DefaultPageSize" xml:space="preserve">
+    <value>Tamaño de página predeterminado</value>
+  </data>
+  <data name="Caption_DataAndPrivacy" xml:space="preserve">
+    <value>Datos y privacidad</value>
+  </data>
+  <data name="Caption_AllowTelemetry" xml:space="preserve">
+    <value>Permitir telemetría</value>
+  </data>
+  <data name="Caption_Reset" xml:space="preserve">
+    <value>Restablecer</value>
+  </data>
+  <data name="Caption_Retry" xml:space="preserve">
+    <value>Reintentar</value>
+  </data>
+  <data name="Caption_Edit" xml:space="preserve">
+    <value>Editar</value>
+  </data>
+  <data name="Caption_Close" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
+  <data name="Caption_Source" xml:space="preserve">
+    <value>Fuente</value>
+  </data>
+  <data name="Caption_Roles" xml:space="preserve">
+    <value>Roles</value>
+  </data>
+  <data name="Caption_User" xml:space="preserve">
+    <value>Usuario</value>
+  </data>
+  <data name="Caption_UserName" xml:space="preserve">
+    <value>Nombre de usuario</value>
+  </data>
+  <data name="Caption_AboutThisApp" xml:space="preserve">
+    <value>Acerca de esta aplicación</value>
+  </data>
+  <data name="Caption_Authors" xml:space="preserve">
+    <value>Autores</value>
+  </data>
+  <data name="Caption_UsedComponents" xml:space="preserve">
+    <value>Bibliotecas utilizadas</value>
+  </data>
+  <data name="Caption_License" xml:space="preserve">
+    <value>Licencia</value>
+  </data>
+  <data name="Caption_SourceCode" xml:space="preserve">
+    <value>Código fuente</value>
+  </data>
+  <data name="Caption_GeneralCategory" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Caption_AboutPlatform" xml:space="preserve">
+    <value>Acerca de la plataforma</value>
+  </data>
+  <data name="Caption_ConfirmPurgeTasks" xml:space="preserve">
+    <value>¿Eliminar las tareas completadas?</value>
+  </data>
+  <data name="Caption_AddBookmark" xml:space="preserve">
+    <value>Añadir marcador</value>
+  </data>
+  <data name="Caption_RemoveBookmark" xml:space="preserve">
+    <value>Quitar marcador</value>
+  </data>
+  <data name="Caption_Admin" xml:space="preserve">
+    <value>Administración</value>
+  </data>
+  <data name="Caption_Version" xml:space="preserve">
+    <value>Versión</value>
+  </data>
+  <data name="Caption_Home" xml:space="preserve">
+      <value>Inicio</value>
+  </data>
+  <data name="Consent_Title" xml:space="preserve">
+    <value>Diagnóstico y privacidad</value>
+  </data>
+  <data name="Consent_Description" xml:space="preserve">
+    <value>Con su permiso, la aplicación envía al servidor registros y trazas técnicas de su funcionamiento para ayudar a encontrar y corregir problemas. Puede cambiarlo en cualquier momento en Configuración.</value>
+  </data>
+  <data name="Consent_Accept" xml:space="preserve">
+    <value>Permitir</value>
+  </data>
+  <data name="Consent_Reject" xml:space="preserve">
+    <value>Rechazar</value>
+  </data>
+  <data name="Consent_Manage" xml:space="preserve">
+    <value>Gestionar preferencias</value>
+  </data>
+  <data name="Consent_PreferencesTitle" xml:space="preserve">
+    <value>Preferencias de privacidad</value>
+  </data>
+  <data name="Consent_Save" xml:space="preserve">
+    <value>Guardar preferencias</value>
+  </data>
+  <data name="Consent_Close" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
+  <data name="Consent_NecessaryTitle" xml:space="preserve">
+    <value>Estrictamente necesarias</value>
+  </data>
+  <data name="Consent_NecessaryDescription" xml:space="preserve">
+    <value>Necesarias para que la aplicación funcione: inicio de sesión y su configuración. No se pueden desactivar.</value>
+  </data>
+  <data name="Consent_TelemetryTitle" xml:space="preserve">
+    <value>Telemetría</value>
+  </data>
+  <data name="Consent_TelemetryDescription" xml:space="preserve">
+    <value>Los registros y trazas técnicas de esta aplicación se envían al servidor. Desactivado de forma predeterminada.</value>
+  </data>
+  <data name="Connection_Title" xml:space="preserve">
+    <value>No se puede conectar con el servidor</value>
+  </data>
+  <data name="Connection_Description" xml:space="preserve">
+    <value>Compruebe su conexión a Internet. La aplicación lo intentará de nuevo automáticamente.</value>
+  </data>
+  <data name="Connection_RetryIn" xml:space="preserve">
+    <value>Reintentando en {0} s</value>
+  </data>
+  <data name="Connection_Details" xml:space="preserve">
+    <value>Detalles</value>
+  </data>
+  <data name="List_NoData" xml:space="preserve">
+    <value>No se encontraron datos</value>
+  </data>
+  <data name="List_LoadFailed" xml:space="preserve">
+    <value>No se pudieron cargar los datos.</value>
+  </data>
+  <data name="List_Stale" xml:space="preserve">
+    <value>Es posible que los datos estén desactualizados.</value>
+  </data>
+  <data name="List_SelectedCount" xml:space="preserve">
+    <value>{0} seleccionados</value>
+  </data>
+  <data name="Message_ConfirmResetSettings" xml:space="preserve">
+    <value>¿Restablecer estos ajustes a sus valores predeterminados?</value>
+  </data>
+  <data name="Message_DiscardUnsavedChanges" xml:space="preserve">
+    <value>Hay cambios sin guardar. ¿Salir de esta página y descartarlos?</value>
+  </data>
+  <data name="Identity_Unavailable" xml:space="preserve">
+    <value>El servidor de inicio de sesión no está disponible, por lo que no se puede renovar su sesión.</value>
+  </data>
+  <data name="Caption_New" xml:space="preserve">
+    <value>Nuevo</value>
+  </data>
+  <data name="Caption_View" xml:space="preserve">
+    <value>Ver</value>
+  </data>
+  <data name="Caption_ShowTotal" xml:space="preserve">
+    <value>Mostrar el total</value>
+  </data>
+  <data name="Caption_TotalCount" xml:space="preserve">
+    <value>Total: {0}</value>
+  </data>
+  <data name="Caption_Connect" xml:space="preserve">
+    <value>Conectar</value>
+  </data>
+  <data name="Caption_Password" xml:space="preserve">
+    <value>Contraseña</value>
+  </data>
+  <data name="Sync_Rejected" xml:space="preserve">
+    <value>El servidor no aceptó un cambio en {0}: {1}</value>
+  </data>
+  <data name="Sync_Reason_Invalid" xml:space="preserve">
+    <value>Los datos no son válidos</value>
+  </data>
+  <data name="Sync_Reason_Forbidden" xml:space="preserve">
+    <value>No tiene permiso para cambiar esto</value>
+  </data>
+  <data name="Sync_Reason_ReadOnly" xml:space="preserve">
+    <value>Estos datos no se pueden cambiar</value>
+  </data>
+  <data name="Sync_Reason_Conflict" xml:space="preserve">
+    <value>Se cambió en otro dispositivo</value>
+  </data>
+  <data name="Sync_Reason_Unknown" xml:space="preserve">
+    <value>El servidor rechazó el cambio</value>
+  </data>
+  <data name="Sync_NotSynced" xml:space="preserve">
+    <value>No sincronizado: {0}</value>
+  </data>
+  <data name="Caption_SignIn" xml:space="preserve">
+    <value>Iniciar sesión</value>
+  </data>
+  <data name="Notice_AnonymousMemory" xml:space="preserve">
+    <value>No has iniciado sesión: los cambios se conservan hasta que se recargue la página.</value>
+  </data>
+  <data name="Notice_AnonymousRefuse" xml:space="preserve">
+    <value>Inicia sesión para usar esto: tus datos se guardan en el servidor.</value>
+  </data>
+  <data name="Notice_AnonymousReadShared" xml:space="preserve">
+    <value>No has iniciado sesión: ves los servidores de la organización. Inicia sesión para añadir los tuyos.</value>
+  </data>
+  <data name="Error_Reference" xml:space="preserve">
+    <value>Referencia: {0}</value>
+  </data>
+  <data name="Error_AccessDenied" xml:space="preserve">
+    <value>No tiene acceso a esta operación.</value>
+  </data>
+  <data name="Error_NetworkUnavailable" xml:space="preserve">
+    <value>No se puede acceder al servidor. Compruebe su conexión e inténtelo de nuevo.</value>
+  </data>
+  <data name="Caption_MoreFilters" xml:space="preserve">
+    <value>Más filtros</value>
+  </data>
+  <data name="Caption_Any" xml:space="preserve">
+    <value>Cualquiera</value>
+  </data>
+  <data name="Message_FieldRequired" xml:space="preserve">
+    <value>El campo es obligatorio</value>
+  </data>
+  <data name="Message_InvalidValue" xml:space="preserve">
+    <value>El valor no es válido</value>
+  </data>
+  <data name="Message_BookmarkQueryString" xml:space="preserve">
+    <value>Un marcador guarda un lugar, no una búsqueda: la dirección tiene una cadena de consulta que puede contener datos de un paciente.</value>
+  </data>
+  <data name="Caption_Name" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="Caption_Type" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="Caption_Status" xml:space="preserve">
+    <value>Estado</value>
+  </data>
+  <data name="Caption_Date" xml:space="preserve">
+    <value>Fecha</value>
+  </data>
+  <data name="Caption_Code" xml:space="preserve">
+    <value>Código</value>
+  </data>
+  <data name="Diagnostics_Title" xml:space="preserve">
+    <value>Diagnóstico</value>
+  </data>
+  <data name="Diagnostics_Routes" xml:space="preserve">
+    <value>Rutas conocidas</value>
+  </data>
+  <data name="Diagnostics_Errors" xml:space="preserve">
+    <value>Gestión de errores</value>
+  </data>
+  <data name="Diagnostics_Sheets" xml:space="preserve">
+    <value>Paneles</value>
+  </data>
+  <data name="Diagnostics_CodeEditor" xml:space="preserve">
+    <value>Editor de código</value>
+  </data>
+  <data name="Diagnostics_Lists" xml:space="preserve">
+    <value>Listas</value>
+  </data>
+  <data name="Caption_WordWrap" xml:space="preserve">
+    <value>Ajuste de línea</value>
+  </data>
+  <data name="Caption_BookmarkedOnly" xml:space="preserve">
+    <value>Solo marcadores</value>
+  </data>
+  <data name="Caption_ExpandAll" xml:space="preserve">
+    <value>Expandir todo</value>
+  </data>
+  <data name="Caption_CollapseAll" xml:space="preserve">
+    <value>Contraer todo</value>
+  </data>
+</root>

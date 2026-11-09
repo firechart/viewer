@@ -1,0 +1,5 @@
+{%- if self.code -%}
+  {%- apply self.code mode: "text" -%}
+{%- else -%}
+  {{- self.id -}}
+{%- endif -%}

@@ -1,0 +1,5 @@
+{%- assign n = self.participant | as_list | size -%}
+{%- capture t0 -%}{{ self.name }}{%- endcapture -%}
+{%- assign title = t0 -%}
+{%- if title == "" -%}{%- assign title = self.id -%}{%- endif -%}
+{{- title -}}

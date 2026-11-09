@@ -1,0 +1,46 @@
+@* What a server needs before it can be read: a sign-in (SMART) or credentials (Basic, Token) *@
+@if (Access == ServerAccess.NeedsAuthorization)
+{
+    <ServerSignInPanel Server=@Server Rejected=@Rejected OnSignedIn=@SignedInAsync/>
+}
+else if (Access == ServerAccess.NeedsCredentials)
+{
+    <ServerCredentialsPanel Server=@Server Rejected=@Rejected OnSubmitted=@OnRetry/>
+}
+
+@code {
+
+    /// <summary>The server.</summary>
+    [Parameter, EditorRequired]
+    public IViewerServer Server { get; set; } = null!;
+
+    /// <summary>What the server needs.</summary>
+    [Parameter]
+    public ServerAccess Access { get; set; }
+
+    /// <summary>The server refused what was given before.</summary>
+    [Parameter]
+    public bool Rejected { get; set; }
+
+    /// <summary>Reads the server again, after the credentials are given.</summary>
+    [Parameter]
+    public EventCallback OnRetry { get; set; }
+
+    /// <summary>The instance of the Viewer.</summary>
+    [CascadingParameter]
+    public ViewerSession Session { get; set; } = null!;
+
+    // A SMART launch decides the start page: the patient of the context, else the page that asked for the sign-in
+    private async Task SignedInAsync(SmartCompletion completion)
+    {
+        if (completion.PatientId is { Length: > 0 } patient)
+        {
+            Session.Navigate(new ViewerRoute(ViewerPage.ClinicalSummary, "Patient", patient));
+        }
+        else
+        {
+            await OnRetry.InvokeAsync();
+        }
+    }
+
+}

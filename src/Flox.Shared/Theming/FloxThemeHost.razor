@@ -1,0 +1,38 @@
+@using Flox.Shared.Settings
+@inject IJSRuntime JS
+@inject Radzen.ThemeService RadzenThemes
+
+@* The Radzen base theme is switched through its service; data-theme drives the FloxWind overlay and the dark: variant *@
+<RadzenTheme Theme=@_initialTheme/>
+
+@code {
+    private string? _initialTheme;
+    private string? _currentTheme;
+    private bool? _appliedDark;
+
+    [Parameter]
+    public bool Dark { get; set; } = ThemeSettings.DEFAULT_DARK;
+
+    protected override void OnParametersSet()
+    {
+        var name = ThemeService.ThemeName(Dark);
+        _initialTheme ??= name;
+
+        if (_currentTheme is not null && _currentTheme != name)
+        {
+            RadzenThemes.SetTheme(name);
+        }
+
+        _currentTheme = name;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_appliedDark != Dark)
+        {
+            _appliedDark = Dark;
+            await JS.InvokeVoidAsync("document.documentElement.setAttribute", "data-theme", Dark ? "dark" : "light");
+        }
+    }
+
+}

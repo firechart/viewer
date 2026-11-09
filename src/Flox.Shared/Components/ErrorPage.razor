@@ -1,0 +1,18 @@
+@* Rendered outside MainLayout, so it brings its own theme *@
+<FloxThemeHost Dark="true"/>
+<RadzenComponents/>
+
+<RadzenStack AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.Center" class="min-h-dvh bg-canvas rz-p-4 text-ink">
+    <RadzenText TextStyle="TextStyle.H1">500</RadzenText>
+    <ErrorDisplay Exception=@Exception ErrorBoundary=@ErrorBoundary/>
+</RadzenStack>
+
+@code {
+
+    [Parameter]
+    public Exception? Exception { get; set; }
+
+    [Parameter]
+    public ErrorBoundary? ErrorBoundary { get; set; }
+
+}

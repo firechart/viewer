@@ -1,0 +1,81 @@
+@attribute [Route(SharedRoutes.TASK)]
+@attribute [Authorize(Policy = FloxPolicies.AUTHENTICATED)]
+
+@using Flox.Core.Authorization
+@using Flox.Core.Models
+@inherits StatefulWidget<BackgroundTaskViewState>
+
+<AppBarTitle>@Strings.Caption_BackgroundTask</AppBarTitle>
+
+<AppBarCommands>
+    <AppBarCommand Icon="delete" IconColor="var(--rz-danger)" Title=@Strings.Caption_Delete OnClick=@DeleteAsync/>
+</AppBarCommands>
+
+<Breadcrumbs Items=@Breadcrumbs/>
+
+@if (State.Item == null)
+{
+    <RadzenSkeleton/>
+}
+else
+{
+    <ListSection Caption=@Strings.Caption_Properties Definitions>
+        <PropertyTile Label="Id" Value=@State.Item.Uid.ToString()/>
+        <PropertyTile Label="Created at" Value=@State.Item.CreatedAt.ToString()/>
+        <PropertyTile Label="Completed at" Value=@State.Item.CompletedAt?.ToString()/>
+        <PropertyTile Label="Status" Value=@State.Item.Status.ToString()/>
+    </ListSection>
+
+    @if (!string.IsNullOrEmpty(State.Item.Error))
+    {
+        <RadzenAlert AlertStyle="Radzen.AlertStyle.Danger" Variant="Radzen.Variant.Flat" AllowClose="false" class="rz-mt-2">@State.Item.Error</RadzenAlert>
+    }
+
+    <BackgroundTaskLogs TaskId=@State.Item.Uid/>
+}
+
+@code {
+
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    protected override object? ActivationKey
+    {
+        get
+        {
+            return Id;
+        }
+    }
+
+    protected override void InitBreadcrumbs()
+    {
+        Breadcrumbs.Add(Strings.Caption_ImportTasks,
+                        href: NavigationManager.Tasks()
+                                                .ToUrl());
+        if (State.Item != null)
+        {
+            Breadcrumbs.Add(Strings.Caption_ImportTask,
+                            href: NavigationManager.Task(State.Item.Uid)
+                                                    .ToUrl());
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        try
+        {
+            if (State.Item != null && await this.ConfirmAsync(Strings.Caption_ConfirmDelete))
+            {
+                await State.DeleteAsync();
+            }
+
+            NavigationManager.Tasks()
+                              .Navigate();
+        }
+        catch (Exception ex)
+        {
+            await this.HandleExceptionUI(ex: ex);
+        }
+    }
+
+}

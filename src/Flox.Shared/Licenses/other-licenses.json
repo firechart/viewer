@@ -1,0 +1,24 @@
+﻿[
+  {
+    "PackageId": "PostgreSQL",
+    "PackageVersion": "latest",
+    "PackageProjectUrl": "https://github.com/postgres/postgres",
+    "Copyright": "Portions Copyright (c) 1996-2026, PostgreSQL Global Development Group | Portions Copyright (c) 1994, The Regents of the University of California",
+    "Authors": "https://github.com/postgres/postgres/graphs/contributors",
+    "Description": "PostgreSQL Database Management System",
+    "License": "THE UNIVERSITY OF CALIFORNIA",
+    "LicenseUrl": "https://github.com/postgres/postgres/blob/master/COPYRIGHT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "CodeMirror",
+    "PackageVersion": "6",
+    "PackageProjectUrl": "https://codemirror.net/",
+    "Copyright": "Copyright (C) 2018-2021 by Marijn Haverbeke <marijn@haverbeke.berlin> and others",
+    "Authors": "https://github.com/codemirror/dev/graphs/contributors",
+    "Description": "CodeMirror is a code editor component for the web.",
+    "License": "MIT",
+    "LicenseUrl": "https://github.com/codemirror/dev/blob/main/LICENSE",
+    "LicenseInformationOrigin": 0
+  }
+]

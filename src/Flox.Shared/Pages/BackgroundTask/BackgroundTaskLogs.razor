@@ -1,0 +1,30 @@
+@using Flox.Core.Models
+
+@inherits StatefulWidget<BackgroundTaskLogState>
+
+<Subtitle>Logs</Subtitle>
+<DataList State=@State Layout="ListLayout.Content" ShowSearch="false" PullToRefresh="false">
+    <ItemTemplate Context="row">
+        <ListTile Dense SubtitleText=@($"{row.Item.DateTime.ToLocalTime():HH:mm:ss} · {row.Item.LogLevel}")>
+            <Title>
+                <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.Div" class="break-words">@row.Item.Message</RadzenText>
+            </Title>
+        </ListTile>
+    </ItemTemplate>
+</DataList>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public Guid TaskId { get; set; }
+
+    protected override object? ActivationKey
+    {
+        get
+        {
+            return TaskId;
+        }
+    }
+
+}

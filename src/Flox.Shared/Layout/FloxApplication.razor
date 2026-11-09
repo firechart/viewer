@@ -1,0 +1,55 @@
+@* Full component nesting, shared by the server/WASM host and MAUI (both use this component as
+   their root now): src/Flox.AppServer.Shared/Docs/internal/layout.md *@
+
+@using System.Reflection
+
+@inject NavigationManager Navigation
+@inject IAuthenticationService AuthenticationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILogger<FloxApplication> Logger
+
+@*
+    https://learn.microsoft.com/en-us/aspnet/core/blazor/security/?view=aspnetcore-10.0&tabs=visual-studio
+    In .NET 8 or later, don't use the CascadingAuthenticationState component.
+    Instead, add cascading authentication state services to the service collection in the Program file:
+    builder.Services.AddCascadingAuthenticationState();
+*@
+
+<AppErrorBoundary @ref=@_appErrorBoundary>
+    <ChildContent>
+        <Router AppAssembly="@(typeof(FloxApplication).Assembly)"
+                AdditionalAssemblies=@AdditionalAssemblies>
+            @* <Navigating>
+                <CircularProgress />
+            </Navigating> *@
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                    <NotAuthorized>
+                        <ModalMessageBox Caption="Please login"></ModalMessageBox>
+                    </NotAuthorized>
+                    <Authorizing>
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-sm)" class="rz-mt-4">
+                            <FloxIcon Icon="login"/>
+                            <RadzenText TextStyle="TextStyle.H6" class="rz-m-0">@Strings.Auth_CompletingSignIn_Message</RadzenText>
+                        </RadzenStack>
+                    </Authorizing>
+                </AuthorizeRouteView>
+                <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
+            </Found>
+            <NotFound>
+                <PageTitle>Not found</PageTitle>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <Page404/>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </ChildContent>
+    <ErrorContent Context="ex">
+        <ErrorPage Exception=@ex ErrorBoundary=@_appErrorBoundary/>
+    </ErrorContent>
+</AppErrorBoundary>
+
+@code
+{
+    AppErrorBoundary? _appErrorBoundary;
+}

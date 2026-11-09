@@ -1,0 +1,50 @@
+﻿@inherits StatelessWidget
+
+@* The account in the app bar (the profile, or the sign-in): a page that wants it puts it into AppBarCommands; the main menu has it on every page *@
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject FloxOidcOptions OidcOptions
+@implements IDisposable
+
+@if (OidcOptions.Enabled)
+{
+    <AuthorizeView>
+        <Authorized>
+            @if (context.User.IsAuthenticated())
+            {
+                <AppBarCommand Icon="account_circle" Href="/profile" Title=@Strings.Caption_Profile/>
+            }
+            else
+            {
+                <AppBarCommand Icon="login" OnClick="LoginAsync" Title=@Strings.Caption_SignIn/>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <AppBarCommand Icon="login" OnClick="LoginAsync" Title=@Strings.Caption_SignIn/>
+        </NotAuthorized>
+    </AuthorizeView>
+}
+
+@code {
+    private Task LoginAsync()
+    {
+        return AuthenticationService.LoginAsync();
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        AuthenticationStateProvider.AuthenticationStateChanged += AuthenticationStateProvider_AuthenticationStateChanged;
+        return base.OnInitializedAsync();
+    }
+
+    private void AuthenticationStateProvider_AuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        AuthenticationStateProvider.AuthenticationStateChanged -= AuthenticationStateProvider_AuthenticationStateChanged;
+    }
+
+}

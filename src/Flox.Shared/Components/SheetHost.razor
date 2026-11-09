@@ -1,0 +1,18 @@
+@if (Commands != null)
+{
+    <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.End" Gap="var(--gap-xs)" class="rz-mb-2">
+        @Commands
+    </RadzenStack>
+}
+
+@Content
+
+@code {
+
+    [Parameter]
+    public RenderFragment? Content { get; set; }
+
+    [Parameter]
+    public RenderFragment? Commands { get; set; }
+
+}

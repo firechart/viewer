@@ -1,0 +1,6 @@
+{%- capture t0 -%}{{ self.name }}{%- endcapture -%}
+{%- capture t1 -%}{% apply self.type mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 -%}
+{%- if title == "" -%}{%- assign title = t1 -%}{%- endif -%}
+{%- if title == "" -%}{%- assign title = self.id -%}{%- endif -%}
+{{- title -}}

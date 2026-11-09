@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Description>The vendor library of FireChart Viewer: Liquid templates for FHIR resources and datatypes, their translations, the fx-* style kit built on daisyUI, and synthetic samples. Use it as the last layer of FireChart.Viewer.Core.</Description>
+    <PackageTags>fhir;hl7;liquid;templates;daisyui;healthcare;viewer</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://git.firechart.org/firechart/firechart</PackageProjectUrl>
+    <RepositoryUrl>https://git.firechart.org/firechart/firechart.git</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The vendor library (templates, texts, styles, forms, samples) is the folders of this project; the assembly carries it as the fallback layer -->
+    <EmbeddedResource Include="templates\**\*.liquid" LogicalName="%(Filename)%(Extension)" />
+    <EmbeddedResource Include="samples\**\*.json" LogicalName="%(Filename)%(Extension)" />
+    <EmbeddedResource Include="locales\*\fhir-templates.json" LogicalName="locales.%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="summary-forms\*.json" LogicalName="summary-forms.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="search-forms\**\*.json" LogicalName="search-forms.%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="styles\*.css" LogicalName="%(Filename)%(Extension)" />
+    <EmbeddedResource Include="styles\daisy\fx.daisy.css" LogicalName="fx.daisy.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FireChart.Viewer.Core\FireChart.Viewer.Core.csproj" />
+  </ItemGroup>
+
+</Project>

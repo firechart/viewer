@@ -1,0 +1,222 @@
+@using System.Globalization
+@using Radzen.Blazor
+@inject Radzen.DialogService Dialogs
+
+@* The dialog is as high as the form, and no higher than the screen: the fields scroll, the commands stay in view (SearchFormView.razor.css) *@
+<div class="form-layout">
+    <div class="form-body">
+        <RadzenStack Gap="var(--gap-lg)">
+            @if (Definition.IsGenerated)
+            {
+                <RadzenAlert AlertStyle="Radzen.AlertStyle.Info" Variant="Radzen.Variant.Flat" AllowClose="false" Size="Radzen.AlertSize.Small">
+                    @Strings.Message_SearchFormGenerated
+                </RadzenAlert>
+            }
+            @* A form of many fields is searched, not scrolled through: what matches is shown, the closed groups open *@
+            @if (Definition.Fields.Count > SearchableFrom)
+            {
+                <Search Value=@_find ValueChanged=@OnFind DebounceInterval="200" Placeholder=@FloxStrings.Caption_Search/>
+            }
+            @foreach (var section in _sections)
+            {
+                var fields = Matching(section.Fields);
+                if (fields.Count == 0)
+                {
+                    continue;
+                }
+
+                if (section.Caption == null)
+                {
+                    @FieldGrid(fields)
+                }
+                else
+                {
+                    <RadzenFieldset Text=@section.Caption AllowCollapse="true" Collapsed=@(section.Collapsed && !Finding)>
+                        @FieldGrid(fields)
+                    </RadzenFieldset>
+                }
+            }
+            @if (Matching(_more) is { Count: > 0 } more)
+            {
+                <RadzenFieldset Text=@FloxStrings.Caption_MoreFilters AllowCollapse="true" Collapsed=@(!Finding && !_more.Any(HasValue))>
+                    @FieldGrid(more)
+                </RadzenFieldset>
+            }
+            @if (Finding && _sections.All(row => Matching(row.Fields).Count == 0) && Matching(_more).Count == 0)
+            {
+                <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0">@FloxStrings.List_NoData</RadzenText>
+            }
+        </RadzenStack>
+    </div>
+    <div class="form-footer">
+        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.End" Gap="var(--gap-sm)">
+            <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Text=@FloxStrings.Caption_Reset Click=@Reset class="form-reset"/>
+            <RadzenButton Variant="Radzen.Variant.Outlined" ButtonStyle="Radzen.ButtonStyle.Base" Text=@FloxStrings.Caption_Cancel Click=@_cancel/>
+            <RadzenButton Variant="Radzen.Variant.Filled" ButtonStyle="Radzen.ButtonStyle.Primary" Text=@FloxStrings.Caption_Ok Click=@Apply/>
+        </RadzenStack>
+    </div>
+</div>
+
+@code {
+
+    private sealed record Section
+    (
+        string? Caption,
+        bool Collapsed,
+        List<SearchFormField> Fields
+    );
+
+    private readonly Dictionary<string, SearchFieldValue> _values = new Dictionary<string, SearchFieldValue>(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _errors = new Dictionary<string, string>(StringComparer.Ordinal);
+    private readonly List<Section> _sections = [];
+    private readonly List<SearchFormField> _more = [];
+    private string _culture = CultureInfo.CurrentUICulture.Name;
+    private SearchFormDefinition? _loadedForm;
+    private IReadOnlyDictionary<string, SearchFieldValue>? _loadedValues;
+
+    /// <summary>The form.</summary>
+    [Parameter, EditorRequired]
+    public SearchFormDefinition Definition { get; set; } = null!;
+
+    /// <summary>The values the form opens with, by query name; none: the defaults of the fields.</summary>
+    [Parameter]
+    public IReadOnlyDictionary<string, SearchFieldValue>? Values { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        // The dialog host passes the same objects again on every render: what the user typed must survive that
+        if (ReferenceEquals(_loadedForm, Definition) && ReferenceEquals(_loadedValues, Values))
+        {
+            return;
+        }
+
+        _loadedForm = Definition;
+        _loadedValues = Values;
+        _values.Clear();
+        foreach (var field in Definition.Fields)
+        {
+            _values[field.QueryName] = Values?.TryGetValue(field.QueryName, out var previous) == true ? previous.Clone() : SearchFormEvaluator.NewValue(field);
+        }
+
+        BuildLayout();
+    }
+
+    private void BuildLayout()
+    {
+        _sections.Clear();
+        _more.Clear();
+
+        var groups = Definition.Groups
+                          .OrderBy(g => g.Order)
+                          .ToList();
+        var known = groups.Select(g => g.Code)
+                           .ToHashSet(StringComparer.Ordinal);
+        var ordered = Definition.Fields
+                           .OrderBy(f => f.Order)
+                           .ToList();
+
+        var loose = ordered.Where(f => f.Included && (f.GroupCode == null || !known.Contains(f.GroupCode)))
+                            .ToList();
+        if (loose.Count > 0)
+        {
+            _sections.Add(new Section(null, false, loose));
+        }
+
+        foreach (var group in groups)
+        {
+            var fields = ordered.Where(f => f.Included && f.GroupCode == group.Code)
+                                 .ToList();
+            if (fields.Count > 0)
+            {
+                var collapsed = group.CollapsedByDefault && !fields.Any(HasValue);
+                _sections.Add(new Section(group.Caption.Resolve(_culture), collapsed, fields));
+            }
+        }
+
+        _more.AddRange(ordered.Where(f => !f.Included));
+    }
+
+    private bool HasValue(SearchFormField field) => SearchFormEvaluator.HasValue(field, _values[field.QueryName]);
+
+    // The search box is shown for a form with more fields than this
+    private const int SearchableFrom = 8;
+
+    private string? _find;
+
+    private bool Finding => !string.IsNullOrWhiteSpace(_find);
+
+    private void OnFind(string? text)
+    {
+        _find = text;
+    }
+
+    // The fields whose label, hint or name have the text; all of them when nothing is searched for
+    private List<SearchFormField> Matching(List<SearchFormField> fields)
+    {
+        if (!Finding)
+        {
+            return fields;
+        }
+
+        var text = _find!.Trim();
+        return [.. fields.Where(field => field.QueryName.Contains(text, StringComparison.OrdinalIgnoreCase) ||
+                                         field.Label.Resolve(_culture).Contains(text, StringComparison.OrdinalIgnoreCase) ||
+                                         field.Hint.Resolve(_culture).Contains(text, StringComparison.OrdinalIgnoreCase))];
+    }
+
+    private RenderFragment FieldGrid(List<SearchFormField> fields) =>
+        @<RadzenRow Gap="var(--gap-lg)">
+            @foreach (var field in fields)
+            {
+                <RadzenColumn @key=field.QueryName Size="12" SizeMD=@(field.Span is > 0 and <= 12 ? field.Span.Value : 6)>
+                    <SearchFieldEditor Field=@field
+                                       Value=@_values[field.QueryName]
+                                       Culture=@_culture
+                                       Error=@_errors.GetValueOrDefault(field.QueryName)/>
+                </RadzenColumn>
+            }
+        </RadzenRow>;
+
+    private void Reset()
+    {
+        _errors.Clear();
+        foreach (var field in Definition.Fields)
+        {
+            _values[field.QueryName] = SearchFormEvaluator.NewValue(field);
+        }
+    }
+
+    private void Apply()
+    {
+        _errors.Clear();
+        foreach (var field in Definition.Fields)
+        {
+            if (SearchFormEvaluator.Validate(field, _values[field.QueryName]) is { } problem)
+            {
+                _errors[field.QueryName] = problem;
+            }
+        }
+
+        if (_errors.Count > 0)
+        {
+            return;
+        }
+
+        Close(new SearchFormDialogResult(SearchFormEvaluator.Evaluate(Definition, _values), _values.ToDictionary(p => p.Key, p => p.Value.Clone(), StringComparer.Ordinal)));
+    }
+
+    // The receiver is not a component, so the form is not rendered again after the click: the dialog is going away
+    private readonly object _noRender = new object();
+    private EventCallback<Microsoft.AspNetCore.Components.Web.MouseEventArgs> _cancel;
+
+    protected override void OnInitialized()
+    {
+        _cancel = EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(_noRender, () => Close(null));
+    }
+
+    private void Close(SearchFormDialogResult? result)
+    {
+        Dialogs.Close(result);
+    }
+
+}

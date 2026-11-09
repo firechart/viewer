@@ -1,0 +1,591 @@
+@typeparam TItem where TItem : class
+
+@inherits StatelessWidget
+@implements IAsyncDisposable
+
+@inject Radzen.ContextMenuService ContextMenuService
+
+@if (_state is not null)
+{
+    var selectionActive = _state.SelectedItems.Count > 0;
+    var rowCount = RowCount;
+
+    <div @ref=@_root class=@(EffectiveLayout == ListLayout.Fill ? "data-list flex min-h-0 flex-1 flex-col" : "data-list flex flex-col")>
+        @if (selectionActive)
+        {
+            <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="var(--gap-xs)" class="border-b border-line rz-px-2 rz-py-1">
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-xs)">
+                    <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Size="Radzen.ButtonSize.Small" Click=@ClearSelection title=@Strings.Caption_Cancel>
+                        <FloxIcon Icon="close" Size="1.25rem"/>
+                    </RadzenButton>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.Span">@string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.List_SelectedCount, _state.SelectedItems.Count)</RadzenText>
+                </RadzenStack>
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-xs)">
+                    @SelectionActions?.Invoke(_state.SelectedItems)
+                </RadzenStack>
+            </RadzenStack>
+        }
+        else if (HasToolbar)
+        {
+            @* The visible box of the search field sits at the bottom of its wrapper (the top is room for a floating label): the toolbar is aligned
+               to the bottom, so the buttons stand level with the box *@
+            <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.End" Gap="var(--gap-sm)" class="rz-pb-1">
+                @ToolbarStart
+                @if (ShowSearch && _state.CanSearch)
+                {
+                    <div class="min-w-0 flex-1">
+                        <Search Value=@_state.SearchText ValueChanged=@SearchAsync Placeholder=@Strings.Caption_Search/>
+                    </div>
+                }
+                else
+                {
+                    <div class="flex-1"></div>
+                }
+                @if (OnFilter.HasDelegate)
+                {
+                    <FilterButton Count=@FilterCount OnClick=@OnFilter/>
+                }
+                @ToolbarEnd
+            </RadzenStack>
+        }
+
+        @if (_state.LoadError is not null && rowCount > 0)
+        {
+            <RadzenAlert AlertStyle="Radzen.AlertStyle.Warning" Variant="Radzen.Variant.Flat" Shade="Radzen.Shade.Lighter" Size="Radzen.AlertSize.Small" AllowClose="false">
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="var(--gap-sm)">
+                    @Strings.List_Stale
+                    <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Size="Radzen.ButtonSize.Small" Text=@Strings.Caption_Retry Click=@RefreshAsync/>
+                </RadzenStack>
+            </RadzenAlert>
+        }
+
+        <div class=@(EffectiveLayout == ListLayout.Fill ? "relative min-h-0 flex-1" : "relative")>
+        <div @ref=@_scroller class=@(EffectiveLayout == ListLayout.Fill ? "h-full overflow-y-auto overscroll-y-contain" : "relative")>
+            @if (PullToRefresh && EffectiveLayout == ListLayout.Fill)
+            {
+                <div data-pull class="flex h-0 items-center justify-center overflow-hidden text-muted">
+                    <FloxIcon Icon="refresh" Size="1.5rem"/>
+                </div>
+            }
+
+            @if (Mode == ListMode.Virtual)
+            {
+                <Virtualize @ref=@_virtualize TItem="TItem" ItemsProvider=@LoadRowsAsync ItemSize=@RowHeight OverscanCount="4" Context="item">
+                    <ItemContent>
+                        <div data-row-id=@RowIndex(item) class="border-b border-line"
+                             @onclick=@(() => HandleRowClickAsync(item))
+                             @oncontextmenu=@(e => OpenRowMenu(e, item))
+                             @oncontextmenu:preventDefault=@(RowMenu is not null)>
+                            @ItemTemplate?.Invoke(CreateRow(item, selectionActive))
+                        </div>
+                    </ItemContent>
+                    <Placeholder>
+                        <div style=@($"height:{RowHeight.ToString(System.Globalization.CultureInfo.InvariantCulture)}px")></div>
+                    </Placeholder>
+                    <EmptyContent>
+                        @EmptyState
+                    </EmptyContent>
+                </Virtualize>
+            }
+            else if (rowCount == 0)
+            {
+                @EmptyState
+            }
+            else
+            {
+                <RadzenDataGrid TItem="TItem"
+                                Data=@_state.Items
+                                AllowPaging="false"
+                                AllowSorting="false"
+                                AllowFiltering="false"
+                                AllowAlternatingRows="false"
+                                ShowHeader="false"
+                                RowClick=@OnGridRowClickAsync
+                                CellContextMenu=@OnCellContextMenu
+                                class="border-0 [--rz-grid-border-radius:0] [--rz-grid-background-color:transparent] [--rz-grid-cell-padding:0]">
+                    <Columns>
+                        @if (Columns is not null)
+                        {
+                            @Columns
+                        }
+                        else
+                        {
+                            <RadzenDataGridColumn TItem="TItem">
+                                <Template Context="item">
+                                    <div data-row-id=@RowIndex(item)>
+                                        @ItemTemplate?.Invoke(CreateRow(item, selectionActive))
+                                    </div>
+                                </Template>
+                            </RadzenDataGridColumn>
+                        }
+                    </Columns>
+                </RadzenDataGrid>
+            }
+        </div>
+            @* The rows stay usable under it: a virtual list loads while it is scrolled *@
+            <BusyIndicator Visible=@(Mode == ListMode.Virtual ? _virtualLoading : _state.IsBusy && rowCount > 0) Dim=@(Mode != ListMode.Virtual) BlockInput="false" Delayed="false"/>
+        </div>
+
+        @if (ShowPager)
+        {
+            var pageSize = _state.PageSize;
+            var from = (long)_state.CurrentPage * pageSize + 1;
+            var to = Math.Min(from + pageSize - 1, _state.Total);
+            <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="var(--gap-sm)" class="border-t border-line rz-px-2 rz-py-1">
+                <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.Span" class="rz-text-nowrap">@from–@to / @_state.Total</RadzenText>
+                <RadzenPager @ref=@_pager
+                             Count=@((int)_state.Total)
+                             PageSize=@pageSize
+                             PageNumbersCount="3"
+                             ShowPagingSummary="false"
+                             HorizontalAlign="Radzen.HorizontalAlign.Right"
+                             PageChanged=@OnPageChangedAsync/>
+            </RadzenStack>
+        }
+    </div>
+}
+
+@code {
+    private IListState<TItem>? _state;
+    private IListState<TItem>? _subscribed;
+    private ArrayListState<TItem>? _array;
+    private IEnumerable<TItem>? _arraySource;
+    private ElementReference _root;
+    private ElementReference _scroller;
+    private IJSObjectReference? _module;
+    private IJSObjectReference? _gestures;
+    private DotNetObjectReference<DataList<TItem>>? _self;
+    private Virtualize<TItem>? _virtualize;
+    private RadzenPager? _pager;
+    private (long Total, int PageSize, int Page)? _pagerSynced;
+
+    // The rows a virtual list has loaded, by their index in the whole list: a gesture finds its row by it
+    private readonly Dictionary<int, TItem> _virtualRows = [];
+    private readonly Dictionary<TItem, int> _virtualIndex = new Dictionary<TItem, int>(ReferenceEqualityComparer.Instance);
+    private int _virtualTotal;
+    private int _virtualLoads;
+    private bool _virtualLoading;
+
+    // The state behind the list: a data source state, or any other. Without it the list shows Items
+    [Parameter]
+    public IListState<TItem>? State { get; set; }
+
+    // The rows as an array; not paged, not searched
+    [Parameter]
+    public IEnumerable<TItem>? Items { get; set; }
+
+    [Parameter]
+    public ListMode Mode { get; set; } = ListMode.Paged;
+
+    [Parameter]
+    public ListLayout Layout { get; set; } = ListLayout.Fill;
+
+    [Parameter]
+    public bool ShowSearch { get; set; } = true;
+
+    // Rows get a mark in place of the leading content to be selected
+    [Parameter]
+    public bool Selectable { get; set; }
+
+    [Parameter]
+    public int FilterCount { get; set; }
+
+    // The filter button is shown when the page handles it (usually it opens a dialog)
+    [Parameter]
+    public EventCallback OnFilter { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> OnRowClick { get; set; }
+
+    // A pull down at the top of a touch screen refreshes the list; only for a list that scrolls itself (Layout Fill)
+    [Parameter]
+    public bool PullToRefresh { get; set; } = true;
+
+    // The height of a row in pixels, for the scroll bar of a virtual list
+    [Parameter]
+    public float RowHeight { get; set; } = 64;
+
+    // The tile of a row; ListRow gives the item and the selection to hand to ListTile
+    [Parameter]
+    public RenderFragment<ListRow<TItem>>? ItemTemplate { get; set; }
+
+    // The commands of the context menu of a row (a right click, a long tap); built when it opens
+    [Parameter]
+    public RenderFragment<RowMenuContext<TItem>>? RowMenu { get; set; }
+
+    // The commands while rows are selected; they get the selected rows
+    [Parameter]
+    public RenderFragment<IReadOnlyCollection<TItem>>? SelectionActions { get; set; }
+
+    [Parameter]
+    public RenderFragment? ToolbarStart { get; set; }
+
+    [Parameter]
+    public RenderFragment? ToolbarEnd { get; set; }
+
+    [Parameter]
+    public RenderFragment? EmptyTemplate { get; set; }
+
+    // Columns of a table; without them the list is one column with ItemTemplate
+    [Parameter]
+    public RenderFragment? Columns { get; set; }
+
+    // A virtual list has no height of its own: it always scrolls inside its parent
+    private ListLayout EffectiveLayout
+    {
+        get
+        {
+            return Mode == ListMode.Virtual ? ListLayout.Fill : Layout;
+        }
+    }
+
+    private int RowCount
+    {
+        get
+        {
+            return Mode == ListMode.Virtual ? _virtualTotal : _state?.Items.Count ?? 0;
+        }
+    }
+
+    private bool HasToolbar
+    {
+        get
+        {
+            return ToolbarStart is not null || ToolbarEnd is not null || OnFilter.HasDelegate || (ShowSearch && _state is { CanSearch: true });
+        }
+    }
+
+
+    private bool ShowPager
+    {
+        get
+        {
+            return Mode == ListMode.Paged && _state is { PageSize: > 0 } state && state.Total > state.PageSize;
+        }
+    }
+
+    private RenderFragment EmptyState =>
+        @<text>
+            @if (_state!.IsBusy)
+            {
+                <RadzenStack AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.Center" class="rz-px-4 rz-py-12">
+                    <CircularProgress/>
+                </RadzenStack>
+            }
+            else if (_state.LoadError is not null)
+            {
+                <RadzenStack AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.Center" Gap="var(--gap-sm)" class="rz-px-4 rz-py-12">
+                    <FloxIcon Icon="error" Size="2rem" Color="var(--rz-danger)"/>
+                    <RadzenText TextStyle="TextStyle.Body2" TextAlign="Radzen.TextAlign.Center">@Strings.List_LoadFailed</RadzenText>
+                    <RadzenButton Variant="Radzen.Variant.Outlined" ButtonStyle="Radzen.ButtonStyle.Base" Text=@Strings.Caption_Retry Click=@RefreshAsync/>
+                </RadzenStack>
+            }
+            else if (EmptyTemplate is not null)
+            {
+                @EmptyTemplate
+            }
+            else
+            {
+                <RadzenStack AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.Center" class="rz-px-4 rz-py-12">
+                    <RadzenText TextStyle="TextStyle.Body2" class="text-muted">@Strings.List_NoData</RadzenText>
+                </RadzenStack>
+            }
+        </text>;
+
+    protected override void OnParametersSet()
+    {
+        if (State is null && Items is not null && !ReferenceEquals(_arraySource, Items))
+        {
+            _array ??= new ArrayListState<TItem>();
+            _array.SetItems(Items);
+            _arraySource = Items;
+        }
+
+        _state = State ?? (Items is not null ? _array : null);
+        if (!ReferenceEquals(_subscribed, _state))
+        {
+            if (_subscribed is not null)
+            {
+                _subscribed.Changed -= OnStateChanged;
+            }
+
+            _subscribed = _state;
+            if (_subscribed is not null)
+            {
+                _subscribed.Changed += OnStateChanged;
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        await SyncPagerAsync();
+        if (_gestures is null && _state is not null)
+        {
+            _module ??= await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Flox.Shared/Components/DataList.razor.js");
+            _self ??= DotNetObjectReference.Create(this);
+            _gestures = await _module.InvokeAsync<IJSObjectReference>("attach", _root, _scroller, _self, new { pull = PullToRefresh && EffectiveLayout == ListLayout.Fill });
+        }
+    }
+
+    [JSInvokable]
+    public void OnLongPress(int index, double clientX, double clientY)
+    {
+        var row = ResolveRow(index);
+        if (row is not null)
+        {
+            OpenRowMenu(new Microsoft.AspNetCore.Components.Web.MouseEventArgs { ClientX = clientX, ClientY = clientY }, row);
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnPullRefresh()
+    {
+        await RefreshAsync();
+    }
+
+    private void OnStateChanged(object? sender, EventArgs e)
+    {
+        UiErrors.Fire(() => InvokeAsync(StateHasChanged), nameof(OnStateChanged));
+    }
+
+    // A row is told to a gesture by its index: in the page, or in the whole virtual list
+    private int RowIndex(TItem item)
+    {
+        if (Mode == ListMode.Virtual)
+        {
+            return _virtualIndex.GetValueOrDefault(item, -1);
+        }
+
+        for (var i = 0; i < _state!.Items.Count; i++)
+        {
+            if (ReferenceEquals(_state.Items[i], item))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private TItem? ResolveRow(int index)
+    {
+        if (Mode == ListMode.Virtual)
+        {
+            return _virtualRows.GetValueOrDefault(index);
+        }
+
+        return _state is not null && index >= 0 && index < _state.Items.Count ? _state.Items[index] : null;
+    }
+
+    private async ValueTask<ItemsProviderResult<TItem>> LoadRowsAsync(ItemsProviderRequest request)
+    {
+        SetVirtualLoading(++_virtualLoads > 0);
+        try
+        {
+            var range = await _state!.LoadRangeAsync(request.StartIndex, request.Count, request.CancellationToken);
+            for (var i = 0; i < range.Items.Count; i++)
+            {
+                _virtualRows[request.StartIndex + i] = range.Items[i];
+                _virtualIndex[range.Items[i]] = request.StartIndex + i;
+            }
+
+            _virtualTotal = (int)range.Total;
+            return new ItemsProviderResult<TItem>(range.Items, _virtualTotal);
+        }
+        catch (OperationCanceledException)
+        {
+            // Virtualize cancels a request when the user scrolls on; the answer is dropped
+            return new ItemsProviderResult<TItem>([], _virtualTotal);
+        }
+        finally
+        {
+            SetVirtualLoading(--_virtualLoads > 0);
+        }
+    }
+
+    private void SetVirtualLoading(bool loading)
+    {
+        if (_virtualLoading != loading)
+        {
+            _virtualLoading = loading;
+            UiErrors.Fire(() => InvokeAsync(StateHasChanged), nameof(SetVirtualLoading));
+        }
+    }
+
+    private async Task ReloadVirtualAsync()
+    {
+        _virtualRows.Clear();
+        _virtualIndex.Clear();
+        if (_virtualize is not null)
+        {
+            await _virtualize.RefreshDataAsync();
+        }
+    }
+
+    private ListRow<TItem> CreateRow(TItem item, bool selectionActive)
+    {
+        return new ListRow<TItem>(item, Selectable, Selectable && _state!.IsSelected(item), selectionActive, OnRowClick.HasDelegate, selected => SetSelectedAsync(item, selected));
+    }
+
+    private Task SetSelectedAsync(TItem item, bool selected)
+    {
+        if (_state!.IsSelected(item) != selected)
+        {
+            _state.ToggleSelected(item);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private void ClearSelection()
+    {
+        _state?.ClearSelection();
+    }
+
+    // Loads the rows again; a virtual list is asked to load what it shows
+    public async Task RefreshAsync()
+    {
+        if (_state is null)
+        {
+            return;
+        }
+
+        if (Mode == ListMode.Virtual)
+        {
+            await ReloadVirtualAsync();
+        }
+        else
+        {
+            await _state.RefreshAsync();
+        }
+    }
+
+    private async Task SearchAsync(string? text)
+    {
+        if (_state is null)
+        {
+            return;
+        }
+
+        if (Mode == ListMode.Virtual)
+        {
+            _state.SetSearchText(text);
+            await ReloadVirtualAsync();
+        }
+        else
+        {
+            await _state.SearchAsync(text);
+        }
+    }
+
+    private async Task OnPageChangedAsync(Radzen.PagerEventArgs args)
+    {
+        // The pager also reports the page it was told to show (SyncPagerAsync): that one is the state's already
+        if (_state is null || args.PageIndex == _state.CurrentPage)
+        {
+            return;
+        }
+
+        Logger.LogDebug("Pager of {Item}: page {Page}", typeof(TItem).Name, args.PageIndex);
+        await _state.GoToPageAsync(args.PageIndex);
+    }
+
+    // RadzenPager works out its pages after its render and does not render again (a Blazor Hybrid host shows the numbers
+    // of the render before), and its page is its own: it is told the page of the state, and drawn once more
+    private async Task SyncPagerAsync()
+    {
+        if (_pager is null || _state is null || !ShowPager)
+        {
+            _pagerSynced = null;
+            return;
+        }
+
+        var current = (_state.Total, _state.PageSize, _state.CurrentPage);
+        if (_pagerSynced == current)
+        {
+            return;
+        }
+
+        _pagerSynced = current;
+        await _pager.GoToPage(_state.CurrentPage, forceReload: true);
+    }
+
+    private async Task OnGridRowClickAsync(Radzen.DataGridRowMouseEventArgs<TItem> args)
+    {
+        if (args.Data is not null)
+        {
+            await HandleRowClickAsync(args.Data);
+        }
+    }
+
+    private async Task HandleRowClickAsync(TItem row)
+    {
+        if (_state is null)
+        {
+            return;
+        }
+
+        _state.Current = row;
+
+        // While rows are being selected a tap selects, it does not open
+        if (_state.SelectedItems.Count == 0 && OnRowClick.HasDelegate)
+        {
+            await OnRowClick.InvokeAsync(row);
+        }
+    }
+
+    private void OnCellContextMenu(Radzen.DataGridCellMouseEventArgs<TItem> args)
+    {
+        if (args.Data is not null)
+        {
+            OpenRowMenu(args, args.Data);
+        }
+    }
+
+    private void OpenRowMenu(Microsoft.AspNetCore.Components.Web.MouseEventArgs position, TItem row)
+    {
+        if (_state is null || RowMenu is null)
+        {
+            return;
+        }
+
+        _state.Current = row;
+        var menu = new RowMenuContext<TItem>(row, _state.Targets(row), ContextMenuService.Close);
+        ContextMenuService.Open(position, _ => MenuContent(menu));
+    }
+
+    private RenderFragment MenuContent(RowMenuContext<TItem> menu)
+    {
+        return @<RadzenMenu Click=@(_ => ContextMenuService.Close())>@RowMenu!(menu)</RadzenMenu>;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_subscribed is not null)
+        {
+            _subscribed.Changed -= OnStateChanged;
+        }
+
+        try
+        {
+            if (_gestures is not null)
+            {
+                await _gestures.InvokeVoidAsync("dispose");
+                await _gestures.DisposeAsync();
+            }
+
+            if (_module is not null)
+            {
+                await _module.DisposeAsync();
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+
+        _self?.Dispose();
+    }
+
+}

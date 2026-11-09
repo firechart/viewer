@@ -1,0 +1,140 @@
+@* The clinical summary of a patient: the banner, then the blocks of the form of the server *@
+@inherits StatefulWidget<ClinicalSummaryViewState>
+
+@if (State.Sections.Any(section => !section.Hidden))
+{
+    <PageMenu>
+        @foreach (var section in State.Sections.Where(section => !section.Hidden))
+        {
+            <PageMenuItem Text=@section.Title Note=@(section.IsLoaded ? section.CountText : null) OnClick=@(() => GoToAsync(section))>
+                <Leading><IconResource ResourceType=@section.IconType Autocolor/></Leading>
+            </PageMenuItem>
+        }
+        <PageMenuSeparator/>
+        <PageMenuItem Icon="unfold_more" Text=@FloxStrings.Caption_ExpandAll OnClick=@(() => State.SetCollapsed(false))/>
+        <PageMenuItem Icon="unfold_less" Text=@FloxStrings.Caption_CollapseAll OnClick=@(() => State.SetCollapsed(true))/>
+    </PageMenu>
+}
+
+<BusyOverlay Busy=@State.IsBusy Concealed=@State.Activating>
+    @if (State.NotFound)
+    {
+        <NotFoundWidget/>
+    }
+    else if (State.Server is not null)
+    {
+        @if (State.Access == ServerAccess.NotSupported)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+                @Strings.Message_FhirServerAuthenticationNotSupported
+            </RadzenAlert>
+        }
+        else if (State.Access is ServerAccess.NeedsAuthorization or ServerAccess.NeedsCredentials)
+        {
+            <ServerAccessPanel Server=@State.Server Access=@State.Access Rejected=@State.CredentialsRejected OnRetry=@State.RetryAsync/>
+        }
+        else if (State.Failed)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+                @Strings.Message_FhirServerUnavailable
+                <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Text=@FloxStrings.Caption_Retry Click=@State.RetryAsync/>
+            </RadzenAlert>
+        }
+        else if (State.Banner is not null)
+        {
+            <style>@State.Style</style>
+            @* The HTML of the templates has passed the white list of FxHtml *@
+            <div class="fx-root fx-summary">
+                <div class="fx-summary-patient">
+                    @((MarkupString)State.Banner)
+                    <p class="fx-muted fx-summary-zone" title="Times are shown in the time zone of this device">@DisplayZone.Text()</p>
+                </div>
+
+                <div class="fx-summary-list">
+                    <SummaryList @ref=_list TRow="SummaryRow" Rows=@State.Rows Memory=@Scroll>
+                        <Row Context="row">@RowOf(row)</Row>
+                        <Sticky Context="row">@HeaderOf(row)</Sticky>
+                    </SummaryList>
+                </div>
+            </div>
+        }
+    }
+</BusyOverlay>
+
+@code {
+
+    private SummaryList<SummaryRow>? _list;
+
+    // The menu of the page: the block is opened, the list scrolls to its title after it has drawn the new rows
+    private async Task GoToAsync(ClinicalSummarySection section)
+    {
+        var index = State.OpenSection(section);
+        if (index >= 0 && _list is not null)
+        {
+            await Task.Yield();
+            await _list.ScrollToAsync(index);
+        }
+    }
+
+    private RenderFragment RowOf(SummaryRow row)
+    {
+        return row.Kind switch
+        {
+            SummaryRowKind.Header => HeaderOf(row),
+            SummaryRowKind.Card => CardOf(row),
+            SummaryRowKind.Spinner => @<div class="fx-summary-note"><CircularProgress Size="ProgressBarCircularSize.Small"/></div>,
+            SummaryRowKind.Error => @<div class="fx-summary-note">
+                                        @Strings.Message_FhirServerUnavailable
+                                        <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_Retry
+                                                      Click=@(() => State.LoadMoreAsync(row.Section))/>
+                                    </div>,
+            _ => @<div class="fx-summary-note">
+                     <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_More
+                                   IsBusy=@row.Section.IsLoading Click=@(() => State.LoadMoreAsync(row.Section))/>
+                 </div>
+        };
+    }
+
+    private RenderFragment HeaderOf(SummaryRow row)
+    {
+        var section = row.Section;
+        var empty = section.IsLoaded && !section.Failed && section.Items.Count == 0;
+        return @<div class=@(empty ? "fx-summary-group fx-summary-group-empty" : "fx-summary-group") role="button" aria-expanded=@(section.Collapsed ? "false" : "true")
+                     style="cursor: pointer" @onclick=@(() => State.Toggle(section))>
+                   <RadzenIcon Icon=@(section.Collapsed ? "chevron_right" : "expand_more")/>
+                   <div class="fx-summary-icon"><IconResource ResourceType=@section.IconType Autocolor/></div>
+                   <span class="fx-summary-group-title">@section.Title</span>
+                   @if (section.IsLoaded)
+                   {
+                       <span class="fx-badge fx-badge-sm fx-badge-ghost">@section.CountText</span>
+                   }
+                   @if (section.IsLoading)
+                   {
+                       <CircularProgress Size="ProgressBarCircularSize.ExtraSmall"/>
+                   }
+               </div>;
+    }
+
+    // The row of a record as its tile: the HTML of the template of its type (a daisyUI list row), which has passed the white list of FxHtml
+    private RenderFragment CardOf(SummaryRow row)
+    {
+        var item = row.Item!;
+        var tile = row.Tile!;
+        return @<div class="fx-summary-row" @onclick=@(() => State.Open(item)) title=@tile.Text>
+                   <div class="fx-summary-icon"><IconResource ResourceType=@item.ResourceType/></div>
+                   <ul class="fx-list fx-summary-tile">@((MarkupString)tile.Html)</ul>
+               </div>;
+    }
+
+    /// <summary>The instance of the Viewer.</summary>
+    [CascadingParameter]
+    public ViewerSession Session { get; set; } = null!;
+
+    /// <summary>The id of the patient.</summary>
+    [Parameter, EditorRequired]
+    public string PatientId { get; set; } = string.Empty;
+
+
+    protected override object? ActivationKey => new ClinicalSummaryKey(Session, PatientId);
+
+}

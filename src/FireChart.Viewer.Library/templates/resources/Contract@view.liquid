@@ -1,0 +1,42 @@
+{% fhir_include "Contract:authority" %}
+{% fhir_include "Contract:subject" %}
+
+{%- assign signers = self.signer | as_list -%}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% if self.title %}{{ self.title }}{% else %}{% apply self.type mode: "text" %}{% endif %}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.issued %}
+    <span>{{ "Issued" | t }} {% apply self.issued mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.applies %}
+    <span>{{ "Applies" | t }} {% apply self.applies mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.type or self.subType or self.authority or self.subject or self.scope or self.domain %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Type", node: self.type, mode: "text" %}
+  {% render "field", label: "Subtype", node: self.subType, mode: "text" %}
+  {% render "field", label: "Authority", node: self.authority %}
+  {% render "field", label: "Subject", node: self.subject %}
+  {% render "field", label: "Scope", node: self.scope, mode: "text" %}
+  {% render "field", label: "Domain", node: self.domain, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if signers.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Signers" | t }}</h3>
+  {%- for s in signers %}
+  <div class="fx-row"><span class="fx-row-main">{% apply s.party mode: "link,text" -%}</span><span class="fx-row-meta">{% if s.type %}{% apply s.type mode: "text" -%}{% endif %}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

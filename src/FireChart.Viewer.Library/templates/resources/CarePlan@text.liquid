@@ -1,0 +1,7 @@
+{%- assign cat = self.category | first -%}{%- assign intent = self.intent | append: "" -%}
+{%- capture t0 -%}{{ self.title }}{%- endcapture -%}
+{%- capture t1 -%}{% if cat %}{% apply cat mode: "text" %}{% endif %}{%- endcapture -%}
+{%- assign title = t0 -%}
+{%- if title == "" -%}{%- assign title = t1 -%}{%- endif -%}
+{%- if title == "" -%}{%- assign title = self.id -%}{%- endif -%}
+{{- title -}}

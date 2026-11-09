@@ -1,0 +1,101 @@
+@typeparam TEntity
+
+<RadzenStack Gap="var(--gap-lg)" class="@($"rz-pr-2 {Class}")">
+    @foreach (var field in Fields)
+    {
+        switch (field.ControlType)
+        {
+            case SearchControlType.Text:
+                <RadzenFormField Text="@field.Label" Variant="Radzen.Variant.Text">
+                    <RadzenTextBox Value="@GetString(field)"
+                                   ValueChanged="@(v => SetValue(field, v))"
+                                   Immediate="true"/>
+                </RadzenFormField>
+                break;
+
+            case SearchControlType.Select:
+                <RadzenFormField Text="@field.Label" Variant="Radzen.Variant.Text">
+                    <RadzenDropDown TValue="string"
+                                    Data="@(field.Options ?? [])"
+                                    Value="@GetString(field)"
+                                    ValueChanged="@(v => SetValue(field, v))"
+                                    AllowClear="true"/>
+                </RadzenFormField>
+                break;
+
+            case SearchControlType.MultiSelect:
+                <RadzenFormField Text="@field.Label" Variant="Radzen.Variant.Text">
+                    <RadzenDropDown TValue="IEnumerable<string>"
+                                    Data="@(field.Options ?? [])"
+                                    Multiple="true"
+                                    Chips="true"
+                                    Value="@GetStrings(field)"
+                                    ValueChanged="@(v => SetValues(field, v ?? new List<string>()))"/>
+                </RadzenFormField>
+                break;
+
+            case SearchControlType.Bool:
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-sm)">
+                    <RadzenCheckBox TValue="bool?"
+                                    TriState="true"
+                                    Value="@GetBool(field)"
+                                    ValueChanged="@(v => SetValue(field, v))"
+                                    Name="@field.Field"/>
+                    <RadzenLabel Text="@field.Label" Component="@field.Field"/>
+                </RadzenStack>
+                break;
+
+            case SearchControlType.DateRange:
+                <RadzenRow Gap="var(--gap-lg)">
+                    <RadzenColumn Size="6">
+                        <RadzenFormField Text="@($"{field.Label} ≥")" Variant="Radzen.Variant.Text">
+                            <RadzenDatePicker TValue="DateTime?"
+                                              Value="@GetDate(field, RangeBound.From)"
+                                              ValueChanged="@(v => SetRangeValue(field, RangeBound.From, v))"
+                                              AllowClear="true"/>
+                        </RadzenFormField>
+                    </RadzenColumn>
+                    <RadzenColumn Size="6">
+                        <RadzenFormField Text="@($"{field.Label} ≤")" Variant="Radzen.Variant.Text">
+                            <RadzenDatePicker TValue="DateTime?"
+                                              Value="@GetDate(field, RangeBound.To)"
+                                              ValueChanged="@(v => SetRangeValue(field, RangeBound.To, v))"
+                                              AllowClear="true"/>
+                        </RadzenFormField>
+                    </RadzenColumn>
+                </RadzenRow>
+                break;
+
+            case SearchControlType.NumberRange:
+                <RadzenRow Gap="var(--gap-lg)">
+                    <RadzenColumn Size="6">
+                        <RadzenFormField Text="@($"{field.Label} ≥")" Variant="Radzen.Variant.Text">
+                            <RadzenNumeric TValue="double?"
+                                           Value="@GetNumber(field, RangeBound.From)"
+                                           ValueChanged="@(v => SetRangeValue(field, RangeBound.From, v))"
+                                           ShowUpDown="false"/>
+                        </RadzenFormField>
+                    </RadzenColumn>
+                    <RadzenColumn Size="6">
+                        <RadzenFormField Text="@($"{field.Label} ≤")" Variant="Radzen.Variant.Text">
+                            <RadzenNumeric TValue="double?"
+                                           Value="@GetNumber(field, RangeBound.To)"
+                                           ValueChanged="@(v => SetRangeValue(field, RangeBound.To, v))"
+                                           ShowUpDown="false"/>
+                        </RadzenFormField>
+                    </RadzenColumn>
+                </RadzenRow>
+                break;
+        }
+    }
+
+    @if (ShowActions)
+    {
+        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-lg)" class="rz-mt-2">
+            <RadzenButton ButtonStyle="Radzen.ButtonStyle.Primary" Icon="search" Text="@Strings.Caption_Search"
+                          Click="@SearchAsync"/>
+            <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Text="@Strings.Caption_Reset"
+                          Click="@ResetAsync"/>
+        </RadzenStack>
+    }
+</RadzenStack>

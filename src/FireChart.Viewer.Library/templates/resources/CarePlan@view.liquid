@@ -1,0 +1,50 @@
+{% fhir_include "CarePlan:subject" %}
+{% fhir_include "CarePlan:care-team" %}
+{% fhir_include "CarePlan:condition" %}
+{% fhir_include "CarePlan:goal" %}
+{% fhir_include "CarePlan:encounter" %}
+
+{%- assign acts = self.activity | as_list -%}
+{%- assign patient = self.subject | resolve -%}
+{%- assign encounter = self.encounter | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, encounter: encounter, visit: self.encounter, own: "CarePlan" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% if self.title %}{{ self.title }}{% else %}{% assign cat = self.category | as_list | first %}{% if cat %}{% apply cat mode: "text" %}{% else %}{{ self.id }}{% endif %}{% endif %}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.period %}
+    <span>{% apply self.period mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.created %}
+    <span>{{ "Created" | t }} {% apply self.created mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+    {%- if self.intent != "" -%}{%- render "badge", text: self.intent -%}{%- endif -%}
+  </div>
+</div>
+
+{%- if self.category or self.description or self.author or self.contributor or self.careTeam or self.addresses or self.goal %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Category", node: self.category, mode: "text" %}
+  {% render "field", label: "Description", node: self.description, mode: "text" %}
+  {% render "field", label: "Author", node: self.author %}
+  {% render "field", label: "Contributors", node: self.contributor %}
+  {% render "field", label: "Care team", node: self.careTeam %}
+  {% render "field", label: "Addresses", node: self.addresses %}
+  {% render "field", label: "Goals", node: self.goal %}
+</section>
+{%- endif %}
+
+{%- if acts.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Activities" | t }}</h3>
+  {%- for a in acts %}
+  <div class="fx-row"><span class="fx-row-main">{% if a.detail %}{% apply a.detail.code mode: "text" -%}{% else %}{% apply a.reference mode: "link,text" -%}{% endif %}</span><span class="fx-row-meta">{{ a.detail.status }}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

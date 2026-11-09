@@ -1,0 +1,71 @@
+# Normalize everything to LF in the repository and on checkout, regardless of the
+# contributor's OS or core.autocrlf setting - avoids the "LF will be replaced by CRLF"
+# churn that comes from relying on autocrlf alone.
+* text=auto eol=lf
+
+# Source / project files
+*.cs text diff=csharp
+*.razor text
+*.cshtml text
+*.csproj text
+*.props text
+*.targets text
+*.sln text
+*.slnx text
+*.resx text
+*.scriban text
+
+# Config / data / markup
+*.json text
+*.xml text
+*.xaml text
+*.plist text
+*.manifest text
+*.appxmanifest text
+*.yml text
+*.yaml text
+*.config text
+*.properties text
+*.ftl text
+*.http text
+
+# Docs / misc text
+*.md text
+*.txt text
+*.html text
+*.css text
+*.js text
+*.ts text
+*.svg text
+LICENSE text
+Dockerfile text
+*.Dockerfile text
+.gitattributes text
+.gitignore text
+.gitmodules text
+.dockerignore text
+.example text
+
+# Windows-only scripts keep native CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Shell scripts must stay LF - a CRLF shebang breaks execution in Linux containers
+*.sh text eol=lf
+
+# Binary - no EOL conversion, no text diff
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.pptx binary
+*.xcf binary
+*.exe binary
+*.dll binary
+*.map binary

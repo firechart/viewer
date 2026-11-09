@@ -1,0 +1,55 @@
+{% fhir_include "DiagnosticReport:subject" %}
+{% fhir_include "DiagnosticReport:performer" %}
+{% fhir_include "DiagnosticReport:results-interpreter" %}
+{% fhir_include "DiagnosticReport:specimen" %}
+{% fhir_include "DiagnosticReport:result" %}
+{% fhir_include "DiagnosticReport:encounter" %}
+
+{%- assign notes = self.note | as_list -%}
+{%- assign patient = self.subject | resolve -%}
+{%- assign encounter = self.encounter | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, encounter: encounter, visit: self.encounter, own: "DiagnosticReport" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% apply self.code mode: "text" -%}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.effective %}
+    <span>{% apply self.effective mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.issued %}
+    <span>{{ "Issued" | t }} {% apply self.issued mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.category or self.performer or self.resultsInterpreter or self.specimen or self.basedOn or self.imagingStudy %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Category", node: self.category, mode: "text" %}
+  {% render "field", label: "Performer", node: self.performer %}
+  {% render "field", label: "Interpreter", node: self.resultsInterpreter %}
+  {% render "field", label: "Specimen", node: self.specimen %}
+  {% render "field", label: "Based on", node: self.basedOn %}
+  {% render "field", label: "Imaging study", node: self.imagingStudy %}
+</section>
+{%- endif %}
+
+{%- if self.result %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Results" | t }}</h3>
+  {% render "field", label: "Results", node: self.result %}
+</section>
+{%- endif %}
+
+{%- if self.conclusion or self.conclusionCode %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Conclusion" | t }}</h3>
+  {% render "field", label: "Conclusion", node: self.conclusion, mode: "text" %}
+  {% render "field", label: "Diagnosis", node: self.conclusionCode, mode: "text" %}
+</section>
+{%- endif %}

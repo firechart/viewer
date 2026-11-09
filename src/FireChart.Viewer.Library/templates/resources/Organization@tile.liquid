@@ -1,0 +1,9 @@
+{%- assign kind = self.type | as_list | first -%}{%- assign adr = self.address | as_list | first -%}{%- assign act = self.active | append: "" -%}
+{%- capture t0 -%}{{ self.name }}{%- endcapture -%}
+{%- assign title = t0 | default: self.id -%}
+{%- capture s0 -%}{% if kind %}{% apply kind mode: "text" %}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% if adr %}{{ adr.city }}{% endif %}{%- endcapture -%}
+{%- capture s2 -%}{% if self.identifier %}{{ self.identifier | map: "value" | first }}{% endif %}{%- endcapture -%}
+{%- capture subtitle -%}{% render "parts", p1: s0, p2: s1, p3: s2 %}{%- endcapture -%}
+{%- capture status -%}{% if act == "false" %}{% render "badge", text: "inactive", tone: "danger" %}{% endif %}{%- endcapture -%}
+{% render "tile-row", title: title, subtitle: subtitle, status: status, patient: nil, encounter: nil, at: nil %}

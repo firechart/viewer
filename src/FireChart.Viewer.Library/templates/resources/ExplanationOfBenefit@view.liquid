@@ -1,0 +1,55 @@
+{% fhir_include "ExplanationOfBenefit:patient" %}
+{% fhir_include "ExplanationOfBenefit:provider" %}
+{% fhir_include "ExplanationOfBenefit:claim" %}
+
+{%- assign totals = self.total | as_list -%}{%- assign items = self.item | as_list -%}{%- assign outcome = self.outcome | append: "" -%}
+{%- assign patient = self.patient | resolve -%}
+{%- render "view-header", patient: patient, subject: self.patient, own: "ExplanationOfBenefit" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% if self.type %}{% apply self.type mode: "text" %}{% else %}{{ "Explanation of benefit" | t }}{% endif %}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.created %}
+    <span>{{ "Created" | t }} {% apply self.created mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.payment %}
+    <span class="fx-tile-value">{% apply self.payment.amount mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+    {%- if self.use != "" -%}{%- render "badge", text: self.use -%}{%- endif -%}
+    {%- if outcome != "" -%}{%- render "status-badge", code: outcome -%}{%- endif -%}
+  </div>
+</div>
+
+{%- if self.insurer or self.provider or self.claim or self.billablePeriod or self.disposition %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Insurer", node: self.insurer %}
+  {% render "field", label: "Provider", node: self.provider %}
+  {% render "field", label: "Claim", node: self.claim %}
+  {% render "field", label: "Billable period", node: self.billablePeriod, mode: "text" %}
+  {% render "field", label: "Disposition", node: self.disposition, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if totals.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Totals" | t }}</h3>
+  {%- for t in totals %}
+  <div class="fx-row"><span class="fx-row-main">{% apply t.category mode: "text" -%}</span><span class="fx-row-meta">{% apply t.amount mode: "text" -%}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if items.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Items" | t }}</h3>
+  {%- for i in items %}
+  <div class="fx-row"><span class="fx-row-main">{% apply i.productOrService mode: "text" -%}</span><span class="fx-row-meta">{% if i.net %}{% apply i.net mode: "text" -%}{% endif %}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

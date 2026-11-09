@@ -1,0 +1,55 @@
+{% fhir_include "AllergyIntolerance:patient" %}
+{% fhir_include "AllergyIntolerance:recorder" %}
+{% fhir_include "AllergyIntolerance:asserter" %}
+
+{%- assign reactions = self.reaction | as_list -%}{%- assign notes = self.note | as_list -%}{%- assign crit = self.criticality | append: "" -%}
+{%- assign patient = self.patient | resolve -%}
+{%- render "view-header", patient: patient, subject: self.patient, own: "AllergyIntolerance" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% apply self.code mode: "text" -%}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.onset %}
+    <span>{{ "Onset" | t }} {% apply self.onset mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.recordedDate %}
+    <span>{{ "Recorded" | t }} {% apply self.recordedDate mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "concept-badge", concept: self.clinicalStatus -%}
+    {%- render "concept-badge", concept: self.verificationStatus -%}
+    {%- if crit == "high" -%}{%- render "badge", text: "high risk", tone: "danger" -%}{%- elsif crit != "" -%}{%- render "badge", text: crit -%}{%- endif -%}
+  </div>
+</div>
+
+{%- if self.type or self.category or self.recorder or self.asserter or self.lastOccurrence %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Type", node: self.type, mode: "text" %}
+  {% render "field", label: "Category", node: self.category, mode: "text" %}
+  {% render "field", label: "Recorded by", node: self.recorder %}
+  {% render "field", label: "Asserted by", node: self.asserter %}
+  {% render "field", label: "Last occurrence", node: self.lastOccurrence, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if reactions.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Reactions" | t }}</h3>
+  {%- for r in reactions %}
+  <div class="fx-row"><span class="fx-row-main">{% render "list-inline", node: r.manifestation, mode: "text" %}</span><span class="fx-row-meta">{{ r.severity }}{% if r.substance %} {% apply r.substance mode: "text" -%}{% endif %}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if notes.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Notes" | t }}</h3>
+  {%- for n in notes %}
+  <div class="fx-row"><span class="fx-row-main">{% apply n mode: "text" -%}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

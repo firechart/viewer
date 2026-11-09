@@ -1,0 +1,58 @@
+@attribute [Route(SharedRoutes.SYNC)]
+@attribute [Authorize]
+@using Flox.Shared.Services
+
+@inherits StatefulWidget<SyncPageState>
+
+<AppBarTitle>@Strings.Sync_Title</AppBarTitle>
+<AppBarCommands>
+    @if (State.Available)
+    {
+        <AppBarCommand Icon="sync" Title=@Strings.Sync_Now Disabled=@(!State.CanSync) OnClick=@State.SyncNowAsync/>
+    }
+</AppBarCommands>
+
+<BusyOverlay Busy=@State.IsBusy Concealed=@State.Activating>
+    @if (!State.IsBusy && !State.Available)
+    {
+        <RadzenText TextStyle="TextStyle.Body2" class="text-muted rz-mt-4">@Strings.Sync_NotAvailable</RadzenText>
+    }
+    else if (State.Status is not null)
+    {
+        <ListSection>
+            <ListTile Icon=@State.StatusIcon TitleText=@State.StatusText SubtitleText=@State.LastSyncedText/>
+        </ListSection>
+
+        @if (State.Failures.Count > 0)
+        {
+            <ListSection Caption=@Strings.Sync_Failures>
+                @foreach (var failure in State.Failures)
+                {
+                    <ListTile Icon="error" TitleText=@($"{failure.Type} {Short(failure.DocumentId)}") SubtitleText=@ReplicationFailureText.Describe(failure) TrailingText=@failure.EditedAt.ToLocalTime().ToString("g", System.Globalization.CultureInfo.CurrentCulture)/>
+                }
+            </ListSection>
+            <RadzenButton Variant="Radzen.Variant.Outlined" ButtonStyle="Radzen.ButtonStyle.Base" Text=@Strings.Sync_Retry Click=@State.RetryAsync/>
+        }
+
+        @if (State.ShowTechnical)
+        {
+            <ListSection Caption=@Strings.Sync_Technical>
+                @foreach (var type in State.Status.Types)
+                {
+                    <ListTile TitleText=@type.Type
+                              SubtitleText=@($"{type.Direction}, {type.Conflicts}, pending {type.Pending}, refused {type.Failed}, synced {(type.LastSyncedAt is { } at ? at.ToLocalTime().ToString("T", System.Globalization.CultureInfo.CurrentCulture) : "-")}")
+                              TrailingText=@type.Cursor/>
+                }
+            </ListSection>
+        }
+    }
+</BusyOverlay>
+
+@code {
+
+    private static string Short(string id)
+    {
+        return id.Length > 8 ? id[..8] : id;
+    }
+
+}

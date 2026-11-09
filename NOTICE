@@ -1,0 +1,21 @@
+FireChart Viewer and the public libraries of FireChart
+Copyright (c) 2026 Dmitry Baranov
+
+This software is licensed under the Mozilla Public License, version 2.0
+(SPDX: MPL-2.0), see the LICENSE file. If a copy of the MPL was not
+distributed with a file, you can obtain one at https://mozilla.org/MPL/2.0/.
+The copyright holder may also license it under other terms.
+
+Contributions are accepted only under the Contributor License Agreement
+(CLA), which allows the copyright holder to license them under other terms
+as well.
+
+The license grants no rights to the names, trademarks or logos of the
+copyright holder (MPL-2.0, section 2.3): FireChart is a trademark of the
+copyright holder.
+
+Third-party components keep their own licenses; they are listed on the About
+page of the application.
+
+FHIR(R) is the registered trademark of Health Level Seven International (HL7);
+its use does not constitute endorsement by HL7.

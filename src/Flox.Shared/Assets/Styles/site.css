@@ -1,0 +1,315 @@
+/*
+ * FloxWind: a Radzen theme built from Tailwind CSS v4 design tokens, with the look of daisyUI 5 (shapes, sizes,
+ * soft variants; components.css) without daisyUI itself.
+ *
+ * Radzen's own "standard" / "standard-dark" theme stays the base (it is chosen by RadzenTheme); this file
+ * overlays its CSS variables with values taken from Tailwind's palette, type scale, radii and shadows,
+ * and exposes the same colors back to Tailwind utilities (bg-surface, text-muted, border-line, ...), so
+ * markup written with utilities follows the active light/dark theme without dark: variants.
+ *
+ * Built by Lombiq.Tailwind.Targets into wwwroot/css/Flox.Shared.Tailwind.css (the tokens are in tokens.css).
+ * Light/dark is switched by data-theme on <html> (FloxThemeHost).
+ */
+
+@import "./tokens.css";
+@import "./palette.css";
+@import "./components.css";
+
+@source "../../Components";
+@source "../../Layout";
+@source "../../Pages";
+
+/*
+ * html:root outranks Radzen's :root rules whatever the load order of the stylesheets is
+ * (RadzenTheme appends its link at runtime, after this file).
+ */
+/* The stock Radzen theme paints a decorative gradient on <body> */
+html:root body {
+    background-image: none;
+}
+
+/* Inter with the single-storey a (cv11): a softer, less corporate face; form controls do not inherit it by themselves */
+html:root {
+    font-feature-settings: "cv11";
+}
+
+html:root :is(input, textarea, select, button) {
+    font-feature-settings: inherit;
+}
+
+html:root {
+    color-scheme: light;
+
+    /* Type: Tailwind scale and weights */
+    --rz-text-font-family: var(--font-sans);
+    --rz-body-font-size: var(--text-sm);
+    --rz-body-line-height: calc(var(--text-sm--line-height));
+
+    --rz-text-h1-font-size: var(--text-4xl);
+    --rz-text-h1-line-height: var(--text-4xl--line-height);
+    --rz-text-h1-letter-spacing: var(--tracking-tight);
+    --rz-text-h1-font-weight: 700;
+    --rz-text-h2-font-size: var(--text-3xl);
+    --rz-text-h2-line-height: var(--text-3xl--line-height);
+    --rz-text-h2-letter-spacing: var(--tracking-tight);
+    --rz-text-h2-font-weight: 700;
+    --rz-text-h3-font-size: var(--text-2xl);
+    --rz-text-h3-line-height: var(--text-2xl--line-height);
+    --rz-text-h3-letter-spacing: var(--tracking-tight);
+    --rz-text-h3-font-weight: 600;
+    --rz-text-h4-font-size: var(--text-xl);
+    --rz-text-h4-line-height: var(--text-xl--line-height);
+    --rz-text-h4-letter-spacing: var(--tracking-tight);
+    --rz-text-h4-font-weight: 600;
+    --rz-text-h5-font-size: var(--text-lg);
+    --rz-text-h5-line-height: var(--text-lg--line-height);
+    --rz-text-h5-letter-spacing: var(--tracking-tight);
+    --rz-text-h5-font-weight: 600;
+    --rz-text-h6-font-size: var(--text-base);
+    --rz-text-h6-line-height: var(--text-base--line-height);
+    --rz-text-h6-letter-spacing: var(--tracking-tight);
+    --rz-text-subtitle1-letter-spacing: var(--tracking-tight);
+    --rz-text-h6-font-weight: 600;
+    --rz-text-subtitle1-font-size: var(--text-base);
+    --rz-text-subtitle1-line-height: var(--text-base--line-height);
+    --rz-text-subtitle2-font-size: var(--text-sm);
+    --rz-text-subtitle2-line-height: var(--text-sm--line-height);
+    --rz-text-body1-font-size: var(--text-base);
+    --rz-text-body1-line-height: var(--text-base--line-height);
+    --rz-text-body2-font-size: var(--text-sm);
+    --rz-text-body2-line-height: var(--text-sm--line-height);
+    --rz-text-caption-font-size: var(--text-xs);
+    --rz-text-caption-line-height: var(--text-xs--line-height);
+    --rz-text-overline-font-size: var(--text-xs);
+    --rz-text-overline-line-height: var(--text-xs--line-height);
+    --rz-text-overline-letter-spacing: var(--tracking-wider);
+    --rz-text-button-font-size: var(--text-sm);
+    --rz-text-button-line-height: var(--text-sm--line-height);
+    --rz-text-button-font-weight: 500;
+
+    /* Density: the gaps between the parts of a page (Gap of RadzenStack and RadzenRow) are these, so one place sets how airy the application is */
+    --gap-xs: calc(var(--spacing) * 1);
+    --gap-sm: calc(var(--spacing) * 2);
+    --gap-md: calc(var(--spacing) * 3);
+    --gap-lg: calc(var(--spacing) * 4);
+    --gap-xl: calc(var(--spacing) * 5);
+
+    /* Shape */
+    --rz-border-radius: var(--radius-field);
+    --rz-card-border-radius: var(--radius-box);
+    --rz-card-padding: calc(var(--spacing) * 4);
+    --rz-dialog-border-radius: var(--radius-box);
+    --rz-dialog-shadow: var(--shadow-xl);
+    --rz-dialog-title-font-size: var(--text-lg);
+    --rz-dialog-title-font-weight: 600;
+    --rz-dialog-title-letter-spacing: var(--tracking-tight);
+    --rz-dialog-title-padding-block: calc(var(--spacing) * 3);
+    --rz-dialog-title-padding-inline: calc(var(--spacing) * 4);
+    --rz-dialog-content-padding: calc(var(--spacing) * 4);
+    --rz-grid-border-radius: var(--radius-box);
+    --rz-grid-border: 1px solid var(--rz-border-color);
+    --rz-card-border: 1px solid var(--rz-border-color);
+
+    /* Fieldsets as daisyUI's: a plate a shade off the page, the semibold legend inside on top (laid out in components.css) */
+    --rz-fieldset-border: 1px solid var(--rz-border-color);
+    --rz-fieldset-border-radius: var(--radius-box);
+    --rz-fieldset-padding: calc(var(--spacing) * 2) calc(var(--spacing) * 4) calc(var(--spacing) * 4);
+    --rz-fieldset-legend-font-size: var(--text-sm);
+    --rz-fieldset-legend-color: var(--rz-text-title-color);
+
+    --rz-card-shadow: none;
+    --rz-menu-background-color: transparent;
+    --rz-menu-border: none;
+    --rz-text-subtitle1-font-weight: 500;
+    --rz-text-subtitle2-font-weight: 500;
+    --rz-text-subtitle2-color: var(--rz-text-secondary-color);
+    --rz-text-caption-color: var(--rz-text-secondary-color);
+    --rz-grid-cell-padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+    --rz-grid-header-padding: calc(var(--spacing) * 1) calc(var(--spacing) * 3);
+    --rz-grid-header-background-color: transparent;
+    --rz-grid-header-color: color-mix(in oklab, var(--rz-text-color) 60%, transparent);
+    --rz-grid-header-cell-border: none;
+    --rz-grid-header-cell-border-bottom: 1px solid var(--rz-border-color);
+    --rz-grid-right-cell-border: none;
+    --rz-grid-bottom-cell-border: 1px solid color-mix(in oklab, var(--rz-text-color) 8%, transparent);
+    --rz-grid-stripe-background-color: transparent;
+    --rz-grid-stripe-odd-background-color: transparent;
+    --rz-grid-hover-background-color: color-mix(in oklab, var(--rz-text-color) 4%, transparent);
+    --rz-grid-hover-color: inherit;
+    --rz-pager-numeric-button-min-width: 2rem;
+    --rz-pager-numeric-button-padding: 0.25rem;
+    --rz-pager-numeric-button-selected-padding: 0.25rem;
+    --rz-pager-numeric-button-background-color: transparent;
+    --rz-pager-back-button-background-color: transparent;
+    --rz-pager-next-button-background-color: transparent;
+    --rz-pager-numeric-button-hover-background-color: color-mix(in oklab, var(--rz-text-color) 8%, transparent);
+    /* The pager as daisyUI's: ghost squares, the current page a soft grey plate */
+    --rz-pager-button-border-radius: var(--radius-field);
+    --rz-pager-numeric-button-selected-background-color: color-mix(in oklab, var(--rz-text-color) 12%, transparent);
+    --rz-pager-numeric-button-selected-color: var(--rz-text-color);
+
+    /* Tabs (the underline is in components.css) */
+    --rz-tabs-padding: calc(var(--spacing) * 4);
+    --rz-tabs-border: none;
+    --rz-tabs-tab-background-color: transparent;
+    --rz-tabs-tab-hover-background-color: transparent;
+    --rz-tabs-tab-focus-background-color: transparent;
+    --rz-tabs-tab-selected-background-color: transparent;
+    --rz-tabs-tab-selected-top-border-color: transparent;
+    --rz-tabs-tab-color: var(--rz-text-secondary-color);
+    --rz-tabs-tab-hover-color: var(--rz-text-color);
+    --rz-tabs-tab-focus-color: var(--rz-text-color);
+    --rz-tabs-tab-selected-color: var(--rz-text-color);
+    --rz-tabs-tab-font-weight: 500;
+    --rz-tabs-tab-padding-block: calc(var(--spacing) * 2);
+    --rz-tabs-tab-padding-inline: calc(var(--spacing) * 3);
+
+    /* Badges as daisyUI's: no capitals, the selector radius */
+    --rz-badge-border-radius: var(--radius-selector);
+    --rz-badge-text-transform: none;
+    --rz-badge-font-weight: 500;
+    --rz-badge-letter-spacing: normal;
+    --rz-badge-font-size: var(--text-xs);
+    --rz-badge-line-height: 1rem;
+    --rz-badge-padding: 0.125rem 0.5rem;
+
+    /* Radio buttons: a hairline ring like the inputs, the accent ring and dot when checked */
+    --rz-radio-border-width: 1px;
+    --rz-radio-checked-border: 1px solid var(--rz-primary);
+
+    /* Slider: a small handle with a thin accent ring */
+    --rz-slider-handle-width: 1rem;
+    --rz-slider-handle-height: 1rem;
+    --rz-slider-handle-border: 2px solid var(--rz-primary);
+    --rz-slider-handle-hover-border: 2px solid var(--rz-primary);
+    --rz-slider-handle-background-color: var(--rz-base-background-color);
+    --rz-slider-handle-hover-background-color: var(--rz-primary);
+
+    /* Check boxes: the selector radius, the accent when checked */
+    --rz-checkbox-border-radius: calc(var(--radius-selector) * 0.75);
+    --rz-icon-size: 1.25rem;
+    --rz-icon-font-family: "Flox Symbols", "Flox Icon Fallback";
+    --rz-border-width: 1px;
+    --rz-transition: 150ms var(--ease-in-out);
+    --rz-header-min-height: 3rem;
+    --rz-layout-body-padding: calc(var(--spacing) * 4);
+    --rz-sidebar-width: 16rem;
+
+    /* Floating panels */
+    --rz-dropdown-panel-shadow: var(--shadow-lg);
+    --rz-context-menu-box-shadow: var(--shadow-lg);
+    --rz-datepicker-panel-shadow: var(--shadow-lg);
+    --rz-header-shadow: none;
+    --rz-button-shadow: none;
+
+    /* Focus ring: the same orange outline everywhere */
+    --rz-outline-width: 2px;
+    --rz-outline-offset: 2px;
+    --rz-outline-color: var(--rz-primary);
+
+    /* Buttons */
+    /* Buttons: the sizes of daisyUI one step down (md is daisyUI's sm), so the application is denser than daisyUI's defaults */
+    --rz-button-size-xs: 1.5rem;
+    --rz-button-size-sm: 1.75rem;
+    --rz-button-size-md: 2rem;
+    --rz-button-size-lg: 2.5rem;
+    --rz-button-border-radius: var(--radius-field);
+    --rz-text-button-font-weight: 600;
+    --rz-button-disabled-opacity: 1;
+    --rz-button-line-height: var(--text-sm--line-height);
+
+    /* Inputs: a hairline of the text color at 20% that does not change on hover, a faint inner shadow; focus is the same hairline in the accent with a faint halo */
+    /* Radzen sets the height through the size class of the input (rz-input-md, ...): the sizes are the buttons' ones */
+    --rz-input-size-xs: 1.5rem;
+    --rz-input-size-sm: 1.75rem;
+    --rz-input-size-md: 2rem;
+    --rz-input-size-lg: 2.5rem;
+    --rz-input-padding-block-xs: 0.125rem;
+    --rz-input-padding-block-sm: 0.1875rem;
+    --rz-input-padding-block-md: 0.3125rem;
+    --rz-input-padding-block-lg: 0.5625rem;
+    --rz-input-height: var(--rz-input-size-md);
+    --rz-input-font-size: var(--text-sm);
+    --rz-input-line-height: var(--text-sm--line-height);
+    --rz-input-padding-inline: calc(var(--spacing) * 3);
+    --rz-input-padding-block: var(--rz-input-padding-block-md);
+    --rz-input-border-radius: var(--radius-field);
+    --rz-input-border: 1px solid color-mix(in oklab, var(--rz-text-color) 20%, transparent);
+    --rz-input-border-block-end: var(--rz-input-border);
+    --rz-input-hover-border: var(--rz-input-border);
+    --rz-input-hover-border-block-end: var(--rz-input-hover-border);
+    --rz-input-shadow: 0 1px color-mix(in oklab, var(--rz-text-color) 8%, transparent) inset;
+    --rz-input-focus-border: 1px solid var(--rz-primary);
+    --rz-input-focus-border-block-end: 1px solid var(--rz-primary);
+    --rz-input-focus-shadow: 0 0 0 3px color-mix(in oklab, var(--rz-primary) 15%, transparent);
+    --rz-input-focus-outline: none;
+    --rz-input-focus-outline-offset: 0;
+    --rz-input-background-color: var(--rz-base-background-color);
+    --rz-input-hover-background-color: var(--rz-base-background-color);
+    --rz-input-focus-background-color: var(--rz-base-background-color);
+    --rz-input-placeholder-color: var(--color-stone-400);
+
+    /* Form fields are Variant.Text everywhere, laid out as daisyUI's (components.css): the label above, the field, the hint below */
+    --fw-field-label-gap: calc(var(--spacing) * 1.5);
+    --rz-form-field-margin-block: calc(1.25rem + var(--fw-field-label-gap)) 0;
+    --rz-form-field-label-floating-font-size: var(--text-sm);
+    --rz-form-field-label-floating-top: calc(-1.25rem - var(--fw-field-label-gap));
+    --rz-form-field-helper-padding: calc(var(--spacing) * 1.5) 0 0;
+
+    /* Shell: flat header with a hairline, light sidebar, orange-tinted active item */
+    --rz-header-background-color: var(--rz-base-background-color);
+    --rz-header-border: 1px solid var(--rz-border-color);
+    --rz-sidebar-background-color: var(--rz-base-background-color);
+    --rz-sidebar-color: var(--rz-text-color);
+    --rz-sidebar-border-inline-end: 1px solid var(--rz-border-color);
+    --rz-panel-menu-item-background-color: transparent;
+    --rz-panel-menu-item-color: var(--rz-text-color);
+    --rz-panel-menu-item-border: none;
+    --rz-panel-menu-item-border-radius: var(--radius-field);
+    /* daisyUI's menu: text-sm in the regular weight (Radzen's is semibold) */
+    --rz-panel-menu-font-weight: 400;
+    --rz-panel-menu-item-margin-inline: calc(var(--spacing) * 2);
+    --rz-panel-menu-item-margin-block: calc(var(--spacing) * 0.25);
+    --rz-panel-menu-item-padding-block: calc(var(--spacing) * 1.5);
+    --rz-panel-menu-item-padding-inline: calc(var(--spacing) * 3);
+    /* The active item is a soft grey plate (a solid dark one was the loudest spot of the light theme); icons are quieter than the text */
+    --rz-panel-menu-item-hover-background-color: color-mix(in oklab, var(--rz-text-color) 6%, transparent);
+    --rz-panel-menu-item-active-background-color: color-mix(in oklab, var(--rz-text-color) 10%, transparent);
+    --rz-panel-menu-item-active-color: var(--rz-text-title-color);
+    --rz-panel-menu-item-active-indicator: transparent;
+    --rz-panel-menu-icon-color: color-mix(in oklab, var(--rz-text-color) 65%, transparent);
+    --rz-panel-menu-item-2nd-level-background-color: transparent;
+    --rz-panel-menu-item-2nd-level-hover-background-color: var(--rz-panel-menu-item-hover-background-color);
+    --rz-panel-menu-item-2nd-level-active-background-color: var(--rz-panel-menu-item-active-background-color);
+    --rz-panel-menu-item-3rd-level-background-color: transparent;
+    --rz-panel-menu-item-3rd-level-hover-background-color: var(--rz-panel-menu-item-hover-background-color);
+    --rz-panel-menu-item-3rd-level-active-background-color: var(--rz-panel-menu-item-active-background-color);
+
+    /* Chips as daisyUI badges: the selector radius, text-xs, a quiet background */
+    --rz-chip-background-color: var(--color-stone-100);
+    --rz-chip-border-radius: var(--radius-selector);
+    --rz-chip-font-size: var(--text-xs);
+    --rz-chip-padding-block: calc(var(--spacing) * 1);
+    --rz-chip-padding-inline: calc(var(--spacing) * 2.5);
+    --rz-chip-gap: calc(var(--spacing) * 1);
+    --rz-chip-icon-size: 1rem;
+    --rz-chip-sm-font-size: var(--text-xs);
+    --rz-chip-sm-padding-block: calc(var(--spacing) * 0.5);
+    --rz-chip-sm-padding-inline: calc(var(--spacing) * 2);
+    --rz-chip-sm-gap: calc(var(--spacing) * 1);
+    --rz-chip-sm-icon-size: 0.875rem;
+}
+
+html:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --rz-chip-background-color: var(--color-stone-800);
+
+    --rz-input-placeholder-color: var(--color-stone-500);
+
+}
+
+/* Radzen 12.1.4 leaves the label of an empty form field (the placeholder position) in the text color; only the floated one is dimmed */
+.rz-form-field-label {
+    color: var(--rz-input-placeholder-color);
+}

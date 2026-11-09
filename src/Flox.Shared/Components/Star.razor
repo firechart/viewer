@@ -1,0 +1,21 @@
+<RadzenButton Variant="Radzen.Variant.Text"
+              ButtonStyle="Radzen.ButtonStyle.Base"
+              Size="Radzen.ButtonSize.Small"
+              Click=NotifyStarredChangingAsync>
+    <FloxIcon Icon="star" Filled=@Starred Color="var(--rz-primary)"/>
+</RadzenButton>
+
+@code {
+
+    [Parameter]
+    public bool Starred { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> StarredChanging { get; set; }
+
+    async Task NotifyStarredChangingAsync()
+    {
+        await StarredChanging.InvokeAsync(!Starred);
+    }
+
+}

@@ -1,0 +1,15 @@
+<span role="button" class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full hover:bg-hover"
+      title=@(Bookmarked ? Strings.Caption_RemoveBookmark : Strings.Caption_AddBookmark)
+      @onclick=@OnToggle @onclick:stopPropagation @onclick:preventDefault>
+    <Bookmark Bookmarked=@Bookmarked/>
+</span>
+
+@code {
+
+    [Parameter]
+    public bool Bookmarked { get; set; }
+
+    [Parameter]
+    public EventCallback OnToggle { get; set; }
+
+}

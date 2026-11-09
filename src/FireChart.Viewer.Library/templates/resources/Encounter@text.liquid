@@ -1,0 +1,10 @@
+{%- assign type = self.type | first -%}
+{%- assign cls = self.class | as_list | first -%}
+
+{%- if type -%}
+  {%- apply type mode: "text" -%}
+{%- elsif cls -%}
+  {%- apply cls mode: "text" -%}
+{%- else -%}
+  {{- "Encounter" -}}
+{%- endif -%}

@@ -1,0 +1,63 @@
+@import url('lib/cookieconsent/dist/cookieconsent.min.css');
+
+/**********************************************************
+FONTS
+
+Keep this sheet free of @media rules. When a viewport change flips a media rule of a sheet, the browser
+registers that sheet's font faces again and the glyphs are missing for a moment (icons vanish, text falls
+back). The faces therefore live here and not in Radzen's theme or in site.css, which are full of
+media rules; Radzen's own "Material Symbols" face is replaced by "Flox Symbols" in the theme variables.
+**********************************************************/
+
+/* Same file Radzen ships; font-display: block keeps a not yet applied icon invisible */
+@font-face {
+    font-family: "Flox Symbols";
+    font-style: normal;
+    font-weight: 100 700;
+    font-display: block;
+    src: url("../Radzen.Blazor/fonts/MaterialSymbolsOutlined.woff2") format("woff2 supports variations"),
+         url("../Radzen.Blazor/fonts/MaterialSymbolsOutlined.woff2") format("woff2-variations");
+}
+
+/* Zero-size fallback after the icon font: a ligature name that shows up anyway stays invisible */
+@font-face {
+    font-family: "Flox Icon Fallback";
+    src: local("Arial"), local("Helvetica"), local("sans-serif");
+    size-adjust: 0.01%;
+}
+
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("../Radzen.Blazor/fonts/InterVariable.woff2") format("woff2");
+}
+
+/**********************************************************
+GENERIC STYLES
+**********************************************************/
+
+body, html, #app {
+    font-family: var(--rz-text-font-family, ui-sans-serif, system-ui, sans-serif);
+}
+
+.dialog-blurry-bg {
+    backdrop-filter: blur(10px);
+}
+
+
+@keyframes slide {
+    0% {
+        transform: translateX(-150%);
+    }
+
+    100% {
+        transform: translateX(450%);
+    }
+}
+
+/* The fatal-error dialog (id="blazor-error-ui") is intentionally NOT styled here.
+   Its markup and CSS are both generated at runtime by blazor-error-ui.js, so that
+   a single <script> tag is the entire integration surface on every host page -
+   see that file. */

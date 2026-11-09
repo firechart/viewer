@@ -1,0 +1,39 @@
+@implements IDisposable
+@inject IConnectivityService ConnectivityService
+
+@if (ConnectivityService is not null && !_isConnected)
+{
+    <RadzenAlert AlertStyle="Radzen.AlertStyle.Warning" Variant="Radzen.Variant.Flat" AllowClose="false"
+                 class="fixed inset-x-0 top-0 z-[9999] rz-border-radius-0 rz-text-align-center">
+        No Internet Connection - Working Offline
+    </RadzenAlert>
+}
+
+
+@code {
+    private bool _isConnected = true;
+
+    protected override void OnInitialized()
+    {
+        if (ConnectivityService is not null)
+        {
+            _isConnected = ConnectivityService.IsConnected;
+            ConnectivityService.ConnectivityChanged += OnConnectivityChanged;
+        }
+    }
+
+    private void OnConnectivityChanged(object? sender, GenericEventArgs<bool> e)
+    {
+        _isConnected = e.Value;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        if (ConnectivityService is not null)
+        {
+            ConnectivityService.ConnectivityChanged -= OnConnectivityChanged;
+        }
+    }
+
+}

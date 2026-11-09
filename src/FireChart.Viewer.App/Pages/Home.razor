@@ -1,0 +1,354 @@
+@page "/"
+@using System.Text.Json
+@using System.Text.Json.Nodes
+@using FireChart.Viewer.App.Sandbox
+@implements IAsyncDisposable
+@inject DemoPresets Presets
+@inject IJSRuntime JS
+
+@* The sandbox: the Viewer of /embed in a frame, driven by the messages a host sends (init, update, restart, navigate), public servers in one click.
+   The page opens empty: the frame (a second .NET runtime) is created when a server is chosen *@
+<PageTitle>FireChart Viewer: sandbox</PageTitle>
+
+<div class="sandbox">
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="12" SizeLG="4">
+            <RadzenStack Gap="0.75rem">
+                <RadzenText TextStyle="TextStyle.H5" class="m-0">FireChart Viewer</RadzenText>
+                <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Size="AlertSize.Small" AllowClose="false" data-sandbox="public-servers">
+                    Public test servers with synthetic data. Do not upload real patient data to them.
+                </RadzenAlert>
+
+                <RadzenFormField Text="Server" Variant="Variant.Outlined">
+                    <RadzenDropDown TValue="string" Data=@_presets TextProperty="Name" ValueProperty="Id" Value=@_presetId
+                                    Placeholder="Select a server" AllowClear="true"
+                                    ValueChanged=@((string? id) => SelectPresetAsync(id)) data-sandbox="preset">
+                        <Template Context="item">
+                            @{ var preset = (DemoPreset)item; }
+                            <span class=@(Availability(preset) == PresetAvailability.Unavailable ? "sandbox-unavailable" : null)>
+                                @preset.Name
+                                @if (Availability(preset) == PresetAvailability.Unavailable)
+                                {
+                                    <span> (not reachable)</span>
+                                }
+                            </span>
+                        </Template>
+                    </RadzenDropDown>
+                </RadzenFormField>
+                @if (Selected is { } selected)
+                {
+                    <RadzenText TextStyle="TextStyle.Body2" class="m-0">@selected.Description</RadzenText>
+                }
+
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.End">
+                    <RadzenFormField Text="Theme" Variant="Variant.Outlined">
+                        <RadzenSelectBar TValue="string" Value=@_theme ValueChanged=@((string theme) => SetThemeAsync(theme)) Size="ButtonSize.Small" data-sandbox="theme">
+                            <Items>
+                                <RadzenSelectBarItem Text="Light" Value="@("light")"/>
+                                <RadzenSelectBarItem Text="Dark" Value="@("dark")"/>
+                                <RadzenSelectBarItem Text="Auto" Value="@("auto")"/>
+                            </Items>
+                        </RadzenSelectBar>
+                    </RadzenFormField>
+                    <RadzenFormField Text="Language" Variant="Variant.Outlined">
+                        <RadzenDropDown TValue="string" Data=@s_locales Value=@_locale ValueChanged=@((string locale) => SetLocaleAsync(locale)) data-sandbox="locale"/>
+                    </RadzenFormField>
+                    @if (Selected?.Patient is { } patient)
+                    {
+                        <RadzenButton ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Icon="person" Text="Patient summary"
+                                      Click=@(() => NavigateAsync(new ViewerRoute(ViewerPage.ClinicalSummary, "Patient", patient).Location)) data-sandbox="patient"/>
+                    }
+                </RadzenStack>
+
+                <RadzenFormField Text="Configuration (viewer.json)" Variant="Variant.Outlined">
+                    <RadzenTextArea @bind-Value=@_editor Rows="18" class="sandbox-editor" spellcheck="false" data-sandbox="editor"/>
+                </RadzenFormField>
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary" Icon="restart_alt" Text="Apply (restart)" Click=@ApplyAsync data-sandbox="apply"/>
+                    @if (Selected is not null)
+                    {
+                        <RadzenButton ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Text="Reset" Click=@(() => SelectPresetAsync(Selected.Id))/>
+                    }
+                </RadzenStack>
+                @if (_errors.Count > 0)
+                {
+                    <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Size="AlertSize.Small" AllowClose="false" data-sandbox="errors">
+                        <ul class="m-0 pl-4">
+                            @foreach (var error in _errors)
+                            {
+                                <li><code>@error.Param</code> (@error.Code): @error.Message</li>
+                            }
+                        </ul>
+                    </RadzenAlert>
+                }
+            </RadzenStack>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeLG="8">
+            <RadzenStack Gap="0.75rem">
+                <div @ref=@_frameHost>
+                    @if (_applied is not null)
+                    {
+                        <iframe src="embed?host=parent" title="FireChart Viewer" class="sandbox-frame" data-sandbox="frame"></iframe>
+                    }
+                    else
+                    {
+                        <div class="sandbox-frame sandbox-empty" data-sandbox="empty">
+                            <RadzenText TextStyle="TextStyle.Body1" class="m-0">Select a server, or write a configuration and apply it.</RadzenText>
+                        </div>
+                    }
+                </div>
+                <RadzenTabs RenderMode="TabRenderMode.Client">
+                    <Tabs>
+                        <RadzenTabsItem Text=@($"Events ({_events.Count})")>
+                            <div class="sandbox-events" data-sandbox="events">
+                                @if (_events.Count == 0)
+                                {
+                                    <RadzenText TextStyle="TextStyle.Body2">The messages between the sandbox and the frame appear here.</RadzenText>
+                                }
+                                @foreach (var entry in _events)
+                                {
+                                    <div class="sandbox-event">
+                                        <span class="sandbox-event-time">@entry.Time.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)</span>
+                                        <span>@(entry.Sent ? "→" : "←")</span>
+                                        <strong>@entry.Type</strong>
+                                        <code>@entry.Payload</code>
+                                    </div>
+                                }
+                            </div>
+                            @if (_events.Count > 0)
+                            {
+                                <RadzenButton ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Size="ButtonSize.Small" Text="Clear" Click=@(() => _events.Clear())/>
+                            }
+                        </RadzenTabsItem>
+                        <RadzenTabsItem Text="Code">
+                            <RadzenStack Gap="1rem" data-sandbox="code">
+                                @foreach (var snippet in _snippets)
+                                {
+                                    <RadzenStack Gap="0.25rem">
+                                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                                            <RadzenText TextStyle="TextStyle.Subtitle2" class="m-0">@snippet.Title</RadzenText>
+                                            <RadzenButton ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Size="ButtonSize.Small" Icon="content_copy" Text="Copy"
+                                                          Click=@(() => CopyAsync(snippet.Code))/>
+                                        </RadzenStack>
+                                        <pre class="sandbox-code"><code>@snippet.Code</code></pre>
+                                    </RadzenStack>
+                                }
+                            </RadzenStack>
+                        </RadzenTabsItem>
+                    </Tabs>
+                </RadzenTabs>
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+</div>
+
+@code {
+
+    private const int MaxEvents = 200;
+
+    private static readonly JsonSerializerOptions s_indented = new() { WriteIndented = true };
+    private static readonly string[] s_locales = ["auto", .. ViewerAppConfigLoader.Locales];
+
+    private readonly Dictionary<string, PresetAvailability> _availability = new(StringComparer.Ordinal);
+    private readonly List<SandboxEvent> _events = [];
+    private readonly CancellationTokenSource _closing = new();
+    private IReadOnlyList<DemoPreset> _presets = [];
+    private IReadOnlyList<CodeSnippet> _snippets = [];
+    private List<ViewerConfigError> _errors = [];
+    private string? _presetId;
+    private string _editor = string.Empty;
+    private JsonObject? _applied;
+    private string _theme = "auto";
+    private string _locale = "auto";
+    private ElementReference _frameHost;
+    private IJSObjectReference? _module;
+    private DotNetObjectReference<Home>? _self;
+
+    private DemoPreset? Selected => _presets.FirstOrDefault(p => p.Id == _presetId);
+
+    protected override async Task OnInitializedAsync()
+    {
+        _presets = await Presets.LoadAsync(_closing.Token);
+        foreach (var preset in _presets)
+        {
+            _availability[preset.Id] = PresetAvailability.Checking;
+            _ = CheckAsync(preset);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _self = DotNetObjectReference.Create(this);
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/sandbox.js");
+            await _module.InvokeVoidAsync("attach", _frameHost, _self);
+        }
+    }
+
+    // The frame says hello when it has loaded (also after the way back of a SMART redirect): it gets the configuration applied here
+    [JSInvokable]
+    public Task OnFrameMessage(string type, string payload)
+    {
+        // The frame of the sandbox fills its box: its height is not news
+        if (type == "resize")
+        {
+            return Task.CompletedTask;
+        }
+
+        return InvokeAsync(async () =>
+        {
+            Log(false, type, payload);
+            if (type == "hello" && _applied is not null)
+            {
+                await SendAsync("init", new JsonObject { ["config"] = _applied.DeepClone() });
+            }
+
+            StateHasChanged();
+        });
+    }
+
+    private async Task CheckAsync(DemoPreset preset)
+    {
+        var availability = await Presets.CheckAsync(preset, _closing.Token);
+        _availability[preset.Id] = availability;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private PresetAvailability Availability(DemoPreset preset)
+    {
+        return _availability.GetValueOrDefault(preset.Id, PresetAvailability.Checking);
+    }
+
+    private async Task SelectPresetAsync(string? id)
+    {
+        _presetId = id;
+        if (Selected is { } preset)
+        {
+            _editor = preset.Config.ToJsonString(s_indented);
+            await ApplyAsync();
+            return;
+        }
+
+        // No server: the frame goes, and its runtime with it
+        _applied = null;
+        _editor = string.Empty;
+        _snippets = [];
+        _errors = [];
+    }
+
+    private async Task ApplyAsync()
+    {
+        JsonObject config;
+        try
+        {
+            config = JsonNode.Parse(_editor, documentOptions: new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true }) as JsonObject
+                     ?? throw new JsonException();
+        }
+        catch (JsonException)
+        {
+            _errors = [new ViewerConfigError("invalid_value", "$", "The configuration is not a well formed JSON object.")];
+            return;
+        }
+
+        var setup = ViewerAppConfigLoader.Parse(config.ToJsonString());
+        _errors = [.. setup.Errors];
+        if (setup.Server is null)
+        {
+            return;
+        }
+
+        var frameShown = _applied is not null;
+        _applied = config;
+        _theme = config["appearance"]?["theme"]?.GetValue<string>() ?? "auto";
+        _locale = config["locale"]?.GetValue<string>() ?? "auto";
+        _snippets = CodeSnippets.Build(config);
+        // A new frame says hello and gets the configuration by init
+        if (frameShown)
+        {
+            await SendAsync("restart", new JsonObject { ["config"] = config.DeepClone() });
+        }
+    }
+
+    private Task SetThemeAsync(string theme)
+    {
+        _theme = theme;
+        return UpdateAsync(new JsonObject { ["appearance"] = new JsonObject { ["theme"] = theme } });
+    }
+
+    private Task SetLocaleAsync(string locale)
+    {
+        _locale = locale;
+        return UpdateAsync(new JsonObject { ["locale"] = locale });
+    }
+
+    // An option that changes live: the frame merges it into its configuration, the editor and the code follow
+    private async Task UpdateAsync(JsonObject patch)
+    {
+        if (_applied is null)
+        {
+            return;
+        }
+
+        ViewerConfigPatch.Merge(_applied, patch);
+        _editor = _applied.ToJsonString(s_indented);
+        _snippets = CodeSnippets.Build(_applied);
+        await SendAsync("update", new JsonObject { ["config"] = patch });
+    }
+
+    private Task NavigateAsync(string location)
+    {
+        return SendAsync("navigate", new JsonObject { ["location"] = location });
+    }
+
+    private async Task SendAsync(string type, JsonObject payload)
+    {
+        var text = payload.ToJsonString();
+        Log(true, type, text);
+        if (_module is not null)
+        {
+            await _module.InvokeVoidAsync("send", type, text);
+        }
+    }
+
+    private async Task CopyAsync(string code)
+    {
+        if (_module is not null)
+        {
+            await _module.InvokeVoidAsync("copy", code);
+        }
+    }
+
+    private void Log(bool sent, string type, string payload)
+    {
+        _events.Insert(0, new SandboxEvent(TimeProvider.System.GetLocalNow(), sent, type, payload == "{}" ? string.Empty : payload));
+        if (_events.Count > MaxEvents)
+        {
+            _events.RemoveAt(_events.Count - 1);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _closing.CancelAsync();
+        _closing.Dispose();
+        if (_module is not null)
+        {
+            try
+            {
+                await _module.InvokeVoidAsync("detach");
+                await _module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // the page is gone
+            }
+        }
+
+        _self?.Dispose();
+    }
+
+    private sealed record SandboxEvent(DateTimeOffset Time, bool Sent, string Type, string Payload);
+
+}

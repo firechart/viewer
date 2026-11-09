@@ -1,0 +1,13 @@
+@* The static application of the Viewer: the sandbox at /, the frame at /embed, the way back of a SMART sign-in at /smart/callback *@
+<RadzenTheme Theme="standard"/>
+<RadzenComponents/>
+
+<Router AppAssembly="typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData"/>
+    </Found>
+    <NotFound>
+        <PageTitle>FireChart Viewer</PageTitle>
+        <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false">Nothing at this address.</RadzenAlert>
+    </NotFound>
+</Router>

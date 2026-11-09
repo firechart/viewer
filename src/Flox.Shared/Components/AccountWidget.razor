@@ -1,0 +1,34 @@
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <Authorized>
+        <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" title=@context.User?.GetUserName() Click="ProfileAsync">
+            <FloxIcon Icon="verified_user"/>
+        </RadzenButton>
+    </Authorized>
+    <NotAuthorized>
+        <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Click="LoginAsync">
+            <FloxIcon Icon="login"/>
+        </RadzenButton>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    private async Task LoginAsync()
+    {
+        await AuthenticationService.LoginAsync();
+    }
+
+    private async Task ProfileAsync()
+    {
+        await AuthenticationService.GoToProfileAsync();
+    }
+
+    private async Task LogoutAsync()
+    {
+        await AuthenticationService.LogoutAsync();
+    }
+
+}

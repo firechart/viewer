@@ -1,0 +1,5 @@
+{%- assign kind = self.type | first -%}
+{%- capture t0 -%}{% if kind %}{% apply kind mode: "text" %}{% endif %}{%- endcapture -%}
+{%- assign title = t0 -%}
+{%- if title == "" -%}{%- assign title = self.id -%}{%- endif -%}
+{{- title -}}

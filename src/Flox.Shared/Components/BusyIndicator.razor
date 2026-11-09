@@ -1,0 +1,31 @@
+@* A circular indicator over its relative parent, shown after 150 ms so a quick load does not flash it. It sits in the middle of what the
+   user can see: the parent may be much higher than the screen (a long list on a page that scrolls), so the indicator is sticky (the body of the layout scrolls under the header and has its own padding, which the offset
+   takes back), as high as the screen below the header, and never higher than the parent *@
+@if (Visible)
+{
+    <div class="absolute inset-0 z-10 @(Delayed ? "animate-progress-appear" : null) @(Dim ? "bg-canvas/60" : null) @(BlockInput ? null : "pointer-events-none")" aria-hidden="true">
+        <div class="viewport-box">
+            <CircularProgress/>
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public bool Visible { get; set; }
+
+    // The content below is veiled
+    [Parameter]
+    public bool Dim { get; set; } = true;
+
+    // Shown after 150 ms, so that a quick load does not flash it. Without the delay it is there at once: for a list the user pages through, where
+    // a load that is quick still has to show that something happens
+    [Parameter]
+    public bool Delayed { get; set; } = true;
+
+    // The content below does not get the mouse and touch while the indicator is shown
+    [Parameter]
+    public bool BlockInput { get; set; } = true;
+
+}

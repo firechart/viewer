@@ -1,0 +1,91 @@
+@attribute [Route("/diagnostics/errors")]
+
+@inherits StatelessWidget
+
+<AppBarTitle>Error handling</AppBarTitle>
+
+<Breadcrumbs Items=@Breadcrumbs/>
+
+@if (_broken)
+{
+    throw new InvalidOperationException("Demo: rendering failed");
+}
+
+<RadzenText TextStyle="TextStyle.Caption" class="rz-mb-2">
+    Every row throws on purpose. See the "Client error handling" article for how each case is handled.
+</RadzenText>
+
+<ListSection Caption="Event handlers (the page stays alive)">
+    <ListTile TitleText="Unexpected error" SubtitleText="Standard message with a reference" OnSelected=@ThrowUnexpected/>
+    <ListTile TitleText="Unexpected error in an async handler" SubtitleText="Thrown after an await" OnSelected=@ThrowUnexpectedAsync/>
+    <ListTile TitleText="Record not found" SubtitleText="Expected: a warning with the message" OnSelected=@ThrowNotFound/>
+    <ListTile TitleText="Access denied" SubtitleText="Expected: a warning" OnSelected=@ThrowForbidden/>
+    <ListTile TitleText="Server unreachable" SubtitleText="Expected: a warning" OnSelected=@ThrowNetwork/>
+    <ListTile TitleText="Custom message" SubtitleText="Own text plus the reference" OnSelected=@ThrowWithMessage/>
+</ListSection>
+
+<ListSection Caption="Outside event handlers">
+    <ListTile TitleText="Fire and forget" SubtitleText="Replacement for async void" OnSelected=@FireAndForget/>
+    <ListTile TitleText="TryAsync" SubtitleText="Handled in place, the result is returned" OnSelected=@UseTryAsync/>
+    <ListTile TitleText="Break rendering" SubtitleText="Reaches the error boundary: error page with a reference" OnSelected=@BreakRendering/>
+</ListSection>
+
+@code {
+    private bool _broken;
+
+    private void ThrowUnexpected()
+    {
+        throw new InvalidOperationException("Demo: unexpected error");
+    }
+
+    private async Task ThrowUnexpectedAsync()
+    {
+        await Task.Delay(50);
+        throw new InvalidOperationException("Demo: unexpected async error");
+    }
+
+    private void ThrowNotFound()
+    {
+        throw new NotFoundException(Guid.Empty);
+    }
+
+    private void ThrowForbidden()
+    {
+        throw new ForbidNotAdminException();
+    }
+
+    private void ThrowNetwork()
+    {
+        throw new HttpRequestException("Failed to fetch");
+    }
+
+    private Task ThrowWithMessage()
+    {
+        return this.HandleExceptionUI("Could not save the record.", new InvalidOperationException("Demo: save failed"));
+    }
+
+    private void FireAndForget()
+    {
+        UiErrors.Fire(async () =>
+                      {
+                          await Task.Delay(50);
+                          throw new InvalidOperationException("Demo: background error");
+                      },
+                      nameof(FireAndForget));
+    }
+
+    private async Task UseTryAsync()
+    {
+        var completed = await TryAsync(() => throw new InvalidOperationException("Demo: TryAsync error"));
+        if (!completed)
+        {
+            Notifications.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Info, Summary = "TryAsync returned false" });
+        }
+    }
+
+    private void BreakRendering()
+    {
+        _broken = true;
+    }
+
+}

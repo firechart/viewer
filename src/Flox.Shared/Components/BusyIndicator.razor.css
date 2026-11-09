@@ -1,0 +1,11 @@
+/* As high as the screen below the header, never higher than the veil, and in view while the page scrolls under it. The body of the layout has
+   a padding of its own, and a sticky box sticks inside it: the offset takes that back */
+.viewport-box {
+    position: sticky;
+    top: calc(-1 * var(--rz-layout-body-padding, 0px));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(100dvh - var(--rz-header-min-height));
+    max-height: 100%;
+}

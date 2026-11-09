@@ -1,0 +1,7 @@
+{%- assign parts = self.line | as_list -%}
+{%- assign city = self.city | as_list -%}
+{%- assign state = self.state | as_list -%}
+{%- assign postal = self.postalCode | as_list -%}
+{%- assign country = self.country | as_list -%}
+{%- assign composed = parts | concat: city | concat: state | concat: postal | concat: country | join: ", " -%}
+{%- if composed != "" -%}{{- composed -}}{%- else -%}{{- self.text -}}{%- endif -%}

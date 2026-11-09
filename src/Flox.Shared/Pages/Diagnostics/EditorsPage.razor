@@ -1,0 +1,39 @@
+@attribute [Route("/diagnostics/editors")]
+
+@inherits StatelessWidget
+
+<AppBarTitle>Code editor</AppBarTitle>
+
+<Breadcrumbs Items=@Breadcrumbs/>
+
+<ListSection Caption="Fixed layout: the parent sets the height, the editor scrolls">
+    <div class="flex h-72 flex-col rz-p-3">
+        <CodeEditor Value=@_json WordWrap=@_wrap/>
+    </div>
+</ListSection>
+
+<ListSection Caption="Auto height: grows with the text, the page scrolls">
+    <div class="rz-p-3">
+        <CodeEditor AutoHeight Language=@CodeEditor.CodeLanguage.Xml Value=@_xml/>
+    </div>
+</ListSection>
+
+<ListSection Caption="Options">
+    <ListTile TitleText="Word wrap" SubtitleText="Applies to the first editor" OnSelected=@(() => _wrap = !_wrap)>
+        <Trailing>
+            <RadzenSwitch Value=@_wrap/>
+        </Trailing>
+    </ListTile>
+</ListSection>
+
+@code {
+    private bool _wrap;
+
+    private readonly string _json = System.Text.Json.JsonSerializer.Serialize(Enumerable.Range(1, 60)
+                                                                                         .Select(i => new { id = i, resourceType = "Patient", name = $"Patient {i} with a rather long display name to show the horizontal scroll" }),
+                                                                              new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+
+    private readonly string _xml = "<Bundle xmlns=\"http://hl7.org/fhir\">\n" + string.Concat(Enumerable.Range(1, 40)
+                                                                                                         .Select(i => $"  <entry>\n    <resource>\n      <Patient>\n        <id value=\"{i}\"/>\n      </Patient>\n    </resource>\n  </entry>\n")) + "</Bundle>";
+
+}

@@ -1,0 +1,75 @@
+@using System.Security.Claims
+@inject IFloxShell Shell
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuthorizationService AuthorizationService
+@inject Flox.Shared.Errors.IUiExceptionHandler Errors
+@implements IDisposable
+
+@foreach ((var menu, var nodes) in _menus)
+{
+    @* A plain, non-collapsible heading - menus are always expanded, no toggle *@
+
+    @if (!string.IsNullOrEmpty(menu.Text))
+    {
+        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-px-4 rz-py-2 rz-text-nowrap">@menu.Text</RadzenText>
+    }
+    <RadzenPanelMenu Multiple="true">
+        @foreach (var node in nodes)
+        {
+            <NavMenuItem Node="node"/>
+        }
+    </RadzenPanelMenu>
+}
+
+@if (_hasMore)
+{
+    <RadzenPanelMenu>
+        <RadzenPanelMenuItem Path=@AppUrl.ToHref(SharedRoutes.MORE) Match="NavLinkMatch.All">
+            <Template>
+                <FloxIcon Icon="more_horiz"/>
+                <span class="rz-ms-2 rz-text-nowrap">@Strings.Caption_More</span>
+            </Template>
+        </RadzenPanelMenuItem>
+    </RadzenPanelMenu>
+}
+
+@code {
+    private List<(IFloxMenu Menu, List<NavMenuNode> Nodes)> _menus = [];
+    private bool _hasMore;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await BuildAsync((await AuthenticationStateProvider.GetAuthenticationStateAsync()).User);
+        AuthenticationStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+    }
+
+    public void Dispose()
+    {
+        AuthenticationStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
+    }
+
+    // Signed in or out: the items depend on the user and on what the server lets the user do
+    private void OnAuthenticationStateChanged(Task<AuthenticationState> state)
+    {
+        Errors.Fire(async () =>
+                    {
+                        var user = (await state).User;
+                        await InvokeAsync(async () =>
+                        {
+                            await BuildAsync(user);
+                            StateHasChanged();
+                        });
+                    },
+                    nameof(OnAuthenticationStateChanged));
+    }
+
+    private async Task BuildAsync(ClaimsPrincipal user)
+    {
+        _menus = await MenuFilter.BuildAsync(Shell, AuthorizationService, user, FloxMenuPlacement.Main);
+
+        // One entry for everything that is placed on the More page, and only when there is something on it
+        _hasMore = (await MenuFilter.BuildAsync(Shell, AuthorizationService, user, FloxMenuPlacement.More)).Count > 0;
+    }
+
+}

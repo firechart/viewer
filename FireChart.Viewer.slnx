@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+    <File Path="Dockerfile" />
+    <File Path="docker-compose.yml" />
+    <File Path=".dockerignore" />
+  </Folder>
+  <Folder Name="/FireChart/">
+    <Project Path="src/FireChart.Resources/FireChart.Resources.csproj" />
+    <Project Path="src/FireChart.Viewer.Core/FireChart.Viewer.Core.csproj" />
+    <Project Path="src/FireChart.Viewer.Library/FireChart.Viewer.Library.csproj" />
+    <Project Path="src/FireChart.Viewer/FireChart.Viewer.csproj" />
+    <Project Path="src/FireChart.Viewer.App/FireChart.Viewer.App.csproj" />
+  </Folder>
+  <Folder Name="/Flox/">
+    <Project Path="src/Flox.Core/Flox.Core.csproj" />
+    <Project Path="src/Flox.Resources/Flox.Resources.csproj" />
+    <Project Path="src/Flox.Shared/Flox.Shared.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="test/FireChart.Viewer.Tests/FireChart.Viewer.Tests.csproj" />
+    <Project Path="test/Flox.Tests/Flox.Tests.csproj" />
+  </Folder>
+</Solution>

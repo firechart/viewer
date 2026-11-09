@@ -1,0 +1,7 @@
+{%- assign pr = self.priority | append: "" -%}
+{%- capture t0 -%}{{ self.description }}{%- endcapture -%}
+{%- capture t1 -%}{% apply self.code mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 -%}
+{%- if title == "" -%}{%- assign title = t1 -%}{%- endif -%}
+{%- if title == "" -%}{%- assign title = self.id -%}{%- endif -%}
+{{- title -}}

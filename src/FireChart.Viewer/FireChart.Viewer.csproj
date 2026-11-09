@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Description>FireChart Viewer: a client-side Blazor component that browses the data of a FHIR server (resource types, lists, resources, the clinical summary of a patient). Runs on Blazor WebAssembly and Blazor Hybrid, on the client side of Flox.</Description>
+    <PackageTags>fhir;hl7;smart-on-fhir;blazor;healthcare;viewer</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://git.firechart.org/firechart/firechart</PackageProjectUrl>
+    <RepositoryUrl>https://git.firechart.org/firechart/firechart.git</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="FireChart.Fhir.Tests" />
+    <InternalsVisibleTo Include="FireChart.Viewer.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
+    <PackageReference Include="Radzen.Blazor" />
+    <PackageReference Include="Lombiq.Tailwind.Targets" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Inputs of the Tailwind build (Assets/Styles/site.css -> wwwroot/css/FireChart.Viewer.Tailwind.css): a host without FireChart gets the utilities too -->
+    <TailwindContentFiles Include="**/*.razor;Assets/**/*.css" Exclude="bin/**;obj/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The client side of Flox only (ViewerIsolationTests) -->
+    <ProjectReference Include="..\Flox.Core\Flox.Core.csproj" />
+    <ProjectReference Include="..\Flox.Resources\Flox.Resources.csproj" />
+    <ProjectReference Include="..\Flox.Shared\Flox.Shared.csproj" />
+    <!-- The texts of FireChart are kept in one place (decided 2026-11-07) -->
+    <ProjectReference Include="..\FireChart.Resources\FireChart.Resources.csproj" />
+    <ProjectReference Include="..\FireChart.Viewer.Core\FireChart.Viewer.Core.csproj" />
+    <ProjectReference Include="..\FireChart.Viewer.Library\FireChart.Viewer.Library.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="FireChart.Viewer.Core" />
+    <Using Include="FireChart.Viewer.Core.Fhir" />
+    <Using Include="FireChart.Viewer.Core.Search" />
+    <Using Include="FireChart.Viewer.Core.Smart" />
+    <Using Include="FireChart.Viewer.Core.Search.SearchOption" Alias="SearchOption" />
+    <Using Include="FireChart.Resources" />
+    <Using Include="Flox.Resources.Strings" Alias="FloxStrings" />
+  </ItemGroup>
+
+</Project>

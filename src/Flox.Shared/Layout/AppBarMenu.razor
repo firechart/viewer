@@ -1,0 +1,25 @@
+@inject Radzen.ContextMenuService ContextMenuService
+
+<RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" title=@Title Click=@OpenAsync>
+    <FloxIcon Icon=@Icon/>
+</RadzenButton>
+
+@code {
+
+    [Parameter]
+    public string Icon { get; set; } = "more_vert";
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    // RadzenMenuItem children; the menu closes when one is picked
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private void OpenAsync(MouseEventArgs args)
+    {
+        ContextMenuService.Open(args,
+                                _ => @<RadzenMenu Click=@(() => ContextMenuService.Close())>@ChildContent</RadzenMenu>);
+    }
+
+}

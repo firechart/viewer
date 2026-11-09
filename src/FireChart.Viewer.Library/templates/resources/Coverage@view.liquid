@@ -1,0 +1,42 @@
+{% fhir_include "Coverage:beneficiary" %}
+{% fhir_include "Coverage:subscriber" %}
+{% fhir_include "Coverage:payor" %}
+
+{%- assign classes = self.class | as_list -%}
+{%- assign patient = self.beneficiary | resolve -%}
+{%- render "view-header", patient: patient, subject: self.beneficiary, own: "Coverage" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% if self.type %}{% apply self.type mode: "text" %}{% else %}{{ "Coverage" | t }}{% endif %}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.period %}
+    <span>{% apply self.period mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.payor or self.subscriber or self.subscriberId or self.relationship or self.network or self.order %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Payor", node: self.payor %}
+  {% render "field", label: "Subscriber", node: self.subscriber %}
+  {% render "field", label: "Subscriber ID", node: self.subscriberId, mode: "text" %}
+  {% render "field", label: "Relationship", node: self.relationship, mode: "text" %}
+  {% render "field", label: "Network", node: self.network, mode: "text" %}
+  {% render "field", label: "Order", node: self.order, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if classes.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Plan" | t }}</h3>
+  {%- for c in classes %}
+  <div class="fx-row"><span class="fx-row-main">{{ c.name | default: c.value }}</span><span class="fx-row-meta">{% if c.type %}{% apply c.type mode: "text" -%}{% endif %}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

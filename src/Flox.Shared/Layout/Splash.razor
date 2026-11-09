@@ -1,0 +1,83 @@
+@inject IFloxBrandingProvider Branding
+
+@* Two instances: Early is rendered by the server (static SSR) and is on the screen before Blazor starts; MainLayout renders the live one
+   while the app initializes, which hides the early one; the early one stays hidden once the layout has set data-app-ready. Without a server host (MAUI) only the live one exists. *@
+
+<style>
+    html:not(:has([data-app-ready])):has(.flox-splash) {
+        background: #1a1a1a;
+    }
+
+    body:has(.flox-splash-live, [data-app-ready]) .flox-splash-early {
+        display: none;
+    }
+
+    .flox-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        background: #1a1a1a;
+    }
+
+    .flox-splash-logo {
+        width: min(50vw, 320px);
+        height: 120px;
+        object-fit: contain;
+    }
+
+    .flox-splash-message {
+        min-height: 1.25em;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.55);
+        font: 0.875rem ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .flox-splash-progress {
+        width: min(50vw, 320px);
+        height: 4px;
+        overflow: hidden;
+        border-radius: 2px;
+    }
+
+    .flox-splash-bar {
+        width: 40%;
+        height: 100%;
+        border-radius: 2px;
+        background: linear-gradient(90deg, #8b0000 0%, #e02020 14%, #e65c00 30%, #ff8c00 46%, #ffa500 56%, #ff8c00 66%, #e65c00 80%, #e02020 92%, #8b0000 100%);
+        background-size: 300% 100%;
+        animation: flox-splash-slide 1.5s infinite ease-in-out, flox-splash-flow 3s infinite linear;
+    }
+
+    @@keyframes flox-splash-slide {
+        from { transform: translateX(-150%); }
+        to { transform: translateX(450%); }
+    }
+
+    @@keyframes flox-splash-flow {
+        from { background-position: 0 0; }
+        to { background-position: 300% 0; }
+    }
+</style>
+
+<div class="flox-splash @(Early ? "flox-splash-early" : "flox-splash-live")">
+    <img class="flox-splash-logo" src="@Branding.App.Logo" alt=""/>
+    <p class="flox-splash-message">@Message</p>
+    <div class="flox-splash-progress">
+        <div class="flox-splash-bar"></div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string? Message { get; set; }
+
+    [Parameter]
+    public bool Early { get; set; }
+
+}

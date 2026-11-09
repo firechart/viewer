@@ -1,0 +1,4 @@
+{%- capture t0 -%}{% apply self.vaccineCode mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 -%}
+{%- if title == "" -%}{%- assign title = self.id -%}{%- endif -%}
+{{- title -}}

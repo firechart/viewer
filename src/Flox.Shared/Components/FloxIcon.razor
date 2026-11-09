@@ -1,0 +1,80 @@
+@if (!string.IsNullOrWhiteSpace(Icon))
+{
+    @if (Icon.StartsWith('<') || FloxIcons.Find(Icon, Filled) is not null)
+    {
+        @((MarkupString)GetSvg())
+    }
+    else
+    {
+        <RadzenIcon Icon=@Icon IconColor=@Color Style=@GetFontStyle() class=@Class title=@Title/>
+    }
+}
+
+@code {
+
+    // Name of a Material Symbols icon (an inline SVG when it is bundled in FloxIcons, a font ligature otherwise),
+    // a full <svg> or the inner paths of a 24x24 SVG (trusted code constants only)
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? Color { get; set; }
+
+    [Parameter]
+    public string? Size { get; set; }
+
+    [Parameter]
+    public bool Filled { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    private string GetSvg()
+    {
+        var icon = Icon!.TrimStart();
+        var attributes = $"class=\"inline-block size-5 shrink-0 fill-current {Class}\" style=\"{GetSvgStyle()}\" {(string.IsNullOrEmpty(Title) ? string.Empty : $"aria-label=\"{Title}\"")}";
+
+        if (FloxIcons.Find(icon, Filled) is { } path)
+        {
+            return $"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"{FloxIcons.ViewBox}\" {attributes}><path d=\"{path}\"/></svg>";
+        }
+
+        return icon.StartsWith("<svg", StringComparison.OrdinalIgnoreCase) ? $"<svg {attributes}{icon[4..]}" : $"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" {attributes}>{icon}</svg>";
+    }
+
+    private string GetSvgStyle()
+    {
+        var style = string.Empty;
+        if (!string.IsNullOrEmpty(Color))
+        {
+            style += $"color: {Color};";
+        }
+
+        if (!string.IsNullOrEmpty(Size))
+        {
+            style += $"width: {Size}; height: {Size};";
+        }
+
+        return style;
+    }
+
+    private string? GetFontStyle()
+    {
+        var style = string.Empty;
+        if (!string.IsNullOrEmpty(Size))
+        {
+            style += $"font-size: {Size};";
+        }
+
+        if (Filled)
+        {
+            style += "font-variation-settings: 'FILL' 1;";
+        }
+
+        return style.Length == 0 ? null : style;
+    }
+
+}

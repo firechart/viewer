@@ -1,0 +1,20 @@
+{%- assign c = concept.coding | as_list | first -%}
+{%- assign code = c.code | append: "" -%}
+{%- assign shown = c | coding_display | append: "" -%}
+{%- if shown == "" -%}{%- assign shown = concept.text | append: "" -%}{%- endif -%}
+{%- if shown == "" -%}{%- assign shown = code -%}{%- endif -%}
+
+{%- if shown -%}
+  {%- case code -%}
+    {%- when "HH", "LL", "AA", "HU", "LU", "POS", "DET" -%}
+      {%- assign tone = "danger" -%}
+    {%- when "H", "L", "A", "<", ">", "IND", "E" -%}
+      {%- assign tone = "warning" -%}
+    {%- when "N", "NEG", "ND", "S" -%}
+      {%- assign tone = "success" -%}
+    {%- else -%}
+      {%- assign tone = "" -%}
+  {%- endcase -%}
+
+  {%- render "badge", text: shown, tone: tone -%}
+{%- endif -%}

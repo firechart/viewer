@@ -1,0 +1,53 @@
+// The public servers of the sandbox at /; each with a patient that has much data. Checked by hand 2026-11-07 (CapabilityStatement, CORS, the patient)
+[
+  {
+    "id": "smart-open",
+    "name": "SMART Health IT R4 (open)",
+    "description": "Synthea patients, no sign-in.",
+    "patient": "13a00221-8417-4973-961e-e21b32ece95a",
+    "config": {
+      "server": { "url": "https://r4.smarthealthit.org", "name": "SMART Health IT R4" },
+      "appearance": { "theme": "auto" }
+    }
+  },
+  {
+    "id": "smart-launcher",
+    "name": "SMART Health IT Launcher (sign-in)",
+    "description": "A real SMART sign-in in a popup: pick a patient at the launcher, the clinical summary opens.",
+    "config": {
+      "server": { "url": "https://launch.smarthealthit.org/v/r4/fhir", "name": "SMART Launcher R4" },
+      "smart": { "clientId": "firechart-viewer", "scopes": "launch/patient patient/*.rs openid fhirUser", "extraParameters": "launch=e30", "flow": "popup" },
+      "appearance": { "theme": "auto" }
+    }
+  },
+  {
+    "id": "hapi-r4",
+    "name": "HAPI FHIR R4",
+    "description": "The public test server of HAPI: anyone writes there, data come and go.",
+    "patient": "nhanes-120300",
+    "config": {
+      "server": { "url": "https://hapi.fhir.org/baseR4", "name": "HAPI FHIR R4", "fhirRelease": "R4" },
+      "appearance": { "theme": "auto" }
+    }
+  },
+  {
+    "id": "hapi-r5",
+    "name": "HAPI FHIR R5",
+    "description": "The public R5 server of HAPI: anyone writes there, data come and go.",
+    "patient": "1132",
+    "config": {
+      "server": { "url": "https://hapi.fhir.org/baseR5", "name": "HAPI FHIR R5", "fhirRelease": "R5" },
+      "appearance": { "theme": "auto" }
+    }
+  },
+  {
+    "id": "firely",
+    "name": "Firely Server R4",
+    "description": "The public test server of Firely.",
+    "patient": "fhirlist-demo-g0028",
+    "config": {
+      "server": { "url": "https://server.fire.ly", "name": "Firely Server R4", "fhirRelease": "R4" },
+      "appearance": { "theme": "auto" }
+    }
+  }
+]

@@ -1,0 +1,40 @@
+{% fhir_include "Goal:subject" %}
+
+{%- assign targets = self.target | as_list -%}
+{%- assign patient = self.subject | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, own: "Goal" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% apply self.description mode: "text" -%}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.start %}
+    <span>{{ "Start" | t }} {% apply self.start mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.lifecycleStatus -%}
+    {%- render "concept-badge", concept: self.achievementStatus -%}
+  </div>
+</div>
+
+{%- if self.category or self.priority or self.expressedBy or self.addresses or self.outcomeCode %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Category", node: self.category, mode: "text" %}
+  {% render "field", label: "Priority", node: self.priority, mode: "text" %}
+  {% render "field", label: "Expressed by", node: self.expressedBy %}
+  {% render "field", label: "Addresses", node: self.addresses %}
+  {% render "field", label: "Outcome", node: self.outcomeCode, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if targets.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Targets" | t }}</h3>
+  {%- for t in targets %}
+  <div class="fx-row"><span class="fx-row-main">{% if t.measure %}{% apply t.measure mode: "text" -%}{% endif %}</span><span class="fx-row-meta">{% if t.due %}{{ "due" | t }} {% apply t.due mode: "text" -%}{% endif %}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

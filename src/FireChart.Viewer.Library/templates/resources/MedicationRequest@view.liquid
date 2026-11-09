@@ -1,0 +1,54 @@
+{% fhir_include "MedicationRequest:subject" %}
+{% fhir_include "MedicationRequest:requester" %}
+{% fhir_include "MedicationRequest:medication" %}
+{% fhir_include "MedicationRequest:encounter" %}
+
+{%- assign doses = self.dosageInstruction | as_list -%}{%- assign notes = self.note | as_list -%}{%- assign pr = self.priority | append: "" -%}
+{%- assign patient = self.subject | resolve -%}
+{%- assign encounter = self.encounter | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, encounter: encounter, visit: self.encounter, own: "MedicationRequest" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% apply self.medication mode: "link,text" -%}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.authoredOn %}
+    <span>{{ "Authored" | t }} {% apply self.authoredOn mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+    {%- if self.intent != "" -%}{%- render "badge", text: self.intent -%}{%- endif -%}
+    {%- if pr != "" and pr != "routine" -%}{%- render "status-badge", code: pr -%}{%- endif -%}
+  </div>
+</div>
+
+{%- if self.requester or self.category or self.reasonCode or self.reasonReference or self.basedOn %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Requester", node: self.requester %}
+  {% render "field", label: "Category", node: self.category, mode: "text" %}
+  {% render "field", label: "Reason", node: self.reasonCode, mode: "text" %}
+  {% render "field", label: "Reason", node: self.reasonReference %}
+  {% render "field", label: "Based on", node: self.basedOn %}
+</section>
+{%- endif %}
+
+{%- if doses.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Dosage" | t }}</h3>
+  {%- for d in doses %}
+  <div class="fx-row"><span class="fx-row-main">{{ d.text }}</span><span class="fx-row-meta">{% if d.route %}{% apply d.route mode: "text" -%}{% endif %}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if notes.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Notes" | t }}</h3>
+  {%- for n in notes %}
+  <div class="fx-row"><span class="fx-row-main">{% apply n mode: "text" -%}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

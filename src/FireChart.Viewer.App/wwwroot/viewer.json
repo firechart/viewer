@@ -1,0 +1,10 @@
+{
+  // The Viewer of /embed. The Docker image replaces this file by a volume (later); for a quick look: the open server of SMART Health IT
+  "server": {
+    "url": "https://r4.smarthealthit.org",
+    "name": "SMART Health IT (open, synthetic data)"
+  },
+  "appearance": {
+    "theme": "auto"
+  }
+}

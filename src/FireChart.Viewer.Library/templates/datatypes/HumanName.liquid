@@ -1,0 +1,8 @@
+<span class="human-name">
+{% assign composed = self.given | join: " " | append: " " | append: self.family | strip %}
+{% if composed != "" %}
+    {{ composed }}
+{% else %}
+    {{ self.text }}
+{% endif %}
+</span>

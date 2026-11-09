@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Caption_FhirServers" xml:space="preserve">
+    <value>FHIR servers</value>
+  </data>
+  <data name="Caption_Resources" xml:space="preserve">
+    <value>Resources</value>
+  </data>
+  <data name="Caption_AllPackages" xml:space="preserve">
+    <value>All packages</value>
+  </data>
+  <data name="Caption_FhirPackage" xml:space="preserve">
+    <value>FHIR package</value>
+  </data>
+  <data name="Caption_CodeSystems" xml:space="preserve">
+    <value>Code systems</value>
+  </data>
+  <data name="Caption_AllFhirServers" xml:space="preserve">
+    <value>All FHIR servers</value>
+  </data>
+  <data name="Caption_FhirCorePackages" xml:space="preserve">
+    <value>FHIR core packages</value>
+  </data>
+  <data name="Caption_FhirSettings" xml:space="preserve">
+    <value>FHIR settings</value>
+  </data>
+  <data name="Caption_DefaultFhirVersion" xml:space="preserve">
+    <value>Default FHIR version</value>
+  </data>
+  <data name="Caption_FhirServer" xml:space="preserve">
+    <value>FHIR server</value>
+  </data>
+  <data name="Caption_FhirRelease" xml:space="preserve">
+    <value>FHIR release</value>
+  </data>
+  <data name="Caption_FhirServerName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Caption_FhirServerBaseUrl" xml:space="preserve">
+    <value>Base URL</value>
+  </data>
+  <data name="Caption_FhirServerAuthentication" xml:space="preserve">
+    <value>Authentication</value>
+  </data>
+  <data name="Caption_FhirServerNoAuthentication" xml:space="preserve">
+    <value>No authentication</value>
+  </data>
+  <data name="Caption_FhirServerCredentialsAsked" xml:space="preserve">
+    <value>The credentials are not stored with the server: they are asked for when you connect.</value>
+  </data>
+  <data name="Caption_FhirServerToken" xml:space="preserve">
+    <value>API token</value>
+  </data>
+  <data name="Caption_FhirServerAuthority" xml:space="preserve">
+    <value>Authority (OIDC issuer, optional)</value>
+  </data>
+  <data name="Caption_FhirServerOAuth2Scope" xml:space="preserve">
+    <value>OAuth2 scope</value>
+  </data>
+  <data name="Caption_FhirServerOAuth2ExtraParameters" xml:space="preserve">
+    <value>OAuth2 extra parameters (key=value&amp;key=value)</value>
+  </data>
+  <data name="Caption_FhirServerRelease" xml:space="preserve">
+    <value>FHIR release (if /metadata is unavailable)</value>
+  </data>
+  <data name="Caption_FhirServerTerminologyUrl" xml:space="preserve">
+    <value>Terminology server URL (optional)</value>
+  </data>
+  <data name="Message_FhirServerUnavailable" xml:space="preserve">
+    <value>The server did not answer. It may be unavailable, or it may not allow requests from a browser (CORS).</value>
+  </data>
+  <data name="Message_FhirServerAuthenticationNotSupported" xml:space="preserve">
+    <value>Connecting to servers with this authentication type is not supported yet.</value>
+  </data>
+  <data name="Caption_ClinicalSummary" xml:space="preserve">
+    <value>Clinical Summary</value>
+  </data>
+  <data name="Caption_ClinicalSummaryForm" xml:space="preserve">
+    <value>Clinical summary form</value>
+  </data>
+  <data name="Message_InvalidSearch" xml:space="preserve">
+    <value>The search in the address is not valid.</value>
+  </data>
+  <data name="Message_SearchFormGenerated" xml:space="preserve">
+    <value>This form was generated automatically from the search parameters of the resource, so it is not very convenient. The server may not support some of the parameters.</value>
+  </data>
+  <data name="Message_CredentialsRejected" xml:space="preserve">
+    <value>The server did not accept these credentials.</value>
+  </data>
+  <data name="Caption_FhirServerOAuth2ClientId" xml:space="preserve">
+    <value>OAuth2 client ID</value>
+  </data>
+  <data name="Caption_FhirServerPageSize" xml:space="preserve">
+    <value>Page size</value>
+  </data>
+  <data name="Caption_FhirServerLiteEdition" xml:space="preserve">
+    <value>This edition only supports public FHIR servers that do not require authentication.</value>
+  </data>
+  <data name="Caption_FhirServerPublic" xml:space="preserve">
+    <value>Public servers</value>
+  </data>
+  <data name="Message_FhirServerSignInAsked" xml:space="preserve">
+    <value>This server asks you to sign in. You will go to its sign-in page and come back here.</value>
+  </data>
+  <data name="Message_SmartDiscoveryFailed" xml:space="preserve">
+    <value>The server does not say where to sign in (no SMART configuration).</value>
+  </data>
+  <data name="Message_SmartPkceNotSupported" xml:space="preserve">
+    <value>The sign-in server does not support PKCE with S256, which is required.</value>
+  </data>
+  <data name="Message_SmartStateMismatch" xml:space="preserve">
+    <value>The answer of the sign-in server does not match the request. Start the sign-in again.</value>
+  </data>
+  <data name="Message_SmartAuthorizationDenied" xml:space="preserve">
+    <value>The sign-in was cancelled or the server did not allow it.</value>
+  </data>
+  <data name="Message_SmartTokenExchangeFailed" xml:space="preserve">
+    <value>The server did not give an access token.</value>
+  </data>
+  <data name="Message_SmartUnknownIss" xml:space="preserve">
+    <value>This server is not on the list of servers the organization allows to start from outside.</value>
+  </data>
+  <data name="Message_SmartClientNotConfigured" xml:space="preserve">
+    <value>The client ID or the scope is not set for this server.</value>
+  </data>
+  <data name="Caption_Packages" xml:space="preserve">
+    <value>Packages</value>
+  </data>
+  <data name="Caption_Publisher" xml:space="preserve">
+    <value>Publisher</value>
+  </data>
+  <data name="Caption_Kind" xml:space="preserve">
+    <value>Kind</value>
+  </data>
+  <data name="Conformance_ResourceProperties" xml:space="preserve">
+    <value>Resource properties</value>
+  </data>
+  <data name="Conformance_Content" xml:space="preserve">
+    <value>Content</value>
+  </data>
+  <data name="Conformance_Concepts" xml:space="preserve">
+    <value>Concepts</value>
+  </data>
+  <data name="Conformance_Derivation" xml:space="preserve">
+    <value>Derivation</value>
+  </data>
+  <data name="Conformance_Abstract" xml:space="preserve">
+    <value>Abstract</value>
+  </data>
+  <data name="Conformance_BaseDefinition" xml:space="preserve">
+    <value>Base definition</value>
+  </data>
+  <data name="Conformance_ElementTypes" xml:space="preserve">
+    <value>Element types</value>
+  </data>
+  <data name="Conformance_Profiles" xml:space="preserve">
+    <value>Profiles</value>
+  </data>
+  <data name="Conformance_Bindings" xml:space="preserve">
+    <value>Value set bindings</value>
+  </data>
+  <data name="Conformance_References" xml:space="preserve">
+    <value>References</value>
+  </data>
+  <data name="Conformance_PackageProperties" xml:space="preserve">
+    <value>Package properties</value>
+  </data>
+  <data name="Conformance_Canonical" xml:space="preserve">
+    <value>Canonical</value>
+  </data>
+  <data name="Conformance_ArtifactCount" xml:space="preserve">
+    <value>Artifacts</value>
+  </data>
+  <data name="Conformance_Dependencies" xml:space="preserve">
+    <value>Dependencies</value>
+  </data>
+  <data name="Conformance_NotIndexed" xml:space="preserve">
+    <value>Not indexed</value>
+  </data>
+  <data name="Conformance_PackageContent" xml:space="preserve">
+    <value>Package content</value>
+  </data>
+  <data name="Conformance_PackageNotFound" xml:space="preserve">
+    <value>Package not found (or not loaded).</value>
+  </data>
+  <data name="Conformance_ArtifactNotFound" xml:space="preserve">
+    <value>The artifact was not found.</value>
+  </data>
+  <data name="Conformance_OutgoingReferences" xml:space="preserve">
+    <value>Outgoing references ({0})</value>
+  </data>
+  <data name="Conformance_IncomingReferences" xml:space="preserve">
+    <value>Incoming references ({0})</value>
+  </data>
+  <data name="Conformance_Flags" xml:space="preserve">
+    <value>Flags</value>
+  </data>
+  <data name="Conformance_Cardinality" xml:space="preserve">
+    <value>Card.</value>
+  </data>
+  <data name="Conformance_FlagSummary" xml:space="preserve">
+    <value>Included in summaries</value>
+  </data>
+  <data name="Conformance_FlagModifier" xml:space="preserve">
+    <value>Modifier element</value>
+  </data>
+  <data name="Conformance_FlagConstraints" xml:space="preserve">
+    <value>Has invariants of its own</value>
+  </data>
+  <data name="Conformance_FindByCanonical" xml:space="preserve">
+    <value>Find by canonical URL</value>
+  </data>
+  <data name="Conformance_CanonicalNotFound" xml:space="preserve">
+    <value>No artifact with this canonical URL is in the indexed packages.</value>
+  </data>
+  <data name="Conformance_CanonicalFound" xml:space="preserve">
+    <value>Found: {0}</value>
+  </data>
+  <data name="Caption_AllBookmarks" xml:space="preserve">
+    <value>All bookmarks</value>
+  </data>
+  <data name="Caption_RecentPages" xml:space="preserve">
+    <value>Recently visited</value>
+  </data>
+  <data name="Caption_AddFhirServer" xml:space="preserve">
+    <value>Add server</value>
+  </data>
+  <data name="Caption_Documentation" xml:space="preserve">
+    <value>Documentation</value>
+  </data>
+  <data name="Home_DocumentationDescription" xml:space="preserve">
+    <value>How to browse FHIR packages and FHIR servers</value>
+  </data>
+  <data name="Message_NoBookmarks" xml:space="preserve">
+    <value>No bookmarks</value>
+  </data>
+  <data name="Message_NoRecentPages" xml:space="preserve">
+    <value>No recently visited pages</value>
+  </data>
+  <data name="Message_NoFhirServers" xml:space="preserve">
+    <value>No FHIR servers</value>
+  </data>
+  <data name="Message_NoCorePackages" xml:space="preserve">
+    <value>No FHIR core packages are indexed</value>
+  </data>
+  <data name="Message_SignInForBookmarks" xml:space="preserve">
+    <value>Sign in to use bookmarks</value>
+  </data>
+  <data name="Message_SignInForRecentPages" xml:space="preserve">
+    <value>Sign in to see the pages you visited</value>
+  </data>
+  <data name="Conformance_Overview" xml:space="preserve">
+    <value>Overview</value>
+  </data>
+  <data name="Conformance_Structure" xml:space="preserve">
+    <value>Structure</value>
+  </data>
+  <data name="Conformance_Snapshot" xml:space="preserve">
+    <value>Snapshot</value>
+  </data>
+  <data name="Conformance_Differential" xml:space="preserve">
+    <value>Differential</value>
+  </data>
+  <data name="Conformance_FindElement" xml:space="preserve">
+    <value>Find an element</value>
+  </data>
+  <data name="Conformance_OnlyThisBranch" xml:space="preserve">
+    <value>Only this branch</value>
+  </data>
+  <data name="Conformance_ShowWholeTree" xml:space="preserve">
+    <value>Show the whole tree</value>
+  </data>
+  <data name="Conformance_NoDifferential" xml:space="preserve">
+    <value>This artifact has no differential.</value>
+  </data>
+  <data name="Conformance_NoElementsFound" xml:space="preserve">
+    <value>No element matches.</value>
+  </data>
+  <data name="Conformance_NotInDifferential" xml:space="preserve">
+    <value>Not changed by the profile</value>
+  </data>
+  <data name="Conformance_Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Conformance_Definition" xml:space="preserve">
+    <value>Definition</value>
+  </data>
+  <data name="Conformance_Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="Conformance_Requirements" xml:space="preserve">
+    <value>Requirements</value>
+  </data>
+  <data name="Conformance_Binding" xml:space="preserve">
+    <value>Binding</value>
+  </data>
+  <data name="Conformance_Constraints" xml:space="preserve">
+    <value>Constraints</value>
+  </data>
+  <data name="Conformance_FlagMustSupport" xml:space="preserve">
+    <value>Must support: systems must be able to handle it</value>
+  </data>
+  <data name="Conformance_StatusTrialUse" xml:space="preserve">
+    <value>Trial use</value>
+  </data>
+  <data name="Conformance_StatusNormative" xml:space="preserve">
+    <value>Normative</value>
+  </data>
+  <data name="Conformance_StatusDraft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="Conformance_StatusDeprecated" xml:space="preserve">
+    <value>Deprecated</value>
+  </data>
+  <data name="Message_ViewerClientOnly" xml:space="preserve">
+    <value>FireChart Viewer runs only in the browser (Blazor WebAssembly) or in an app (Blazor Hybrid), not on a server.</value>
+  </data>
+  <data name="Message_ViewerUnknownAddress" xml:space="preserve">
+    <value>The viewer has no page at this address.</value>
+  </data>
+  <data name="Message_SmartPopupWaiting" xml:space="preserve">
+    <value>Complete the sign-in in the window that opened.</value>
+  </data>
+  <data name="Message_SmartPopupBlocked" xml:space="preserve">
+    <value>The browser did not open the sign-in window (a pop-up blocker or the settings of the page that embeds the viewer). Open it again or sign in here.</value>
+  </data>
+  <data name="Message_SmartPopupClosed" xml:space="preserve">
+    <value>The sign-in window was closed before the sign-in was complete, or the connection to it was lost. Open it again or sign in here.</value>
+  </data>
+  <data name="Caption_SmartOpenSignInWindow" xml:space="preserve">
+    <value>Open the sign-in window</value>
+  </data>
+  <data name="Caption_SmartSignInHere" xml:space="preserve">
+    <value>Sign in here</value>
+  </data>
+</root>

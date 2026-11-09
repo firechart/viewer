@@ -1,0 +1,13 @@
+/* The daisyUI subset of the visualization kit: every class is prefixed fx- (the sanitizer lets through classes fx-*), no theme (the tokens of fx.css
+   feed the colours), no preflight and no base styles. Rebuilt by build.cmd; the result is fx.daisy.css */
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@source not "./daisyui.mjs";
+@source "./classes.txt";
+
+@plugin "./daisyui.mjs" {
+  themes: false;
+  prefix: "fx-";
+  include: badge, card, list, table, stat, status, collapse, divider, timeline, skeleton, kbd, alert, join, stack, avatar;
+  logs: false;
+}

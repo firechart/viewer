@@ -1,0 +1,17 @@
+<RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-sm)" class="rz-mb-3">
+    <FloxIcon Icon=@Icon Color=@IconColor/>
+    <RadzenText TextStyle="TextStyle.H6">@Text</RadzenText>
+</RadzenStack>
+
+@code {
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? IconColor { get; set; }
+
+    [Parameter]
+    public string? Text { get; set; }
+
+}

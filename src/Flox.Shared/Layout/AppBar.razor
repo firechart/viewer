@@ -1,0 +1,136 @@
+@using Microsoft.AspNetCore.Components.Sections
+@using System.Reflection
+
+
+@inject IFloxRuntime Runtime
+
+@inject IFloxBrandingProvider Branding
+
+@inject INavigationHistoryService NavigationHistory
+
+@inject NavigationManager Navigation
+
+@inject IJSRuntime JS
+
+@implements IDisposable
+
+<RadzenHeader class="flex items-center gap-2 px-2">
+    <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Click=@OnLeadingButtonClick>
+        <FloxIcon Icon=@(_showBackButton ? "arrow_back" : "menu")/>
+    </RadzenButton>
+
+    <div class="min-w-0 flex-1 rz-text-align-center">
+        <SectionOutlet SectionName="appbar-title"/>
+    </div>
+
+    <SectionOutlet SectionName="appbar-commands"/>
+
+    @* The menu of the page (PageMenu); the account is the first item of the main menu *@
+    <SectionOutlet SectionName="appbar-menu"/>
+</RadzenHeader>
+
+<RadzenSidebar @bind-Expanded=@_drawerOpen Responsive="true" class="max-md:fixed! max-md:top-(--rz-header-min-height) max-md:shadow-lg">
+    <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-py-3 short:hidden">
+        <RadzenLink Path=@AppUrl.ToHref("/")>
+            <RadzenImage Path=@Branding.App.Logo class="w-50" title=@_buildVersion/>
+        </RadzenLink>
+    </RadzenStack>
+
+    <NavMenu/>
+</RadzenSidebar>
+
+@code {
+
+    [Parameter]
+    public bool BackButton { get; set; } = false;
+
+    [Parameter]
+    public EventCallback BackRequested { get; set; }
+
+    bool _drawerOpen = true;
+    bool _showBackButton;
+    IJSObjectReference? _module;
+
+    // MinVer bakes the git-tag-derived build version into AssemblyInformationalVersion - see
+    // Directory.Build.props/version.props. Debug-only: not meant for end users, just for telling
+    // apart local builds during development. The fields themselves must exist in every build
+    // configuration for the markup above to compile - #if around a value inside an @code block is
+    // reliable C#, #if around markup outside @code is not.
+    private static readonly string? _buildVersion = Assembly.GetExecutingAssembly()
+                                                             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                                                             ?.InformationalVersion ?? "unknown";
+
+    // MinVer's InformationalVersion includes the full 40-char commit sha after "+" - too long for
+    // this drawer's width. Show everything before it; the full string is still one hover away via
+    // the title attribute above.
+    private static readonly string? _buildVersionShort = _buildVersion?.Split('+')[0];
+
+    protected override void OnInitialized()
+    {
+        NavigationHistory.HistoryChanged += OnHistoryChanged;
+        Navigation.LocationChanged += OnLocationChanged;
+        UpdateBackButtonVisibility();
+        base.OnInitialized();
+    }
+
+    private void OnHistoryChanged(object? sender, EventArgs e)
+    {
+        UpdateBackButtonVisibility();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (!_drawerOpen)
+        {
+            return;
+        }
+
+        try
+        {
+            _module ??= await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Flox.Shared/Layout/AppBar.razor.js");
+            if (await _module.InvokeAsync<bool>("isNarrow"))
+            {
+                _drawerOpen = false;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (JSException)
+        {
+            // the sidebar just stays open
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+    }
+
+    private void UpdateBackButtonVisibility()
+    {
+        _showBackButton = NavigationHistory.CanGoBack;
+    }
+
+    private void OnLeadingButtonClick()
+    {
+        if (_showBackButton)
+        {
+            NavigationHistory.GoBack();
+        }
+        else
+        {
+            DrawerToggle();
+        }
+    }
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    public void Dispose()
+    {
+        NavigationHistory.HistoryChanged -= OnHistoryChanged;
+        Navigation.LocationChanged -= OnLocationChanged;
+        _module?.DisposeAsync();
+    }
+
+}

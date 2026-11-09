@@ -1,0 +1,169 @@
+/*
+ * FloxWind palette: the color roles (neutral scale, accent, status colors) as the Radzen variables, for light
+ * and dark (data-theme on <html>). Imported by Flox.Shared's site.css and by every stylesheet that must look
+ * like the application without Radzen (the client pages of Flox.AppServer.Shared). The neutral scale is Tailwind's
+ * warm stone, to go with the orange accent.
+ */
+
+html:root {
+    /* Neutral scale */
+    --rz-base-50: var(--color-stone-50);
+    --rz-base-100: var(--color-stone-100);
+    --rz-base-200: var(--color-stone-200);
+    --rz-base-300: var(--color-stone-300);
+    --rz-base-400: var(--color-stone-400);
+    --rz-base-500: var(--color-stone-500);
+    --rz-base-600: var(--color-stone-600);
+    --rz-base-700: var(--color-stone-700);
+    --rz-base-800: var(--color-stone-800);
+    --rz-base-900: var(--color-stone-900);
+    --rz-base: var(--color-stone-200);
+    --rz-base-light: var(--color-stone-100);
+    --rz-base-lighter: var(--color-stone-50);
+    --rz-base-dark: var(--color-stone-600);
+    --rz-base-darker: var(--color-stone-900);
+    --rz-on-base: var(--color-stone-900);
+    --rz-on-base-light: var(--color-stone-900);
+    --rz-on-base-lighter: var(--color-stone-900);
+    --rz-on-base-dark: var(--color-white);
+    --rz-on-base-darker: var(--color-white);
+
+    /* No pure white: surfaces (menu, app bar, inputs) are stone-50, the page under them stone-100 */
+    --rz-body-background-color: var(--color-stone-100);
+    --rz-base-background-color: var(--color-stone-50);
+    /* Text half a tone off black: still about 14:1 on white, a calmer page */
+    --rz-text-color: var(--color-stone-800);
+    --rz-text-title-color: var(--color-stone-900);
+    --rz-text-secondary-color: var(--color-stone-500);
+    --rz-text-tertiary-color: var(--color-stone-400);
+    --rz-text-disabled-color: var(--color-stone-400);
+    --rz-border-color: var(--color-stone-200);
+
+    /* Accent: fire. Orange 600 carries white text; text-sized accents use the darker 700 */
+    --rz-primary: var(--color-orange-600);
+    --rz-primary-light: var(--color-orange-500);
+    --rz-primary-dark: var(--color-orange-700);
+    --rz-primary-darker: var(--color-orange-800);
+    --rz-primary-lighter: color-mix(in oklab, var(--color-orange-600) 12%, transparent);
+    --rz-on-primary: var(--color-white);
+    --rz-on-primary-light: var(--color-white);
+    --rz-on-primary-dark: var(--color-white);
+    --rz-on-primary-darker: var(--color-white);
+    --rz-on-primary-lighter: var(--color-orange-800);
+    --rz-link-color: var(--color-orange-700);
+    --rz-link-hover-color: var(--color-orange-800);
+
+    --rz-secondary: var(--color-amber-600);
+    --rz-secondary-light: var(--color-amber-500);
+    --rz-secondary-dark: var(--color-amber-700);
+    --rz-secondary-darker: var(--color-amber-800);
+    --rz-secondary-lighter: color-mix(in oklab, var(--color-amber-600) 12%, transparent);
+    --rz-on-secondary: var(--color-white);
+    --rz-on-secondary-light: var(--color-stone-950);
+    --rz-on-secondary-dark: var(--color-white);
+    --rz-on-secondary-darker: var(--color-white);
+    --rz-on-secondary-lighter: var(--color-amber-800);
+
+    --rz-danger: var(--color-red-600);
+    --rz-danger-light: var(--color-red-500);
+    --rz-danger-dark: var(--color-red-700);
+    --rz-danger-darker: var(--color-red-800);
+    --rz-danger-lighter: color-mix(in oklab, var(--color-red-600) 12%, transparent);
+    --rz-on-danger: var(--color-white);
+    --rz-on-danger-light: var(--color-white);
+    --rz-on-danger-dark: var(--color-white);
+    --rz-on-danger-darker: var(--color-white);
+    --rz-on-danger-lighter: var(--color-red-800);
+
+    --rz-warning: var(--color-amber-500);
+    --rz-warning-light: var(--color-amber-400);
+    --rz-warning-dark: var(--color-amber-600);
+    --rz-warning-darker: var(--color-amber-700);
+    --rz-warning-lighter: color-mix(in oklab, var(--color-amber-500) 15%, transparent);
+    --rz-on-warning: var(--color-stone-950);
+    --rz-on-warning-light: var(--color-stone-950);
+    --rz-on-warning-dark: var(--color-white);
+    --rz-on-warning-darker: var(--color-white);
+    --rz-on-warning-lighter: var(--color-amber-800);
+
+    --rz-success: var(--color-green-600);
+    --rz-success-light: var(--color-green-500);
+    --rz-success-dark: var(--color-green-700);
+    --rz-success-darker: var(--color-green-800);
+    --rz-success-lighter: color-mix(in oklab, var(--color-green-600) 12%, transparent);
+    --rz-on-success: var(--color-white);
+    --rz-on-success-light: var(--color-white);
+    --rz-on-success-dark: var(--color-white);
+    --rz-on-success-darker: var(--color-white);
+    --rz-on-success-lighter: var(--color-green-800);
+
+    --rz-info: var(--color-sky-600);
+    --rz-info-light: var(--color-sky-500);
+    --rz-info-dark: var(--color-sky-700);
+    --rz-info-darker: var(--color-sky-800);
+    --rz-info-lighter: color-mix(in oklab, var(--color-sky-600) 12%, transparent);
+    --rz-on-info: var(--color-white);
+    --rz-on-info-light: var(--color-white);
+    --rz-on-info-dark: var(--color-white);
+    --rz-on-info-darker: var(--color-white);
+    --rz-on-info-lighter: var(--color-sky-800);
+}
+
+html:root[data-theme="dark"] {
+    --rz-base: var(--color-stone-800);
+    --rz-base-light: var(--color-stone-800);
+    --rz-base-lighter: var(--color-stone-900);
+    --rz-base-dark: var(--color-stone-400);
+    --rz-base-darker: var(--color-stone-50);
+    --rz-on-base: var(--color-stone-50);
+    --rz-on-base-light: var(--color-stone-50);
+    --rz-on-base-lighter: var(--color-stone-50);
+    --rz-on-base-dark: var(--color-stone-950);
+    --rz-on-base-darker: var(--color-stone-950);
+
+    --rz-body-background-color: var(--color-stone-950);
+    --rz-base-background-color: var(--color-stone-900);
+    --rz-text-color: var(--color-stone-50);
+    --rz-text-title-color: var(--color-white);
+    --rz-text-secondary-color: var(--color-stone-400);
+    --rz-text-tertiary-color: var(--color-stone-500);
+    --rz-text-disabled-color: var(--color-stone-600);
+    --rz-border-color: var(--color-stone-800);
+
+    --rz-primary-light: var(--color-orange-400);
+    --rz-primary-lighter: color-mix(in oklab, var(--color-orange-500) 16%, transparent);
+    --rz-on-primary-lighter: var(--color-orange-300);
+    --rz-link-color: var(--color-orange-400);
+    --rz-link-hover-color: var(--color-orange-300);
+
+    --rz-secondary: var(--color-amber-500);
+    --rz-secondary-light: var(--color-amber-400);
+    --rz-secondary-dark: var(--color-amber-600);
+    --rz-secondary-darker: var(--color-amber-700);
+    --rz-secondary-lighter: color-mix(in oklab, var(--color-amber-500) 16%, transparent);
+    --rz-on-secondary: var(--color-stone-950);
+    --rz-on-secondary-lighter: var(--color-amber-300);
+
+    --rz-danger: var(--color-red-500);
+    --rz-danger-light: var(--color-red-400);
+    --rz-danger-lighter: color-mix(in oklab, var(--color-red-500) 16%, transparent);
+    --rz-on-danger-lighter: var(--color-red-300);
+
+    --rz-warning: var(--color-amber-400);
+    --rz-warning-light: var(--color-amber-300);
+    --rz-warning-dark: var(--color-amber-500);
+    --rz-warning-lighter: color-mix(in oklab, var(--color-amber-400) 16%, transparent);
+    --rz-on-warning-lighter: var(--color-amber-300);
+
+    --rz-success: var(--color-green-500);
+    --rz-success-light: var(--color-green-400);
+    --rz-success-lighter: color-mix(in oklab, var(--color-green-500) 16%, transparent);
+    --rz-on-success: var(--color-stone-950);
+    --rz-on-success-lighter: var(--color-green-300);
+
+    --rz-info: var(--color-sky-500);
+    --rz-info-light: var(--color-sky-400);
+    --rz-info-lighter: color-mix(in oklab, var(--color-sky-500) 16%, transparent);
+    --rz-on-info: var(--color-stone-950);
+    --rz-on-info-lighter: var(--color-sky-300);
+}

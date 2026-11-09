@@ -1,0 +1,115 @@
+@using Flox.Core.Replication
+@using Flox.Shared.Errors
+@using Flox.Shared.Services
+@implements IDisposable
+@inject IServiceProvider Services
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILogger<ReplicationHost> Logger
+@inject IUiNotifier Notifier
+
+@code {
+    // Foreground: while the app is open a sync also runs on this period, for changes made on other devices
+    private static readonly TimeSpan s_period = TimeSpan.FromMinutes(2);
+
+    private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+    private IReplicationService? _replication;
+    private IConnectivityService? _connectivity;
+
+    protected override void OnInitialized()
+    {
+        _replication = Services.GetService<IReplicationService>();
+        if (_replication is null)
+        {
+            return;
+        }
+
+        AuthenticationStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
+        _replication.Rejected += OnRejected;
+        _connectivity = Services.GetService<IConnectivityService>();
+        if (_connectivity is not null)
+        {
+            _connectivity.ConnectivityChanged += OnConnectivityChanged;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _replication is null)
+        {
+            return;
+        }
+
+        // The start of the app, then the period
+        Sync();
+        using var timer = new PeriodicTimer(s_period);
+        try
+        {
+            while (await timer.WaitForNextTickAsync(_cts.Token))
+            {
+                Sync();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // the app is closing
+        }
+    }
+
+    private void OnAuthenticationStateChanged(Task<AuthenticationState> state)
+    {
+        Sync();
+    }
+
+    // The server refused a change the user made earlier, maybe on another day: it is not lost, but it is not on the server either
+    private void OnRejected(object? sender, ReplicationRejectedEventArgs e)
+    {
+        _ = InvokeAsync(() => Notifier.Error(string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.Sync_Rejected, e.Failure.Type, ReplicationFailureText.Describe(e.Failure))));
+    }
+
+    private void OnConnectivityChanged(object? sender, GenericEventArgs<bool> e)
+    {
+        if (e.Value)
+        {
+            Sync();
+        }
+    }
+
+    private void Sync()
+    {
+        _ = SyncAsync();
+    }
+
+    private async Task SyncAsync()
+    {
+        try
+        {
+            await _replication!.SyncAsync(_cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // the app is closing
+        }
+        catch (Exception ex)
+        {
+            // Offline or the server is down: the next trigger tries again
+            Logger.LogInformation(ex, "Replication did not complete");
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_replication is not null)
+        {
+            AuthenticationStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
+            _replication.Rejected -= OnRejected;
+        }
+
+        if (_connectivity is not null)
+        {
+            _connectivity.ConnectivityChanged -= OnConnectivityChanged;
+        }
+
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+}

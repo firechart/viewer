@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!-- The SDK of FireChart Viewer on a plain page of another origin. Serve the repository root (python -m http.server 8090), run the Viewer with
+     this origin in its host.json (docker run --rm -p 8088:8080 -v "$PWD/host.json:/usr/share/nginx/html/host.json:ro" firechart-viewer:local,
+     host.json: { "frameAncestors": ["'self'", "http://localhost:8090"] }),
+     open http://localhost:8090/samples/viewer-sdk/?viewer=http://localhost:8088/ -->
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FireChart Viewer SDK sample</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 0; display: grid; grid-template-columns: 320px 1fr; height: 100vh; }
+        aside { padding: 12px; border-right: 1px solid #ddd; overflow: auto; }
+        main { min-width: 0; }
+        #viewer { height: 100%; }
+        button, select { margin: 2px 0; }
+        pre { font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+        @media (max-width: 720px) { body { grid-template-columns: 1fr; grid-template-rows: auto 70vh; height: auto; } }
+    </style>
+</head>
+<body>
+<aside>
+    <h3>SDK sample</h3>
+    <p>Viewer at <code id="url"></code></p>
+    <p>
+        <button data-theme="light">Light</button>
+        <button data-theme="dark">Dark</button>
+        <button data-theme="auto">Auto</button>
+    </p>
+    <p>
+        <select id="locale">
+            <option>auto</option><option>en</option><option>de</option><option>es</option><option>ru</option><option>zh-Hans</option>
+        </select>
+    </p>
+    <p>
+        Page: <button id="page-theme">Toggle page theme</button>
+        <select id="page-lang"><option value="">no lang</option><option>de</option><option>ru</option><option>fr</option></select>
+    </p>
+    <p>
+        <button id="print">Print</button>
+        <button id="patient">Patient summary</button>
+        <button id="types">Resource types</button>
+    </p>
+    <p>
+        <button id="hapi">Restart on HAPI R4</button>
+        <button id="wrong">update({ server }) (refused)</button>
+        <button id="outside">navigate outside (refused)</button>
+    </p>
+    <p>Location: <code id="location"></code></p>
+    <pre id="log"></pre>
+</aside>
+<main><div id="viewer"></div></main>
+<script type="module">
+    import { Viewer } from "../../src/FireChart.Viewer.App/wwwroot/sdk/viewer.js";
+
+    const url = new URLSearchParams(location.search).get("viewer") ?? "http://localhost:5280/";
+    document.getElementById("url").textContent = url;
+    const log = text => document.getElementById("log").textContent = `${new Date().toLocaleTimeString()} ${text}\n` + document.getElementById("log").textContent;
+
+    // The theme and the language follow this page ("inherit"); the address of the Viewer is kept in ?fhir=
+    const viewer = Viewer.create(
+        { server: { url: "https://r4.smarthealthit.org", name: "SMART Health IT R4" }, appearance: { theme: "inherit" }, locale: "inherit" },
+        { url, urlParam: "fhir" });
+    for (const event of ["ready", "navigate", "restarting", "updated", "error"]) {
+        viewer.on(event, payload => {
+            log(`${event} ${JSON.stringify(payload)}`);
+            document.getElementById("location").textContent = viewer.location ?? "";
+        });
+    }
+
+    viewer.mount("#viewer");
+    window.viewer = viewer;
+
+    const run = async (name, action) => {
+        try {
+            log(`${name} -> ${JSON.stringify(await action())}`);
+        } catch (error) {
+            log(`${name} rejected: ${error.code} ${error.param}: ${error.message}`);
+        }
+    };
+
+    for (const button of document.querySelectorAll("[data-theme]")) {
+        button.onclick = () => run("update theme", () => viewer.update({ appearance: { theme: button.dataset.theme } }));
+    }
+
+    document.getElementById("page-theme").onclick = () => {
+        const root = document.documentElement;
+        root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
+        document.body.style.background = root.dataset.theme === "dark" ? "#222" : "";
+        document.body.style.color = root.dataset.theme === "dark" ? "#eee" : "";
+    };
+    document.getElementById("page-lang").onchange = e => document.documentElement.lang = e.target.value;
+    document.getElementById("print").onclick = () => run("print", () => viewer.print());
+    document.getElementById("locale").onchange = e => run("update locale", () => viewer.update({ locale: e.target.value }));
+    document.getElementById("patient").onclick = () => run("navigate", () => viewer.navigate("summary/13a00221-8417-4973-961e-e21b32ece95a"));
+    document.getElementById("types").onclick = () => run("navigate", () => viewer.navigate("resources"));
+    document.getElementById("hapi").onclick = () => run("restart", () => viewer.restart({ server: { url: "https://hapi.fhir.org/baseR4", name: "HAPI R4" } }));
+    document.getElementById("wrong").onclick = () => run("update server", () => viewer.update({ server: { url: "https://example.org" } }));
+    document.getElementById("outside").onclick = () => run("navigate", () => viewer.navigate("https://evil.example/"));
+</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+{% fhir_include "Encounter:subject" %}
+
+{%- assign patient = self.subject | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, encounter: self, own: "Encounter" %}
+
+{%- assign period = self.period | default: self.actualPeriod -%}
+{%- assign reasonCodes = self.reasonCode | as_list -%}
+{%- assign reasons = self.reason | as_list -%}
+{%- assign reasonReferences = self.reasonReference | as_list -%}
+{%- assign diagnoses = self.diagnosis | as_list -%}
+{%- assign participants = self.participant | as_list -%}
+{%- assign locations = self.location | as_list -%}
+{%- assign identifiers = self.identifier | as_list -%}
+{%- assign discharge = self.hospitalization.dischargeDisposition | default: self.admission.dischargeDisposition %}
+
+{%- if reasonCodes.size > 0 or reasons.size > 0 or reasonReferences.size > 0 or diagnoses.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">
+    {{ "Reason and diagnoses" | t }}
+    <span class="fx-count">{{ reasonCodes.size | plus: reasons.size | plus: reasonReferences.size | plus: diagnoses.size }}</span>
+  </h3>
+  {%- for c in reasonCodes %}
+  <div class="fx-row">
+    <span class="fx-row-main">{% apply c mode: "text" -%}</span>
+    <span class="fx-row-meta">{{ "Reason" | t }}</span>
+  </div>
+  {%- endfor %}
+  {%- for r in reasonReferences %}
+  <div class="fx-row">
+    <span class="fx-row-main">{% apply r mode: "link,text" -%}</span>
+    <span class="fx-row-meta">{{ "Reason" | t }}</span>
+  </div>
+  {%- endfor %}
+  {%- for r in reasons %}
+  <div class="fx-row">
+    <span class="fx-row-main">{% render "list-inline", node: r.value %}</span>
+    <span class="fx-row-meta">{{ "Reason" | t }}</span>
+  </div>
+  {%- endfor %}
+  {%- for d in diagnoses %}
+  <div class="fx-row">
+    <span class="fx-row-main">{% render "list-inline", node: d.condition %}</span>
+    <span class="fx-row-meta">{% render "list-inline", node: d.use, mode: "text" %}</span>
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Visit" | t }}</h3>
+  {% render "field", label: "Period", node: period, mode: "text" %}
+  {% render "field", label: "Length", node: self.length, mode: "text" %}
+  {% render "field", label: "Class", node: self.class, mode: "text" %}
+  {% render "field", label: "Type", node: self.type, mode: "text" %}
+  {% render "field", label: "Service type", node: self.serviceType, mode: "text" %}
+  {% render "field", label: "Priority", node: self.priority, mode: "text" %}
+  {% render "field", label: "Outcome", node: discharge, mode: "text" %}
+  {% render "field", label: "Service provider", node: self.serviceProvider %}
+</section>
+
+{%- if participants.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">
+    {{ "Participants" | t }}
+    <span class="fx-count">{{ participants.size }}</span>
+  </h3>
+  {%- for p in participants %}
+  {%- assign who = p.individual | default: p.actor %}
+  <div class="fx-row">
+    <span class="fx-row-main">{% render "list-inline", node: who %}</span>
+    <span class="fx-row-meta">{% render "list-inline", node: p.type, mode: "text" %}</span>
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if locations.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">
+    {{ "Locations" | t }}
+    <span class="fx-count">{{ locations.size }}</span>
+  </h3>
+  {%- for l in locations %}
+  <div class="fx-row">
+    <span class="fx-row-main">{% render "list-inline", node: l.location %}</span>
+    {%- if l.status %}
+    <span class="fx-row-meta">{{ l.status }}</span>
+    {%- endif %}
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if identifiers.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">
+    {{ "Identifiers" | t }}
+    <span class="fx-count">{{ identifiers.size }}</span>
+  </h3>
+  {%- for i in identifiers %}
+  <div class="fx-row">
+    <span class="fx-row-main">{{ i.value }}</span>
+    <span class="fx-row-meta">{{ i.system }}</span>
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}

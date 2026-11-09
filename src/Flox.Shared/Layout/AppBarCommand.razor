@@ -1,0 +1,54 @@
+@inject NavigationManager Navigation
+
+<RadzenButton Variant="Radzen.Variant.Text"
+              ButtonStyle="Radzen.ButtonStyle.Base"
+              Style=@(!string.IsNullOrEmpty(IconColor) ? $"color: {IconColor}" : null)
+              Disabled=@Disabled
+              title=@Title
+              aria-pressed=@(Pressed is null ? null : Pressed.Value ? "true" : "false")
+              Click=@HandleClickAsync>
+    <FloxIcon Icon=@Icon Filled=@(Pressed == true) Color=@(Pressed == true ? "var(--rz-primary)" : null)/>
+    @ChildContent
+</RadzenButton>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public string Icon { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? IconColor { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    // A toggle: null for an ordinary command; pressed, the icon is filled in the accent color
+    [Parameter]
+    public bool? Pressed { get; set; }
+
+    [Parameter]
+    public string? Href { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private async Task HandleClickAsync()
+    {
+        if (!string.IsNullOrEmpty(Href))
+        {
+            Navigation.NavigateToRoute(Href);
+        }
+        else
+        {
+            await OnClick.InvokeAsync();
+        }
+    }
+
+}

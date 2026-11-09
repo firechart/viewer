@@ -1,0 +1,68 @@
+/*
+ * FloxWind design tokens for Tailwind: the layer order, the theme and utilities imports, custom variants and
+ * the semantic colors (bg-surface, text-muted, border-line, ...) that follow the active light/dark theme.
+ *
+ * Every project that builds its own Assets/Styles/site.css imports this file and adds @source lines for its
+ * own folders, so utilities used in its Razor files are generated into its own stylesheet. The Radzen
+ * overlay itself lives only in Flox.Shared's site.css.
+ */
+
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+/* important: Radzen's own rules are not layered and would otherwise beat every utility used on its components */
+@import "tailwindcss/utilities.css" layer(utilities) source(none) important;
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Short viewports (landscape phones): hide what crowds out the content */
+@custom-variant short (@media (max-height: 480px));
+
+/* The font faces are declared in app.css: see the note there */
+
+/* The shape of daisyUI 5: fields (buttons, inputs), boxes (cards, dialogs, alerts), selectors (badges, check boxes, toggles); utilities rounded-field, rounded-box, rounded-selector */
+@theme {
+    --radius-field: 0.25rem;
+    --radius-box: 0.5rem;
+    --radius-selector: 0.5rem;
+}
+
+@theme {
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+        "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/* The busy overlay (BusyOverlay) appears after 150 ms so a quick load does not flash it; the wait cursor over it comes with it. The hidden start is
+   in the animation (fill both), not a utility: the utilities are !important, and an !important opacity-0 beats any animation */
+@theme {
+    --animate-progress-appear: progress-appear 1ms linear 150ms both;
+
+    @keyframes progress-appear {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+            cursor: wait;
+        }
+    }
+}
+
+/* Semantic colors for utilities; the values switch with the theme */
+@theme inline {
+    --color-canvas: var(--rz-body-background-color);
+    --color-surface: var(--rz-base-background-color);
+    --color-line: var(--rz-border-color);
+    --color-ink: var(--rz-text-color);
+    --color-muted: var(--rz-text-secondary-color);
+    --color-subtle: var(--rz-text-tertiary-color);
+    /* A tint of the text color works in both modes (Tailwind: bg-black/5, dark:bg-white/5) */
+    --color-hover: color-mix(in oklab, var(--rz-text-color) 5%, transparent);
+    --color-accent: var(--rz-primary);
+    --color-accent-ink: var(--rz-link-color);
+    --color-accent-soft: var(--rz-primary-lighter);
+    --color-danger: var(--rz-danger);
+    --color-success: var(--rz-success);
+    --color-warning: var(--rz-warning);
+}

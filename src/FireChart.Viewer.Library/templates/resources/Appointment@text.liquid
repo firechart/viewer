@@ -1,0 +1,9 @@
+{%- assign svc = self.serviceType | first -%}{%- assign n = self.participant | as_list | size -%}
+{%- capture t0 -%}{{ self.description }}{%- endcapture -%}
+{%- capture t1 -%}{% if svc %}{% apply svc mode: "text" %}{% endif %}{%- endcapture -%}
+{%- capture t2 -%}{% apply self.appointmentType mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 -%}
+{%- if title == "" -%}{%- assign title = t1 -%}{%- endif -%}
+{%- if title == "" -%}{%- assign title = t2 -%}{%- endif -%}
+{%- if title == "" -%}{%- assign title = self.id -%}{%- endif -%}
+{{- title -}}

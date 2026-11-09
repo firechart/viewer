@@ -1,0 +1,10 @@
+<RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.End" Gap="var(--gap-sm)" class="rz-mt-4">
+    @ChildContent
+</RadzenStack>
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+}

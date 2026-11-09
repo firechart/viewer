@@ -1,0 +1,91 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <NoWarn>1701;1702;NETSDK1187</NoWarn>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <NoWarn>1701;1702;NETSDK1187</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Inputs of the Tailwind build (Assets/Styles/site.css -> wwwroot/css/Flox.Shared.Tailwind.css) -->
+		<TailwindContentFiles Include="Components/**/*.razor;Layout/**/*.razor;Pages/**/*.razor;Assets/**/*.css" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Exclude non-minified JS and CSS from lib — only ship .min.js and .min.css -->
+		<Compile Remove="wwwroot\fonts\**" />
+		<Content Remove="wwwroot\fonts\**" />
+		<Content Remove="wwwroot\lib\**\*.js" />
+		<Content Remove="wwwroot\lib\**\*.css" />
+		<Content Include="wwwroot\lib\**\*.min.js" />
+		<Content Include="wwwroot\lib\**\*.min.css" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Remove="wwwroot\fonts\**" />
+	  <None Remove="wwwroot\fonts\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="Components\RepositoryDataList.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Licenses\other-licenses.json" />
+    <EmbeddedResource Include="Licenses\licenses.json" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.Debug" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+		<PackageReference Include="Microsoft.Extensions.Http" />
+		<PackageReference Include="Radzen.Blazor" />
+		<PackageReference Include="Lombiq.Tailwind.Targets" PrivateAssets="all" />
+		<PackageReference Include="Serilog.Extensions.Logging" />
+		<PackageReference Include="Serilog.Settings.Configuration" />
+		<PackageReference Include="Serilog.Sinks.BrowserConsole" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Flox.Core\Flox.Core.csproj" />
+	  <ProjectReference Include="..\Flox.Resources\Flox.Resources.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Resources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Resources.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+</Project>

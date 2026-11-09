@@ -1,0 +1,24 @@
+/* The dialog is as high as the form and no higher than the screen: the body scrolls, the footer stays in view */
+.form-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: calc(100dvh - 9rem);
+}
+
+.form-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: 0.5rem;
+}
+
+.form-footer {
+    border-top: 1px solid var(--rz-border-color);
+    padding-top: 0.75rem;
+}
+
+/* Reset stands at the left, Cancel and OK at the right */
+.form-footer ::deep .form-reset {
+    margin-right: auto;
+}

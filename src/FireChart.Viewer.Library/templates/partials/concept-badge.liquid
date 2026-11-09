@@ -1,0 +1,8 @@
+{%- assign c = concept.coding | as_list | first -%}
+{%- assign shown = c | coding_display | append: "" -%}
+{%- if shown == "" -%}{%- assign shown = concept.text | append: "" -%}{%- endif -%}
+{%- if shown == "" -%}{%- assign shown = c.code | append: "" -%}{%- endif -%}
+
+{%- if shown != "" -%}
+  {%- render "status-badge", code: c.code, label: shown -%}
+{%- endif -%}

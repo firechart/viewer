@@ -1,0 +1,10 @@
+{% fhir_include "Specimen:subject" %}
+{%- assign acc = self.accessionIdentifier.value | append: "" -%}
+{%- capture t0 -%}{% apply self.type mode: "text" %}{%- endcapture -%}
+{%- capture t1 -%}{{ acc }}{%- endcapture -%}
+{%- assign title = t0 | default: t1 | default: self.id -%}
+{%- capture s0 -%}{% if self.collection %}{% apply self.collection.collected mode: "text" %}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{{ acc }}{%- endcapture -%}
+{%- capture subtitle -%}{% render "parts", p1: s0, p2: s1 %}{%- endcapture -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% render "tile-row", title: title, subtitle: subtitle, status: status, patient: self.subject, encounter: nil, at: self.collection.collected %}

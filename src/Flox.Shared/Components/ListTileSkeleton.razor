@@ -1,0 +1,49 @@
+@{
+    RenderFragment? leading = Icon
+        ? @<RadzenSkeleton Variant="Radzen.SkeletonVariant.Circular" Style="width: 32px; height: 32px"/>
+        : null;
+}
+
+<ListTile Leading="@leading">
+    <Title>
+        <RadzenSkeleton Style=@($"width: {_titleWidth}%") />
+    </Title>
+    <Subtitle>
+        @if (Lines >= 2)
+        {
+            <RadzenSkeleton Style=@($"width: {_subtitleWidths[0]}%") class="rz-mt-1"/>
+        }
+        @if (Lines >= 3)
+        {
+            <RadzenSkeleton Style=@($"width: {_subtitleWidths[1]}%") class="rz-mt-1"/>
+        }
+        @if (Lines >= 4)
+        {
+            <RadzenSkeleton Style=@($"width: {_subtitleWidths[2]}%") class="rz-mt-1"/>
+        }
+    </Subtitle>
+</ListTile>
+
+@code {
+
+#pragma warning disable CA5394
+
+    // Snapshotted once so the shimmer widths don't jump around on every re-render while loading.
+    private readonly int _titleWidth = Random.Shared.Next(20, 71);
+
+    private readonly int[] _subtitleWidths =
+    [
+        Random.Shared.Next(40, 71),
+        Random.Shared.Next(30, 61),
+        Random.Shared.Next(20, 51)
+    ];
+
+#pragma warning restore CA5394
+
+    [Parameter]
+    public int Lines { get; set; } = 1;
+
+    [Parameter]
+    public bool Icon { get; set; } = true;
+
+}

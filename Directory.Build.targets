@@ -1,0 +1,21 @@
+<Project>
+
+    <!--
+      .NET MAUI mobile workloads (Android/iOS/MacCatalyst) override $(Version) from
+      $(ApplicationDisplayVersion) after MinVer has already set it (MinVer's own target runs earlier
+      in the SDK's target import chain than Directory.Build.targets) - see
+      Microsoft.Android.Sdk.DefaultProperties.targets / Xamarin.Shared.Sdk.targets - while
+      net10.0-windows keeps MinVer's value untouched. That makes $(Version) (and the
+      $(PackageVersion) NuGet derives from it) differ across target frameworks within the same
+      multi-targeted project, which fails restore under Central Package Management with NU1105.
+      Re-assert a single, consistent value here, since Directory.Build.targets is imported last and
+      therefore wins over every SDK/workload override - read MinVer's own $(MinVerVersion) property
+      rather than $(Version) itself, since MAUI's SDK has no idea that property exists and never
+      touches it.
+    -->
+    <PropertyGroup>
+        <Version Condition="'$(MinVerVersion)' != ''">$(MinVerVersion)</Version>
+        <PackageVersion Condition="'$(MinVerVersion)' != ''">$(MinVerVersion)</PackageVersion>
+    </PropertyGroup>
+
+</Project>

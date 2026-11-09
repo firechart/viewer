@@ -1,0 +1,124 @@
+{% fhir_include "Observation:subject" %}
+{% fhir_include "Observation:encounter" %}
+
+{%- assign patient = self.subject | resolve -%}
+{%- assign encounter = self.encounter | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, encounter: encounter, visit: self.encounter, own: "Observation" %}
+
+{%- assign interpretations = self.interpretation | as_list -%}
+{%- assign ranges = self.referenceRange | as_list -%}
+{%- assign components = self.component | as_list -%}
+{%- assign performers = self.performer | as_list -%}
+{%- assign notes = self.note | as_list -%}
+{%- assign members = self.hasMember | as_list -%}
+{%- assign sources = self.derivedFrom | as_list -%}
+{%- assign categories = self.category | as_list -%}
+{%- assign effective = self.effective %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% apply self.code mode: "text" -%}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if effective %}
+    <span>{% apply effective mode: "text" -%}</span>
+    {%- endif %}
+    {%- if categories.size > 0 %}
+    <span>{% render "list-inline", node: categories, mode: "text" %}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.value or self.dataAbsentReason or interpretations.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Result" | t }}</h3>
+  <div class="fx-row">
+    <span class="fx-row-main">
+      {%- if self.value -%}
+        {%- apply self.value mode: "text" -%}
+      {%- else -%}
+        {%- apply self.dataAbsentReason mode: "text" -%}
+      {%- endif -%}
+    </span>
+    {%- for i in interpretations %}
+    {% render "interpretation-badge", concept: i %}
+    {%- endfor %}
+  </div>
+  {%- for r in ranges %}
+  <div class="fx-row">
+    <span class="fx-row-meta">{{ "Reference range" | t }}</span>
+    <span class="fx-row-main">
+      {%- if r.text -%}
+        {{- r.text -}}
+      {%- else -%}
+        {%- apply r.low mode: "text" -%}
+        {%- if r.low and r.high -%}
+          {{- " - " -}}
+        {%- endif -%}
+        {%- apply r.high mode: "text" -%}
+      {%- endif -%}
+    </span>
+    {%- if r.type %}
+    <span class="fx-row-meta">{% apply r.type mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if components.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">
+    {{ "Components" | t }}
+    <span class="fx-count">{{ components.size }}</span>
+  </h3>
+  {%- for c in components %}
+  {%- assign componentInterpretations = c.interpretation | as_list %}
+  <div class="fx-row">
+    <span class="fx-row-main">{% apply c.code mode: "text" -%}</span>
+    <span>
+      {%- if c.value -%}
+        {%- apply c.value mode: "text" -%}
+      {%- else -%}
+        {%- apply c.dataAbsentReason mode: "text" -%}
+      {%- endif -%}
+    </span>
+    {%- for i in componentInterpretations %}
+    {% render "interpretation-badge", concept: i %}
+    {%- endfor %}
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if self.method or self.bodySite or self.specimen or self.device or performers.size > 0 or self.issued or self.basedOn or members.size > 0 or sources.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Method", node: self.method, mode: "text" %}
+  {% render "field", label: "Body site", node: self.bodySite, mode: "text" %}
+  {% render "field", label: "Specimen", node: self.specimen %}
+  {% render "field", label: "Device", node: self.device %}
+  {% render "field", label: "Performed by", node: performers %}
+  {% render "field", label: "Issued", node: self.issued, mode: "text" %}
+  {% render "field", label: "Based on", node: self.basedOn %}
+  {% render "field", label: "Has members", node: members %}
+  {% render "field", label: "Derived from", node: sources %}
+</section>
+{%- endif %}
+
+{%- if notes.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">
+    {{ "Notes" | t }}
+    <span class="fx-count">{{ notes.size }}</span>
+  </h3>
+  {%- for n in notes %}
+  <div class="fx-row">
+    <span class="fx-row-main">{% apply n mode: "text" -%}</span>
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}

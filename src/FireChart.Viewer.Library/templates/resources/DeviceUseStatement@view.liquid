@@ -1,0 +1,42 @@
+{% fhir_include "DeviceUseStatement:subject" %}
+{% fhir_include "DeviceUseStatement:device" %}
+
+{%- assign reasons = self.reasonCode | as_list -%}{%- assign notes = self.note | as_list -%}
+{%- assign patient = self.subject | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, own: "DeviceUseStatement" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% apply self mode: "text" -%}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.timing %}
+    <span>{% apply self.timing mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.device or self.bodySite or self.recordedOn or self.source or reasons.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Device", node: self.device %}
+  {% render "field", label: "Body site", node: self.bodySite, mode: "text" %}
+  {% render "field", label: "Recorded", node: self.recordedOn, mode: "text" %}
+  {% render "field", label: "Source", node: self.source %}
+  {%- if reasons.size > 0 %}
+  {% render "field", label: "Reason", node: self.reasonCode, mode: "text" %}
+  {%- endif %}
+</section>
+{%- endif %}
+
+{%- if notes.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Notes" | t }}</h3>
+  {%- for n in notes %}
+  <div class="fx-row"><span class="fx-row-main">{% apply n mode: "text" -%}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

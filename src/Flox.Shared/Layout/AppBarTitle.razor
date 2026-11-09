@@ -1,0 +1,23 @@
+@inject IFloxBrandingProvider Branding
+
+<SectionContent SectionName="appbar-title">
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.Div" class="rz-text-truncate rz-m-0">
+        @if (ChildContent != null)
+        {
+            @ChildContent
+        }
+        else
+        {
+            @Branding.App.Title
+        }
+    </RadzenText>
+</SectionContent>
+
+<PageTitle>@Branding.App.Title → @ChildContent</PageTitle>
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+}

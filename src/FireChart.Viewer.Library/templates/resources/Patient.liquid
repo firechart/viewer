@@ -1,0 +1,6 @@
+<article class="fhir-patient">
+  <h2>{% apply self.name %}</h2>
+  {% render "partials/row", label: "Gender", value: self.gender %}
+  {% render "partials/row", label: "Birth date", value: self.birthDate %}
+  {% apply self.contact %}
+</article>

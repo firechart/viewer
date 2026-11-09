@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Description>Renders FHIR resources to HTML with Liquid (Fluid) templates on the client: layered templates, translations of their texts, a safety net for what the templates do not show, an HTML sanitizer. Part of FireChart Viewer.</Description>
+    <PackageTags>fhir;hl7;liquid;fluid;rendering;healthcare;viewer</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://git.firechart.org/firechart/firechart</PackageProjectUrl>
+    <RepositoryUrl>https://git.firechart.org/firechart/firechart.git</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="FireChart.Fhir.Tests" />
+    <InternalsVisibleTo Include="FireChart.Viewer.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The client side of Flox (corrected 2026-11-07); never its server side: ViewerIsolationTests -->
+    <ProjectReference Include="..\Flox.Core\Flox.Core.csproj" />
+    <ProjectReference Include="..\Flox.Resources\Flox.Resources.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" />
+    <PackageReference Include="Duende.IdentityModel.OidcClient" />
+    <PackageReference Include="Fluid.Core" />
+    <PackageReference Include="Hl7.Fhir.R4" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <!-- Every release of the Firely SDK, each under its own alias (AliasFirelyReleases): the releases have the same type names. Only R4 is visible to
+         whoever references this project. In the browser a host may load the assemblies of the other releases lazily (IReleaseAssemblyLoader) -->
+    <PackageReference Include="Hl7.Fhir.STU3" PrivateAssets="compile" />
+    <PackageReference Include="Hl7.Fhir.R4B" PrivateAssets="compile" />
+    <PackageReference Include="Hl7.Fhir.R5" PrivateAssets="compile" />
+    <PackageReference Include="Hl7.Fhir.R6" PrivateAssets="compile" />
+  </ItemGroup>
+
+  <!-- A PackageReference has no alias: it is put on the assemblies of the releases before the compiler gets them (R4 stays global) -->
+  <Target Name="AliasFirelyReleases" AfterTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <ReferencePath Condition="'%(Filename)' == 'Hl7.Fhir.STU3'">
+        <Aliases>STU3</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(Filename)' == 'Hl7.Fhir.R4B'">
+        <Aliases>R4B</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(Filename)' == 'Hl7.Fhir.R5'">
+        <Aliases>R5</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(Filename)' == 'Hl7.Fhir.R6'">
+        <Aliases>R6</Aliases>
+      </ReferencePath>
+    </ItemGroup>
+  </Target>
+
+</Project>

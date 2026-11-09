@@ -1,0 +1,12 @@
+/* Radzen colors the arc by the style class of the bar (primary by default), not by a variable: the selector has to be stronger */
+.circular-progress {
+    display: inline-flex;
+}
+
+.circular-progress ::deep .rz-progressbar.rz-progressbar-indeterminate .rz-progressbar-circular-value {
+    stroke: var(--rz-text-color);
+}
+
+.circular-progress ::deep .rz-progressbar.rz-progressbar-indeterminate .rz-progressbar-circular-background {
+    stroke: color-mix(in oklab, var(--rz-text-color) 15%, transparent);
+}

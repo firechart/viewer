@@ -1,0 +1,59 @@
+@using Flox.Shared.Layout
+@inject IFloxRuntime Runtime
+@inject NavigationManager Navigation
+
+<RadzenCard Variant="Radzen.Variant.Outlined">
+    <IconTitle Icon="error" IconColor="var(--rz-danger)" Text=@Strings.Caption_Error/>
+    <RadzenText>@Strings.Caption_ErrorNotification</RadzenText>
+    @if (ErrorBoundary is AppErrorBoundary { CorrelationId: { } reference })
+    {
+        <RadzenText TextStyle="TextStyle.Caption" class="rz-mt-1">@string.Format(Strings.Error_Reference, reference)</RadzenText>
+    }
+
+    @if (Runtime.IsDevelopment)
+    {
+        <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-2">@Exception?.Message</RadzenText>
+        <StackTraceView Trace=@Exception?.StackTrace/>
+    }
+    else
+    {
+        <AuthorizeView Roles="@AppRoles.ADMINISTRATOR">
+            <Authorized>
+                <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-2">@Exception?.Message</RadzenText>
+            </Authorized>
+        </AuthorizeView>
+    }
+    <DialogActions>
+        <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Secondary" Text=@Strings.Caption_Home Click="@(() => Navigation.NavigateToRoute("/", true))"/>
+        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Warning" Text=@Strings.Caption_Retry Click="@RecoverAsync"/>
+    </DialogActions>
+</RadzenCard>
+
+@code {
+
+    [Parameter]
+    public Exception? Exception { get; set; }
+
+    // Passed so we can reset the framework's own boundary state (ErrorBoundary.Recover())
+    // in addition to - or instead of - a caller-supplied retry action.
+    [Parameter]
+    public ErrorBoundary? ErrorBoundary { get; set; }
+
+    // Optional: when set, Retry runs this (e.g. MainLayout re-running its own
+    // initialization) instead of just clearing the boundary.
+    [Parameter]
+    public EventCallback OnRetry { get; set; }
+
+    private async Task RecoverAsync()
+    {
+        if (OnRetry.HasDelegate)
+        {
+            await OnRetry.InvokeAsync();
+        }
+        else
+        {
+            ErrorBoundary?.Recover();
+        }
+    }
+
+}

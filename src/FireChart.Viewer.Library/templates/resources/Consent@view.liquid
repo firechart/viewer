@@ -1,0 +1,42 @@
+{% fhir_include "Consent:patient" %}
+{% fhir_include "Consent:organization" %}
+{% fhir_include "Consent:performer" %}
+
+{%- assign prov = self.provision.type | append: "" -%}
+{%- assign patient = self.patient | resolve -%}
+{%- render "view-header", patient: patient, subject: self.patient, own: "Consent" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% apply self.scope mode: "text" -%}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.dateTime %}
+    <span>{{ "Signed" | t }} {% apply self.dateTime mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+    {%- if prov != "" -%}{%- render "status-badge", code: prov -%}{%- endif -%}
+  </div>
+</div>
+
+{%- if self.category or self.policyRule or self.organization or self.performer %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Category", node: self.category, mode: "text" %}
+  {% render "field", label: "Policy", node: self.policyRule, mode: "text" %}
+  {% render "field", label: "Organization", node: self.organization %}
+  {% render "field", label: "Performer", node: self.performer %}
+</section>
+{%- endif %}
+
+{%- if self.provision.period or self.provision.action or self.provision.purpose or self.provision.class %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Provision" | t }}</h3>
+  {% render "field", label: "Period", node: self.provision.period, mode: "text" %}
+  {% render "field", label: "Action", node: self.provision.action, mode: "text" %}
+  {% render "field", label: "Purpose", node: self.provision.purpose, mode: "text" %}
+  {% render "field", label: "Data class", node: self.provision.class, mode: "text" %}
+</section>
+{%- endif %}

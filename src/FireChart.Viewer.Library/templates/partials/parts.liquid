@@ -1,0 +1,8 @@
+{%- comment -%} The parts of a line joined by sep (" - " when not given): a part that is blank drops its separator (p1 to p5, each a captured piece of HTML, printed as it is) {%- endcomment -%}
+{%- assign sep = sep | default: " - " -%}
+{%- assign first = true -%}
+{%- if p1 != blank -%}{{ p1 }}{%- assign first = false -%}{%- endif -%}
+{%- if p2 != blank -%}{%- unless first -%}{{ sep }}{%- endunless -%}{{ p2 }}{%- assign first = false -%}{%- endif -%}
+{%- if p3 != blank -%}{%- unless first -%}{{ sep }}{%- endunless -%}{{ p3 }}{%- assign first = false -%}{%- endif -%}
+{%- if p4 != blank -%}{%- unless first -%}{{ sep }}{%- endunless -%}{{ p4 }}{%- assign first = false -%}{%- endif -%}
+{%- if p5 != blank -%}{%- unless first -%}{{ sep }}{%- endunless -%}{{ p5 }}{%- endif -%}

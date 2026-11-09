@@ -1,0 +1,45 @@
+@* Marks the page as one to remember in the recent pages: placed by the page, recorded once its title is known *@
+@using Flox.Shared.Services
+@inject IRecentVisitService Recent
+@inject NavigationManager Navigation
+
+@code {
+
+    // Null or empty while the page loads its data
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Category { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    private string? _path;
+    private string? _what;
+
+    protected override void OnParametersSet()
+    {
+        if (Disabled || string.IsNullOrWhiteSpace(Title))
+        {
+            return;
+        }
+
+        var path = RecentVisitService.PathOf(Navigation.Uri);
+        var what = $"{Category}|{Title}";
+
+        // A page reused for another address shows the old title until its data is loaded
+        if (path == _path || what == _what)
+        {
+            return;
+        }
+
+        _path = path;
+        _what = what;
+        _ = Recent.VisitAsync(Title, Category, Icon);
+    }
+
+}

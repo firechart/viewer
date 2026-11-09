@@ -1,0 +1,11 @@
+{% fhir_include "MedicationRequest:subject" %}
+{% fhir_include "MedicationRequest:encounter" %}
+{%- assign dose = self.dosageInstruction | as_list | first -%}{%- assign pr = self.priority | append: "" -%}
+{%- capture t0 -%}{% apply self.medication mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 | default: self.id -%}
+{%- capture s0 -%}{% if dose %}{{ dose.text }}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% if self.authoredOn %}{{ self.authoredOn | fhir_date }}{% endif %}{%- endcapture -%}
+{%- capture subtitle -%}{% render "parts", p1: s0, p2: s1 %}{%- endcapture -%}
+{%- capture trailing -%}{% if pr != "" and pr != "routine" %}{% render "status-badge", code: pr %}{% endif %}{%- endcapture -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% render "tile-row", title: title, subtitle: subtitle, trailing: trailing, status: status, patient: self.subject, encounter: self.encounter, at: self.authoredOn %}

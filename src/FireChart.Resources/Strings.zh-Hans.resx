@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Microsoft ResX Schema
+
+    Version 2.0
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
+    associated with the data types.
+
+    Example:
+
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+
+    There are any number of "resheader" rows that contain simple
+    name/value pairs.
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
+    mimetype set.
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
+    extensible. For a given mimetype the value must be set accordingly:
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
+    read any of the formats listed below.
+
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Caption_FhirServers" xml:space="preserve">
+    <value>FHIR 服务器</value>
+  </data>
+  <data name="Caption_Resources" xml:space="preserve">
+    <value>资源</value>
+  </data>
+  <data name="Caption_AllPackages" xml:space="preserve">
+    <value>所有包</value>
+  </data>
+  <data name="Caption_FhirPackage" xml:space="preserve">
+    <value>FHIR 包</value>
+  </data>
+  <data name="Caption_CodeSystems" xml:space="preserve">
+    <value>代码系统</value>
+  </data>
+  <data name="Caption_AllFhirServers" xml:space="preserve">
+    <value>所有 FHIR 服务器</value>
+  </data>
+  <data name="Caption_FhirCorePackages" xml:space="preserve">
+    <value>FHIR 核心包</value>
+  </data>
+  <data name="Caption_FhirSettings" xml:space="preserve">
+    <value>FHIR 设置</value>
+  </data>
+  <data name="Caption_DefaultFhirVersion" xml:space="preserve">
+    <value>默认 FHIR 版本</value>
+  </data>
+  <data name="Caption_FhirServer" xml:space="preserve">
+    <value>FHIR 服务器</value>
+  </data>
+  <data name="Caption_FhirRelease" xml:space="preserve">
+    <value>FHIR 版本</value>
+  </data>
+  <data name="Caption_FhirServerName" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="Caption_FhirServerBaseUrl" xml:space="preserve">
+    <value>基础 URL</value>
+  </data>
+  <data name="Caption_FhirServerAuthentication" xml:space="preserve">
+    <value>身份验证</value>
+  </data>
+  <data name="Caption_FhirServerNoAuthentication" xml:space="preserve">
+    <value>无身份验证</value>
+  </data>
+  <data name="Caption_FhirServerCredentialsAsked" xml:space="preserve">
+    <value>凭据不会与服务器一起保存：连接时会要求输入。</value>
+  </data>
+  <data name="Caption_FhirServerToken" xml:space="preserve">
+    <value>API 令牌</value>
+  </data>
+  <data name="Caption_FhirServerAuthority" xml:space="preserve">
+    <value>Authority（OIDC 颁发者，可选）</value>
+  </data>
+  <data name="Caption_FhirServerOAuth2Scope" xml:space="preserve">
+    <value>OAuth2 范围</value>
+  </data>
+  <data name="Caption_FhirServerOAuth2ExtraParameters" xml:space="preserve">
+    <value>OAuth2 附加参数（键=值&amp;键=值）</value>
+  </data>
+  <data name="Caption_FhirServerRelease" xml:space="preserve">
+    <value>FHIR 版本（/metadata 不可用时）</value>
+  </data>
+  <data name="Caption_FhirServerTerminologyUrl" xml:space="preserve">
+    <value>术语服务器 URL（可选）</value>
+  </data>
+  <data name="Message_FhirServerUnavailable" xml:space="preserve">
+    <value>服务器未响应。它可能不可用，或不允许来自浏览器的请求（CORS）。</value>
+  </data>
+  <data name="Message_FhirServerAuthenticationNotSupported" xml:space="preserve">
+    <value>尚不支持连接使用此类认证方式的服务器。</value>
+  </data>
+  <data name="Caption_ClinicalSummary" xml:space="preserve">
+    <value>临床摘要</value>
+  </data>
+  <data name="Caption_ClinicalSummaryForm" xml:space="preserve">
+    <value>临床摘要表单</value>
+  </data>
+  <data name="Message_InvalidSearch" xml:space="preserve">
+    <value>地址中的搜索无效。</value>
+  </data>
+  <data name="Message_SearchFormGenerated" xml:space="preserve">
+    <value>此表单根据资源的搜索参数自动生成，因此不太方便。服务器可能不支持其中的某些参数。</value>
+  </data>
+  <data name="Message_CredentialsRejected" xml:space="preserve">
+    <value>服务器不接受这些凭据。</value>
+  </data>
+  <data name="Caption_FhirServerOAuth2ClientId" xml:space="preserve">
+    <value>OAuth2 客户端 ID</value>
+  </data>
+  <data name="Caption_FhirServerPageSize" xml:space="preserve">
+    <value>每页大小</value>
+  </data>
+  <data name="Caption_FhirServerLiteEdition" xml:space="preserve">
+    <value>此版本仅支持无需身份验证的公共 FHIR 服务器。</value>
+  </data>
+  <data name="Caption_FhirServerPublic" xml:space="preserve">
+    <value>公共服务器</value>
+  </data>
+  <data name="Message_FhirServerSignInAsked" xml:space="preserve">
+    <value>此服务器要求登录。您将前往其登录页面，然后返回此处。</value>
+  </data>
+  <data name="Message_SmartDiscoveryFailed" xml:space="preserve">
+    <value>服务器未说明登录地址（没有 SMART 配置）。</value>
+  </data>
+  <data name="Message_SmartPkceNotSupported" xml:space="preserve">
+    <value>登录服务器不支持必需的 PKCE（S256）。</value>
+  </data>
+  <data name="Message_SmartStateMismatch" xml:space="preserve">
+    <value>登录服务器的响应与请求不匹配。请重新登录。</value>
+  </data>
+  <data name="Message_SmartAuthorizationDenied" xml:space="preserve">
+    <value>登录已取消，或服务器不允许登录。</value>
+  </data>
+  <data name="Message_SmartTokenExchangeFailed" xml:space="preserve">
+    <value>服务器未提供访问令牌。</value>
+  </data>
+  <data name="Message_SmartUnknownIss" xml:space="preserve">
+    <value>此服务器不在组织允许从外部启动的服务器列表中。</value>
+  </data>
+  <data name="Message_SmartClientNotConfigured" xml:space="preserve">
+    <value>未为此服务器设置客户端 ID 或范围。</value>
+  </data>
+  <data name="Caption_Packages" xml:space="preserve">
+    <value>包</value>
+  </data>
+  <data name="Caption_Publisher" xml:space="preserve">
+    <value>发布者</value>
+  </data>
+  <data name="Caption_Kind" xml:space="preserve">
+    <value>种类</value>
+  </data>
+  <data name="Conformance_ResourceProperties" xml:space="preserve">
+    <value>资源属性</value>
+  </data>
+  <data name="Conformance_Content" xml:space="preserve">
+    <value>内容</value>
+  </data>
+  <data name="Conformance_Concepts" xml:space="preserve">
+    <value>概念</value>
+  </data>
+  <data name="Conformance_Derivation" xml:space="preserve">
+    <value>派生方式</value>
+  </data>
+  <data name="Conformance_Abstract" xml:space="preserve">
+    <value>抽象</value>
+  </data>
+  <data name="Conformance_BaseDefinition" xml:space="preserve">
+    <value>基础定义</value>
+  </data>
+  <data name="Conformance_ElementTypes" xml:space="preserve">
+    <value>元素类型</value>
+  </data>
+  <data name="Conformance_Profiles" xml:space="preserve">
+    <value>配置文件</value>
+  </data>
+  <data name="Conformance_Bindings" xml:space="preserve">
+    <value>值集绑定</value>
+  </data>
+  <data name="Conformance_References" xml:space="preserve">
+    <value>引用</value>
+  </data>
+  <data name="Conformance_PackageProperties" xml:space="preserve">
+    <value>包属性</value>
+  </data>
+  <data name="Conformance_Canonical" xml:space="preserve">
+    <value>规范 URL</value>
+  </data>
+  <data name="Conformance_ArtifactCount" xml:space="preserve">
+    <value>工件</value>
+  </data>
+  <data name="Conformance_Dependencies" xml:space="preserve">
+    <value>依赖项</value>
+  </data>
+  <data name="Conformance_NotIndexed" xml:space="preserve">
+    <value>未编入索引</value>
+  </data>
+  <data name="Conformance_PackageContent" xml:space="preserve">
+    <value>包内容</value>
+  </data>
+  <data name="Conformance_PackageNotFound" xml:space="preserve">
+    <value>未找到包（或未加载）。</value>
+  </data>
+  <data name="Conformance_ArtifactNotFound" xml:space="preserve">
+    <value>未找到该工件。</value>
+  </data>
+  <data name="Conformance_OutgoingReferences" xml:space="preserve">
+    <value>传出引用 ({0})</value>
+  </data>
+  <data name="Conformance_IncomingReferences" xml:space="preserve">
+    <value>传入引用 ({0})</value>
+  </data>
+  <data name="Conformance_Flags" xml:space="preserve">
+    <value>标志</value>
+  </data>
+  <data name="Conformance_Cardinality" xml:space="preserve">
+    <value>基数</value>
+  </data>
+  <data name="Conformance_FlagSummary" xml:space="preserve">
+    <value>包含在摘要中</value>
+  </data>
+  <data name="Conformance_FlagModifier" xml:space="preserve">
+    <value>修饰元素</value>
+  </data>
+  <data name="Conformance_FlagConstraints" xml:space="preserve">
+    <value>有约束</value>
+  </data>
+  <data name="Conformance_FindByCanonical" xml:space="preserve">
+    <value>按规范 URL 查找</value>
+  </data>
+  <data name="Conformance_CanonicalNotFound" xml:space="preserve">
+    <value>已编入索引的包中没有具有此规范 URL 的工件。</value>
+  </data>
+  <data name="Conformance_CanonicalFound" xml:space="preserve">
+    <value>找到：{0}</value>
+  </data>
+  <data name="Caption_AllBookmarks" xml:space="preserve">
+    <value>所有书签</value>
+  </data>
+  <data name="Caption_RecentPages" xml:space="preserve">
+    <value>最近访问</value>
+  </data>
+  <data name="Caption_AddFhirServer" xml:space="preserve">
+    <value>添加服务器</value>
+  </data>
+  <data name="Caption_Documentation" xml:space="preserve">
+    <value>文档</value>
+  </data>
+  <data name="Home_DocumentationDescription" xml:space="preserve">
+    <value>如何浏览 FHIR 包和 FHIR 服务器</value>
+  </data>
+  <data name="Message_NoBookmarks" xml:space="preserve">
+    <value>没有书签</value>
+  </data>
+  <data name="Message_NoRecentPages" xml:space="preserve">
+    <value>没有最近访问的页面</value>
+  </data>
+  <data name="Message_NoFhirServers" xml:space="preserve">
+    <value>没有 FHIR 服务器</value>
+  </data>
+  <data name="Message_NoCorePackages" xml:space="preserve">
+    <value>尚未索引 FHIR 核心包</value>
+  </data>
+  <data name="Message_SignInForBookmarks" xml:space="preserve">
+    <value>登录后即可使用书签</value>
+  </data>
+  <data name="Message_SignInForRecentPages" xml:space="preserve">
+    <value>登录后即可查看最近访问的页面</value>
+  </data>
+  <data name="Conformance_Overview" xml:space="preserve">
+    <value>概览</value>
+  </data>
+  <data name="Conformance_Structure" xml:space="preserve">
+    <value>结构</value>
+  </data>
+  <data name="Conformance_Snapshot" xml:space="preserve">
+    <value>快照</value>
+  </data>
+  <data name="Conformance_Differential" xml:space="preserve">
+    <value>差异</value>
+  </data>
+  <data name="Conformance_FindElement" xml:space="preserve">
+    <value>查找元素</value>
+  </data>
+  <data name="Conformance_OnlyThisBranch" xml:space="preserve">
+    <value>仅此分支</value>
+  </data>
+  <data name="Conformance_ShowWholeTree" xml:space="preserve">
+    <value>显示整棵树</value>
+  </data>
+  <data name="Conformance_NoDifferential" xml:space="preserve">
+    <value>此工件没有差异视图。</value>
+  </data>
+  <data name="Conformance_NoElementsFound" xml:space="preserve">
+    <value>没有匹配的元素。</value>
+  </data>
+  <data name="Conformance_NotInDifferential" xml:space="preserve">
+    <value>配置文件未更改</value>
+  </data>
+  <data name="Conformance_Description" xml:space="preserve">
+    <value>描述</value>
+  </data>
+  <data name="Conformance_Definition" xml:space="preserve">
+    <value>定义</value>
+  </data>
+  <data name="Conformance_Comment" xml:space="preserve">
+    <value>注释</value>
+  </data>
+  <data name="Conformance_Requirements" xml:space="preserve">
+    <value>需求</value>
+  </data>
+  <data name="Conformance_Binding" xml:space="preserve">
+    <value>绑定</value>
+  </data>
+  <data name="Conformance_Constraints" xml:space="preserve">
+    <value>约束</value>
+  </data>
+  <data name="Conformance_FlagMustSupport" xml:space="preserve">
+    <value>必须支持</value>
+  </data>
+  <data name="Conformance_StatusTrialUse" xml:space="preserve">
+    <value>试用</value>
+  </data>
+  <data name="Conformance_StatusNormative" xml:space="preserve">
+    <value>规范性</value>
+  </data>
+  <data name="Conformance_StatusDraft" xml:space="preserve">
+    <value>草案</value>
+  </data>
+  <data name="Conformance_StatusDeprecated" xml:space="preserve">
+    <value>已弃用</value>
+  </data>
+  <data name="Message_ViewerClientOnly" xml:space="preserve">
+    <value>FireChart Viewer 只能在浏览器（Blazor WebAssembly）或应用（Blazor Hybrid）中运行，不能在服务器上运行。</value>
+  </data>
+  <data name="Message_ViewerUnknownAddress" xml:space="preserve">
+    <value>查看器在此地址没有页面。</value>
+  </data>
+  <data name="Message_SmartPopupWaiting" xml:space="preserve">
+    <value>请在打开的窗口中完成登录。</value>
+  </data>
+  <data name="Message_SmartPopupBlocked" xml:space="preserve">
+    <value>浏览器未打开登录窗口（弹出窗口拦截器或嵌入查看器的页面设置）。请重新打开，或在此处登录。</value>
+  </data>
+  <data name="Message_SmartPopupClosed" xml:space="preserve">
+    <value>登录完成前登录窗口已关闭，或与其失去连接。请重新打开，或在此处登录。</value>
+  </data>
+  <data name="Caption_SmartOpenSignInWindow" xml:space="preserve">
+    <value>打开登录窗口</value>
+  </data>
+  <data name="Caption_SmartSignInHere" xml:space="preserve">
+    <value>在此处登录</value>
+  </data>
+</root>

@@ -1,0 +1,2 @@
+{%- assign target = self | resolve -%}
+{%- if target %}{% apply target mode: "text" %}{% else %}{{ self.display }}{% endif -%}

@@ -1,0 +1,5 @@
+{%- assign outcome = self.outcome | append: "" -%}
+{%- capture t0 -%}{% if self.purpose %}{% assign purposes = self.purpose | join: ", " %}{{ "Eligibility: {{purposes}}" | t: purposes: purposes }}{% endif %}{%- endcapture -%}
+{%- assign title = t0 -%}
+{%- if title == "" -%}{%- assign title = self.id -%}{%- endif -%}
+{{- title -}}

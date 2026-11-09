@@ -1,0 +1,53 @@
+{% fhir_include "ServiceRequest:subject" %}
+{% fhir_include "ServiceRequest:requester" %}
+{% fhir_include "ServiceRequest:performer" %}
+{% fhir_include "ServiceRequest:specimen" %}
+{% fhir_include "ServiceRequest:encounter" %}
+
+{%- assign notes = self.note | as_list -%}{%- assign pr = self.priority | append: "" -%}
+{%- assign patient = self.subject | resolve -%}
+{%- assign encounter = self.encounter | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, encounter: encounter, visit: self.encounter, own: "ServiceRequest" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% apply self.code mode: "text" -%}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.authoredOn %}
+    <span>{{ "Authored" | t }} {% apply self.authoredOn mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.occurrence %}
+    <span>{% apply self.occurrence mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+    {%- if self.intent != "" -%}{%- render "badge", text: self.intent -%}{%- endif -%}
+    {%- if pr != "" and pr != "routine" -%}{%- render "status-badge", code: pr -%}{%- endif -%}
+  </div>
+</div>
+
+{%- if self.category or self.requester or self.performer or self.reasonCode or self.reasonReference or self.specimen or self.bodySite or self.orderDetail or self.patientInstruction %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Category", node: self.category, mode: "text" %}
+  {% render "field", label: "Requester", node: self.requester %}
+  {% render "field", label: "Performer", node: self.performer %}
+  {% render "field", label: "Reason", node: self.reasonCode, mode: "text" %}
+  {% render "field", label: "Reason", node: self.reasonReference %}
+  {% render "field", label: "Specimen", node: self.specimen %}
+  {% render "field", label: "Body site", node: self.bodySite, mode: "text" %}
+  {% render "field", label: "Order details", node: self.orderDetail, mode: "text" %}
+  {% render "field", label: "Patient instruction", node: self.patientInstruction, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if notes.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Notes" | t }}</h3>
+  {%- for n in notes %}
+  <div class="fx-row"><span class="fx-row-main">{% apply n mode: "text" -%}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

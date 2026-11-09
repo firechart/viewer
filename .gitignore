@@ -1,0 +1,25 @@
+# The public part on its own (the GitHub mirror); in the whole repository the root .gitignore applies too
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+TestResults/
+.vs/
+.idea/
+.vscode/*
+*.user
+*.suo
+*.DotSettings.user
+*.binlog
+*.log
+*.nupkg
+*.snupkg
+**/node_modules/
+# Tailwind CLI downloaded by Lombiq.Tailwind.Targets and the stylesheets it generates
+.tailwind/
+**/wwwroot/css/*.Tailwind.css
+# Output of the license tooling (src/Flox.Shared)
+**/licenses.xml
+.env
+.env.local

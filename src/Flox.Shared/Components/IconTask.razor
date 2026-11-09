@@ -1,0 +1,33 @@
+﻿@using Flox.Core.Models
+
+@if (Status == BackgroundTaskStatus.Pending)
+{
+    <IconPending/>
+}
+else if (Status == BackgroundTaskStatus.Running)
+{
+    <IconRunning/>
+}
+else if (Status == BackgroundTaskStatus.Completed)
+{
+    <IconDone/>
+}
+else if (Status == BackgroundTaskStatus.Error)
+{
+    <IconError/>
+}
+else if (Status == BackgroundTaskStatus.Cancelling)
+{
+    <IconCancelling/>
+}
+else if (Status == BackgroundTaskStatus.Cancelled)
+{
+    <IconCancelled/>
+}
+
+@code {
+
+    [Parameter]
+    public BackgroundTaskStatus Status { get; set; }
+
+}

@@ -1,0 +1,54 @@
+{% fhir_include "Specimen:subject" %}
+{% fhir_include "Specimen:parent" %}
+
+{%- assign containers = self.container | as_list -%}{%- assign notes = self.note | as_list -%}
+{%- assign patient = self.subject | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, own: "Specimen" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% apply self.type mode: "text" -%}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.collection.collected %}
+    <span>{{ "Collected" | t }} {% apply self.collection.collected mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.receivedTime %}
+    <span>{{ "Received" | t }} {% apply self.receivedTime mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.accessionIdentifier or self.collection.collector or self.collection.method or self.collection.bodySite or self.collection.quantity or self.request or self.parent %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Accession", node: self.accessionIdentifier, mode: "text" %}
+  {% render "field", label: "Collector", node: self.collection.collector %}
+  {% render "field", label: "Method", node: self.collection.method, mode: "text" %}
+  {% render "field", label: "Body site", node: self.collection.bodySite, mode: "text" %}
+  {% render "field", label: "Quantity", node: self.collection.quantity, mode: "text" %}
+  {% render "field", label: "Request", node: self.request %}
+  {% render "field", label: "Parent", node: self.parent %}
+</section>
+{%- endif %}
+
+{%- if containers.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Containers" | t }}</h3>
+  {%- for c in containers %}
+  <div class="fx-row"><span class="fx-row-main">{% if c.type %}{% apply c.type mode: "text" -%}{% endif %}</span><span class="fx-row-meta">{% if c.capacity %}{% apply c.capacity mode: "text" -%}{% endif %}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if notes.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Notes" | t }}</h3>
+  {%- for n in notes %}
+  <div class="fx-row"><span class="fx-row-main">{% apply n mode: "text" -%}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

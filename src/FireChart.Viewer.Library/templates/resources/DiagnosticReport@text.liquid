@@ -1,0 +1,5 @@
+{%- assign cat = self.category | first -%}
+{%- capture t0 -%}{% apply self.code mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 -%}
+{%- if title == "" -%}{%- assign title = self.id -%}{%- endif -%}
+{{- title -}}

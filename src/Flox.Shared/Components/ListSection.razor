@@ -1,0 +1,66 @@
+@* A group of rows framed as daisyUI's fieldset: the caption is the legend on top, the rows on the surface *@
+<RadzenFieldset Text=@Caption HeaderTemplate=@Commands class="[--rz-fieldset-padding:0] [--fw-fieldset-background:var(--rz-base-background-color)] [--fw-fieldset-legend-padding-block-end:calc(var(--spacing)*2)] [--fw-fieldset-bare-padding-block-start:0]">
+    @if (Definitions)
+    {
+        <dl class=@($"{GetClass()} m-0")>
+            @ChildContent
+        </dl>
+    }
+    else
+    {
+        <div class=@GetClass()>
+            @ChildContent
+        </div>
+    }
+</RadzenFieldset>
+
+@if (!string.IsNullOrEmpty(Footer))
+{
+    <Subtitle>@Footer</Subtitle>
+}
+
+@code {
+
+    [Parameter]
+    public string? Caption { get; set; }
+
+    [Parameter]
+    public string? Footer { get; set; }
+
+    [Parameter]
+    public RenderFragment? Commands { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>
+    /// Renders a divider between consecutive children (e.g. ListTile rows) - the container, not
+    /// each child, owns this so callers don't have to compute "am I the last item" themselves.
+    /// </summary>
+    [Parameter]
+    public bool Dividers { get; set; } = true;
+
+    // The rows are PropertyTiles: the list is a definition list (<dl>), read by a screen reader as pairs of a term and its value
+    [Parameter]
+    public bool Definitions { get; set; }
+
+    private string GetClass()
+    {
+        var list = new List<string> { "overflow-hidden rounded-box" };
+        if (Dividers)
+        {
+            list.Add("divide-y divide-line");
+        }
+
+        if (!string.IsNullOrEmpty(Class))
+        {
+            list.Add(Class);
+        }
+
+        return string.Join(" ", list);
+    }
+
+}

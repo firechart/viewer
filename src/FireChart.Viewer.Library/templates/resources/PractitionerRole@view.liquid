@@ -1,0 +1,32 @@
+{% fhir_include "PractitionerRole:practitioner" %}
+{% fhir_include "PractitionerRole:organization" %}
+{% fhir_include "PractitionerRole:location" %}
+{% fhir_include "PractitionerRole:service" %}
+
+{%- assign act = self.active | append: "" -%}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% apply self.practitioner mode: "link,text" -%}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.period %}
+    <span>{% apply self.period mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- if act == "false" -%}{%- render "badge", text: "inactive", tone: "danger" -%}{%- endif -%}
+  </div>
+</div>
+
+{%- if self.code or self.specialty or self.organization or self.location or self.healthcareService or self.telecom %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Role" | t }}</h3>
+  {% render "field", label: "Role", node: self.code, mode: "text" %}
+  {% render "field", label: "Specialty", node: self.specialty, mode: "text" %}
+  {% render "field", label: "Organization", node: self.organization %}
+  {% render "field", label: "Location", node: self.location %}
+  {% render "field", label: "Service", node: self.healthcareService %}
+  {% render "field", label: "Phone and email", node: self.telecom, mode: "text" %}
+</section>
+{%- endif %}

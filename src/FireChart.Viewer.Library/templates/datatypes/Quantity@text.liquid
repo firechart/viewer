@@ -1,0 +1,9 @@
+{{- self.comparator -}}
+{{- self.value | fhir_number -}}
+{%- if self.unit -%}
+  {{- " " -}}
+  {{- self.unit -}}
+{%- elsif self.code -%}
+  {{- " " -}}
+  {{- self.code -}}
+{%- endif -%}

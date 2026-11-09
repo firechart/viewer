@@ -1,0 +1,48 @@
+{% fhir_include "Task:subject" %}
+{% fhir_include "Task:owner" %}
+{% fhir_include "Task:requester" %}
+{% fhir_include "Task:focus" %}
+{% fhir_include "Task:encounter" %}
+
+{%- assign notes = self.note | as_list -%}{%- assign pr = self.priority | append: "" -%}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% if self.description %}{{ self.description }}{% else %}{% apply self.code mode: "text" %}{% endif %}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.authoredOn %}
+    <span>{{ "Authored" | t }} {% apply self.authoredOn mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.lastModified %}
+    <span>{{ "Modified" | t }} {% apply self.lastModified mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+    {%- if self.intent != "" -%}{%- render "badge", text: self.intent -%}{%- endif -%}
+    {%- if pr != "" and pr != "routine" -%}{%- render "status-badge", code: pr -%}{%- endif -%}
+  </div>
+</div>
+
+{%- if self.for or self.focus or self.owner or self.requester or self.encounter or self.businessStatus or self.reasonCode %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "For", node: self.for %}
+  {% render "field", label: "Focus", node: self.focus %}
+  {% render "field", label: "Owner", node: self.owner %}
+  {% render "field", label: "Requester", node: self.requester %}
+  {% render "field", label: "Encounter", node: self.encounter %}
+  {% render "field", label: "Business status", node: self.businessStatus, mode: "text" %}
+  {% render "field", label: "Reason", node: self.reasonCode, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if notes.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Notes" | t }}</h3>
+  {%- for n in notes %}
+  <div class="fx-row"><span class="fx-row-main">{% apply n mode: "text" -%}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

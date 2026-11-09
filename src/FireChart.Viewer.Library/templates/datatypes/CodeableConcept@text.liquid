@@ -1,0 +1,13 @@
+{%- comment -%} The coded value comes first (the display of a coding: its own, else the one of a terminology server), the text the author typed is the fallback, the bare code the last resort {%- endcomment -%}
+{%- assign shown = "" -%}
+{%- assign codings = self.coding | as_list -%}
+{%- for c in codings -%}
+  {%- assign d = c | coding_display | append: "" -%}
+  {%- if shown == "" and d != "" -%}{%- assign shown = d -%}{%- endif -%}
+{%- endfor -%}
+{%- if shown == "" -%}{%- assign shown = self.text | append: "" -%}{%- endif -%}
+{%- if shown == "" -%}
+  {%- assign c = codings | first -%}
+  {%- assign shown = c.code | append: "" -%}
+{%- endif -%}
+{{- shown -}}

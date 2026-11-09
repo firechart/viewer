@@ -1,0 +1,5 @@
+{%- apply self.low mode: "text" -%}
+{%- if self.low and self.high -%}
+  {{- " - " -}}
+{%- endif -%}
+{%- apply self.high mode: "text" -%}

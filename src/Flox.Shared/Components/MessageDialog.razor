@@ -1,0 +1,33 @@
+@using Radzen
+@inject DialogService DialogService
+
+<RadzenStack>
+    <RadzenText class="whitespace-pre-line">@Message</RadzenText>
+    <DialogActions>
+        @if (!string.IsNullOrEmpty(CancelText))
+        {
+            <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Text=@CancelText Click=@(() => DialogService.Close(null))/>
+        }
+        @if (!string.IsNullOrEmpty(NoText))
+        {
+            <RadzenButton Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Text=@NoText Click=@(() => DialogService.Close(false))/>
+        }
+        <RadzenButton ButtonStyle="ButtonStyle.Primary" Text=@YesText Click=@(() => DialogService.Close(true))/>
+    </DialogActions>
+</RadzenStack>
+
+@code {
+
+    [Parameter]
+    public string? Message { get; set; }
+
+    [Parameter]
+    public string YesText { get; set; } = "OK";
+
+    [Parameter]
+    public string? NoText { get; set; }
+
+    [Parameter]
+    public string? CancelText { get; set; }
+
+}

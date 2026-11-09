@@ -1,0 +1,31 @@
+{% fhir_include "CoverageEligibilityRequest:patient" %}
+{% fhir_include "CoverageEligibilityRequest:provider" %}
+
+{%- assign patient = self.patient | resolve -%}
+{%- render "view-header", patient: patient, subject: self.patient, own: "CoverageEligibilityRequest" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{{ "Eligibility request" | t }}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.created %}
+    <span>{{ "Created" | t }} {% apply self.created mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.purpose or self.insurer or self.provider or self.enterer or self.serviced or self.priority %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Purpose", node: self.purpose, mode: "text" %}
+  {% render "field", label: "Insurer", node: self.insurer %}
+  {% render "field", label: "Provider", node: self.provider %}
+  {% render "field", label: "Enterer", node: self.enterer %}
+  {% render "field", label: "Serviced", node: self.serviced, mode: "text" %}
+  {% render "field", label: "Priority", node: self.priority, mode: "text" %}
+</section>
+{%- endif %}

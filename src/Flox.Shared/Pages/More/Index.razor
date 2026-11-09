@@ -1,0 +1,40 @@
+@attribute [Route(SharedRoutes.MORE)]
+
+@inherits StatelessWidget
+
+@inject IFloxShell Shell
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuthorizationService AuthorizationService
+
+<AppBarTitle>@Strings.Caption_More</AppBarTitle>
+
+@foreach (var (menu, nodes) in _sections)
+{
+    <ListSection Caption=@menu.Text>
+        @foreach (var node in nodes)
+        {
+            @* A group without a page of its own shows its children *@
+            @foreach (var target in string.IsNullOrEmpty(node.Item.Href) ? node.Children.Select(row => row.Item) : [node.Item])
+            {
+                <ListTile TitleText=@target.Text Icon=@target.Icon Href=@target.Href Chevron/>
+            }
+        }
+    </ListSection>
+}
+
+@if (_loaded && _sections.Count == 0)
+{
+    <RadzenText TextStyle="TextStyle.Body2" class="text-muted">@Strings.List_NoData</RadzenText>
+}
+
+@code {
+    private List<(IFloxMenu Menu, List<NavMenuNode> Nodes)> _sections = [];
+    private bool _loaded;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        _sections = await MenuFilter.BuildAsync(Shell, AuthorizationService, user, FloxMenuPlacement.More);
+        _loaded = true;
+    }
+}

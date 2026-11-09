@@ -1,0 +1,46 @@
+{% fhir_include "ImagingStudy:subject" %}
+{% fhir_include "ImagingStudy:referrer" %}
+{% fhir_include "ImagingStudy:interpreter" %}
+{% fhir_include "ImagingStudy:encounter" %}
+
+{%- assign series = self.series | as_list -%}
+{%- assign patient = self.subject | resolve -%}
+{%- assign encounter = self.encounter | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, encounter: encounter, visit: self.encounter, own: "ImagingStudy" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{{ self.description | default: self.id }}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.started %}
+    <span>{% apply self.started mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.numberOfSeries %}
+    <span>{{ "{{count}} series" | t: count: self.numberOfSeries }}, {{ "{{count}} images" | t: count: self.numberOfInstances }}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.modality or self.referrer or self.interpreter or self.procedureCode or self.reasonCode %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Modality", node: self.modality, mode: "text" %}
+  {% render "field", label: "Referrer", node: self.referrer %}
+  {% render "field", label: "Interpreter", node: self.interpreter %}
+  {% render "field", label: "Procedure", node: self.procedureCode, mode: "text" %}
+  {% render "field", label: "Reason", node: self.reasonCode, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if series.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Series" | t }}</h3>
+  {%- for s in series %}
+  <div class="fx-row"><span class="fx-row-main">{{ s.number }}. {{ s.description | default: s.uid }}</span><span class="fx-row-meta">{% if s.modality %}{% apply s.modality mode: "text" -%}{% endif %} {{ s.numberOfInstances }} images</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

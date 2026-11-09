@@ -1,0 +1,5 @@
+{%- assign tgt = self.target | first -%}
+{%- capture t0 -%}{% apply self.description mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 -%}
+{%- if title == "" -%}{%- assign title = self.id -%}{%- endif -%}
+{{- title -}}

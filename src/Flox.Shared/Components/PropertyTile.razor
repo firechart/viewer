@@ -1,0 +1,18 @@
+@* A property of a record: a pair of a definition list, inside <ListSection Definitions>. The value stays on the line of the label while
+   both fit, then goes under it and takes up to three lines (an address breaks anywhere); the full text is its title *@
+<RadzenStack Orientation="Radzen.Orientation.Horizontal" Wrap="Radzen.FlexWrap.Wrap" AlignItems="Radzen.AlignItems.Center" Gap="0"
+             class="min-h-12 gap-x-3 rz-px-3 rz-py-2">
+    <dt class="rz-text-body2 m-0 min-w-0 flex-auto truncate" style="color: var(--rz-text-title-color)">@Label</dt>
+    <dd class="rz-text-subtitle2 m-0 min-w-0 max-w-full flex-initial line-clamp-3 wrap-anywhere" title=@Value>@Value</dd>
+</RadzenStack>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Value { get; set; }
+
+}

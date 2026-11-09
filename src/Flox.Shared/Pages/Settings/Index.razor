@@ -1,0 +1,51 @@
+@attribute [Route(SharedRoutes.SETTINGS)]
+@attribute [Authorize]
+
+@inherits StatefulWidget<SettingsPageState>
+
+<AppBarTitle>@Strings.Caption_Settings</AppBarTitle>
+
+<Breadcrumbs Items=@Breadcrumbs />
+
+<NavigationLock OnBeforeInternalNavigation=@OnBeforeNavigationAsync/>
+
+<BusyOverlay Busy=@State.IsBusy Concealed=@State.Activating>
+    <RadzenStack Gap="var(--gap-md)" class="rz-my-2">
+        @foreach (var section in State.Sections)
+        {
+            <SettingsSection Section=@section OnModified=@StateHasChanged/>
+        }
+    </RadzenStack>
+
+    <DialogActions>
+        <RadzenButton Variant="Radzen.Variant.Outlined" ButtonStyle="Radzen.ButtonStyle.Base" Text=@Strings.Caption_Reset Click=@State.ResetAsync/>
+        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Primary" Text=@Strings.Caption_Save Disabled=@(!State.IsModified) Click=@State.SaveAsync/>
+    </DialogActions>
+</BusyOverlay>
+
+    @code {
+
+    private async Task OnBeforeNavigationAsync(LocationChangingContext context)
+    {
+        if (!State.IsModified)
+        {
+            return;
+        }
+
+        if (await this.ConfirmAsync(Strings.Message_DiscardUnsavedChanges))
+        {
+            await State.DiscardAsync();
+        }
+        else
+        {
+            context.PreventNavigation();
+        }
+    }
+
+    protected override void InitBreadcrumbs()
+    {
+        base.InitBreadcrumbs();
+        Breadcrumbs.Add(Strings.Caption_Settings);
+    }
+
+}

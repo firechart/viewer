@@ -1,0 +1,86 @@
+{% fhir_include "Procedure:subject" %}
+{% fhir_include "Procedure:encounter" %}
+
+{%- assign patient = self.subject | resolve -%}
+{%- assign encounter = self.encounter | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, encounter: encounter, visit: self.encounter, own: "Procedure" %}
+
+{%- assign reasonCodes = self.reasonCode | as_list -%}
+{%- assign reasons = self.reason | as_list -%}
+{%- assign reasonReferences = self.reasonReference | as_list -%}
+{%- assign performers = self.performer | as_list -%}
+{%- assign complications = self.complication | as_list -%}
+{%- assign notes = self.note | as_list -%}
+{%- assign performed = self.performed %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% apply self.code mode: "text" -%}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if performed %}
+    <span>{% apply performed mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.category %}
+    <span>{% render "list-inline", node: self.category, mode: "text" %}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if reasonCodes.size > 0 or reasons.size > 0 or reasonReferences.size > 0 or self.outcome %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Reason and outcome" | t }}</h3>
+  {% render "field", label: "Reason", node: reasonCodes, mode: "text" %}
+  {% render "field", label: "Reason", node: reasonReferences %}
+  {%- for r in reasons %}
+  {% render "field", label: "Reason", node: r.value %}
+  {%- endfor %}
+  {% render "field", label: "Outcome", node: self.outcome, mode: "text" %}
+  {% render "field", label: "Complication", node: complications, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if self.bodySite or self.location or self.followUp or self.report or self.basedOn %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Body site", node: self.bodySite, mode: "text" %}
+  {% render "field", label: "Location", node: self.location %}
+  {% render "field", label: "Follow up", node: self.followUp, mode: "text" %}
+  {% render "field", label: "Report", node: self.report %}
+  {% render "field", label: "Based on", node: self.basedOn %}
+</section>
+{%- endif %}
+
+{%- if performers.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">
+    {{ "Performers" | t }}
+    <span class="fx-count">{{ performers.size }}</span>
+  </h3>
+  {%- for p in performers %}
+  <div class="fx-row">
+    <span class="fx-row-main">{% render "list-inline", node: p.actor %}</span>
+    {%- if p.function %}
+    <span class="fx-row-meta">{% render "list-inline", node: p.function, mode: "text" %}</span>
+    {%- endif %}
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if notes.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">
+    {{ "Notes" | t }}
+    <span class="fx-count">{{ notes.size }}</span>
+  </h3>
+  {%- for n in notes %}
+  <div class="fx-row">
+    <span class="fx-row-main">{% apply n mode: "text" -%}</span>
+  </div>
+  {%- endfor %}
+</section>
+{%- endif %}

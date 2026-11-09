@@ -1,0 +1,24 @@
+{% fhir_include "Observation:subject" %}
+{% fhir_include "Observation:encounter" %}
+{%- capture title -%}{% apply self.code mode: "text" %}{%- endcapture -%}
+{%- assign title = title | default: self.id -%}
+{%- assign components = self.component | as_list -%}
+{%- capture value -%}
+  {%- assign first = true -%}
+  {%- if self.value -%}{% apply self.value mode: "text" %}{%- assign first = false -%}{%- endif -%}
+  {%- for c in components -%}
+    {%- if c.value -%}
+      {%- unless first %} / {% endunless -%}
+      {% apply c.value mode: "text" %}
+      {%- assign first = false -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- capture subtitle -%}{% if self.effective %}{% apply self.effective mode: "text" %}{% endif %}{%- endcapture -%}
+{%- assign interpretations = self.interpretation | as_list -%}
+{%- capture trailing -%}
+  {%- if value != "" %}<span class="fx-tile-value">{{ value }}</span>{% endif -%}
+  {%- for i in interpretations -%}{% render "interpretation-badge", concept: i %}{%- endfor -%}
+{%- endcapture -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% render "tile-row", title: title, subtitle: subtitle, trailing: trailing, status: status, patient: self.subject, encounter: self.encounter, at: self.effective %}

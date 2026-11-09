@@ -1,0 +1,37 @@
+{% fhir_include "Account:subject" %}
+{% fhir_include "Account:owner" %}
+
+{%- assign covers = self.coverage | as_list -%}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{{ self.name | default: self.id }}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.servicePeriod %}
+    <span>{% apply self.servicePeriod mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.type or self.subject or self.owner or self.description %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Type", node: self.type, mode: "text" %}
+  {% render "field", label: "Subject", node: self.subject %}
+  {% render "field", label: "Owner", node: self.owner %}
+  {% render "field", label: "Description", node: self.description, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if covers.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Coverage" | t }}</h3>
+  {%- for c in covers %}
+  <div class="fx-row"><span class="fx-row-main">{% apply c.coverage mode: "link,text" -%}</span><span class="fx-row-meta">{{ c.priority }}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

@@ -1,0 +1,40 @@
+{% fhir_include "EpisodeOfCare:patient" %}
+{% fhir_include "EpisodeOfCare:organization" %}
+{% fhir_include "EpisodeOfCare:care-manager" %}
+
+{%- assign diagnoses = self.diagnosis | as_list -%}
+{%- assign patient = self.patient | resolve -%}
+{%- render "view-header", patient: patient, subject: self.patient, own: "EpisodeOfCare" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% assign kind = self.type | as_list | first %}{% if kind %}{% apply kind mode: "text" %}{% else %}{{ "Episode of care" | t }}{% endif %}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.period %}
+    <span>{% apply self.period mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.managingOrganization or self.careManager or self.team or self.referralRequest %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Managing organization", node: self.managingOrganization %}
+  {% render "field", label: "Care manager", node: self.careManager %}
+  {% render "field", label: "Care team", node: self.team %}
+  {% render "field", label: "Referral", node: self.referralRequest %}
+</section>
+{%- endif %}
+
+{%- if diagnoses.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Diagnoses" | t }}</h3>
+  {%- for d in diagnoses %}
+  <div class="fx-row"><span class="fx-row-main">{% apply d.condition mode: "link,text" -%}</span><span class="fx-row-meta">{% if d.role %}{% apply d.role mode: "text" -%}{% endif %}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Microsoft ResX Schema
+
+    Version 2.0
+
+    The primary goals of this format is to allow a simple XML format
+    that is mostly human readable. The generation and parsing of the
+    various data types are done through the TypeConverter classes
+    associated with the data types.
+
+    Example:
+
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+
+    There are any number of "resheader" rows that contain simple
+    name/value pairs.
+
+    Each data row contains a name, and value. The row also contains a
+    type or mimetype. Type corresponds to a .NET class that support
+    text/value conversion through the TypeConverter architecture.
+    Classes that don't support this are serialized and stored with the
+    mimetype set.
+
+    The mimetype is used for serialized objects, and tells the
+    ResXResourceReader how to depersist the object. This is currently not
+    extensible. For a given mimetype the value must be set accordingly:
+
+    Note - application/x-microsoft.net.object.binary.base64 is the format
+    that the ResXResourceWriter will generate, however the reader can
+    read any of the formats listed below.
+
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Nav_Home" xml:space="preserve">
+    <value>首页</value>
+  </data>
+  <data name="Settings_PageTitle" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="Auth_CompletingSignIn_Message" xml:space="preserve">
+    <value>正在完成登录…</value>
+  </data>
+  <data name="NotFound_Message" xml:space="preserve">
+    <value>抱歉，您要查找的内容不存在。</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="Caption_Login" xml:space="preserve">
+    <value>登录</value>
+  </data>
+  <data name="Caption_Logout" xml:space="preserve">
+    <value>退出登录</value>
+  </data>
+  <data name="Caption_Profile" xml:space="preserve">
+    <value>个人资料</value>
+  </data>
+  <data name="Caption_Error" xml:space="preserve">
+    <value>错误</value>
+  </data>
+  <data name="Caption_ErrorNotification" xml:space="preserve">
+    <value>出错了。请重试；如果问题仍然存在，请联系管理员。</value>
+  </data>
+  <data name="Caption_Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="Caption_Saved" xml:space="preserve">
+    <value>已保存</value>
+  </data>
+  <data name="Caption_Information" xml:space="preserve">
+    <value>信息</value>
+  </data>
+  <data name="Caption_Confirm" xml:space="preserve">
+    <value>确认</value>
+  </data>
+  <data name="Caption_Yes" xml:space="preserve">
+    <value>是</value>
+  </data>
+  <data name="Caption_No" xml:space="preserve">
+    <value>否</value>
+  </data>
+  <data name="Caption_ConfirmDelete" xml:space="preserve">
+    <value>删除？</value>
+  </data>
+  <data name="Caption_Filter" xml:space="preserve">
+    <value>筛选</value>
+  </data>
+  <data name="Caption_Search" xml:space="preserve">
+    <value>搜索</value>
+  </data>
+  <data name="Caption_Ok" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="Caption_Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="Message_FormInvalid" xml:space="preserve">
+    <value>请在保存表单前更正标红的错误。</value>
+  </data>
+  <data name="Message_FormSaveFailed" xml:space="preserve">
+    <value>表单保存失败，请稍后重试。</value>
+  </data>
+  <data name="Message_DeleteSucceeded" xml:space="preserve">
+    <value>记录已成功删除。</value>
+  </data>
+  <data name="Message_RecordIsUndefined" xml:space="preserve">
+    <value>找不到该记录，或该记录已被删除。</value>
+  </data>
+  <data name="Message_CreateFailed" xml:space="preserve">
+    <value>无法创建记录，请重试。</value>
+  </data>
+  <data name="Caption_Delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="Caption_BackgroundTasks" xml:space="preserve">
+    <value>后台任务</value>
+  </data>
+  <data name="Caption_BackgroundTask" xml:space="preserve">
+    <value>后台任务</value>
+  </data>
+  <data name="Caption_ImportTasks" xml:space="preserve">
+    <value>导入任务</value>
+  </data>
+  <data name="Caption_ImportTask" xml:space="preserve">
+    <value>导入任务</value>
+  </data>
+  <data name="Caption_Properties" xml:space="preserve">
+    <value>属性</value>
+  </data>
+  <data name="Caption_Add" xml:space="preserve">
+    <value>添加</value>
+  </data>
+  <data name="Caption_Installed" xml:space="preserve">
+    <value>已安装</value>
+  </data>
+  <data name="Sync_Title" xml:space="preserve">
+    <value>同步</value>
+  </data>
+  <data name="Sync_Now" xml:space="preserve">
+    <value>立即同步</value>
+  </data>
+  <data name="Sync_StatusSynced" xml:space="preserve">
+    <value>所有内容均已同步</value>
+  </data>
+  <data name="Sync_StatusSyncing" xml:space="preserve">
+    <value>正在同步…</value>
+  </data>
+  <data name="Sync_StatusPending" xml:space="preserve">
+    <value>待发送的更改：{0}</value>
+  </data>
+  <data name="Sync_StatusError" xml:space="preserve">
+    <value>上次同步失败</value>
+  </data>
+  <data name="Sync_LastSynced" xml:space="preserve">
+    <value>上次同步：{0}</value>
+  </data>
+  <data name="Sync_Never" xml:space="preserve">
+    <value>尚未同步</value>
+  </data>
+  <data name="Sync_NotAvailable" xml:space="preserve">
+    <value>此应用不支持同步</value>
+  </data>
+  <data name="Sync_Failures" xml:space="preserve">
+    <value>服务器未接受的更改</value>
+  </data>
+  <data name="Sync_Retry" xml:space="preserve">
+    <value>重试</value>
+  </data>
+  <data name="Sync_Technical" xml:space="preserve">
+    <value>技术细节</value>
+  </data>
+  <data name="Caption_More" xml:space="preserve">
+    <value>更多</value>
+  </data>
+  <data name="Caption_Bookmarks" xml:space="preserve">
+    <value>书签</value>
+  </data>
+  <data name="Caption_Settings" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="Caption_Appearance" xml:space="preserve">
+    <value>外观</value>
+  </data>
+  <data name="Caption_Theme" xml:space="preserve">
+    <value>主题</value>
+  </data>
+  <data name="Caption_ThemeDark" xml:space="preserve">
+    <value>深色</value>
+  </data>
+  <data name="Caption_ThemeLight" xml:space="preserve">
+    <value>浅色</value>
+  </data>
+  <data name="Caption_ThemeSystem" xml:space="preserve">
+    <value>系统</value>
+  </data>
+  <data name="Caption_Language" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="Caption_DefaultPageSize" xml:space="preserve">
+    <value>默认分页大小</value>
+  </data>
+  <data name="Caption_DataAndPrivacy" xml:space="preserve">
+    <value>数据与隐私</value>
+  </data>
+  <data name="Caption_AllowTelemetry" xml:space="preserve">
+    <value>允许遥测</value>
+  </data>
+  <data name="Caption_Reset" xml:space="preserve">
+    <value>重置</value>
+  </data>
+  <data name="Caption_Retry" xml:space="preserve">
+    <value>重试</value>
+  </data>
+  <data name="Caption_Edit" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="Caption_Close" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="Caption_Source" xml:space="preserve">
+    <value>来源</value>
+  </data>
+  <data name="Caption_Roles" xml:space="preserve">
+    <value>角色</value>
+  </data>
+  <data name="Caption_User" xml:space="preserve">
+    <value>用户</value>
+  </data>
+  <data name="Caption_UserName" xml:space="preserve">
+    <value>用户名</value>
+  </data>
+  <data name="Caption_AboutThisApp" xml:space="preserve">
+    <value>关于此应用</value>
+  </data>
+  <data name="Caption_Authors" xml:space="preserve">
+    <value>作者</value>
+  </data>
+  <data name="Caption_UsedComponents" xml:space="preserve">
+    <value>使用的库</value>
+  </data>
+  <data name="Caption_License" xml:space="preserve">
+    <value>许可证</value>
+  </data>
+  <data name="Caption_SourceCode" xml:space="preserve">
+    <value>源代码</value>
+  </data>
+  <data name="Caption_GeneralCategory" xml:space="preserve">
+    <value>常规</value>
+  </data>
+  <data name="Caption_AboutPlatform" xml:space="preserve">
+    <value>关于平台</value>
+  </data>
+  <data name="Caption_ConfirmPurgeTasks" xml:space="preserve">
+    <value>删除已完成的任务？</value>
+  </data>
+  <data name="Caption_AddBookmark" xml:space="preserve">
+    <value>添加书签</value>
+  </data>
+  <data name="Caption_RemoveBookmark" xml:space="preserve">
+    <value>移除书签</value>
+  </data>
+  <data name="Caption_Admin" xml:space="preserve">
+    <value>管理</value>
+  </data>
+  <data name="Caption_Version" xml:space="preserve">
+    <value>版本</value>
+  </data>
+  <data name="Caption_Home" xml:space="preserve">
+      <value>首页</value>
+  </data>
+  <data name="Consent_Title" xml:space="preserve">
+    <value>诊断与隐私</value>
+  </data>
+  <data name="Consent_Description" xml:space="preserve">
+    <value>经您允许，应用会将其运行的技术日志和跟踪发送到服务器，以帮助发现并修复问题。您可以随时在设置中更改。</value>
+  </data>
+  <data name="Consent_Accept" xml:space="preserve">
+    <value>允许</value>
+  </data>
+  <data name="Consent_Reject" xml:space="preserve">
+    <value>拒绝</value>
+  </data>
+  <data name="Consent_Manage" xml:space="preserve">
+    <value>管理偏好</value>
+  </data>
+  <data name="Consent_PreferencesTitle" xml:space="preserve">
+    <value>隐私偏好</value>
+  </data>
+  <data name="Consent_Save" xml:space="preserve">
+    <value>保存偏好</value>
+  </data>
+  <data name="Consent_Close" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="Consent_NecessaryTitle" xml:space="preserve">
+    <value>严格必要</value>
+  </data>
+  <data name="Consent_NecessaryDescription" xml:space="preserve">
+    <value>应用运行所必需：登录和您的设置。无法关闭。</value>
+  </data>
+  <data name="Consent_TelemetryTitle" xml:space="preserve">
+    <value>遥测</value>
+  </data>
+  <data name="Consent_TelemetryDescription" xml:space="preserve">
+    <value>此应用的技术日志和跟踪会发送到服务器。默认关闭。</value>
+  </data>
+  <data name="Connection_Title" xml:space="preserve">
+    <value>无法连接到服务器</value>
+  </data>
+  <data name="Connection_Description" xml:space="preserve">
+    <value>请检查您的网络连接。应用程序将自动重试。</value>
+  </data>
+  <data name="Connection_RetryIn" xml:space="preserve">
+    <value>{0} 秒后重试</value>
+  </data>
+  <data name="Connection_Details" xml:space="preserve">
+    <value>详细信息</value>
+  </data>
+  <data name="List_NoData" xml:space="preserve">
+    <value>未找到数据</value>
+  </data>
+  <data name="List_LoadFailed" xml:space="preserve">
+    <value>无法加载数据。</value>
+  </data>
+  <data name="List_Stale" xml:space="preserve">
+    <value>数据可能已过期。</value>
+  </data>
+  <data name="List_SelectedCount" xml:space="preserve">
+    <value>已选择 {0} 项</value>
+  </data>
+  <data name="Message_ConfirmResetSettings" xml:space="preserve">
+    <value>将这些设置恢复为默认值？</value>
+  </data>
+  <data name="Message_DiscardUnsavedChanges" xml:space="preserve">
+    <value>有未保存的更改。要离开此页面并放弃这些更改吗？</value>
+  </data>
+  <data name="Identity_Unavailable" xml:space="preserve">
+    <value>登录服务器不可用，无法续期您的会话。</value>
+  </data>
+  <data name="Caption_New" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="Caption_View" xml:space="preserve">
+    <value>查看</value>
+  </data>
+  <data name="Caption_ShowTotal" xml:space="preserve">
+    <value>显示总数</value>
+  </data>
+  <data name="Caption_TotalCount" xml:space="preserve">
+    <value>总计：{0}</value>
+  </data>
+  <data name="Caption_Connect" xml:space="preserve">
+    <value>连接</value>
+  </data>
+  <data name="Caption_Password" xml:space="preserve">
+    <value>密码</value>
+  </data>
+  <data name="Sync_Rejected" xml:space="preserve">
+    <value>服务器未接受对 {0} 的更改：{1}</value>
+  </data>
+  <data name="Sync_Reason_Invalid" xml:space="preserve">
+    <value>数据无效</value>
+  </data>
+  <data name="Sync_Reason_Forbidden" xml:space="preserve">
+    <value>您无权更改此内容</value>
+  </data>
+  <data name="Sync_Reason_ReadOnly" xml:space="preserve">
+    <value>此数据无法更改</value>
+  </data>
+  <data name="Sync_Reason_Conflict" xml:space="preserve">
+    <value>已在其他设备上更改</value>
+  </data>
+  <data name="Sync_Reason_Unknown" xml:space="preserve">
+    <value>服务器拒绝了更改</value>
+  </data>
+  <data name="Sync_NotSynced" xml:space="preserve">
+    <value>未同步：{0}</value>
+  </data>
+  <data name="Caption_SignIn" xml:space="preserve">
+    <value>登录</value>
+  </data>
+  <data name="Notice_AnonymousMemory" xml:space="preserve">
+    <value>您尚未登录：更改将保留到页面重新加载为止。</value>
+  </data>
+  <data name="Notice_AnonymousRefuse" xml:space="preserve">
+    <value>请登录后使用：您的数据保存在服务器上。</value>
+  </data>
+  <data name="Notice_AnonymousReadShared" xml:space="preserve">
+    <value>您尚未登录：只能看到组织的服务器。登录后可添加您自己的服务器。</value>
+  </data>
+  <data name="Error_Reference" xml:space="preserve">
+    <value>参考编号：{0}</value>
+  </data>
+  <data name="Error_AccessDenied" xml:space="preserve">
+    <value>您无权执行此操作。</value>
+  </data>
+  <data name="Error_NetworkUnavailable" xml:space="preserve">
+    <value>无法连接到服务器。请检查网络连接后重试。</value>
+  </data>
+  <data name="Caption_MoreFilters" xml:space="preserve">
+    <value>更多筛选条件</value>
+  </data>
+  <data name="Caption_Any" xml:space="preserve">
+    <value>任意</value>
+  </data>
+  <data name="Message_FieldRequired" xml:space="preserve">
+    <value>此字段为必填项</value>
+  </data>
+  <data name="Message_InvalidValue" xml:space="preserve">
+    <value>值无效</value>
+  </data>
+  <data name="Message_BookmarkQueryString" xml:space="preserve">
+    <value>书签保存的是位置而不是搜索：该地址包含查询字符串，其中可能带有患者数据。</value>
+  </data>
+  <data name="Caption_Name" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="Caption_Type" xml:space="preserve">
+    <value>类型</value>
+  </data>
+  <data name="Caption_Status" xml:space="preserve">
+    <value>状态</value>
+  </data>
+  <data name="Caption_Date" xml:space="preserve">
+    <value>日期</value>
+  </data>
+  <data name="Caption_Code" xml:space="preserve">
+    <value>代码</value>
+  </data>
+  <data name="Diagnostics_Title" xml:space="preserve">
+    <value>诊断</value>
+  </data>
+  <data name="Diagnostics_Routes" xml:space="preserve">
+    <value>已知路由</value>
+  </data>
+  <data name="Diagnostics_Errors" xml:space="preserve">
+    <value>错误处理</value>
+  </data>
+  <data name="Diagnostics_Sheets" xml:space="preserve">
+    <value>面板</value>
+  </data>
+  <data name="Diagnostics_CodeEditor" xml:space="preserve">
+    <value>代码编辑器</value>
+  </data>
+  <data name="Diagnostics_Lists" xml:space="preserve">
+    <value>列表</value>
+  </data>
+  <data name="Caption_WordWrap" xml:space="preserve">
+    <value>自动换行</value>
+  </data>
+  <data name="Caption_BookmarkedOnly" xml:space="preserve">
+    <value>仅书签</value>
+  </data>
+  <data name="Caption_ExpandAll" xml:space="preserve">
+    <value>全部展开</value>
+  </data>
+  <data name="Caption_CollapseAll" xml:space="preserve">
+    <value>全部折叠</value>
+  </data>
+</root>

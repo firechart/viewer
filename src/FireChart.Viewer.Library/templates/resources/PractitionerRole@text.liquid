@@ -1,0 +1,5 @@
+{%- assign role = self.code | first -%}{%- assign spec = self.specialty | first -%}{%- assign act = self.active | append: "" -%}
+{%- capture t0 -%}{% apply self.practitioner mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 -%}
+{%- if title == "" -%}{%- assign title = self.id -%}{%- endif -%}
+{{- title -}}

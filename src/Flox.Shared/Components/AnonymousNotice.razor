@@ -1,0 +1,41 @@
+@inject IAuthenticationService AuthenticationService
+
+<AuthorizeView>
+    <NotAuthorized>
+        @if (Text is { } text)
+        {
+            <RadzenAlert AlertStyle="Radzen.AlertStyle.Info" Variant="Radzen.Variant.Flat" Shade="Radzen.Shade.Lighter" Size="Radzen.AlertSize.Small" AllowClose="false">
+                <span>@text</span>
+                <RadzenButton Variant="Radzen.Variant.Text" Size="Radzen.ButtonSize.Small" Text=@Strings.Caption_Login Click="LoginAsync"/>
+            </RadzenAlert>
+        }
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    // What the notice tells; shown to a caller who is not signed in only
+    [Parameter]
+    [EditorRequired]
+    public AnonymousNoticeKind Kind { get; set; }
+
+    private string? Text
+    {
+        get
+        {
+            return Kind switch
+            {
+                AnonymousNoticeKind.Refuse => Strings.Notice_AnonymousRefuse,
+                AnonymousNoticeKind.Memory => Strings.Notice_AnonymousMemory,
+                AnonymousNoticeKind.ReadShared => Strings.Notice_AnonymousReadShared,
+                var _ => null
+            };
+        }
+    }
+
+    private async Task LoginAsync()
+    {
+        await AuthenticationService.LoginAsync();
+    }
+
+}

@@ -1,0 +1,393 @@
+/*
+ * FloxWind components: the look of daisyUI 5 on Radzen components where a theme variable is not enough
+ * (the depth of buttons, the soft variant, the toggle, tabs with an underline). daisyUI itself is not used.
+ *
+ * Radzen appends its theme after this file and its rules are not layered: every rule starts with html:root to outrank them.
+ */
+
+/*
+ * The colors of a component for the variants that tint: --fw-fill is the solid fill, --fw-on the text on it,
+ * --fw-c the hue of a tint, --fw-ink the text on a tint or on the page.
+ */
+:is(.rz-primary, .rz-badge-primary, .rz-chip-primary) {
+    --fw-fill: var(--rz-primary);
+    --fw-on: var(--rz-on-primary);
+    --fw-c: var(--rz-primary);
+    --fw-ink: var(--rz-on-primary-lighter);
+}
+
+:is(.rz-secondary, .rz-badge-secondary, .rz-chip-secondary) {
+    --fw-fill: var(--rz-secondary);
+    --fw-on: var(--rz-on-secondary);
+    --fw-c: var(--rz-secondary);
+    --fw-ink: var(--rz-on-secondary-lighter);
+}
+
+:is(.rz-success, .rz-badge-success, .rz-chip-success) {
+    --fw-fill: var(--rz-success);
+    --fw-on: var(--rz-on-success);
+    --fw-c: var(--rz-success);
+    --fw-ink: var(--rz-on-success-lighter);
+}
+
+:is(.rz-warning, .rz-badge-warning, .rz-chip-warning) {
+    --fw-fill: var(--rz-warning);
+    --fw-on: var(--rz-on-warning);
+    --fw-c: var(--rz-warning);
+    --fw-ink: var(--rz-on-warning-lighter);
+}
+
+:is(.rz-danger, .rz-badge-danger, .rz-chip-danger) {
+    --fw-fill: var(--rz-danger);
+    --fw-on: var(--rz-on-danger);
+    --fw-c: var(--rz-danger);
+    --fw-ink: var(--rz-on-danger-lighter);
+}
+
+:is(.rz-info, .rz-badge-info, .rz-chip-info) {
+    --fw-fill: var(--rz-info);
+    --fw-on: var(--rz-on-info);
+    --fw-c: var(--rz-info);
+    --fw-ink: var(--rz-on-info-lighter);
+}
+
+:is(.rz-base, .rz-light, .rz-badge-base, .rz-badge-light, .rz-chip-base, .rz-chip-light) {
+    --fw-fill: var(--rz-base);
+    --fw-on: var(--rz-on-base);
+    --fw-c: var(--rz-text-color);
+    --fw-ink: var(--rz-text-color);
+}
+
+:is(.rz-dark, .rz-badge-dark, .rz-chip-dark) {
+    --fw-fill: var(--rz-base-900);
+    --fw-on: var(--rz-base-50);
+    --fw-c: var(--rz-text-color);
+    --fw-ink: var(--rz-text-color);
+}
+
+/* Buttons: semibold, a hairline a shade darker than the fill, a soft drop shadow, a half-pixel press */
+html:root .rz-button {
+    --fw-depth: 0 0.5px 0 0.5px oklch(100% 0 0 / 6%) inset,
+        0 3px 2px -2px color-mix(in oklab, var(--fw-fill, transparent) 30%, transparent),
+        0 4px 3px -2px color-mix(in oklab, var(--fw-fill, transparent) 30%, transparent);
+    --rz-button-shadow: var(--fw-depth);
+    --rz-button-hover-shadow: var(--fw-depth);
+    --rz-button-focus-shadow: var(--fw-depth);
+    --rz-button-active-shadow: none;
+    font-weight: 600;
+    border: 1px solid transparent;
+    transition: color 0.2s, background-color 0.2s, border-color 0.2s, box-shadow 0.2s, translate 0.1s;
+}
+
+/* The height of a button is its size variable: Radzen pads every size by fixed rems, which with the border overshoots it */
+html:root .rz-button.rz-button-xs {
+    --fw-size: var(--rz-button-size-xs);
+    padding: calc((var(--fw-size) - 1rem - 2px) / 2) 0.5rem;
+}
+
+html:root .rz-button.rz-button-sm {
+    --fw-size: var(--rz-button-size-sm);
+    padding: calc((var(--fw-size) - 1.25rem - 2px) / 2) 0.625rem;
+}
+
+html:root .rz-button.rz-button-md {
+    --fw-size: var(--rz-button-size-md);
+    padding: calc((var(--fw-size) - 1.25rem - 2px) / 2) 0.75rem;
+}
+
+html:root .rz-button.rz-button-lg {
+    --fw-size: var(--rz-button-size-lg);
+    padding: calc((var(--fw-size) - 1.5rem - 2px) / 2) 1.25rem;
+}
+
+/* A button with only an icon is a square (FloxIcon children are not Radzen's icon-only) */
+html:root .rz-button.rz-button:is(.rz-button-icon-only, :has(> .rz-button-box > svg:only-child)) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    width: var(--fw-size);
+    height: var(--fw-size);
+}
+
+html:root .rz-button.rz-variant-filled {
+    border-color: color-mix(in oklab, var(--fw-fill, transparent), #000 5%);
+}
+
+html:root .rz-button:not(.rz-state-disabled):active {
+    translate: 0 0.5px;
+}
+
+html:root .rz-button:is(.rz-variant-flat, .rz-variant-outlined, .rz-variant-text) {
+    --fw-depth: none;
+}
+
+/* Flat is daisyUI's soft: a light tint of the color, the text in its dark tone; hover fills it */
+html:root .rz-button.rz-variant-flat {
+    background-color: color-mix(in oklab, var(--fw-c) 10%, var(--rz-base-background-color));
+    border-color: color-mix(in oklab, var(--fw-c) 12%, var(--rz-base-background-color));
+    color: var(--fw-ink);
+}
+
+/* Outline and ghost take the text color from the hue (Radzen leaves some of them unreadable in the dark theme) */
+html:root .rz-button.rz-button:is(.rz-variant-outlined, .rz-variant-text) {
+    color: var(--fw-c);
+}
+
+html:root .rz-button.rz-button:is(.rz-variant-flat, .rz-variant-outlined):not(.rz-state-disabled):hover {
+    background-color: var(--fw-fill);
+    background-image: none;
+    border-color: var(--fw-fill);
+    color: var(--fw-on);
+}
+
+/* Disabled: a grey plate whatever the color, as in daisyUI (the class twice outranks Radzen's variant and color rules) */
+html:root .rz-button.rz-button:is(.rz-state-disabled, :disabled) {
+    --fw-depth: none;
+    opacity: 1;
+    background-color: color-mix(in oklab, var(--rz-text-color) 8%, transparent);
+    background-image: none;
+    border-color: transparent;
+    color: color-mix(in oklab, var(--rz-text-color) 35%, transparent);
+    box-shadow: none;
+}
+
+html:root .rz-button.rz-button.rz-variant-text:is(.rz-state-disabled, :disabled) {
+    background-color: transparent;
+}
+
+/* Fieldset (daisyUI): a plate a shade off the page (the fields on it are lighter), the legend a semibold caption inside on top
+   with its commands beside it; a float takes the legend out of the border line */
+html:root .rz-fieldset {
+    background-color: var(--fw-fieldset-background, color-mix(in oklab, var(--rz-text-color) 4%, var(--rz-body-background-color)));
+}
+
+html:root .rz-fieldset:not(:has(> .rz-fieldset-legend)) {
+    padding-block-start: var(--fw-fieldset-bare-padding-block-start, calc(var(--spacing) * 2));
+}
+
+html:root .rz-fieldset-legend {
+    float: inline-start;
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0;
+    padding: var(--fw-fieldset-legend-padding-block-start, calc(var(--spacing) * 3)) calc(var(--spacing) * 4) var(--fw-fieldset-legend-padding-block-end, 0);
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    white-space: normal !important;
+}
+
+/* Fieldsets one after another in plain flow keep apart; a flex or grid parent spaces them with its own gap */
+html:root :not(.rz-stack, .flex, .inline-flex, .grid) > .rz-fieldset + .rz-fieldset {
+    margin-block-start: var(--gap-md);
+}
+
+html:root .rz-fieldset-legend + .rz-fieldset-content-wrapper {
+    clear: both;
+}
+
+/* Form fields (Variant.Text everywhere): daisyUI's label above the field, a framed field, the hint below.
+   Radzen's Text variant is an underlined field with a floating label: the frame comes back, the underline goes,
+   the label stays in its floated place (the variables in site.css), quiet text-sm in the regular weight */
+html:root .rz-form-field.rz-variant-text .rz-form-field-content {
+    --rz-input-background-color: inherit;
+    --rz-input-hover-background-color: inherit;
+    --rz-input-focus-background-color: inherit;
+    --rz-input-border-radius: inherit;
+    --rz-input-padding-block: inherit;
+    --rz-input-padding-inline: inherit;
+    --rz-numeric-input-padding-block: inherit;
+    --rz-numeric-input-padding-inline: inherit;
+    --rz-text-area-padding-block: inherit;
+    --rz-text-area-padding-inline: inherit;
+    --rz-form-field-label-padding: 0;
+    border: var(--rz-input-border);
+    box-shadow: var(--rz-input-shadow);
+}
+
+html:root .rz-form-field.rz-variant-text .rz-form-field-content::before,
+html:root .rz-form-field.rz-variant-text .rz-form-field-content::after {
+    display: none;
+}
+
+html:root .rz-form-field.rz-variant-text .rz-form-field-start {
+    padding-inline-start: var(--rz-input-padding-inline);
+}
+
+html:root .rz-form-field.rz-variant-text .rz-form-field-end {
+    padding-inline-end: var(--rz-input-padding-inline);
+}
+
+html:root .rz-form-field.rz-variant-text.rz-state-focused:not(.rz-state-disabled) .rz-form-field-content {
+    border: var(--rz-input-focus-border);
+    box-shadow: var(--rz-input-focus-shadow);
+}
+
+html:root .rz-form-field.rz-variant-text.rz-state-disabled .rz-form-field-content {
+    border: var(--rz-input-disabled-border);
+}
+
+html:root .rz-form-field.rz-variant-text .rz-form-field-content:has(.invalid) {
+    border-color: var(--rz-danger);
+}
+
+html:root .rz-form-field.rz-variant-text .rz-form-field-label,
+.fw-label {
+    inset-inline-start: 0;
+    inset-block-start: var(--rz-form-field-label-floating-top);
+    max-width: 100%;
+    padding: 0;
+    transform: none;
+    transition: none;
+    font-size: var(--text-sm);
+    line-height: 1.25rem;
+    font-weight: 400;
+}
+
+/* Radzen paints a filled field's label with !important rules of up to seven classes: an id-weight :not() outranks them */
+html:root .rz-form-field.rz-variant-text .rz-form-field-label:not(#_),
+.fw-label {
+    color: color-mix(in oklab, var(--rz-text-color) 70%, transparent) !important;
+    background-color: transparent !important;
+}
+
+html:root .rz-form-field.rz-variant-text .invalid ~ .rz-form-field-label:not(#_) {
+    color: var(--rz-danger) !important;
+}
+
+/* The same label and hint for a control outside a form field (a slider, a list of radio buttons) */
+.fw-label {
+    display: block;
+    margin-block-end: var(--fw-field-label-gap);
+}
+
+html:root .rz-form-field.rz-variant-text .rz-form-field-helper,
+html:root .rz-form-field-helper,
+.fw-hint {
+    padding: var(--rz-form-field-helper-padding);
+    font-size: var(--text-xs);
+    line-height: 1rem;
+    color: color-mix(in oklab, var(--rz-text-color) 60%, transparent);
+}
+
+/* Alerts: a hairline border, the box radius; Flat is soft (tint and dark text), not a solid bar */
+html:root .rz-alert {
+    --rz-alert-border-radius: var(--radius-box);
+    --rz-alert-box-shadow: none;
+    border: 1px solid transparent;
+}
+
+html:root .rz-alert-md {
+    --rz-alert-gap: 0.75rem;
+    --rz-alert-padding: 0.625rem 1rem;
+    --rz-alert-message-margin: 0;
+    --rz-alert-icon-margin: 0;
+}
+
+html:root .rz-alert-sm {
+    --rz-alert-gap: 0.5rem;
+    --rz-alert-padding: 0.375rem 0.75rem;
+    --rz-alert-message-margin: 0;
+    --rz-alert-icon-margin: 0;
+}
+
+html:root .rz-alert.rz-variant-flat {
+    --rz-alert-background-color: color-mix(in oklab, var(--fw-c) 8%, var(--rz-base-background-color));
+    --rz-alert-color: var(--fw-ink);
+    --rz-alert-title-color: var(--fw-ink);
+    --rz-alert-icon-color: var(--fw-ink);
+    border-color: color-mix(in oklab, var(--fw-c) 18%, var(--rz-base-background-color));
+}
+
+/* Badges and chips: Flat is soft */
+html:root :is(.rz-badge, .rz-chip).rz-variant-flat {
+    background-color: color-mix(in oklab, var(--fw-c) 10%, var(--rz-base-background-color));
+    color: var(--fw-ink);
+}
+
+/* The toggle of daisyUI: an outlined track with a square-ish knob; checked fills the track with the accent */
+html:root .rz-switch {
+    width: 2.25rem;
+    min-width: 2.25rem;
+    height: 1.25rem;
+    border-radius: var(--radius-selector);
+}
+
+html:root .rz-switch .rz-switch-circle {
+    border-radius: var(--radius-selector);
+    background: transparent;
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--rz-text-color) 22%, transparent) inset;
+}
+
+html:root .rz-switch .rz-switch-circle:before {
+    width: 0.875rem;
+    height: 0.875rem;
+    inset-inline-start: 0.1875rem;
+    margin-block-start: -0.4375rem;
+    border-radius: calc(var(--radius-selector) - 0.1875rem);
+    background: color-mix(in oklab, var(--rz-text-color) 35%, transparent);
+    box-shadow: none;
+}
+
+html:root .rz-switch.rz-switch-checked .rz-switch-circle {
+    background: var(--rz-primary);
+    box-shadow: 0 0 0 1px var(--rz-primary) inset;
+}
+
+html:root .rz-switch.rz-switch-checked .rz-switch-circle:before {
+    background: var(--rz-on-primary);
+    transform: translateX(1rem);
+}
+
+/* The side menu: icons (FloxIcon, not Radzen's icon element) quieter than the text, the active item semibold */
+html:root .rz-panel-menu .rz-navigation-item-link > svg {
+    color: var(--rz-panel-menu-icon-color);
+}
+
+html:root .rz-panel-menu .rz-navigation-item-wrapper-active .rz-navigation-item-link {
+    font-weight: 600;
+}
+
+html:root .rz-panel-menu .rz-navigation-item-wrapper-active .rz-navigation-item-link > svg {
+    color: inherit;
+}
+
+/* The commands of the app bar are quieter than the title */
+html:root .rz-header .rz-button.rz-button.rz-variant-text.rz-base:not(:hover) {
+    color: var(--rz-panel-menu-icon-color);
+}
+
+/* Tabs as daisyUI's tabs-border: no plates, the selected tab is underlined */
+html:root .rz-tabview-nav {
+    border-block-end: 1px solid var(--rz-border-color);
+}
+
+html:root .rz-tabview-nav li.rz-tabview-selected {
+    box-shadow: 0 -2px 0 var(--rz-primary) inset;
+}
+
+/* Breadcrumbs (daisyUI): a thin chevron at 40% between the crumbs */
+html:root .rz-breadcrumb-item + .rz-breadcrumb-item::before {
+    content: "" / "";
+    box-sizing: content-box;
+    width: 0.375rem;
+    height: 0.375rem;
+    padding: 0;
+    margin-inline: 0.5rem 0.75rem;
+    border-block-start: 1px solid currentColor;
+    border-inline-end: 1px solid currentColor;
+    opacity: 0.4;
+    rotate: 45deg;
+}
+
+html:root [dir="rtl"] .rz-breadcrumb-item + .rz-breadcrumb-item::before {
+    rotate: -45deg;
+}
+
+/* A form field is as wide as its content needs up to a readable line; a search box takes the whole width (--fw-field-max-width: none) */
+html:root .rz-form-field.rz-variant-text {
+    max-width: var(--fw-field-max-width, 40rem);
+}

@@ -1,0 +1,32 @@
+{% fhir_include "Device:patient" %}
+{% fhir_include "Device:owner" %}
+{% fhir_include "Device:location" %}
+
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% assign dn = self.deviceName | as_list | first %}{% if dn %}{{ dn.name }}{% else %}{% apply self.type mode: "text" %}{% endif %}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.type %}
+    <span>{% apply self.type mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.manufacturer or self.modelNumber or self.serialNumber or self.lotNumber or self.expirationDate or self.patient or self.owner or self.location %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Manufacturer", node: self.manufacturer, mode: "text" %}
+  {% render "field", label: "Model", node: self.modelNumber, mode: "text" %}
+  {% render "field", label: "Serial number", node: self.serialNumber, mode: "text" %}
+  {% render "field", label: "Lot", node: self.lotNumber, mode: "text" %}
+  {% render "field", label: "Expires", node: self.expirationDate, mode: "text" %}
+  {% render "field", label: "Patient", node: self.patient %}
+  {% render "field", label: "Owner", node: self.owner %}
+  {% render "field", label: "Location", node: self.location %}
+</section>
+{%- endif %}

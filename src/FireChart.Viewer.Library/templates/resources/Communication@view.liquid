@@ -1,0 +1,55 @@
+{% fhir_include "Communication:subject" %}
+{% fhir_include "Communication:sender" %}
+{% fhir_include "Communication:recipient" %}
+{% fhir_include "Communication:encounter" %}
+
+{%- assign payloads = self.payload | as_list -%}{%- assign notes = self.note | as_list -%}
+{%- assign patient = self.subject | resolve -%}
+{%- assign encounter = self.encounter | resolve -%}
+{%- render "view-header", patient: patient, subject: self.subject, encounter: encounter, visit: self.encounter, own: "Communication" %}
+
+<div class="fx-title">
+  <h2 class="fx-title-text">{% assign cat = self.category | as_list | first %}{% if self.topic %}{% apply self.topic mode: "text" %}{% elsif cat %}{% apply cat mode: "text" %}{% else %}{{ "Communication" | t }}{% endif %}</h2>
+
+  <div class="fx-banner-facts">
+    {%- if self.sent %}
+    <span>{{ "Sent" | t }} {% apply self.sent mode: "text" -%}</span>
+    {%- endif %}
+    {%- if self.received %}
+    <span>{{ "Received" | t }} {% apply self.received mode: "text" -%}</span>
+    {%- endif %}
+  </div>
+
+  <div class="fx-banner-flags">
+    {%- render "status-badge", code: self.status -%}
+  </div>
+</div>
+
+{%- if self.sender or self.recipient or self.category or self.medium or self.reasonCode %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Details" | t }}</h3>
+  {% render "field", label: "Sender", node: self.sender %}
+  {% render "field", label: "Recipient", node: self.recipient %}
+  {% render "field", label: "Category", node: self.category, mode: "text" %}
+  {% render "field", label: "Medium", node: self.medium, mode: "text" %}
+  {% render "field", label: "Reason", node: self.reasonCode, mode: "text" %}
+</section>
+{%- endif %}
+
+{%- if payloads.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Message" | t }}</h3>
+  {%- for p in payloads %}
+  <div class="fx-row"><span class="fx-row-main">{{ p.contentString }}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}
+
+{%- if notes.size > 0 %}
+<section class="fx-section">
+  <h3 class="fx-section-title">{{ "Notes" | t }}</h3>
+  {%- for n in notes %}
+  <div class="fx-row"><span class="fx-row-main">{% apply n mode: "text" -%}</span></div>
+  {%- endfor %}
+</section>
+{%- endif %}

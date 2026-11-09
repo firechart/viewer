@@ -1,0 +1,16 @@
+/* The pager of a list: squares of a button's size, the size of a fingertip on a touch screen. The stock rule is a single class, so this wins */
+.data-list ::deep .rz-pager-element {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    min-width: var(--rz-button-size-md);
+    min-height: var(--rz-button-size-md);
+}
+
+@media (pointer: coarse) {
+    .data-list ::deep .rz-pager-element {
+        min-width: 2.5rem;
+        min-height: 2.5rem;
+    }
+}

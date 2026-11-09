@@ -1,0 +1,11 @@
+{% fhir_include "Claim:patient" %}
+{% fhir_include "Claim:provider" %}
+{%- capture t0 -%}{% apply self.type mode: "text" %}{%- endcapture -%}
+{%- capture t1 -%}{% if self.use %}{{ "Claim ({{use}})" | t: use: self.use }}{% endif %}{%- endcapture -%}
+{%- assign title = t0 | default: t1 | default: self.id -%}
+{%- capture s0 -%}{% if self.created %}{{ self.created | fhir_date }}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% apply self.provider mode: "text" %}{%- endcapture -%}
+{%- capture subtitle -%}{% render "parts", p1: s0, p2: s1 %}{%- endcapture -%}
+{%- capture trailing -%}{% if self.total %}<span class="fx-tile-value">{% apply self.total mode: "text" %}</span>{% endif %}{%- endcapture -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% render "tile-row", title: title, subtitle: subtitle, trailing: trailing, status: status, patient: self.patient, encounter: nil, at: self.created %}

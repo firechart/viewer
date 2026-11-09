@@ -1,0 +1,10 @@
+{% fhir_include "EpisodeOfCare:patient" %}
+{% fhir_include "EpisodeOfCare:organization" %}
+{%- assign kind = self.type | as_list | first -%}
+{%- capture t0 -%}{% if kind %}{% apply kind mode: "text" %}{% endif %}{%- endcapture -%}
+{%- assign title = t0 | default: self.id -%}
+{%- capture s0 -%}{% if self.period %}{% apply self.period mode: "text" %}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% apply self.managingOrganization mode: "text" %}{%- endcapture -%}
+{%- capture subtitle -%}{% render "parts", p1: s0, p2: s1 %}{%- endcapture -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% render "tile-row", title: title, subtitle: subtitle, status: status, patient: self.patient, encounter: nil, at: self.period %}

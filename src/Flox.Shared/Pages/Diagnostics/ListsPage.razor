@@ -1,0 +1,73 @@
+@attribute [Route("/diagnostics/lists")]
+
+@inherits StatelessWidget
+
+<ListPage Title="Lists" Layout=@Layout Breadcrumbs=@Breadcrumbs OnRefresh=@(() => _list!.RefreshAsync())>
+    <MenuItems>
+        <RadzenMenuItem Text="Fail the next load" Click=@(() => _state.FailNext = true)/>
+        <RadzenMenuItem Text=@(_state.Empty ? "Show the rows" : "Show an empty list") Click=@(() => _state.Empty = !_state.Empty)/>
+        <RadzenMenuItem Text=@(_state.Slow ? "Fast loads" : "Slow loads (2 s)") Click=@(() => _state.Slow = !_state.Slow)/>
+        <RadzenMenuItem Text=@(_virtual ? "Paged list (95 rows)" : "Virtual list (5000 rows)") Click=@ToggleVirtualAsync/>
+        <RadzenMenuItem Text=@(_content ? "The list scrolls" : "The page scrolls (a list higher than the screen)") Click=@(() => _content = !_content)/>
+    </MenuItems>
+    <ChildContent>
+        <DataList @ref=@_list TItem="DemoRow" State=@_state Layout=@Layout Mode=@(_virtual ? ListMode.Virtual : ListMode.Paged) Selectable OnRowClick=@OnRowClickAsync FilterCount=@_filterCount OnFilter=@(() => _filterCount = (_filterCount + 1) % 4)>
+            <ItemTemplate Context="row">
+                <ListTile Row=@row TitleText=@row.Item.Name SubtitleText=@row.Item.Detail TrailingText=@row.Item.Number.ToString() Icon="description"/>
+            </ItemTemplate>
+            <RowMenu Context="menu">
+                <RadzenMenuItem Text="Open" Icon="open_in_new" Click=@(() => OpenAsync(menu.Row))/>
+                <RadzenMenuItem Text=@($"Delete ({menu.Targets.Count})") Icon="delete" Click=@(() => _state.Delete(menu.Targets))/>
+            </RowMenu>
+            <SelectionActions Context="selected">
+                <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Click=@(() => _state.Delete([.. selected]))/>
+            </SelectionActions>
+        </DataList>
+    </ChildContent>
+</ListPage>
+
+@code {
+    private readonly DemoListState _state = new DemoListState();
+    private int _filterCount;
+    private bool _virtual;
+    private bool _content;
+    private DataList<DemoRow>? _list;
+
+    private ListLayout Layout => _content ? ListLayout.Content : ListLayout.Fill;
+
+    private async Task ToggleVirtualAsync()
+    {
+        _virtual = !_virtual;
+        _state.Big = _virtual;
+        _state.SetSearchText(null);
+        if (!_virtual)
+        {
+            await _state.RefreshAsync();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await _state.RefreshAsync();
+    }
+
+    protected override void InitBreadcrumbs()
+    {
+        Breadcrumbs.Add("Diagnostics", href: "/diagnostics");
+        Breadcrumbs.Add("Lists", href: "/diagnostics/lists");
+    }
+
+    private Task OnRowClickAsync(DemoRow row)
+    {
+        this.ShowSnack($"Opened {row.Name}");
+        return Task.CompletedTask;
+    }
+
+    private Task OpenAsync(DemoRow row)
+    {
+        this.ShowSnack($"Opened {row.Name}");
+        return Task.CompletedTask;
+    }
+
+}
