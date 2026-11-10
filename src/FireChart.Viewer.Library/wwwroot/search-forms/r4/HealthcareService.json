@@ -1,0 +1,705 @@
+{
+  "formatVersion": 1,
+  "name": "generated",
+  "authoredForVersion": "4.0.1",
+  "isGenerated": true,
+  "title": {
+    "en-US": "Filter"
+  },
+  "description": {},
+  "groups": [],
+  "fields": [
+    {
+      "queryName": "identifier",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Identifier"
+      },
+      "hint": {
+        "en-US": "External identifiers for this item"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 1,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/HealthcareService-identifier",
+        "expression": "HealthcareService.identifier",
+        "base": [
+          "HealthcareService"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "specialty",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Specialty"
+      },
+      "hint": {
+        "en-US": "The specialty of the service provided by this healthcare service"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 2,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/c80-practice-codes",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/HealthcareService-specialty",
+        "expression": "HealthcareService.specialty",
+        "base": [
+          "HealthcareService"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "endpoint",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Endpoint"
+      },
+      "hint": {
+        "en-US": "Technical endpoints providing access to electronic services operated for the healthcare service"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 3,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Endpoint"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/HealthcareService-endpoint",
+        "expression": "HealthcareService.endpoint",
+        "base": [
+          "HealthcareService"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "service-category",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Service category"
+      },
+      "hint": {
+        "en-US": "Service Category of the Healthcare Service"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 4,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/service-category",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/HealthcareService-service-category",
+        "expression": "HealthcareService.category",
+        "base": [
+          "HealthcareService"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "coverage-area",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Coverage area"
+      },
+      "hint": {
+        "en-US": "Location(s) service is intended for/available to"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 5,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Location"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/HealthcareService-coverage-area",
+        "expression": "HealthcareService.coverageArea",
+        "base": [
+          "HealthcareService"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "service-type",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Service type"
+      },
+      "hint": {
+        "en-US": "The type of service provided by this healthcare service"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 6,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/service-type",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/HealthcareService-service-type",
+        "expression": "HealthcareService.type",
+        "base": [
+          "HealthcareService"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "organization",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Organization"
+      },
+      "hint": {
+        "en-US": "The organization that provides this Healthcare Service"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 7,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Organization"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/HealthcareService-organization",
+        "expression": "HealthcareService.providedBy",
+        "base": [
+          "HealthcareService"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "name",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Name"
+      },
+      "hint": {
+        "en-US": "A portion of the Healthcare service name"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 8,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/HealthcareService-name",
+        "expression": "HealthcareService.name",
+        "base": [
+          "HealthcareService"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "active",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Active"
+      },
+      "hint": {
+        "en-US": "The Healthcare Service is currently marked as active"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "boolean",
+      "order": 9,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/HealthcareService-active",
+        "expression": "HealthcareService.active",
+        "base": [
+          "HealthcareService"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "location",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Location"
+      },
+      "hint": {
+        "en-US": "The location of the Healthcare Service"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 10,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Location"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/HealthcareService-location",
+        "expression": "HealthcareService.location",
+        "base": [
+          "HealthcareService"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "program",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Program"
+      },
+      "hint": {
+        "en-US": "One of the Programs supported by this HealthcareService"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 11,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/program",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/HealthcareService-program",
+        "expression": "HealthcareService.program",
+        "base": [
+          "HealthcareService"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "characteristic",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Characteristic"
+      },
+      "hint": {
+        "en-US": "One of the HealthcareService\u0027s characteristics"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 12,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/HealthcareService-characteristic",
+        "expression": "HealthcareService.characteristic",
+        "base": [
+          "HealthcareService"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_content",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Content"
+      },
+      "hint": {
+        "en-US": "Search on the entire content of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 13,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-content",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_id",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Id"
+      },
+      "hint": {
+        "en-US": "Search by resource identifier - e.g. same as the read interaction, but can return included resources"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 14,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/example",
+        "expression": "id",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_lastUpdated",
+      "origin": "package",
+      "parameterType": "date",
+      "included": false,
+      "label": {
+        "en-US": "Last updated"
+      },
+      "hint": {
+        "en-US": "When the resource version last changed"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 15,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-lastUpdated",
+        "expression": "Resource.meta.lastUpdated",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_profile",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Profile"
+      },
+      "hint": {
+        "en-US": "Profiles this resource claims to conform to"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 16,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-profile",
+        "expression": "Resource.meta.profile",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_query",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Query"
+      },
+      "hint": {
+        "en-US": "A custom search profile that describes a specific defined query operation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 17,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-query",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_security",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Security"
+      },
+      "hint": {
+        "en-US": "Security Labels applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 18,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-security",
+        "expression": "Resource.meta.security",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_source",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Source"
+      },
+      "hint": {
+        "en-US": "Identifies where the resource comes from"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 19,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-source",
+        "expression": "Resource.meta.source",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_tag",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Tag"
+      },
+      "hint": {
+        "en-US": "Tags applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 20,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-tag",
+        "expression": "Resource.meta.tag",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_text",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Text"
+      },
+      "hint": {
+        "en-US": "Search on the narrative of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 21,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DomainResource-text",
+        "base": [
+          "DomainResource"
+        ]
+      },
+      "notInPackage": false
+    }
+  ]
+}

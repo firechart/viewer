@@ -1,0 +1,12 @@
+{% fhir_include "Goal:subject" %}
+{%- assign tgt = self.target | as_list | first -%}
+{%- capture t0 -%}{% apply self.description mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 | default: self.id -%}
+{%- capture s0 -%}{% if self.start %}{% apply self.start mode: "text" %}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% if tgt and tgt.due %}{{ "due" | t }} {% apply tgt.due mode: "text" %}{% endif %}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", p1: s0, p2: s1 %}{%- endslot -%}
+{%- slot "trailing" -%}{% render "concept-badge", concept: self.achievementStatus %}{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.lifecycleStatus %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}
+{% slot_data patient: self.subject, at: self.start %}

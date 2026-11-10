@@ -6,13 +6,12 @@ using Microsoft.Extensions.Logging;
 namespace Flox.Shared.Services;
 
 [FloxService(typeof(IRecentVisitService))]
-public sealed class RecentVisitService(IAuthenticationService authentication, NavigationManager navigation, IServiceProvider serviceProvider, ILogger<RecentVisitService> logger) : IRecentVisitService
+public sealed class RecentVisitService(NavigationManager navigation, IServiceProvider serviceProvider, ILogger<RecentVisitService> logger) : IRecentVisitService
 {
     public const string PAGE_TYPE = "Page";
 
-    private static readonly TimeSpan s_keepFor = TimeSpan.FromDays(30);
-
-    private bool _pruned;
+    // A queue: the visits beyond it, the oldest, are deleted by the next visit
+    public const int Capacity = 200;
 
     // The path without the query: a list with other filters is the same page
     public static string PathOf(string url)
@@ -21,10 +20,10 @@ public sealed class RecentVisitService(IAuthenticationService authentication, Na
         return end >= 0 ? url[..end] : url;
     }
 
-    // One row for a user and a page, whatever device or tab visits it
-    private static Guid KeyOf(string userId, string path)
+    // One row for a page, whatever tab visits it
+    private static Guid KeyOf(string path)
     {
-        var hash = SHA256.HashData(Encoding.UTF8.GetBytes($"{userId}|{PAGE_TYPE}|{path}"));
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes($"{PAGE_TYPE}|{path}"));
         return new Guid(hash.AsSpan(0, 16));
     }
 
@@ -32,15 +31,14 @@ public sealed class RecentVisitService(IAuthenticationService authentication, Na
     {
         try
         {
-            var user = await authentication.GetCurrentUserAsync();
-            if (!user.IsAuthenticated() || string.IsNullOrWhiteSpace(displayName))
+            if (string.IsNullOrWhiteSpace(displayName))
             {
                 return;
             }
 
             var url = "/" + navigation.ToBaseRelativePath(navigation.Uri);
             var path = PathOf(url);
-            var key = KeyOf(user.GetUserId(), path);
+            var key = KeyOf(path);
 
             // A data source of every call: two visits in a row must not share one
             var recent = serviceProvider.GetRequiredService<IGuidDataSource<UserRecent>>();
@@ -56,15 +54,13 @@ public sealed class RecentVisitService(IAuthenticationService authentication, Na
                 row = new UserRecent { Uid = key, Type = PAGE_TYPE, EntityId = path };
                 Fill(row);
                 await recent.InsertAsync(row, refresh: false, cancellationToken: cancellationToken);
+                await TrimAsync(cancellationToken);
             }
             else
             {
                 Fill(row);
                 await recent.UpdateAsync(key, row, cancellationToken);
             }
-
-            // After the visit: a slow clean-up must not cost it
-            await PruneOnceAsync(recent, cancellationToken);
 
             void Fill(UserRecent value)
             {
@@ -83,12 +79,6 @@ public sealed class RecentVisitService(IAuthenticationService authentication, Na
 
     public async Task<IReadOnlyList<UserRecent>> GetRecentAsync(int count, CancellationToken cancellationToken = default)
     {
-        var user = await authentication.GetCurrentUserAsync();
-        if (!user.IsAuthenticated())
-        {
-            return [];
-        }
-
         var list = serviceProvider.GetRequiredService<IGuidDataSource<UserRecent>>();
         list.SetPageSize(count)
             .SetCount(false)
@@ -97,23 +87,23 @@ public sealed class RecentVisitService(IAuthenticationService authentication, Na
         return list.Items;
     }
 
-    // Once per session, not per visit
-    private async Task PruneOnceAsync(IGuidDataSource<UserRecent> recent, CancellationToken cancellationToken)
+    // Only a new row can overflow the queue: an update moves a row to its head
+    private async Task TrimAsync(CancellationToken cancellationToken)
     {
-        if (_pruned)
+        var storage = serviceProvider.GetRequiredService<IGuidEntityStorage<UserRecent>>();
+        if (await storage.CountAsync(cancellationToken: cancellationToken) <= Capacity)
         {
             return;
         }
 
-        _pruned = true;
-        var before = DateTimeOffset.UtcNow - s_keepFor;
-        try
+        var request = new PagedRequest<UserRecent>
         {
-            await recent.DeleteManyAsync(row => row.VisitedAt < before, refresh: false, cancellationToken: cancellationToken);
-        }
-        catch (BatchLimitExceededException)
-        {
-            // too many old rows at once: the next sessions take their turn
-        }
+            Skip = Capacity,
+            PageSize = 0,
+            ReturnTotal = false
+        };
+        request.Sorts.SetValue(nameof(UserRecent.VisitedAt), ascending: false);
+        var oldest = (await storage.FindAsync(request, cancellationToken)).Items.Select(row => row.Uid).ToHashSet();
+        await storage.DeleteManyAsync(row => oldest.Contains(row.Uid), cancellationToken: cancellationToken);
     }
 }

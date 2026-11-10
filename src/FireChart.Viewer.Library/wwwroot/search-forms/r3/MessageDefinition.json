@@ -1,0 +1,663 @@
+{
+  "formatVersion": 1,
+  "name": "generated",
+  "authoredForVersion": "3.0.2",
+  "isGenerated": true,
+  "title": {
+    "en-US": "Filter"
+  },
+  "description": {},
+  "groups": [],
+  "fields": [
+    {
+      "queryName": "date",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Date"
+      },
+      "hint": {
+        "en-US": "The message definition publication date"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 1,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-date",
+        "expression": "MessageDefinition.date",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "identifier",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Identifier"
+      },
+      "hint": {
+        "en-US": "External identifier for the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 2,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-identifier",
+        "expression": "MessageDefinition.identifier",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "jurisdiction",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Jurisdiction"
+      },
+      "hint": {
+        "en-US": "Intended jurisdiction for the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 3,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-jurisdiction",
+        "expression": "MessageDefinition.jurisdiction",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "description",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Description"
+      },
+      "hint": {
+        "en-US": "The description of the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 4,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-description",
+        "expression": "MessageDefinition.description",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "focus",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Focus"
+      },
+      "hint": {
+        "en-US": "A resource that is a permitted focus of the message"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 5,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-focus",
+        "expression": "MessageDefinition.focus.code",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "title",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Title"
+      },
+      "hint": {
+        "en-US": "The human-friendly name of the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 6,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-title",
+        "expression": "MessageDefinition.title",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "version",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Version"
+      },
+      "hint": {
+        "en-US": "The business version of the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 7,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-version",
+        "expression": "MessageDefinition.version",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "url",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": true,
+      "label": {
+        "en-US": "Url"
+      },
+      "hint": {
+        "en-US": "The uri that identifies the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 8,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-url",
+        "expression": "MessageDefinition.url",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "name",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Name"
+      },
+      "hint": {
+        "en-US": "Computationally friendly name of the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 9,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-name",
+        "expression": "MessageDefinition.name",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "publisher",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Publisher"
+      },
+      "hint": {
+        "en-US": "Name of the publisher of the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 10,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-publisher",
+        "expression": "MessageDefinition.publisher",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "event",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Event"
+      },
+      "hint": {
+        "en-US": "The event that triggers the message"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 11,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-event",
+        "expression": "MessageDefinition.event",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "category",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Category"
+      },
+      "hint": {
+        "en-US": "The behavior associated with the message"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 12,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-category",
+        "expression": "MessageDefinition.category",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "status",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Status"
+      },
+      "hint": {
+        "en-US": "The current status of the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 13,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-status",
+        "expression": "MessageDefinition.status",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_content",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Content"
+      },
+      "hint": {
+        "en-US": "Search on the entire content of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 14,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-content",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_id",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Id"
+      },
+      "hint": {
+        "en-US": "Search by resource identifier - e.g. same as the read interaction, but can return included resources"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 15,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/example",
+        "expression": "id",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_lastUpdated",
+      "origin": "package",
+      "parameterType": "date",
+      "included": false,
+      "label": {
+        "en-US": "Last updated"
+      },
+      "hint": {
+        "en-US": "When the resource version last changed"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 16,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-lastUpdated",
+        "expression": "Resource.meta.lastUpdated",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_profile",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Profile"
+      },
+      "hint": {
+        "en-US": "Profiles this resource claims to conform to"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 17,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-profile",
+        "expression": "Resource.meta.profile",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_query",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Query"
+      },
+      "hint": {
+        "en-US": "A custom search profile that describes a specific defined query operation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 18,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-query",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_security",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Security"
+      },
+      "hint": {
+        "en-US": "Security Labels applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 19,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-security",
+        "expression": "Resource.meta.security",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_tag",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Tag"
+      },
+      "hint": {
+        "en-US": "Tags applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 20,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-tag",
+        "expression": "Resource.meta.tag",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_text",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Text"
+      },
+      "hint": {
+        "en-US": "Search on the narrative of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 21,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DomainResource-text",
+        "base": [
+          "DomainResource"
+        ]
+      },
+      "notInPackage": false
+    }
+  ]
+}

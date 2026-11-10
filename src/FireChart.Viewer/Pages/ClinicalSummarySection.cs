@@ -58,6 +58,16 @@ public sealed class SectionSearch(ClinicalSummaryFormSearch definition, string c
         parts.Add($"_count={PageSize}");
         return string.Join('&', parts);
     }
+
+    /// <summary>The search of the history of one measure of the patient: its code, newest first.</summary>
+    /// <param name="patientId">The id of the patient.</param>
+    /// <param name="code">The token of the code (<c>system|code</c>).</param>
+    /// <param name="count">How many records.</param>
+    /// <returns>The query string.</returns>
+    public string HistoryQuery(string patientId, string code, int count)
+    {
+        return $"{definition.PatientParam}={Uri.EscapeDataString(patientId)}&code={Uri.EscapeDataString(code)}&_sort=-date&_count={count.ToString(CultureInfo.InvariantCulture)}";
+    }
 }
 
 /// <summary>One block of the page: the records of its searches together, newest first, loaded page by page.</summary>
@@ -69,12 +79,17 @@ public sealed class ClinicalSummarySection
     /// <param name="definition">The block of the form.</param>
     /// <param name="searches">Its searches the server can do.</param>
     /// <param name="culture">The culture of the titles.</param>
-    public ClinicalSummarySection(ClinicalSummaryFormSection definition, IEnumerable<ClinicalSummaryFormSearch> searches, string culture)
+    /// <param name="tileOptions">The options of its rows; the defaults when <see langword="null"/>.</param>
+    public ClinicalSummarySection(ClinicalSummaryFormSection definition, IEnumerable<ClinicalSummaryFormSearch> searches, string culture, TileOptions? tileOptions = null)
     {
         Code = definition.Code;
         CollapsedByDefault = definition.CollapsedByDefault;
         Collapsed = definition.CollapsedByDefault;
         HideIfUnsupported = definition.HideIfUnsupported;
+        Format = definition.Format;
+        HideIfEmpty = definition.HideIfEmpty;
+        Component = SummaryComponents.IsKnown(definition.Component) ? definition.Component : SummaryComponents.Tiles;
+        TileOptions = tileOptions ?? FireChart.Viewer.Core.TileOptions.Default;
         Searches = [.. searches.Select(search => new SectionSearch(search, culture))];
         var title = definition.Title.Resolve(culture);
         Title = string.IsNullOrWhiteSpace(title) ? (Searches.Count > 0 ? Searches[0].ResourceType : Code) : title;
@@ -97,6 +112,39 @@ public sealed class ClinicalSummarySection
 
     /// <summary>A search of a type the server does not have is left out instead of failing.</summary>
     public bool HideIfUnsupported { get; }
+
+    /// <summary>How the values of the rows are shown; <see langword="null"/> as the records have them.</summary>
+    public ValueFormat? Format { get; }
+
+    /// <summary>The block is dropped, header and all, when it found no record.</summary>
+    public bool HideIfEmpty { get; }
+
+    /// <summary>The component that shows the records (<see cref="SummaryComponents"/>); an unknown one of the form is shown as tiles.</summary>
+    public string Component { get; }
+
+    /// <summary>The measures of a block of the component <c>observation-trends</c> (<see cref="ObservationTrends"/>); empty for another component.</summary>
+    public IReadOnlyList<TrendGroup> Trends { get; set; } = [];
+
+    /// <summary>The key of the measure whose chart is shown.</summary>
+    public string? SelectedTrend { get; set; }
+
+    /// <summary>The history of a measure (its records found by its code) by the key of the measure.</summary>
+    public Dictionary<string, IReadOnlyList<ResourceSummary>> TrendHistory { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>The history of the chosen measure is being loaded.</summary>
+    public bool TrendLoading { get; set; }
+
+    /// <summary>The groups of a block of the component <c>lab-results</c> (<see cref="LabResults"/>); empty for another component.</summary>
+    public IReadOnlyList<LabGroup> LabGroups { get; set; } = [];
+
+    /// <summary>The cells of the rows of the table of <c>lab-results</c> by the key of the record (<see cref="KeyOf"/>).</summary>
+    public Dictionary<string, IReadOnlyDictionary<string, string>> Cells { get; } = [];
+
+    /// <summary>The options of the rows of the block: its own, else the ones of the form.</summary>
+    public TileOptions TileOptions { get; }
+
+    /// <summary>The id of the block on the page: the menu brings it to the top, and a later page of its own may take it as its address.</summary>
+    public string ElementId => "fx-section-" + Code;
 
     /// <summary>The searches of the block.</summary>
     public IReadOnlyList<SectionSearch> Searches { get; }
@@ -152,8 +200,9 @@ public sealed class ClinicalSummarySection
     /// <summary>A search or the rendering failed: the block offers a retry.</summary>
     public bool Failed { get; set; }
 
-    /// <summary>Every search was left out: nothing to show, not even a title.</summary>
-    public bool Hidden => HideIfUnsupported && Searches.Count > 0 && Searches.All(search => search.Unsupported);
+    /// <summary>Nothing to show, not even a title: every search was left out, or the block found nothing and the form hides it then.</summary>
+    public bool Hidden => (HideIfUnsupported && Searches.Count > 0 && Searches.All(search => search.Unsupported)) ||
+                          (HideIfEmpty && IsLoaded && !Failed && Items.Count == 0);
 
     /// <summary>A search has a next page.</summary>
     public bool HasMore => Searches.Any(search => search.Next is not null);
@@ -185,7 +234,7 @@ public static class ClinicalSummarySections
             var searches = definition.Searches.Where(search => !definition.HideIfUnsupported || declaredTypes is null || declaredTypes.Contains(search.ResourceType)).ToList();
             if (searches.Count > 0)
             {
-                result.Add(new ClinicalSummarySection(definition, searches, culture));
+                result.Add(new ClinicalSummarySection(definition, searches, culture, SummaryComponents.TileOptionsOf(form, definition)));
             }
         }
 

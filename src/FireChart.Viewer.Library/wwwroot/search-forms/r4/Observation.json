@@ -1,0 +1,2156 @@
+{
+  "formatVersion": 1,
+  "name": "generated",
+  "authoredForVersion": "4.0.1",
+  "isGenerated": true,
+  "title": {
+    "en-US": "Filter"
+  },
+  "description": {},
+  "groups": [],
+  "fields": [
+    {
+      "queryName": "date",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Date"
+      },
+      "hint": {
+        "en-US": "Obtained date/time. If the obtained element is a period, a date that falls in the period"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 1,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-date",
+        "expression": "AllergyIntolerance.recordedDate | CarePlan.period | CareTeam.period | ClinicalImpression.date | Composition.date | Consent.dateTime | DiagnosticReport.effective | Encounter.period | EpisodeOfCare.period | FamilyMemberHistory.date | Flag.period | Immunization.occurrence | List.date | Observation.effective | Procedure.performed | (RiskAssessment.occurrence as dateTime) | SupplyRequest.authoredOn",
+        "base": [
+          "AllergyIntolerance",
+          "CarePlan",
+          "CareTeam",
+          "ClinicalImpression",
+          "Composition",
+          "Consent",
+          "DiagnosticReport",
+          "Encounter",
+          "EpisodeOfCare",
+          "FamilyMemberHistory",
+          "Flag",
+          "Immunization",
+          "List",
+          "Observation",
+          "Procedure",
+          "RiskAssessment",
+          "SupplyRequest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "combo-data-absent-reason",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Combo data absent reason"
+      },
+      "hint": {
+        "en-US": "The reason why the expected value in the element Observation.value[x] or Observation.component.value[x] is missing"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 2,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-combo-data-absent-reason",
+        "expression": "Observation.dataAbsentReason | Observation.component.dataAbsentReason",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "code",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Code"
+      },
+      "hint": {
+        "en-US": "The code of the observation type"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 3,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/observation-codes",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-code",
+        "expression": "AllergyIntolerance.code | AllergyIntolerance.reaction.substance | Condition.code | (DeviceRequest.code as CodeableConcept) | DiagnosticReport.code | FamilyMemberHistory.condition.code | List.code | Medication.code | (MedicationAdministration.medication as CodeableConcept) | (MedicationDispense.medication as CodeableConcept) | (MedicationRequest.medication as CodeableConcept) | (MedicationStatement.medication as CodeableConcept) | Observation.code | Procedure.code | ServiceRequest.code",
+        "base": [
+          "AllergyIntolerance",
+          "Condition",
+          "DeviceRequest",
+          "DiagnosticReport",
+          "FamilyMemberHistory",
+          "List",
+          "Medication",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationRequest",
+          "MedicationStatement",
+          "Observation",
+          "Procedure",
+          "ServiceRequest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "subject",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Subject"
+      },
+      "hint": {
+        "en-US": "The subject that the observation is about"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 4,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Group",
+          "Device",
+          "Patient",
+          "Location"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-subject",
+        "expression": "Observation.subject",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "component-data-absent-reason",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Component data absent reason"
+      },
+      "hint": {
+        "en-US": "The reason why the expected value in the element Observation.component.value[x] is missing"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 5,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/data-absent-reason",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-component-data-absent-reason",
+        "expression": "Observation.component.dataAbsentReason",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "value-concept",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Value concept"
+      },
+      "hint": {
+        "en-US": "The value of the observation, if the value is a CodeableConcept"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 6,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-value-concept",
+        "expression": "(Observation.value as CodeableConcept)",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "value-date",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Value date"
+      },
+      "hint": {
+        "en-US": "The value of the observation, if the value is a date or period of time"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 7,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-value-date",
+        "expression": "(Observation.value as dateTime) | (Observation.value as Period)",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "focus",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Focus"
+      },
+      "hint": {
+        "en-US": "The focus of an observation when the focus is not the patient of record"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 8,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Account",
+          "ActivityDefinition",
+          "AdverseEvent",
+          "AllergyIntolerance",
+          "Appointment",
+          "AppointmentResponse",
+          "AuditEvent",
+          "Basic",
+          "Binary",
+          "BiologicallyDerivedProduct",
+          "BodyStructure",
+          "Bundle",
+          "CapabilityStatement",
+          "CarePlan",
+          "CareTeam",
+          "CatalogEntry",
+          "ChargeItem",
+          "ChargeItemDefinition",
+          "Claim",
+          "ClaimResponse",
+          "ClinicalImpression",
+          "CodeSystem",
+          "Communication",
+          "CommunicationRequest",
+          "CompartmentDefinition",
+          "Composition",
+          "ConceptMap",
+          "Condition",
+          "Consent",
+          "Contract",
+          "Coverage",
+          "CoverageEligibilityRequest",
+          "CoverageEligibilityResponse",
+          "DetectedIssue",
+          "Device",
+          "DeviceDefinition",
+          "DeviceMetric",
+          "DeviceRequest",
+          "DeviceUseStatement",
+          "DiagnosticReport",
+          "DocumentManifest",
+          "DocumentReference",
+          "EffectEvidenceSynthesis",
+          "Encounter",
+          "Endpoint",
+          "EnrollmentRequest",
+          "EnrollmentResponse",
+          "EpisodeOfCare",
+          "EventDefinition",
+          "Evidence",
+          "EvidenceVariable",
+          "ExampleScenario",
+          "ExplanationOfBenefit",
+          "FamilyMemberHistory",
+          "Flag",
+          "Goal",
+          "GraphDefinition",
+          "Group",
+          "GuidanceResponse",
+          "HealthcareService",
+          "ImagingStudy",
+          "Immunization",
+          "ImmunizationEvaluation",
+          "ImmunizationRecommendation",
+          "ImplementationGuide",
+          "InsurancePlan",
+          "Invoice",
+          "Library",
+          "Linkage",
+          "List",
+          "Location",
+          "Measure",
+          "MeasureReport",
+          "Media",
+          "Medication",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationKnowledge",
+          "MedicationRequest",
+          "MedicationStatement",
+          "MedicinalProduct",
+          "MedicinalProductAuthorization",
+          "MedicinalProductContraindication",
+          "MedicinalProductIndication",
+          "MedicinalProductIngredient",
+          "MedicinalProductInteraction",
+          "MedicinalProductManufactured",
+          "MedicinalProductPackaged",
+          "MedicinalProductPharmaceutical",
+          "MedicinalProductUndesirableEffect",
+          "MessageDefinition",
+          "MessageHeader",
+          "MolecularSequence",
+          "NamingSystem",
+          "NutritionOrder",
+          "Observation",
+          "ObservationDefinition",
+          "OperationDefinition",
+          "OperationOutcome",
+          "Organization",
+          "OrganizationAffiliation",
+          "Patient",
+          "PaymentNotice",
+          "PaymentReconciliation",
+          "Person",
+          "PlanDefinition",
+          "Practitioner",
+          "PractitionerRole",
+          "Procedure",
+          "Provenance",
+          "Questionnaire",
+          "QuestionnaireResponse",
+          "RelatedPerson",
+          "RequestGroup",
+          "ResearchDefinition",
+          "ResearchElementDefinition",
+          "ResearchStudy",
+          "ResearchSubject",
+          "RiskAssessment",
+          "RiskEvidenceSynthesis",
+          "Schedule",
+          "SearchParameter",
+          "ServiceRequest",
+          "Slot",
+          "Specimen",
+          "SpecimenDefinition",
+          "StructureDefinition",
+          "StructureMap",
+          "Subscription",
+          "Substance",
+          "SubstanceNucleicAcid",
+          "SubstancePolymer",
+          "SubstanceProtein",
+          "SubstanceReferenceInformation",
+          "SubstanceSourceMaterial",
+          "SubstanceSpecification",
+          "SupplyDelivery",
+          "SupplyRequest",
+          "Task",
+          "TerminologyCapabilities",
+          "TestReport",
+          "TestScript",
+          "ValueSet",
+          "VerificationResult",
+          "VisionPrescription"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-focus",
+        "expression": "Observation.focus",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "derived-from",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Derived from"
+      },
+      "hint": {
+        "en-US": "Related measurements the observation is made from"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 9,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Media",
+          "Observation",
+          "ImagingStudy",
+          "MolecularSequence",
+          "QuestionnaireResponse",
+          "DocumentReference"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-derived-from",
+        "expression": "Observation.derivedFrom",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "part-of",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Part of"
+      },
+      "hint": {
+        "en-US": "Part of referenced event"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 10,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Immunization",
+          "MedicationDispense",
+          "MedicationAdministration",
+          "Procedure",
+          "ImagingStudy",
+          "MedicationStatement"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-part-of",
+        "expression": "Observation.partOf",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "has-member",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Has member"
+      },
+      "hint": {
+        "en-US": "Related resource that belongs to the Observation group"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 11,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Observation",
+          "MolecularSequence",
+          "QuestionnaireResponse"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-has-member",
+        "expression": "Observation.hasMember",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "based-on",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Based on"
+      },
+      "hint": {
+        "en-US": "Reference to the service request"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 12,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "CarePlan",
+          "MedicationRequest",
+          "NutritionOrder",
+          "DeviceRequest",
+          "ServiceRequest",
+          "ImmunizationRecommendation"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-based-on",
+        "expression": "Observation.basedOn",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "patient",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Patient"
+      },
+      "hint": {
+        "en-US": "The subject that the observation is about (if patient)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 13,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Patient",
+          "Group"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-patient",
+        "expression": "AllergyIntolerance.patient | CarePlan.subject.where(resolve() is Patient) | CareTeam.subject.where(resolve() is Patient) | ClinicalImpression.subject.where(resolve() is Patient) | Composition.subject.where(resolve() is Patient) | Condition.subject.where(resolve() is Patient) | Consent.patient | DetectedIssue.patient | DeviceRequest.subject.where(resolve() is Patient) | DeviceUseStatement.subject | DiagnosticReport.subject.where(resolve() is Patient) | DocumentManifest.subject.where(resolve() is Patient) | DocumentReference.subject.where(resolve() is Patient) | Encounter.subject.where(resolve() is Patient) | EpisodeOfCare.patient | FamilyMemberHistory.patient | Flag.subject.where(resolve() is Patient) | Goal.subject.where(resolve() is Patient) | ImagingStudy.subject.where(resolve() is Patient) | Immunization.patient | List.subject.where(resolve() is Patient) | MedicationAdministration.subject.where(resolve() is Patient) | MedicationDispense.subject.where(resolve() is Patient) | MedicationRequest.subject.where(resolve() is Patient) | MedicationStatement.subject.where(resolve() is Patient) | NutritionOrder.patient | Observation.subject.where(resolve() is Patient) | Procedure.subject.where(resolve() is Patient) | RiskAssessment.subject.where(resolve() is Patient) | ServiceRequest.subject.where(resolve() is Patient) | SupplyDelivery.patient | VisionPrescription.patient",
+        "base": [
+          "AllergyIntolerance",
+          "CarePlan",
+          "CareTeam",
+          "ClinicalImpression",
+          "Composition",
+          "Condition",
+          "Consent",
+          "DetectedIssue",
+          "DeviceRequest",
+          "DeviceUseStatement",
+          "DiagnosticReport",
+          "DocumentManifest",
+          "DocumentReference",
+          "Encounter",
+          "EpisodeOfCare",
+          "FamilyMemberHistory",
+          "Flag",
+          "Goal",
+          "ImagingStudy",
+          "Immunization",
+          "List",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationRequest",
+          "MedicationStatement",
+          "NutritionOrder",
+          "Observation",
+          "Procedure",
+          "RiskAssessment",
+          "ServiceRequest",
+          "SupplyDelivery",
+          "VisionPrescription"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "specimen",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Specimen"
+      },
+      "hint": {
+        "en-US": "Specimen used for this observation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 14,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Specimen"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-specimen",
+        "expression": "Observation.specimen",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "component-code",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Component code"
+      },
+      "hint": {
+        "en-US": "The component code of the observation type"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 15,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/observation-codes",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-component-code",
+        "expression": "Observation.component.code",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "value-string",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Value string"
+      },
+      "hint": {
+        "en-US": "The value of the observation, if the value is a string, and also searches in CodeableConcept.text"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 16,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-value-string",
+        "expression": "(Observation.value as string) | (Observation.value as CodeableConcept).text",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "identifier",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Identifier"
+      },
+      "hint": {
+        "en-US": "The unique id for a particular observation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 17,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-identifier",
+        "expression": "AllergyIntolerance.identifier | CarePlan.identifier | CareTeam.identifier | Composition.identifier | Condition.identifier | Consent.identifier | DetectedIssue.identifier | DeviceRequest.identifier | DiagnosticReport.identifier | DocumentManifest.masterIdentifier | DocumentManifest.identifier | DocumentReference.masterIdentifier | DocumentReference.identifier | Encounter.identifier | EpisodeOfCare.identifier | FamilyMemberHistory.identifier | Goal.identifier | ImagingStudy.identifier | Immunization.identifier | List.identifier | MedicationAdministration.identifier | MedicationDispense.identifier | MedicationRequest.identifier | MedicationStatement.identifier | NutritionOrder.identifier | Observation.identifier | Procedure.identifier | RiskAssessment.identifier | ServiceRequest.identifier | SupplyDelivery.identifier | SupplyRequest.identifier | VisionPrescription.identifier",
+        "base": [
+          "AllergyIntolerance",
+          "CarePlan",
+          "CareTeam",
+          "Composition",
+          "Condition",
+          "Consent",
+          "DetectedIssue",
+          "DeviceRequest",
+          "DiagnosticReport",
+          "DocumentManifest",
+          "DocumentReference",
+          "Encounter",
+          "EpisodeOfCare",
+          "FamilyMemberHistory",
+          "Goal",
+          "ImagingStudy",
+          "Immunization",
+          "List",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationRequest",
+          "MedicationStatement",
+          "NutritionOrder",
+          "Observation",
+          "Procedure",
+          "RiskAssessment",
+          "ServiceRequest",
+          "SupplyDelivery",
+          "SupplyRequest",
+          "VisionPrescription"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "performer",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Performer"
+      },
+      "hint": {
+        "en-US": "Who performed the observation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 18,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Practitioner",
+          "Organization",
+          "CareTeam",
+          "Patient",
+          "PractitionerRole",
+          "RelatedPerson"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-performer",
+        "expression": "Observation.performer",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "combo-code",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Combo code"
+      },
+      "hint": {
+        "en-US": "The code of the observation type or component type"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 19,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-combo-code",
+        "expression": "Observation.code | Observation.component.code",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "method",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Method"
+      },
+      "hint": {
+        "en-US": "The method used for the observation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 20,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/observation-methods",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-method",
+        "expression": "Observation.method",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "value-quantity",
+      "origin": "package",
+      "parameterType": "quantity",
+      "included": true,
+      "label": {
+        "en-US": "Value quantity"
+      },
+      "hint": {
+        "en-US": "The value of the observation, if the value is a Quantity, or a SampledData (just search on the bounds of the values in sampled data)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "quantity",
+      "order": 21,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [
+        {
+          "code": "kg",
+          "label": {
+            "en-US": "kg"
+          }
+        },
+        {
+          "code": "g",
+          "label": {
+            "en-US": "g"
+          }
+        },
+        {
+          "code": "mg",
+          "label": {
+            "en-US": "mg"
+          }
+        },
+        {
+          "code": "[lb_av]",
+          "label": {
+            "en-US": "lb"
+          }
+        },
+        {
+          "code": "cm",
+          "label": {
+            "en-US": "cm"
+          }
+        },
+        {
+          "code": "m",
+          "label": {
+            "en-US": "m"
+          }
+        },
+        {
+          "code": "[in_i]",
+          "label": {
+            "en-US": "in"
+          }
+        },
+        {
+          "code": "Cel",
+          "label": {
+            "en-US": "°C"
+          }
+        },
+        {
+          "code": "[degF]",
+          "label": {
+            "en-US": "°F"
+          }
+        },
+        {
+          "code": "mm[Hg]",
+          "label": {
+            "en-US": "mm[Hg]"
+          }
+        },
+        {
+          "code": "/min",
+          "label": {
+            "en-US": "/min"
+          }
+        },
+        {
+          "code": "%",
+          "label": {
+            "en-US": "%"
+          }
+        },
+        {
+          "code": "mmol/L",
+          "label": {
+            "en-US": "mmol/L"
+          }
+        },
+        {
+          "code": "mg/dL",
+          "label": {
+            "en-US": "mg/dL"
+          }
+        },
+        {
+          "code": "mL",
+          "label": {
+            "en-US": "mL"
+          }
+        },
+        {
+          "code": "L",
+          "label": {
+            "en-US": "L"
+          }
+        },
+        {
+          "code": "a",
+          "label": {
+            "en-US": "year"
+          }
+        },
+        {
+          "code": "mo",
+          "label": {
+            "en-US": "month"
+          }
+        },
+        {
+          "code": "wk",
+          "label": {
+            "en-US": "week"
+          }
+        },
+        {
+          "code": "d",
+          "label": {
+            "en-US": "day"
+          }
+        }
+      ],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-value-quantity",
+        "expression": "(Observation.value as Quantity) | (Observation.value as SampledData)",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "component-value-quantity",
+      "origin": "package",
+      "parameterType": "quantity",
+      "included": true,
+      "label": {
+        "en-US": "Component value quantity"
+      },
+      "hint": {
+        "en-US": "The value of the component observation, if the value is a Quantity, or a SampledData (just search on the bounds of the values in sampled data)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "quantity",
+      "order": 22,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [
+        {
+          "code": "kg",
+          "label": {
+            "en-US": "kg"
+          }
+        },
+        {
+          "code": "g",
+          "label": {
+            "en-US": "g"
+          }
+        },
+        {
+          "code": "mg",
+          "label": {
+            "en-US": "mg"
+          }
+        },
+        {
+          "code": "[lb_av]",
+          "label": {
+            "en-US": "lb"
+          }
+        },
+        {
+          "code": "cm",
+          "label": {
+            "en-US": "cm"
+          }
+        },
+        {
+          "code": "m",
+          "label": {
+            "en-US": "m"
+          }
+        },
+        {
+          "code": "[in_i]",
+          "label": {
+            "en-US": "in"
+          }
+        },
+        {
+          "code": "Cel",
+          "label": {
+            "en-US": "°C"
+          }
+        },
+        {
+          "code": "[degF]",
+          "label": {
+            "en-US": "°F"
+          }
+        },
+        {
+          "code": "mm[Hg]",
+          "label": {
+            "en-US": "mm[Hg]"
+          }
+        },
+        {
+          "code": "/min",
+          "label": {
+            "en-US": "/min"
+          }
+        },
+        {
+          "code": "%",
+          "label": {
+            "en-US": "%"
+          }
+        },
+        {
+          "code": "mmol/L",
+          "label": {
+            "en-US": "mmol/L"
+          }
+        },
+        {
+          "code": "mg/dL",
+          "label": {
+            "en-US": "mg/dL"
+          }
+        },
+        {
+          "code": "mL",
+          "label": {
+            "en-US": "mL"
+          }
+        },
+        {
+          "code": "L",
+          "label": {
+            "en-US": "L"
+          }
+        },
+        {
+          "code": "a",
+          "label": {
+            "en-US": "year"
+          }
+        },
+        {
+          "code": "mo",
+          "label": {
+            "en-US": "month"
+          }
+        },
+        {
+          "code": "wk",
+          "label": {
+            "en-US": "week"
+          }
+        },
+        {
+          "code": "d",
+          "label": {
+            "en-US": "day"
+          }
+        }
+      ],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-component-value-quantity",
+        "expression": "(Observation.component.value as Quantity) | (Observation.component.value as SampledData)",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "data-absent-reason",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Data absent reason"
+      },
+      "hint": {
+        "en-US": "The reason why the expected value in the element Observation.value[x] is missing"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 23,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/data-absent-reason",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-data-absent-reason",
+        "expression": "Observation.dataAbsentReason",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "combo-value-quantity",
+      "origin": "package",
+      "parameterType": "quantity",
+      "included": true,
+      "label": {
+        "en-US": "Combo value quantity"
+      },
+      "hint": {
+        "en-US": "The value or component value of the observation, if the value is a Quantity, or a SampledData (just search on the bounds of the values in sampled data)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "quantity",
+      "order": 24,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [
+        {
+          "code": "kg",
+          "label": {
+            "en-US": "kg"
+          }
+        },
+        {
+          "code": "g",
+          "label": {
+            "en-US": "g"
+          }
+        },
+        {
+          "code": "mg",
+          "label": {
+            "en-US": "mg"
+          }
+        },
+        {
+          "code": "[lb_av]",
+          "label": {
+            "en-US": "lb"
+          }
+        },
+        {
+          "code": "cm",
+          "label": {
+            "en-US": "cm"
+          }
+        },
+        {
+          "code": "m",
+          "label": {
+            "en-US": "m"
+          }
+        },
+        {
+          "code": "[in_i]",
+          "label": {
+            "en-US": "in"
+          }
+        },
+        {
+          "code": "Cel",
+          "label": {
+            "en-US": "°C"
+          }
+        },
+        {
+          "code": "[degF]",
+          "label": {
+            "en-US": "°F"
+          }
+        },
+        {
+          "code": "mm[Hg]",
+          "label": {
+            "en-US": "mm[Hg]"
+          }
+        },
+        {
+          "code": "/min",
+          "label": {
+            "en-US": "/min"
+          }
+        },
+        {
+          "code": "%",
+          "label": {
+            "en-US": "%"
+          }
+        },
+        {
+          "code": "mmol/L",
+          "label": {
+            "en-US": "mmol/L"
+          }
+        },
+        {
+          "code": "mg/dL",
+          "label": {
+            "en-US": "mg/dL"
+          }
+        },
+        {
+          "code": "mL",
+          "label": {
+            "en-US": "mL"
+          }
+        },
+        {
+          "code": "L",
+          "label": {
+            "en-US": "L"
+          }
+        },
+        {
+          "code": "a",
+          "label": {
+            "en-US": "year"
+          }
+        },
+        {
+          "code": "mo",
+          "label": {
+            "en-US": "month"
+          }
+        },
+        {
+          "code": "wk",
+          "label": {
+            "en-US": "week"
+          }
+        },
+        {
+          "code": "d",
+          "label": {
+            "en-US": "day"
+          }
+        }
+      ],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-combo-value-quantity",
+        "expression": "(Observation.value as Quantity) | (Observation.value as SampledData) | (Observation.component.value as Quantity) | (Observation.component.value as SampledData)",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "encounter",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Encounter"
+      },
+      "hint": {
+        "en-US": "Encounter related to the observation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 25,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Encounter",
+          "EpisodeOfCare"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-encounter",
+        "expression": "Composition.encounter | DeviceRequest.encounter | DiagnosticReport.encounter | DocumentReference.context.encounter | Flag.encounter | List.encounter | NutritionOrder.encounter | Observation.encounter | Procedure.encounter | RiskAssessment.encounter | ServiceRequest.encounter | VisionPrescription.encounter",
+        "base": [
+          "Composition",
+          "DeviceRequest",
+          "DiagnosticReport",
+          "DocumentReference",
+          "Flag",
+          "List",
+          "NutritionOrder",
+          "Observation",
+          "Procedure",
+          "RiskAssessment",
+          "ServiceRequest",
+          "VisionPrescription"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "component-value-concept",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Component value concept"
+      },
+      "hint": {
+        "en-US": "The value of the component observation, if the value is a CodeableConcept"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 26,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-component-value-concept",
+        "expression": "(Observation.component.value as CodeableConcept)",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "category",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Category"
+      },
+      "hint": {
+        "en-US": "The classification of the type of observation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 27,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/observation-category",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-category",
+        "expression": "Observation.category",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "device",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Device"
+      },
+      "hint": {
+        "en-US": "The Device that generated the observation data"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 28,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Device",
+          "DeviceMetric"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-device",
+        "expression": "Observation.device",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "combo-value-concept",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Combo value concept"
+      },
+      "hint": {
+        "en-US": "The value or component value of the observation, if the value is a CodeableConcept"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 29,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-combo-value-concept",
+        "expression": "(Observation.value as CodeableConcept) | (Observation.component.value as CodeableConcept)",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "status",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Status"
+      },
+      "hint": {
+        "en-US": "The status of the observation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 30,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/observation-status",
+      "valueSetVersion": "4.0.1",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Observation-status",
+        "expression": "Observation.status",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "amino-acid-change",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Amino acid change"
+      },
+      "hint": {
+        "en-US": "HGVS Protein Change"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 31,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/observation-genetic-Observation-amino-acid-change",
+        "expression": "Observation.extension(\u0027http://hl7.org/fhir/StructureDefinition/observation-geneticsAminoAcidChangeName\u0027)",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "dna-variant",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Dna variant"
+      },
+      "hint": {
+        "en-US": "HGVS DNA variant"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 32,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/observation-genetic-Observation-dna-variant",
+        "expression": "Observation.extension(\u0027http://hl7.org/fhir/StructureDefinition/observation-geneticsDnaVariant\u0027)",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "gene-amino-acid-change",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Gene amino acid change"
+      },
+      "hint": {
+        "en-US": "HGNC gene symbol and HGVS Protein change"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 33,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/observation-genetic-Observation-gene-amino-acid-change",
+        "expression": "Observation.extension(\u0027http://hl7.org/fhir/StructureDefinition/observation-geneticsAminoAcidChangeName\u0027)",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "gene-dnavariant",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Gene dnavariant"
+      },
+      "hint": {
+        "en-US": "HGNC gene symbol and HGVS DNA Variant"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 34,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/observation-genetic-Observation-gene-dnavariant",
+        "expression": "Observation.extension(\u0027http://hl7.org/fhir/StructureDefinition/observation-geneticsDnaVariant\u0027)",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "gene-identifier",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Gene identifier"
+      },
+      "hint": {
+        "en-US": "HGNC gene symbol and identifier"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 35,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/observation-genetic-Observation-gene-identifier",
+        "expression": "Observation.extension(\u0027http://hl7.org/fhir/StructureDefinition/observation-geneticsGene\u0027)",
+        "base": [
+          "Observation"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_content",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Content"
+      },
+      "hint": {
+        "en-US": "Search on the entire content of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 36,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-content",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_id",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Id"
+      },
+      "hint": {
+        "en-US": "Search by resource identifier - e.g. same as the read interaction, but can return included resources"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 37,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/example",
+        "expression": "id",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_lastUpdated",
+      "origin": "package",
+      "parameterType": "date",
+      "included": false,
+      "label": {
+        "en-US": "Last updated"
+      },
+      "hint": {
+        "en-US": "When the resource version last changed"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 38,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-lastUpdated",
+        "expression": "Resource.meta.lastUpdated",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_profile",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Profile"
+      },
+      "hint": {
+        "en-US": "Profiles this resource claims to conform to"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 39,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-profile",
+        "expression": "Resource.meta.profile",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_query",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Query"
+      },
+      "hint": {
+        "en-US": "A custom search profile that describes a specific defined query operation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 40,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-query",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_security",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Security"
+      },
+      "hint": {
+        "en-US": "Security Labels applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 41,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-security",
+        "expression": "Resource.meta.security",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_source",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Source"
+      },
+      "hint": {
+        "en-US": "Identifies where the resource comes from"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 42,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-source",
+        "expression": "Resource.meta.source",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_tag",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Tag"
+      },
+      "hint": {
+        "en-US": "Tags applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 43,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-tag",
+        "expression": "Resource.meta.tag",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_text",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Text"
+      },
+      "hint": {
+        "en-US": "Search on the narrative of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 44,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DomainResource-text",
+        "base": [
+          "DomainResource"
+        ]
+      },
+      "notInPackage": false
+    }
+  ]
+}

@@ -1,9 +1,10 @@
-@* The clinical summary of a patient: the banner, then the blocks of the form of the server *@
+@* The clinical summary of a patient: the banner, then the sections of the form of the server, a stack in one scroller: each section is its shell
+   (SectionShell: the sticky header, the loading, the failure, the next page) around the records its component draws (tiles so far) *@
 @inherits StatefulWidget<ClinicalSummaryViewState>
 
 @if (State.Sections.Any(section => !section.Hidden))
 {
-    <PageMenu>
+    <PageMenu SectionName=@FhirViewer.PageMenuSection>
         @foreach (var section in State.Sections.Where(section => !section.Hidden))
         {
             <PageMenuItem Text=@section.Title Note=@(section.IsLoaded ? section.CountText : null) OnClick=@(() => GoToAsync(section))>
@@ -45,16 +46,34 @@
             <style>@State.Style</style>
             @* The HTML of the templates has passed the white list of FxHtml *@
             <div class="fx-root fx-summary">
+                <SectionContent SectionName=@FhirViewer.PageCommandsSection>
+                    <BookmarkStar Route=@(new ViewerRoute(ViewerPage.ClinicalSummary, "Patient", PatientId)) Title=@BannerTitleAsync Category=@Strings.Caption_ClinicalSummary Icon="history"/>
+                </SectionContent>
                 <div class="fx-summary-patient">
                     @((MarkupString)State.Banner)
                     <p class="fx-muted fx-summary-zone" title="Times are shown in the time zone of this device">@DisplayZone.Text()</p>
                 </div>
 
                 <div class="fx-summary-list">
-                    <SummaryList @ref=_list TRow="SummaryRow" Rows=@State.Rows Memory=@Scroll>
-                        <Row Context="row">@RowOf(row)</Row>
-                        <Sticky Context="row">@HeaderOf(row)</Sticky>
-                    </SummaryList>
+                    <SummaryStack @ref=_stack Memory=@Scroll>
+                        @foreach (var section in State.Sections.Where(section => !section.Hidden))
+                        {
+                            <SectionShell @key=section Section=@section OnToggle=@(() => State.Toggle(section)) OnMore=@(() => State.LoadMoreAsync(section))>
+                                @if (section.Component == FireChart.Viewer.Core.Forms.SummaryComponents.LabResults)
+                                {
+                                    <LabResultsView Section=@section OnOpen=@State.Open/>
+                                }
+                                else if (section.Component == FireChart.Viewer.Core.Forms.SummaryComponents.ObservationTrends)
+                                {
+                                    <ObservationTrendsView Section=@section OnOpen=@State.Open OnSelect=@(key => State.SelectTrendAsync(section, key))/>
+                                }
+                                else
+                                {
+                                    @TilesOf(section)
+                                }
+                            </SectionShell>
+                        }
+                    </SummaryStack>
                 </div>
             </div>
         }
@@ -63,67 +82,31 @@
 
 @code {
 
-    private SummaryList<SummaryRow>? _list;
+    private SummaryStack? _stack;
 
-    // The menu of the page: the block is opened, the list scrolls to its title after it has drawn the new rows
+    // The menu of the page: the block is opened, the stack brings it to the top after it has drawn its records
     private async Task GoToAsync(ClinicalSummarySection section)
     {
-        var index = State.OpenSection(section);
-        if (index >= 0 && _list is not null)
+        State.OpenSection(section);
+        if (_stack is not null)
         {
             await Task.Yield();
-            await _list.ScrollToAsync(index);
+            await _stack.ScrollToAsync(section.ElementId);
         }
     }
 
-    private RenderFragment RowOf(SummaryRow row)
+    // The component tiles: a row per record, the frame Tile lays out the slots the template of its type filled
+    private RenderFragment TilesOf(ClinicalSummarySection section)
     {
-        return row.Kind switch
-        {
-            SummaryRowKind.Header => HeaderOf(row),
-            SummaryRowKind.Card => CardOf(row),
-            SummaryRowKind.Spinner => @<div class="fx-summary-note"><CircularProgress Size="ProgressBarCircularSize.Small"/></div>,
-            SummaryRowKind.Error => @<div class="fx-summary-note">
-                                        @Strings.Message_FhirServerUnavailable
-                                        <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_Retry
-                                                      Click=@(() => State.LoadMoreAsync(row.Section))/>
-                                    </div>,
-            _ => @<div class="fx-summary-note">
-                     <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_More
-                                   IsBusy=@row.Section.IsLoading Click=@(() => State.LoadMoreAsync(row.Section))/>
-                 </div>
-        };
-    }
-
-    private RenderFragment HeaderOf(SummaryRow row)
-    {
-        var section = row.Section;
-        var empty = section.IsLoaded && !section.Failed && section.Items.Count == 0;
-        return @<div class=@(empty ? "fx-summary-group fx-summary-group-empty" : "fx-summary-group") role="button" aria-expanded=@(section.Collapsed ? "false" : "true")
-                     style="cursor: pointer" @onclick=@(() => State.Toggle(section))>
-                   <RadzenIcon Icon=@(section.Collapsed ? "chevron_right" : "expand_more")/>
-                   <div class="fx-summary-icon"><IconResource ResourceType=@section.IconType Autocolor/></div>
-                   <span class="fx-summary-group-title">@section.Title</span>
-                   @if (section.IsLoaded)
+        return @<text>
+                   @foreach (var item in section.Items)
                    {
-                       <span class="fx-badge fx-badge-sm fx-badge-ghost">@section.CountText</span>
+                       var tile = section.Tiles.GetValueOrDefault(ClinicalSummarySection.KeyOf(item)) ?? ResourceTiles.Plain(item);
+                       <div class="fx-summary-section-row" @key=item>
+                           <Tile Model=@tile ResourceType=@item.ResourceType OnClick=@(() => State.Open(item))/>
+                       </div>
                    }
-                   @if (section.IsLoading)
-                   {
-                       <CircularProgress Size="ProgressBarCircularSize.ExtraSmall"/>
-                   }
-               </div>;
-    }
-
-    // The row of a record as its tile: the HTML of the template of its type (a daisyUI list row), which has passed the white list of FxHtml
-    private RenderFragment CardOf(SummaryRow row)
-    {
-        var item = row.Item!;
-        var tile = row.Tile!;
-        return @<div class="fx-summary-row" @onclick=@(() => State.Open(item)) title=@tile.Text>
-                   <div class="fx-summary-icon"><IconResource ResourceType=@item.ResourceType/></div>
-                   <ul class="fx-list fx-summary-tile">@((MarkupString)tile.Html)</ul>
-               </div>;
+               </text>;
     }
 
     /// <summary>The instance of the Viewer.</summary>
@@ -136,5 +119,10 @@
 
 
     protected override object? ActivationKey => new ClinicalSummaryKey(Session, PatientId);
+
+    private Task<string?> BannerTitleAsync()
+    {
+        return Task.FromResult(ViewerText.Plain(State.Banner));
+    }
 
 }

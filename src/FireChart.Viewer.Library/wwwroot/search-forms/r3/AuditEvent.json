@@ -1,0 +1,1020 @@
+{
+  "formatVersion": 1,
+  "name": "generated",
+  "authoredForVersion": "3.0.2",
+  "isGenerated": true,
+  "title": {
+    "en-US": "Filter"
+  },
+  "description": {},
+  "groups": [],
+  "fields": [
+    {
+      "queryName": "date",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Date"
+      },
+      "hint": {
+        "en-US": "Time when the event occurred on source"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 1,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-date",
+        "expression": "AuditEvent.recorded",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "entity-type",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Entity type"
+      },
+      "hint": {
+        "en-US": "Type of entity involved"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 2,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-entity-type",
+        "expression": "AuditEvent.entity.type",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "agent",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Agent"
+      },
+      "hint": {
+        "en-US": "Direct reference to resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 3,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Practitioner",
+          "Organization",
+          "Device",
+          "Patient",
+          "RelatedPerson"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-agent",
+        "expression": "AuditEvent.agent.reference",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "address",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Address"
+      },
+      "hint": {
+        "en-US": "Identifier for the network access point of the user device"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 4,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-address",
+        "expression": "AuditEvent.agent.network.address",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "entity-role",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Entity role"
+      },
+      "hint": {
+        "en-US": "What role the entity played"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 5,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-entity-role",
+        "expression": "AuditEvent.entity.role",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "source",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Source"
+      },
+      "hint": {
+        "en-US": "The identity of source detecting the event"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 6,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-source",
+        "expression": "AuditEvent.source.identifier",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "type",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Type"
+      },
+      "hint": {
+        "en-US": "Type/identifier of event"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 7,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-type",
+        "expression": "AuditEvent.type",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "altid",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Altid"
+      },
+      "hint": {
+        "en-US": "Alternative User id e.g. authentication"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 8,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-altid",
+        "expression": "AuditEvent.agent.altId",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "site",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Site"
+      },
+      "hint": {
+        "en-US": "Logical source location within the enterprise"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 9,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-site",
+        "expression": "AuditEvent.source.site",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "agent-name",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Agent name"
+      },
+      "hint": {
+        "en-US": "Human-meaningful name for the agent"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 10,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-agent-name",
+        "expression": "AuditEvent.agent.name",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "entity-name",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Entity name"
+      },
+      "hint": {
+        "en-US": "Descriptor for entity"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 11,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-entity-name",
+        "expression": "AuditEvent.entity.name",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "subtype",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Subtype"
+      },
+      "hint": {
+        "en-US": "More specific type/id for the event"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 12,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-subtype",
+        "expression": "AuditEvent.subtype",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "patient",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Patient"
+      },
+      "hint": {
+        "en-US": "Direct reference to resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 13,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Patient"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-patient",
+        "expression": "AuditEvent.agent.reference | AuditEvent.entity.reference",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "action",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Action"
+      },
+      "hint": {
+        "en-US": "Type of action performed during the event"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 14,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-action",
+        "expression": "AuditEvent.action",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "agent-role",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Agent role"
+      },
+      "hint": {
+        "en-US": "Agent role in the event"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 15,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-agent-role",
+        "expression": "AuditEvent.agent.role",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "user",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "User"
+      },
+      "hint": {
+        "en-US": "Unique identifier for the user"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 16,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-user",
+        "expression": "AuditEvent.agent.userId",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "entity",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Entity"
+      },
+      "hint": {
+        "en-US": "Specific instance of resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 17,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Account",
+          "ActivityDefinition",
+          "AdverseEvent",
+          "AllergyIntolerance",
+          "Appointment",
+          "AppointmentResponse",
+          "AuditEvent",
+          "Basic",
+          "Binary",
+          "BodySite",
+          "Bundle",
+          "CapabilityStatement",
+          "CarePlan",
+          "CareTeam",
+          "ChargeItem",
+          "Claim",
+          "ClaimResponse",
+          "ClinicalImpression",
+          "CodeSystem",
+          "Communication",
+          "CommunicationRequest",
+          "CompartmentDefinition",
+          "Composition",
+          "ConceptMap",
+          "Condition",
+          "Consent",
+          "Contract",
+          "Coverage",
+          "DataElement",
+          "DetectedIssue",
+          "Device",
+          "DeviceComponent",
+          "DeviceMetric",
+          "DeviceRequest",
+          "DeviceUseStatement",
+          "DiagnosticReport",
+          "DocumentManifest",
+          "DocumentReference",
+          "EligibilityRequest",
+          "EligibilityResponse",
+          "Encounter",
+          "Endpoint",
+          "EnrollmentRequest",
+          "EnrollmentResponse",
+          "EpisodeOfCare",
+          "ExpansionProfile",
+          "ExplanationOfBenefit",
+          "FamilyMemberHistory",
+          "Flag",
+          "Goal",
+          "GraphDefinition",
+          "Group",
+          "GuidanceResponse",
+          "HealthcareService",
+          "ImagingManifest",
+          "ImagingStudy",
+          "Immunization",
+          "ImmunizationRecommendation",
+          "ImplementationGuide",
+          "Library",
+          "Linkage",
+          "List",
+          "Location",
+          "Measure",
+          "MeasureReport",
+          "Media",
+          "Medication",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationRequest",
+          "MedicationStatement",
+          "MessageDefinition",
+          "MessageHeader",
+          "NamingSystem",
+          "NutritionOrder",
+          "Observation",
+          "OperationDefinition",
+          "OperationOutcome",
+          "Organization",
+          "Patient",
+          "PaymentNotice",
+          "PaymentReconciliation",
+          "Person",
+          "PlanDefinition",
+          "Practitioner",
+          "PractitionerRole",
+          "Procedure",
+          "ProcedureRequest",
+          "ProcessRequest",
+          "ProcessResponse",
+          "Provenance",
+          "Questionnaire",
+          "QuestionnaireResponse",
+          "ReferralRequest",
+          "RelatedPerson",
+          "RequestGroup",
+          "ResearchStudy",
+          "ResearchSubject",
+          "RiskAssessment",
+          "Schedule",
+          "SearchParameter",
+          "Sequence",
+          "ServiceDefinition",
+          "Slot",
+          "Specimen",
+          "StructureDefinition",
+          "StructureMap",
+          "Subscription",
+          "Substance",
+          "SupplyDelivery",
+          "SupplyRequest",
+          "Task",
+          "TestReport",
+          "TestScript",
+          "ValueSet",
+          "VisionPrescription"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-entity",
+        "expression": "AuditEvent.entity.reference",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "entity-id",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Entity id"
+      },
+      "hint": {
+        "en-US": "Specific instance of object"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 18,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-entity-id",
+        "expression": "AuditEvent.entity.identifier",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "outcome",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Outcome"
+      },
+      "hint": {
+        "en-US": "Whether the event succeeded or failed"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 19,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-outcome",
+        "expression": "AuditEvent.outcome",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "policy",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": true,
+      "label": {
+        "en-US": "Policy"
+      },
+      "hint": {
+        "en-US": "Policy that authorized event"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 20,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AuditEvent-policy",
+        "expression": "AuditEvent.agent.policy",
+        "base": [
+          "AuditEvent"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_content",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Content"
+      },
+      "hint": {
+        "en-US": "Search on the entire content of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 21,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-content",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_id",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Id"
+      },
+      "hint": {
+        "en-US": "Search by resource identifier - e.g. same as the read interaction, but can return included resources"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 22,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/example",
+        "expression": "id",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_lastUpdated",
+      "origin": "package",
+      "parameterType": "date",
+      "included": false,
+      "label": {
+        "en-US": "Last updated"
+      },
+      "hint": {
+        "en-US": "When the resource version last changed"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 23,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-lastUpdated",
+        "expression": "Resource.meta.lastUpdated",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_profile",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Profile"
+      },
+      "hint": {
+        "en-US": "Profiles this resource claims to conform to"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 24,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-profile",
+        "expression": "Resource.meta.profile",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_query",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Query"
+      },
+      "hint": {
+        "en-US": "A custom search profile that describes a specific defined query operation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 25,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-query",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_security",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Security"
+      },
+      "hint": {
+        "en-US": "Security Labels applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 26,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-security",
+        "expression": "Resource.meta.security",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_tag",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Tag"
+      },
+      "hint": {
+        "en-US": "Tags applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 27,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-tag",
+        "expression": "Resource.meta.tag",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_text",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Text"
+      },
+      "hint": {
+        "en-US": "Search on the narrative of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 28,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DomainResource-text",
+        "base": [
+          "DomainResource"
+        ]
+      },
+      "notInPackage": false
+    }
+  ]
+}

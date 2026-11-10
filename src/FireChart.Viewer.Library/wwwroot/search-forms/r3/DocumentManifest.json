@@ -1,0 +1,1006 @@
+{
+  "formatVersion": 1,
+  "name": "generated",
+  "authoredForVersion": "3.0.2",
+  "isGenerated": true,
+  "title": {
+    "en-US": "Filter"
+  },
+  "description": {},
+  "groups": [],
+  "fields": [
+    {
+      "queryName": "identifier",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Identifier"
+      },
+      "hint": {
+        "en-US": "Unique Identifier for the set of documents"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 1,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-identifier",
+        "expression": "DocumentManifest.masterIdentifier | DocumentManifest.identifier | Goal.identifier | Consent.identifier | DocumentReference.masterIdentifier | DocumentReference.identifier | SupplyRequest.identifier | RiskAssessment.identifier | CareTeam.identifier | ImagingStudy.identifier | FamilyMemberHistory.identifier | Encounter.identifier | DeviceRequest.identifier | AllergyIntolerance.identifier | CarePlan.identifier | EpisodeOfCare.identifier | Procedure.identifier | List.identifier | Immunization.identifier | VisionPrescription.identifier | ProcedureRequest.identifier | Observation.identifier | DiagnosticReport.identifier | NutritionOrder.identifier | Condition.identifier | Composition.identifier | DetectedIssue.identifier | SupplyDelivery.identifier",
+        "base": [
+          "DocumentManifest",
+          "Goal",
+          "Consent",
+          "DocumentReference",
+          "SupplyRequest",
+          "RiskAssessment",
+          "CareTeam",
+          "ImagingStudy",
+          "FamilyMemberHistory",
+          "Encounter",
+          "DeviceRequest",
+          "AllergyIntolerance",
+          "CarePlan",
+          "EpisodeOfCare",
+          "Procedure",
+          "List",
+          "Immunization",
+          "VisionPrescription",
+          "ProcedureRequest",
+          "Observation",
+          "DiagnosticReport",
+          "NutritionOrder",
+          "Condition",
+          "Composition",
+          "DetectedIssue",
+          "SupplyDelivery"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "related-id",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Related id"
+      },
+      "hint": {
+        "en-US": "Identifiers of things that are related"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 2,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DocumentManifest-related-id",
+        "expression": "DocumentManifest.related.identifier",
+        "base": [
+          "DocumentManifest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "content-ref",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Content ref"
+      },
+      "hint": {
+        "en-US": "Contents of this set of documents"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 3,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Account",
+          "ActivityDefinition",
+          "AdverseEvent",
+          "AllergyIntolerance",
+          "Appointment",
+          "AppointmentResponse",
+          "AuditEvent",
+          "Basic",
+          "Binary",
+          "BodySite",
+          "Bundle",
+          "CapabilityStatement",
+          "CarePlan",
+          "CareTeam",
+          "ChargeItem",
+          "Claim",
+          "ClaimResponse",
+          "ClinicalImpression",
+          "CodeSystem",
+          "Communication",
+          "CommunicationRequest",
+          "CompartmentDefinition",
+          "Composition",
+          "ConceptMap",
+          "Condition",
+          "Consent",
+          "Contract",
+          "Coverage",
+          "DataElement",
+          "DetectedIssue",
+          "Device",
+          "DeviceComponent",
+          "DeviceMetric",
+          "DeviceRequest",
+          "DeviceUseStatement",
+          "DiagnosticReport",
+          "DocumentManifest",
+          "DocumentReference",
+          "EligibilityRequest",
+          "EligibilityResponse",
+          "Encounter",
+          "Endpoint",
+          "EnrollmentRequest",
+          "EnrollmentResponse",
+          "EpisodeOfCare",
+          "ExpansionProfile",
+          "ExplanationOfBenefit",
+          "FamilyMemberHistory",
+          "Flag",
+          "Goal",
+          "GraphDefinition",
+          "Group",
+          "GuidanceResponse",
+          "HealthcareService",
+          "ImagingManifest",
+          "ImagingStudy",
+          "Immunization",
+          "ImmunizationRecommendation",
+          "ImplementationGuide",
+          "Library",
+          "Linkage",
+          "List",
+          "Location",
+          "Measure",
+          "MeasureReport",
+          "Media",
+          "Medication",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationRequest",
+          "MedicationStatement",
+          "MessageDefinition",
+          "MessageHeader",
+          "NamingSystem",
+          "NutritionOrder",
+          "Observation",
+          "OperationDefinition",
+          "OperationOutcome",
+          "Organization",
+          "Patient",
+          "PaymentNotice",
+          "PaymentReconciliation",
+          "Person",
+          "PlanDefinition",
+          "Practitioner",
+          "PractitionerRole",
+          "Procedure",
+          "ProcedureRequest",
+          "ProcessRequest",
+          "ProcessResponse",
+          "Provenance",
+          "Questionnaire",
+          "QuestionnaireResponse",
+          "ReferralRequest",
+          "RelatedPerson",
+          "RequestGroup",
+          "ResearchStudy",
+          "ResearchSubject",
+          "RiskAssessment",
+          "Schedule",
+          "SearchParameter",
+          "Sequence",
+          "ServiceDefinition",
+          "Slot",
+          "Specimen",
+          "StructureDefinition",
+          "StructureMap",
+          "Subscription",
+          "Substance",
+          "SupplyDelivery",
+          "SupplyRequest",
+          "Task",
+          "TestReport",
+          "TestScript",
+          "ValueSet",
+          "VisionPrescription"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DocumentManifest-content-ref",
+        "expression": "DocumentManifest.content.p.as(Reference)",
+        "base": [
+          "DocumentManifest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "subject",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Subject"
+      },
+      "hint": {
+        "en-US": "The subject of the set of documents"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 4,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Practitioner",
+          "Group",
+          "Device",
+          "Patient"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DocumentManifest-subject",
+        "expression": "DocumentManifest.subject",
+        "base": [
+          "DocumentManifest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "author",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Author"
+      },
+      "hint": {
+        "en-US": "Who and/or what authored the manifest"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 5,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Practitioner",
+          "Organization",
+          "Device",
+          "Patient",
+          "RelatedPerson"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DocumentManifest-author",
+        "expression": "DocumentManifest.author",
+        "base": [
+          "DocumentManifest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "created",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Created"
+      },
+      "hint": {
+        "en-US": "When this document manifest created"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 6,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DocumentManifest-created",
+        "expression": "DocumentManifest.created",
+        "base": [
+          "DocumentManifest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "description",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Description"
+      },
+      "hint": {
+        "en-US": "Human-readable description (title)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 7,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DocumentManifest-description",
+        "expression": "DocumentManifest.description",
+        "base": [
+          "DocumentManifest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "source",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": true,
+      "label": {
+        "en-US": "Source"
+      },
+      "hint": {
+        "en-US": "The source system/application/software"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 8,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DocumentManifest-source",
+        "expression": "DocumentManifest.source",
+        "base": [
+          "DocumentManifest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "type",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Type"
+      },
+      "hint": {
+        "en-US": "Kind of document set"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 9,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-type",
+        "expression": "ReferralRequest.type | DocumentManifest.type | DocumentReference.type | Encounter.type | AllergyIntolerance.type | EpisodeOfCare.type | Composition.type",
+        "base": [
+          "ReferralRequest",
+          "DocumentManifest",
+          "DocumentReference",
+          "Encounter",
+          "AllergyIntolerance",
+          "EpisodeOfCare",
+          "Composition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "related-ref",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Related ref"
+      },
+      "hint": {
+        "en-US": "Related Resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 10,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Account",
+          "ActivityDefinition",
+          "AdverseEvent",
+          "AllergyIntolerance",
+          "Appointment",
+          "AppointmentResponse",
+          "AuditEvent",
+          "Basic",
+          "Binary",
+          "BodySite",
+          "Bundle",
+          "CapabilityStatement",
+          "CarePlan",
+          "CareTeam",
+          "ChargeItem",
+          "Claim",
+          "ClaimResponse",
+          "ClinicalImpression",
+          "CodeSystem",
+          "Communication",
+          "CommunicationRequest",
+          "CompartmentDefinition",
+          "Composition",
+          "ConceptMap",
+          "Condition",
+          "Consent",
+          "Contract",
+          "Coverage",
+          "DataElement",
+          "DetectedIssue",
+          "Device",
+          "DeviceComponent",
+          "DeviceMetric",
+          "DeviceRequest",
+          "DeviceUseStatement",
+          "DiagnosticReport",
+          "DocumentManifest",
+          "DocumentReference",
+          "EligibilityRequest",
+          "EligibilityResponse",
+          "Encounter",
+          "Endpoint",
+          "EnrollmentRequest",
+          "EnrollmentResponse",
+          "EpisodeOfCare",
+          "ExpansionProfile",
+          "ExplanationOfBenefit",
+          "FamilyMemberHistory",
+          "Flag",
+          "Goal",
+          "GraphDefinition",
+          "Group",
+          "GuidanceResponse",
+          "HealthcareService",
+          "ImagingManifest",
+          "ImagingStudy",
+          "Immunization",
+          "ImmunizationRecommendation",
+          "ImplementationGuide",
+          "Library",
+          "Linkage",
+          "List",
+          "Location",
+          "Measure",
+          "MeasureReport",
+          "Media",
+          "Medication",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationRequest",
+          "MedicationStatement",
+          "MessageDefinition",
+          "MessageHeader",
+          "NamingSystem",
+          "NutritionOrder",
+          "Observation",
+          "OperationDefinition",
+          "OperationOutcome",
+          "Organization",
+          "Patient",
+          "PaymentNotice",
+          "PaymentReconciliation",
+          "Person",
+          "PlanDefinition",
+          "Practitioner",
+          "PractitionerRole",
+          "Procedure",
+          "ProcedureRequest",
+          "ProcessRequest",
+          "ProcessResponse",
+          "Provenance",
+          "Questionnaire",
+          "QuestionnaireResponse",
+          "ReferralRequest",
+          "RelatedPerson",
+          "RequestGroup",
+          "ResearchStudy",
+          "ResearchSubject",
+          "RiskAssessment",
+          "Schedule",
+          "SearchParameter",
+          "Sequence",
+          "ServiceDefinition",
+          "Slot",
+          "Specimen",
+          "StructureDefinition",
+          "StructureMap",
+          "Subscription",
+          "Substance",
+          "SupplyDelivery",
+          "SupplyRequest",
+          "Task",
+          "TestReport",
+          "TestScript",
+          "ValueSet",
+          "VisionPrescription"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DocumentManifest-related-ref",
+        "expression": "DocumentManifest.related.ref",
+        "base": [
+          "DocumentManifest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "patient",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Patient"
+      },
+      "hint": {
+        "en-US": "The subject of the set of documents"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 11,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Patient",
+          "Group"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-patient",
+        "expression": "ReferralRequest.subject | DocumentManifest.subject | Goal.subject | Consent.patient | DocumentReference.subject | ImagingManifest.patient | RiskAssessment.subject | CareTeam.subject | ImagingStudy.patient | FamilyMemberHistory.patient | Encounter.subject | DeviceUseStatement.subject | DeviceRequest.subject | AllergyIntolerance.patient | CarePlan.subject | EpisodeOfCare.patient | Procedure.subject | List.subject | Immunization.patient | VisionPrescription.patient | ProcedureRequest.subject | Flag.subject | Observation.subject | DiagnosticReport.subject | NutritionOrder.patient | Condition.subject | Composition.subject | DetectedIssue.patient | SupplyDelivery.patient | ClinicalImpression.subject",
+        "base": [
+          "ReferralRequest",
+          "DocumentManifest",
+          "Goal",
+          "Consent",
+          "DocumentReference",
+          "ImagingManifest",
+          "RiskAssessment",
+          "CareTeam",
+          "ImagingStudy",
+          "FamilyMemberHistory",
+          "Encounter",
+          "DeviceUseStatement",
+          "DeviceRequest",
+          "AllergyIntolerance",
+          "CarePlan",
+          "EpisodeOfCare",
+          "Procedure",
+          "List",
+          "Immunization",
+          "VisionPrescription",
+          "ProcedureRequest",
+          "Flag",
+          "Observation",
+          "DiagnosticReport",
+          "NutritionOrder",
+          "Condition",
+          "Composition",
+          "DetectedIssue",
+          "SupplyDelivery",
+          "ClinicalImpression"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "recipient",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Recipient"
+      },
+      "hint": {
+        "en-US": "Intended to get notified about this set of documents"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 12,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Practitioner",
+          "Organization",
+          "Patient",
+          "RelatedPerson"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DocumentManifest-recipient",
+        "expression": "DocumentManifest.recipient",
+        "base": [
+          "DocumentManifest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "status",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Status"
+      },
+      "hint": {
+        "en-US": "current | superseded | entered-in-error"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 13,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DocumentManifest-status",
+        "expression": "DocumentManifest.status",
+        "base": [
+          "DocumentManifest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_content",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Content"
+      },
+      "hint": {
+        "en-US": "Search on the entire content of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 14,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-content",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_id",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Id"
+      },
+      "hint": {
+        "en-US": "Search by resource identifier - e.g. same as the read interaction, but can return included resources"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 15,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/example",
+        "expression": "id",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_lastUpdated",
+      "origin": "package",
+      "parameterType": "date",
+      "included": false,
+      "label": {
+        "en-US": "Last updated"
+      },
+      "hint": {
+        "en-US": "When the resource version last changed"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 16,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-lastUpdated",
+        "expression": "Resource.meta.lastUpdated",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_profile",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Profile"
+      },
+      "hint": {
+        "en-US": "Profiles this resource claims to conform to"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 17,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-profile",
+        "expression": "Resource.meta.profile",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_query",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Query"
+      },
+      "hint": {
+        "en-US": "A custom search profile that describes a specific defined query operation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 18,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-query",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_security",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Security"
+      },
+      "hint": {
+        "en-US": "Security Labels applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 19,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-security",
+        "expression": "Resource.meta.security",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_tag",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Tag"
+      },
+      "hint": {
+        "en-US": "Tags applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 20,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-tag",
+        "expression": "Resource.meta.tag",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_text",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Text"
+      },
+      "hint": {
+        "en-US": "Search on the narrative of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 21,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DomainResource-text",
+        "base": [
+          "DomainResource"
+        ]
+      },
+      "notInPackage": false
+    }
+  ]
+}

@@ -18,6 +18,9 @@ public class ResourceTypesViewState : State
     /// <summary>A row of the list that is not a type: the clinical summary of a patient (before Patient, when the server has it).</summary>
     public const string ClinicalSummaryEntry = "#summary";
 
+    /// <summary>The entry of the bookmarks in <see cref="Visible"/>, first, when the host keeps bookmarks.</summary>
+    public const string BookmarksEntry = "#bookmarks";
+
     // The ones that clinicians open most, they come first
     private static readonly string[] s_frequent = ["Patient", "Encounter", "Observation", "Condition", "Procedure"];
 
@@ -145,7 +148,8 @@ public class ResourceTypesViewState : State
             ? _types
             : [.. _types.Where(row => row.Contains(Filter.Trim(), StringComparison.OrdinalIgnoreCase))];
         var summary = _types.Contains("Patient") && (string.IsNullOrWhiteSpace(Filter) || Strings.Caption_ClinicalSummary.Contains(Filter.Trim(), StringComparison.OrdinalIgnoreCase));
-        string[] entry = summary ? [ClinicalSummaryEntry] : [];
+        var bookmarks = ViewerBookmarks.AreAvailable(ServiceProvider) && (string.IsNullOrWhiteSpace(Filter) || FloxStrings.Caption_Bookmarks.Contains(Filter.Trim(), StringComparison.OrdinalIgnoreCase));
+        string[] entry = [.. bookmarks ? [BookmarksEntry] : Array.Empty<string>(), .. summary ? [ClinicalSummaryEntry] : Array.Empty<string>()];
         Visible = [.. entry, .. types];
     }
 }

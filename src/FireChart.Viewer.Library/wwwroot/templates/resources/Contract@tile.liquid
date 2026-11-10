@@ -1,0 +1,9 @@
+{%- capture t0 -%}{{ self.title }}{%- endcapture -%}
+{%- capture t1 -%}{% apply self.type mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 | default: t1 | default: self.id -%}
+{%- capture s0 -%}{% if self.issued %}{{ self.issued | fhir_date }}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% if self.applies %}{% apply self.applies mode: "text" %}{% endif %}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", p1: s0, p2: s1 %}{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}

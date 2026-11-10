@@ -1,0 +1,771 @@
+{
+  "formatVersion": 1,
+  "name": "generated",
+  "authoredForVersion": "5.0.0",
+  "isGenerated": true,
+  "title": {
+    "en-US": "Filter"
+  },
+  "description": {},
+  "groups": [],
+  "fields": [
+    {
+      "queryName": "identifier",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Identifier"
+      },
+      "hint": {
+        "en-US": "Any identifier for the organization (not the accreditation issuer\u0027s identifier)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 1,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-identifier",
+        "expression": "InsurancePlan.identifier",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "address",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Address"
+      },
+      "hint": {
+        "en-US": "A server defined search that may match any of the string fields in the Address, including line, city, district, state, country, postalCode, and/or text"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 2,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-address",
+        "expression": "InsurancePlan.contact.address",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "address-state",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Address state"
+      },
+      "hint": {
+        "en-US": "A state specified in an address"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 3,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-address-state",
+        "expression": "InsurancePlan.contact.address.state",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "owned-by",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Owned by"
+      },
+      "hint": {
+        "en-US": "An organization of which this organization forms a part"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 4,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Organization"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-owned-by",
+        "expression": "InsurancePlan.ownedBy",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "type",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Type"
+      },
+      "hint": {
+        "en-US": "A code for the type of organization"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 5,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/insuranceplan-type",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-type",
+        "expression": "InsurancePlan.type",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "address-postalcode",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Address postalcode"
+      },
+      "hint": {
+        "en-US": "A postal code specified in an address"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 6,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-address-postalcode",
+        "expression": "InsurancePlan.contact.address.postalCode",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "address-country",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Address country"
+      },
+      "hint": {
+        "en-US": "A country specified in an address"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 7,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-address-country",
+        "expression": "InsurancePlan.contact.address.country",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "administered-by",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Administered by"
+      },
+      "hint": {
+        "en-US": "Product administrator"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 8,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Organization"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-administered-by",
+        "expression": "InsurancePlan.administeredBy",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "endpoint",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Endpoint"
+      },
+      "hint": {
+        "en-US": "Technical endpoint"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 9,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Endpoint"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-endpoint",
+        "expression": "InsurancePlan.endpoint",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "phonetic",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Phonetic"
+      },
+      "hint": {
+        "en-US": "A portion of the organization\u0027s name using some kind of phonetic matching algorithm"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 10,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-phonetic",
+        "expression": "InsurancePlan.name",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "address-use",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Address use"
+      },
+      "hint": {
+        "en-US": "A use code specified in an address"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 11,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-address-use",
+        "expression": "InsurancePlan.contact.address.use",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "name",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Name"
+      },
+      "hint": {
+        "en-US": "A portion of the organization\u0027s name or alias"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 12,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-name",
+        "expression": "InsurancePlan.name | InsurancePlan.alias",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "address-city",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Address city"
+      },
+      "hint": {
+        "en-US": "A city specified in an address"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 13,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-address-city",
+        "expression": "InsurancePlan.contact.address.city",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "status",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Status"
+      },
+      "hint": {
+        "en-US": "Is the Organization record active"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 14,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/publication-status",
+      "valueSetVersion": "5.0.0",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/InsurancePlan-status",
+        "expression": "InsurancePlan.status",
+        "base": [
+          "InsurancePlan"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_id",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Id"
+      },
+      "hint": {
+        "en-US": "Search by resource identifier - e.g. same as the read interaction, but can return included resources"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 15,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/example",
+        "expression": "id",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_in",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": false,
+      "label": {
+        "en-US": "In"
+      },
+      "hint": {
+        "en-US": "Allows for the retrieval of resources that are active members of a CareTeam, Group, or List"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 16,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-in",
+        "expression": "Resource.id",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_language",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Language"
+      },
+      "hint": {
+        "en-US": "Language of the resource content"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 17,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-language",
+        "expression": "Resource.language",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_lastUpdated",
+      "origin": "package",
+      "parameterType": "date",
+      "included": false,
+      "label": {
+        "en-US": "Last updated"
+      },
+      "hint": {
+        "en-US": "When the resource version last changed"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 18,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-lastUpdated",
+        "expression": "Resource.meta.lastUpdated",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_profile",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": false,
+      "label": {
+        "en-US": "Profile"
+      },
+      "hint": {
+        "en-US": "Profiles this resource claims to conform to"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 19,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "StructureDefinition"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-profile",
+        "expression": "Resource.meta.profile",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_security",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Security"
+      },
+      "hint": {
+        "en-US": "Security Labels applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 20,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-security",
+        "expression": "Resource.meta.security",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_source",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Source"
+      },
+      "hint": {
+        "en-US": "Identifies where the resource comes from"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 21,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-source",
+        "expression": "Resource.meta.source",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_tag",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Tag"
+      },
+      "hint": {
+        "en-US": "Tags applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 22,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-tag",
+        "expression": "Resource.meta.tag",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_text",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Text"
+      },
+      "hint": {
+        "en-US": "Text search against the narrative"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 23,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-text",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    }
+  ]
+}

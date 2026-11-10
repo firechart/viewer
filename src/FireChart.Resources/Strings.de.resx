@@ -198,6 +198,9 @@
   <data name="Message_InvalidSearch" xml:space="preserve">
     <value>Die Suche in der Adresse ist ungültig.</value>
   </data>
+  <data name="Placeholder_SearchAllFields" xml:space="preserve">
+    <value>In allen Feldern suchen</value>
+  </data>
   <data name="Message_SearchFormGenerated" xml:space="preserve">
     <value>Dieses Formular wurde automatisch aus den Suchparametern der Ressource erzeugt und ist daher nicht sehr komfortabel. Der Server unterstützt möglicherweise nicht alle Parameter.</value>
   </data>
@@ -206,9 +209,6 @@
   </data>
   <data name="Caption_FhirServerOAuth2ClientId" xml:space="preserve">
     <value>OAuth2-Client-ID</value>
-  </data>
-  <data name="Caption_FhirServerPageSize" xml:space="preserve">
-    <value>Seitengröße</value>
   </data>
   <data name="Caption_FhirServerLiteEdition" xml:space="preserve">
     <value>Diese Edition unterstützt nur öffentliche FHIR-Server ohne Authentifizierung.</value>
@@ -360,12 +360,6 @@
   <data name="Message_NoCorePackages" xml:space="preserve">
     <value>Keine FHIR-Kernpakete indiziert</value>
   </data>
-  <data name="Message_SignInForBookmarks" xml:space="preserve">
-    <value>Melden Sie sich an, um Lesezeichen zu verwenden</value>
-  </data>
-  <data name="Message_SignInForRecentPages" xml:space="preserve">
-    <value>Melden Sie sich an, um zuletzt besuchte Seiten zu sehen</value>
-  </data>
   <data name="Conformance_Overview" xml:space="preserve">
     <value>Übersicht</value>
   </data>
@@ -449,5 +443,38 @@
   </data>
   <data name="Caption_SmartSignInHere" xml:space="preserve">
     <value>Hier anmelden</value>
+  </data>
+  <data name="Message_BookmarkOnOtherServer" xml:space="preserve">
+    <value>Auf dem Server {0}: dort öffnen.</value>
+  </data>
+  <data name="Caption_AllHistory" xml:space="preserve">
+    <value>Gesamter Verlauf</value>
+  </data>
+  <data name="Caption_FhirPackages" xml:space="preserve">
+    <value>FHIR-Pakete</value>
+  </data>
+  <data name="Notice_PackageIndexing" xml:space="preserve">
+    <value>Das Indizieren eines FHIR-Pakets ist ein aufwendiger Vorgang: Er läuft auf dem Server, und nur Administratoren und Entwickler können Pakete hinzufügen und indizieren.</value>
+  </data>
+  <data name="Caption_OpenPackageManager" xml:space="preserve">
+    <value>FHIR Package Manager öffnen</value>
+  </data>
+  <data name="Caption_LabTest" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="Caption_LabResult" xml:space="preserve">
+    <value>Ergebnis</value>
+  </data>
+  <data name="Caption_LabReferenceRange" xml:space="preserve">
+    <value>Referenzbereich</value>
+  </data>
+  <data name="Caption_LabFlag" xml:space="preserve">
+    <value>Kennzeichen</value>
+  </data>
+  <data name="Caption_TrendNoValues" xml:space="preserve">
+    <value>Keine Werte zum Zeichnen</value>
+  </data>
+  <data name="Caption_TrendOpenLast" xml:space="preserve">
+    <value>Letzten Eintrag öffnen</value>
   </data>
 </root>

@@ -17,7 +17,10 @@ public enum ViewerPage
     Resource,
 
     /// <summary>The clinical summary, of a patient or the choice of one (<c>summary</c>, <c>summary/123</c>).</summary>
-    ClinicalSummary
+    ClinicalSummary,
+
+    /// <summary>The bookmarks of the Viewer on this device (<c>bookmarks</c>), of every server.</summary>
+    Bookmarks
 }
 
 /// <summary>
@@ -45,6 +48,7 @@ public sealed record ViewerRoute(ViewerPage Page, string? ResourceType = null, s
             var path = Page switch
             {
                 ViewerPage.ResourceTypes => ViewerRoutes.Resources,
+                ViewerPage.Bookmarks => ViewerRoutes.Bookmarks,
                 ViewerPage.ResourceList => $"{ViewerRoutes.Resources}/{Uri.EscapeDataString(ResourceType ?? string.Empty)}",
                 ViewerPage.Resource => $"{ViewerRoutes.Resources}/{Uri.EscapeDataString(ResourceType ?? string.Empty)}/{Uri.EscapeDataString(Id ?? string.Empty)}",
                 _ => Id is null ? ViewerRoutes.Summary : $"{ViewerRoutes.Summary}/{Uri.EscapeDataString(Id)}"
@@ -78,6 +82,9 @@ public static partial class ViewerRoutes
     /// <summary>The first segment of the clinical summary: <c>summary</c>.</summary>
     public const string Summary = "summary";
 
+    /// <summary>The page of the bookmarks: <c>bookmarks</c>.</summary>
+    public const string Bookmarks = "bookmarks";
+
     [GeneratedRegex("^[A-Za-z]{1,64}$", RegexOptions.CultureInvariant)]
     private static partial Regex ResourceTypePattern();
 
@@ -107,6 +114,7 @@ public static partial class ViewerRoutes
             [Resources, var type] when ResourceTypePattern().IsMatch(type) => new ViewerRoute(ViewerPage.ResourceList, type, Query: query),
             [Resources, var type, var id] when ResourceTypePattern().IsMatch(type) && IdPattern().IsMatch(id) => new ViewerRoute(ViewerPage.Resource, type, id, query),
             [Summary] => new ViewerRoute(ViewerPage.ClinicalSummary, Query: query),
+            [Bookmarks] => new ViewerRoute(ViewerPage.Bookmarks),
             [Summary, var patient] when IdPattern().IsMatch(patient) => new ViewerRoute(ViewerPage.ClinicalSummary, "Patient", patient, query),
             _ => null
         };

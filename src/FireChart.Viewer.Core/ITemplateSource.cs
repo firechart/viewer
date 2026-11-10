@@ -14,20 +14,37 @@ namespace FireChart.Viewer.Core;
 /// {
 ///     ["Patient@tile"] = "&lt;li class=\"fx-list-row\"&gt;{{ self.name | first | apply: \"text\" }}&lt;/li&gt;"
 /// });
-/// var renderer = new FhirRenderer([overrides, new VendorTemplates()]);
+/// var renderer = new FhirRenderer([overrides, new WebVendorTemplates(assets)]);
 /// </code>
 /// </example>
 public interface ITemplateSource
 {
     /// <summary>
-    /// The keys of all the templates of the layer.
+    /// The keys of all the templates of the layer; a layer that loads its templates on demand knows only the ones it has loaded.
     /// </summary>
     IEnumerable<string> Keys { get; }
 
     /// <summary>
-    /// Finds the Liquid text of a template.
+    /// Finds the Liquid text of a template among the ones the layer has at hand (in memory, on a disk), without waiting for anything.
     /// </summary>
     /// <param name="key">The key of the template, the file name without extension (<c>Patient@tile</c>).</param>
-    /// <returns>The text of the template, or <see langword="null"/> when the layer has no template with this key.</returns>
+    /// <returns>The text of the template, or <see langword="null"/> when the layer has no template with this key at hand.</returns>
     string? Find(string key);
+
+    /// <summary>
+    /// Finds the Liquid text of a template, loading it when the layer loads its templates on demand (over HTTP from the static files of the host).
+    /// </summary>
+    /// <param name="key">The key of the template, the file name without extension (<c>Patient@tile</c>).</param>
+    /// <param name="cancellationToken">Cancels the load.</param>
+    /// <returns>The text of the template, or <see langword="null"/> when the layer has no template with this key.</returns>
+    /// <remarks>The engine asks for a template when it needs it; once found, <see cref="Find"/> has it too. By default the same as <see cref="Find"/>.</remarks>
+    /// <example>
+    /// <code>
+    /// var text = await layer.FindAsync("Patient@tile");
+    /// </code>
+    /// </example>
+    ValueTask<string?> FindAsync(string key, CancellationToken cancellationToken = default)
+    {
+        return ValueTask.FromResult(Find(key));
+    }
 }

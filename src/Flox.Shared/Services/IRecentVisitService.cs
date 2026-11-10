@@ -2,7 +2,7 @@ using Flox.Core.Models;
 
 namespace Flox.Shared.Services;
 
-// The history of the pages a signed-in user has visited; a guest has none
+// The history of the pages visited on this device, the newest RecentVisitService.Capacity; kept on the device only
 public interface IRecentVisitService
 {
     // Records the current page; never throws: a lost visit costs nothing

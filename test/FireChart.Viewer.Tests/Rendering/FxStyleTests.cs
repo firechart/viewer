@@ -10,22 +10,22 @@ public class FxStyleTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(FxStyle.Daisy, Does.Contain(".fx-badge-error{--fx-badge-color:var(--color-error)"), "the variable carries the prefix of the kit");
-            Assert.That(FxStyle.Vendor, Does.Contain(".fx-badge-danger").And.Contain("--fx-badge-color: var(--color-error)"));
+            Assert.That(TestLibrary.Styles.Daisy, Does.Contain(".fx-badge-error{--fx-badge-color:var(--color-error)"), "the variable carries the prefix of the kit");
+            Assert.That(TestLibrary.Styles.Vendor, Does.Contain(".fx-badge-danger").And.Contain("--fx-badge-color: var(--color-error)"));
         });
     }
 
     [Test]
     public void TheDaisyComponents_ArePrefixed_ScopedToTheirClasses_AndPartOfTheVendorLayer()
     {
-        var composed = FxStyle.Compose(null);
+        var composed = TestLibrary.Styles.Compose(null);
 
         Assert.Multiple(() =>
         {
-            Assert.That(StyleChecks.CheckVendor(FxStyle.Daisy), Is.Null, "the built file passes the checks of the vendor style");
-            Assert.That(FxStyle.Daisy, Does.Contain(".fx-badge").And.Contain(".fx-list-row").And.Contain(".fx-stat"), "the components of the subset");
-            Assert.That(FxStyle.Daisy, Does.Not.Contain(":root").And.Not.Contain("[data-theme"), "no rule reaches outside the classes of the kit");
-            Assert.That(System.Text.RegularExpressions.Regex.IsMatch(FxStyle.Daisy, @"(?<![-.\w])(html|body)\s*\{"), Is.False, "no rule of the page itself");
+            Assert.That(StyleChecks.CheckVendor(TestLibrary.Styles.Daisy), Is.Null, "the built file passes the checks of the vendor style");
+            Assert.That(TestLibrary.Styles.Daisy, Does.Contain(".fx-badge").And.Contain(".fx-list-row").And.Contain(".fx-stat"), "the components of the subset");
+            Assert.That(TestLibrary.Styles.Daisy, Does.Not.Contain(":root").And.Not.Contain("[data-theme"), "no rule reaches outside the classes of the kit");
+            Assert.That(System.Text.RegularExpressions.Regex.IsMatch(TestLibrary.Styles.Daisy, @"(?<![-.\w])(html|body)\s*\{"), Is.False, "no rule of the page itself");
             Assert.That(composed.IndexOf(".fx-badge", StringComparison.Ordinal), Is.LessThan(composed.IndexOf(".fx-banner", StringComparison.Ordinal)), "fx.css comes after the components and wins");
         });
     }
@@ -33,15 +33,15 @@ public class FxStyleTests
     [Test]
     public void TheVendorStyle_IsEmbedded_AndDefinesTheKit()
     {
-        Assert.That(FxStyle.Vendor, Does.Contain(".fx-banner").And.Contain(".fx-section").And.Contain(".fx-row").And.Contain(".fx-badge"));
-        Assert.That(FxStyle.Tokens().Select(token => token.Name), Does.Contain("--fx-color-accent").And.Contain("--fx-gap"));
-        Assert.That(StyleChecks.CheckVendor(FxStyle.Vendor), Is.Null, "the vendor style passes its own checks");
+        Assert.That(TestLibrary.Styles.Vendor, Does.Contain(".fx-banner").And.Contain(".fx-section").And.Contain(".fx-row").And.Contain(".fx-badge"));
+        Assert.That(TestLibrary.Styles.Tokens().Select(token => token.Name), Does.Contain("--fx-color-accent").And.Contain("--fx-gap"));
+        Assert.That(StyleChecks.CheckVendor(TestLibrary.Styles.Vendor), Is.Null, "the vendor style passes its own checks");
     }
 
     [Test]
     public void TheCustomStyle_IsInALaterLayer_SoItWins()
     {
-        var text = FxStyle.Compose(".fx-root { --fx-gap: 1rem; }");
+        var text = TestLibrary.Styles.Compose(".fx-root { --fx-gap: 1rem; }");
 
         Assert.That(text, Does.StartWith("@layer fx, fx-custom;"));
         Assert.That(text.IndexOf("@layer fx-custom {", StringComparison.Ordinal), Is.GreaterThan(text.IndexOf("@layer fx {", StringComparison.Ordinal)));
@@ -53,7 +53,7 @@ public class FxStyleTests
     [TestCase("  \n ")]
     public void NoCustomStyle_IsTheVendorOneAlone(string? custom)
     {
-        Assert.That(FxStyle.Compose(custom), Does.Not.Contain("@layer fx-custom {"));
+        Assert.That(TestLibrary.Styles.Compose(custom), Does.Not.Contain("@layer fx-custom {"));
     }
 
     [TestCase(".fx-root { --fx-color-accent: #0a7; }")]

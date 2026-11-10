@@ -37,11 +37,14 @@ public sealed class SharedMenuSource
         }
 
         menu.Items.Add(SharedMenuItems.Settings);
+
+        // The bookmarks and the history are on the device: no sign-in needed
+        menu.Items.Add(SharedMenuItems.Bookmarks);
+        menu.Items.Add(SharedMenuItems.History);
         if (true == user.Identity?.IsAuthenticated)
         {
             // The administration is a page of the server: what the user may do there is decided by the server
             menu.Items.Add(SharedMenuItems.Admin);
-            menu.Items.Add(SharedMenuItems.Bookmarks);
             menu.Items.Add(SharedMenuItems.Tasks);
 
             // Only where a local store replicates: it is a client that has IReplicationService

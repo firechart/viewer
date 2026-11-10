@@ -5,13 +5,14 @@ namespace FireChart.Viewer.Core;
 /// </summary>
 /// <param name="Shown">The references (<c>Patient/p1</c>) the page shows above the list (the banner of the patient): a row does not repeat them.</param>
 /// <param name="Options">The options of the rows.</param>
+/// <param name="Format">How the values of the rows are shown (<c>fhir_options.decimals</c> of the templates); <see langword="null"/> as the records have them.</param>
 /// <example>
 /// <code>
 /// var context = new TileContext(["Patient/p1"], new TileOptions(ShowAge: true));
 /// var row = await renderer.RenderTileAsync(observationJson, context: context);
 /// </code>
 /// </example>
-public sealed record TileContext(IReadOnlyList<string> Shown, TileOptions Options)
+public sealed record TileContext(IReadOnlyList<string> Shown, TileOptions Options, Forms.ValueFormat? Format = null)
 {
     /// <summary>
     /// Nothing shown above the list, the default options.

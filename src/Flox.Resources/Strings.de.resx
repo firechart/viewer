@@ -283,7 +283,7 @@
     <value>Sprache</value>
   </data>
   <data name="Caption_DefaultPageSize" xml:space="preserve">
-    <value>Standard-Seitengröße</value>
+    <value>Einträge pro Seite</value>
   </data>
   <data name="Caption_DataAndPrivacy" xml:space="preserve">
     <value>Daten und Datenschutz</value>
@@ -495,9 +495,6 @@
   <data name="Message_InvalidValue" xml:space="preserve">
     <value>Der Wert ist ungültig</value>
   </data>
-  <data name="Message_BookmarkQueryString" xml:space="preserve">
-    <value>Ein Lesezeichen merkt sich einen Ort, keine Suche: Die Adresse enthält eine Abfragezeichenfolge, die Daten eines Patienten enthalten kann.</value>
-  </data>
   <data name="Caption_Name" xml:space="preserve">
     <value>Name</value>
   </data>
@@ -542,5 +539,26 @@
   </data>
   <data name="Caption_CollapseAll" xml:space="preserve">
     <value>Alle zuklappen</value>
+  </data>
+  <data name="Notice_BookmarksOnDevice" xml:space="preserve">
+    <value>Lesezeichen und zuletzt besuchte Seiten werden nur auf diesem Gerät gespeichert und nie an den Server gesendet; auf Ihren anderen Geräten gibt es sie daher nicht. Um Lesezeichen zu übertragen, exportieren Sie sie in eine Datei und importieren Sie diese dort; die Datei kann Namen von Patienten enthalten, bewahren Sie sie sorgfältig auf. Ein Konto des Betriebssystems ist ein Benutzer: Die Lesezeichen dieses Browsers sieht jeder, der ihn verwendet.</value>
+  </data>
+  <data name="Caption_ExportBookmarks" xml:space="preserve">
+    <value>Exportieren</value>
+  </data>
+  <data name="Caption_ImportBookmarks" xml:space="preserve">
+    <value>Importieren</value>
+  </data>
+  <data name="Message_BookmarksImported" xml:space="preserve">
+    <value>Hinzugefügte Lesezeichen: {0}; bereits vorhanden: {1}.</value>
+  </data>
+  <data name="Message_BookmarksFileInvalid" xml:space="preserve">
+    <value>Die Datei ist kein Export von Lesezeichen.</value>
+  </data>
+  <data name="Message_BookmarkSourceMissing" xml:space="preserve">
+    <value>Der Server dieses Lesezeichens ({0}) ist hier nicht registriert: Registrieren Sie ihn, um das Lesezeichen zu öffnen.</value>
+  </data>
+  <data name="Caption_History" xml:space="preserve">
+    <value>Verlauf</value>
   </data>
 </root>

@@ -54,7 +54,7 @@ public class ViewTemplatesTests
           "performer": [ { "actor": { "reference": "Practitioner/dr1", "display": "Dr. House" } } ] }
         """;
 
-    private static readonly VendorTemplates s_vendor = new();
+    private static readonly VendorTemplates s_vendor = TestLibrary.Vendor;
 
     private static ResourcePool Pool(params string[] resources)
     {
@@ -107,7 +107,8 @@ public class ViewTemplatesTests
             Assert.That(title, Is.GreaterThan(encounter));
             Assert.That(html, Does.Contain("""<a href="/app/Patient/p1">Peter James Chalmers &amp; Co</a>"""), "the banners of another resource lead to their resources");
             Assert.That(html, Does.Contain("""<a href="/app/Encounter/e1">Encounter: Office visit</a>"""));
-            Assert.That(html, Does.Contain("150 mmHg").And.Contain("""<span class="fx-badge fx-badge-soft fx-badge-sm fx-badge-warning">High</span>"""));
+            Assert.That(FxHtml.PlainText(html), Does.Contain("150 mmHg"));
+            Assert.That(html, Does.Contain("""<span class="fx-badge fx-badge-soft fx-badge-sm fx-badge-warning">High</span>"""));
         });
     }
 
@@ -136,7 +137,7 @@ public class ViewTemplatesTests
         {
             Assert.That(html, Does.Contain("""<a href="/app/Patient/p1">"""));
             Assert.That(html, Does.Contain("""<h2 class="fx-banner-title">Encounter: Office visit</h2>"""));
-            Assert.That(html, Does.Contain("2020-03-01 10:15 - 2020-03-01 11:00").And.Contain("Cough").And.Contain("Dr. House").And.Contain("Admission"));
+            Assert.That(html, Does.Contain("2020-03-01 10:15 - 11:00").And.Contain("Cough").And.Contain("Dr. House").And.Contain("Admission"));
             Assert.That(html, Does.Contain("""<a href="/app/Condition/c1">Bronchitis</a>"""), "a diagnosis that is not at hand is shown by what the reference says");
         });
     }
@@ -205,17 +206,17 @@ public class ViewTemplatesTests
     }
 
     [Test]
-    public void TheViewTemplatesDeclareWhatTheyNeedFromTheServer()
+    public async Task TheViewTemplatesDeclareWhatTheyNeedFromTheServer()
     {
         var renderer = new FhirRenderer([s_vendor]);
 
-        Assert.Multiple(() =>
+        await Assert.MultipleAsync(async () =>
         {
-            Assert.That(renderer.NeedsFor("Observation", "view").Include, Is.EqualTo(["Observation:subject", "Observation:encounter"]));
-            Assert.That(renderer.NeedsFor("Procedure", "view").Include, Is.EqualTo(["Procedure:subject", "Procedure:encounter"]));
-            Assert.That(renderer.NeedsFor("Condition", "view").Include, Is.EqualTo(["Condition:subject", "Condition:encounter"]));
-            Assert.That(renderer.NeedsFor("Encounter", "view").Include, Is.EqualTo(["Encounter:subject"]));
-            Assert.That(renderer.NeedsFor("Patient", "view").IsEmpty, Is.True);
+            Assert.That((await renderer.NeedsForAsync("Observation", "view")).Include, Is.EqualTo(["Observation:subject", "Observation:encounter"]));
+            Assert.That((await renderer.NeedsForAsync("Procedure", "view")).Include, Is.EqualTo(["Procedure:subject", "Procedure:encounter"]));
+            Assert.That((await renderer.NeedsForAsync("Condition", "view")).Include, Is.EqualTo(["Condition:subject", "Condition:encounter"]));
+            Assert.That((await renderer.NeedsForAsync("Encounter", "view")).Include, Is.EqualTo(["Encounter:subject"]));
+            Assert.That((await renderer.NeedsForAsync("Patient", "view")).IsEmpty, Is.True);
         });
     }
 

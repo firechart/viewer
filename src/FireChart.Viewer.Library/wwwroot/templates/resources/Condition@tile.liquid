@@ -1,0 +1,9 @@
+{% fhir_include "Condition:subject" %}
+{% fhir_include "Condition:encounter" %}
+{%- capture title -%}{% apply self.code mode: "text" %}{%- endcapture -%}
+{%- assign title = title | default: self.id -%}
+{%- assign since = self.onset | default: self.recordedDate -%}
+{%- slot "subtitle" -%}{% if since %}{% apply since mode: "text" %}{% endif %}{%- endslot -%}
+{%- slot "status" -%}{% render "concept-badge", concept: self.clinicalStatus %}{%- endslot -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot_data patient: self.subject, encounter: self.encounter, at: since %}

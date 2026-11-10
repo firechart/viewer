@@ -1,0 +1,1546 @@
+{
+  "formatVersion": 1,
+  "name": "generated",
+  "authoredForVersion": "5.0.0",
+  "isGenerated": true,
+  "title": {
+    "en-US": "Filter"
+  },
+  "description": {},
+  "groups": [],
+  "fields": [
+    {
+      "queryName": "date",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Date"
+      },
+      "hint": {
+        "en-US": "The capability statement publication date"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 1,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CanonicalResource-date",
+        "expression": "ActivityDefinition.date | ActorDefinition.date | CapabilityStatement.date | ChargeItemDefinition.date | Citation.date | CodeSystem.date | CompartmentDefinition.date | ConceptMap.date | ConditionDefinition.date | EventDefinition.date | Evidence.date | EvidenceVariable.date | ExampleScenario.date | GraphDefinition.date | ImplementationGuide.date | Library.date | Measure.date | MessageDefinition.date | NamingSystem.date | OperationDefinition.date | PlanDefinition.date | Questionnaire.date | Requirements.date | SearchParameter.date | StructureDefinition.date | StructureMap.date | SubscriptionTopic.date | TerminologyCapabilities.date | TestScript.date | ValueSet.date",
+        "base": [
+          "ActivityDefinition",
+          "ActorDefinition",
+          "CapabilityStatement",
+          "ChargeItemDefinition",
+          "Citation",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "ConditionDefinition",
+          "EventDefinition",
+          "Evidence",
+          "EvidenceVariable",
+          "ExampleScenario",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "Library",
+          "Measure",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "PlanDefinition",
+          "Questionnaire",
+          "Requirements",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "SubscriptionTopic",
+          "TerminologyCapabilities",
+          "TestScript",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "identifier",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Identifier"
+      },
+      "hint": {
+        "en-US": "External identifier for the capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 2,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CanonicalResource-identifier",
+        "expression": "ActivityDefinition.identifier | ActorDefinition.identifier | CapabilityStatement.identifier | ChargeItemDefinition.identifier | Citation.identifier | CodeSystem.identifier | ConceptMap.identifier | ConditionDefinition.identifier | EventDefinition.identifier | Evidence.identifier | EvidenceReport.identifier | EvidenceVariable.identifier | ExampleScenario.identifier | GraphDefinition.identifier | ImplementationGuide.identifier | Library.identifier | Measure.identifier | MedicationKnowledge.identifier | MessageDefinition.identifier | NamingSystem.identifier | ObservationDefinition.identifier | OperationDefinition.identifier | PlanDefinition.identifier | Questionnaire.identifier | Requirements.identifier | SearchParameter.identifier | SpecimenDefinition.identifier | StructureDefinition.identifier | StructureMap.identifier | SubscriptionTopic.identifier | TerminologyCapabilities.identifier | TestPlan.identifier | TestScript.identifier | ValueSet.identifier",
+        "base": [
+          "ActivityDefinition",
+          "ActorDefinition",
+          "CapabilityStatement",
+          "ChargeItemDefinition",
+          "Citation",
+          "CodeSystem",
+          "ConceptMap",
+          "ConditionDefinition",
+          "EventDefinition",
+          "Evidence",
+          "EvidenceReport",
+          "EvidenceVariable",
+          "ExampleScenario",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "Library",
+          "Measure",
+          "MedicationKnowledge",
+          "MessageDefinition",
+          "NamingSystem",
+          "ObservationDefinition",
+          "OperationDefinition",
+          "PlanDefinition",
+          "Questionnaire",
+          "Requirements",
+          "SearchParameter",
+          "SpecimenDefinition",
+          "StructureDefinition",
+          "StructureMap",
+          "SubscriptionTopic",
+          "TerminologyCapabilities",
+          "TestPlan",
+          "TestScript",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "resource-profile",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Resource profile"
+      },
+      "hint": {
+        "en-US": "A profile id invoked in a capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 3,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "StructureDefinition"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CapabilityStatement-resource-profile",
+        "expression": "CapabilityStatement.rest.resource.profile",
+        "base": [
+          "CapabilityStatement"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "software",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Software"
+      },
+      "hint": {
+        "en-US": "Part of the name of a software application"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 4,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CapabilityStatement-software",
+        "expression": "CapabilityStatement.software.name",
+        "base": [
+          "CapabilityStatement"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "resource",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Resource"
+      },
+      "hint": {
+        "en-US": "Name of a resource mentioned in a capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 5,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/resource-types",
+      "valueSetVersion": "5.0.0",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CapabilityStatement-resource",
+        "expression": "CapabilityStatement.rest.resource.type",
+        "base": [
+          "CapabilityStatement"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "jurisdiction",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Jurisdiction"
+      },
+      "hint": {
+        "en-US": "Intended jurisdiction for the capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 6,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/jurisdiction",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CanonicalResource-jurisdiction",
+        "expression": "ActivityDefinition.jurisdiction | ActorDefinition.jurisdiction | CapabilityStatement.jurisdiction | ChargeItemDefinition.jurisdiction | Citation.jurisdiction | CodeSystem.jurisdiction | ConceptMap.jurisdiction | ConditionDefinition.jurisdiction | EventDefinition.jurisdiction | ExampleScenario.jurisdiction | GraphDefinition.jurisdiction | ImplementationGuide.jurisdiction | Library.jurisdiction | Measure.jurisdiction | MessageDefinition.jurisdiction | NamingSystem.jurisdiction | OperationDefinition.jurisdiction | PlanDefinition.jurisdiction | Questionnaire.jurisdiction | Requirements.jurisdiction | SearchParameter.jurisdiction | StructureDefinition.jurisdiction | StructureMap.jurisdiction | TerminologyCapabilities.jurisdiction | TestScript.jurisdiction | ValueSet.jurisdiction",
+        "base": [
+          "ActivityDefinition",
+          "ActorDefinition",
+          "CapabilityStatement",
+          "ChargeItemDefinition",
+          "Citation",
+          "CodeSystem",
+          "ConceptMap",
+          "ConditionDefinition",
+          "EventDefinition",
+          "ExampleScenario",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "Library",
+          "Measure",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "PlanDefinition",
+          "Questionnaire",
+          "Requirements",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "TestScript",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "format",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Format"
+      },
+      "hint": {
+        "en-US": "formats supported (xml | json | ttl | mime type)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 7,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/mimetypes",
+      "valueSetVersion": "5.0.0",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CapabilityStatement-format",
+        "expression": "CapabilityStatement.format",
+        "base": [
+          "CapabilityStatement"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "description",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Description"
+      },
+      "hint": {
+        "en-US": "The description of the capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 8,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CanonicalResource-description",
+        "expression": "ActivityDefinition.description | ActorDefinition.description | CapabilityStatement.description | ChargeItemDefinition.description | Citation.description | CodeSystem.description | CompartmentDefinition.description | ConceptMap.description | ConditionDefinition.description | EventDefinition.description | Evidence.description | EvidenceVariable.description | GraphDefinition.description | ImplementationGuide.description | Library.description | Measure.description | MessageDefinition.description | NamingSystem.description | OperationDefinition.description | PlanDefinition.description | Questionnaire.description | Requirements.description | SearchParameter.description | StructureDefinition.description | StructureMap.description | TerminologyCapabilities.description | TestScript.description | ValueSet.description",
+        "base": [
+          "ActivityDefinition",
+          "ActorDefinition",
+          "CapabilityStatement",
+          "ChargeItemDefinition",
+          "Citation",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "ConditionDefinition",
+          "EventDefinition",
+          "Evidence",
+          "EvidenceVariable",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "Library",
+          "Measure",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "PlanDefinition",
+          "Questionnaire",
+          "Requirements",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "TestScript",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "context-type",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Context type"
+      },
+      "hint": {
+        "en-US": "A type of use context assigned to the capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 9,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CanonicalResource-context-type",
+        "expression": "ActivityDefinition.useContext.code | ActorDefinition.useContext.code | CapabilityStatement.useContext.code | ChargeItemDefinition.useContext.code | Citation.useContext.code | CodeSystem.useContext.code | CompartmentDefinition.useContext.code | ConceptMap.useContext.code | ConditionDefinition.useContext.code | EventDefinition.useContext.code | Evidence.useContext.code | EvidenceReport.useContext.code | EvidenceVariable.useContext.code | ExampleScenario.useContext.code | GraphDefinition.useContext.code | ImplementationGuide.useContext.code | Library.useContext.code | Measure.useContext.code | MessageDefinition.useContext.code | NamingSystem.useContext.code | OperationDefinition.useContext.code | PlanDefinition.useContext.code | Questionnaire.useContext.code | Requirements.useContext.code | SearchParameter.useContext.code | StructureDefinition.useContext.code | StructureMap.useContext.code | TerminologyCapabilities.useContext.code | TestScript.useContext.code | ValueSet.useContext.code",
+        "base": [
+          "ActivityDefinition",
+          "ActorDefinition",
+          "CapabilityStatement",
+          "ChargeItemDefinition",
+          "Citation",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "ConditionDefinition",
+          "EventDefinition",
+          "Evidence",
+          "EvidenceReport",
+          "EvidenceVariable",
+          "ExampleScenario",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "Library",
+          "Measure",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "PlanDefinition",
+          "Questionnaire",
+          "Requirements",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "TestScript",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "fhirversion",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Fhirversion"
+      },
+      "hint": {
+        "en-US": "The version of FHIR"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 10,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/FHIR-version",
+      "valueSetVersion": "5.0.0",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CapabilityStatement-fhirversion",
+        "expression": "CapabilityStatement.fhirVersion",
+        "base": [
+          "CapabilityStatement"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "title",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Title"
+      },
+      "hint": {
+        "en-US": "The human-friendly name of the capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 11,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CanonicalResource-title",
+        "expression": "ActivityDefinition.title | ActorDefinition.title | CapabilityStatement.title | ChargeItemDefinition.title | Citation.title | CodeSystem.title | ConceptMap.title | ConditionDefinition.title | EventDefinition.title | Evidence.title | EvidenceVariable.title | ImplementationGuide.title | Library.title | Measure.title | MessageDefinition.title | ObservationDefinition.title | OperationDefinition.title | PlanDefinition.title | Questionnaire.title | Requirements.title | SpecimenDefinition.title | StructureDefinition.title | StructureMap.title | SubscriptionTopic.title | TerminologyCapabilities.title | TestScript.title | ValueSet.title",
+        "base": [
+          "ActivityDefinition",
+          "ActorDefinition",
+          "CapabilityStatement",
+          "ChargeItemDefinition",
+          "Citation",
+          "CodeSystem",
+          "ConceptMap",
+          "ConditionDefinition",
+          "EventDefinition",
+          "Evidence",
+          "EvidenceVariable",
+          "ImplementationGuide",
+          "Library",
+          "Measure",
+          "MessageDefinition",
+          "ObservationDefinition",
+          "OperationDefinition",
+          "PlanDefinition",
+          "Questionnaire",
+          "Requirements",
+          "SpecimenDefinition",
+          "StructureDefinition",
+          "StructureMap",
+          "SubscriptionTopic",
+          "TerminologyCapabilities",
+          "TestScript",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "version",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Version"
+      },
+      "hint": {
+        "en-US": "The business version of the capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 12,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CanonicalResource-version",
+        "expression": "ActivityDefinition.version | ActorDefinition.version | CapabilityStatement.version | ChargeItemDefinition.version | Citation.version | CodeSystem.version | CompartmentDefinition.version | ConceptMap.version | ConditionDefinition.version | EventDefinition.version | Evidence.version | EvidenceVariable.version | ExampleScenario.version | GraphDefinition.version | ImplementationGuide.version | Library.version | Measure.version | MessageDefinition.version | NamingSystem.version | OperationDefinition.version | PlanDefinition.version | Questionnaire.version | Requirements.version | SearchParameter.version | StructureDefinition.version | StructureMap.version | SubscriptionTopic.version | TerminologyCapabilities.version | TestScript.version | ValueSet.version",
+        "base": [
+          "ActivityDefinition",
+          "ActorDefinition",
+          "CapabilityStatement",
+          "ChargeItemDefinition",
+          "Citation",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "ConditionDefinition",
+          "EventDefinition",
+          "Evidence",
+          "EvidenceVariable",
+          "ExampleScenario",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "Library",
+          "Measure",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "PlanDefinition",
+          "Questionnaire",
+          "Requirements",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "SubscriptionTopic",
+          "TerminologyCapabilities",
+          "TestScript",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "supported-profile",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Supported profile"
+      },
+      "hint": {
+        "en-US": "Profiles for use cases supported"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 13,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "StructureDefinition"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CapabilityStatement-supported-profile",
+        "expression": "CapabilityStatement.rest.resource.supportedProfile",
+        "base": [
+          "CapabilityStatement"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "url",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": true,
+      "label": {
+        "en-US": "Url"
+      },
+      "hint": {
+        "en-US": "The uri that identifies the capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 14,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CanonicalResource-url",
+        "expression": "ActivityDefinition.url | ActorDefinition.url | CapabilityStatement.url | ChargeItemDefinition.url | Citation.url | CodeSystem.url | CompartmentDefinition.url | ConceptMap.url | ConditionDefinition.url | EventDefinition.url | Evidence.url | EvidenceReport.url | EvidenceVariable.url | ExampleScenario.url | GraphDefinition.url | ImplementationGuide.url | Library.url | Measure.url | MessageDefinition.url | NamingSystem.url | ObservationDefinition.url | OperationDefinition.url | PlanDefinition.url | Questionnaire.url | Requirements.url | SearchParameter.url | SpecimenDefinition.url | StructureDefinition.url | StructureMap.url | SubscriptionTopic.url | TerminologyCapabilities.url | TestPlan.url | TestScript.url | ValueSet.url",
+        "base": [
+          "ActivityDefinition",
+          "ActorDefinition",
+          "CapabilityStatement",
+          "ChargeItemDefinition",
+          "Citation",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "ConditionDefinition",
+          "EventDefinition",
+          "Evidence",
+          "EvidenceReport",
+          "EvidenceVariable",
+          "ExampleScenario",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "Library",
+          "Measure",
+          "MessageDefinition",
+          "NamingSystem",
+          "ObservationDefinition",
+          "OperationDefinition",
+          "PlanDefinition",
+          "Questionnaire",
+          "Requirements",
+          "SearchParameter",
+          "SpecimenDefinition",
+          "StructureDefinition",
+          "StructureMap",
+          "SubscriptionTopic",
+          "TerminologyCapabilities",
+          "TestPlan",
+          "TestScript",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "mode",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Mode"
+      },
+      "hint": {
+        "en-US": "Mode - restful (server/client) or messaging (sender/receiver)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 15,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/restful-capability-mode",
+      "valueSetVersion": "5.0.0",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CapabilityStatement-mode",
+        "expression": "CapabilityStatement.rest.mode",
+        "base": [
+          "CapabilityStatement"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "context-quantity",
+      "origin": "package",
+      "parameterType": "quantity",
+      "included": true,
+      "label": {
+        "en-US": "Context quantity"
+      },
+      "hint": {
+        "en-US": "A quantity- or range-valued use context assigned to the capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "quantity",
+      "order": 16,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [
+        {
+          "code": "kg",
+          "label": {
+            "en-US": "kg"
+          }
+        },
+        {
+          "code": "g",
+          "label": {
+            "en-US": "g"
+          }
+        },
+        {
+          "code": "mg",
+          "label": {
+            "en-US": "mg"
+          }
+        },
+        {
+          "code": "[lb_av]",
+          "label": {
+            "en-US": "lb"
+          }
+        },
+        {
+          "code": "cm",
+          "label": {
+            "en-US": "cm"
+          }
+        },
+        {
+          "code": "m",
+          "label": {
+            "en-US": "m"
+          }
+        },
+        {
+          "code": "[in_i]",
+          "label": {
+            "en-US": "in"
+          }
+        },
+        {
+          "code": "Cel",
+          "label": {
+            "en-US": "°C"
+          }
+        },
+        {
+          "code": "[degF]",
+          "label": {
+            "en-US": "°F"
+          }
+        },
+        {
+          "code": "mm[Hg]",
+          "label": {
+            "en-US": "mm[Hg]"
+          }
+        },
+        {
+          "code": "/min",
+          "label": {
+            "en-US": "/min"
+          }
+        },
+        {
+          "code": "%",
+          "label": {
+            "en-US": "%"
+          }
+        },
+        {
+          "code": "mmol/L",
+          "label": {
+            "en-US": "mmol/L"
+          }
+        },
+        {
+          "code": "mg/dL",
+          "label": {
+            "en-US": "mg/dL"
+          }
+        },
+        {
+          "code": "mL",
+          "label": {
+            "en-US": "mL"
+          }
+        },
+        {
+          "code": "L",
+          "label": {
+            "en-US": "L"
+          }
+        },
+        {
+          "code": "a",
+          "label": {
+            "en-US": "year"
+          }
+        },
+        {
+          "code": "mo",
+          "label": {
+            "en-US": "month"
+          }
+        },
+        {
+          "code": "wk",
+          "label": {
+            "en-US": "week"
+          }
+        },
+        {
+          "code": "d",
+          "label": {
+            "en-US": "day"
+          }
+        }
+      ],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CanonicalResource-context-quantity",
+        "expression": "(ActivityDefinition.useContext.value.ofType(Quantity)) | (ActivityDefinition.useContext.value.ofType(Range)) | (ActorDefinition.useContext.value.ofType(Quantity)) | (ActorDefinition.useContext.value.ofType(Range)) | (CapabilityStatement.useContext.value.ofType(Quantity)) | (CapabilityStatement.useContext.value.ofType(Range)) | (ChargeItemDefinition.useContext.value.ofType(Quantity)) | (ChargeItemDefinition.useContext.value.ofType(Range)) | (Citation.useContext.value.ofType(Quantity)) | (Citation.useContext.value.ofType(Range)) | (CodeSystem.useContext.value.ofType(Quantity)) | (CodeSystem.useContext.value.ofType(Range)) | (CompartmentDefinition.useContext.value.ofType(Quantity)) | (CompartmentDefinition.useContext.value.ofType(Range)) | (ConceptMap.useContext.value.ofType(Quantity)) | (ConceptMap.useContext.value.ofType(Range)) | (ConditionDefinition.useContext.value.ofType(Quantity)) | (ConditionDefinition.useContext.value.ofType(Range)) | (EventDefinition.useContext.value.ofType(Quantity)) | (EventDefinition.useContext.value.ofType(Range)) | (Evidence.useContext.value.ofType(Quantity)) | (Evidence.useContext.value.ofType(Range)) | (EvidenceReport.useContext.value.ofType(Quantity)) | (EvidenceReport.useContext.value.ofType(Range)) | (EvidenceVariable.useContext.value.ofType(Quantity)) | (EvidenceVariable.useContext.value.ofType(Range)) | (ExampleScenario.useContext.value.ofType(Quantity)) | (ExampleScenario.useContext.value.ofType(Range)) | (GraphDefinition.useContext.value.ofType(Quantity)) | (GraphDefinition.useContext.value.ofType(Range)) | (ImplementationGuide.useContext.value.ofType(Quantity)) | (ImplementationGuide.useContext.value.ofType(Range)) | (Library.useContext.value.ofType(Quantity)) | (Library.useContext.value.ofType(Range)) | (Measure.useContext.value.ofType(Quantity)) | (Measure.useContext.value.ofType(Range)) | (MessageDefinition.useContext.value.ofType(Quantity)) | (MessageDefinition.useContext.value.ofType(Range)) | (NamingSystem.useContext.value.ofType(Quantity)) | (NamingSystem.useContext.value.ofType(Range)) | (OperationDefinition.useContext.value.ofType(Quantity)) | (OperationDefinition.useContext.value.ofType(Range)) | (PlanDefinition.useContext.value.ofType(Quantity)) | (PlanDefinition.useContext.value.ofType(Range)) | (Questionnaire.useContext.value.ofType(Quantity)) | (Questionnaire.useContext.value.ofType(Range)) | (Requirements.useContext.value.ofType(Quantity)) | (Requirements.useContext.value.ofType(Range)) | (SearchParameter.useContext.value.ofType(Quantity)) | (SearchParameter.useContext.value.ofType(Range)) | (StructureDefinition.useContext.value.ofType(Quantity)) | (StructureDefinition.useContext.value.ofType(Range)) | (StructureMap.useContext.value.ofType(Quantity)) | (StructureMap.useContext.value.ofType(Range)) | (TerminologyCapabilities.useContext.value.ofType(Quantity)) | (TerminologyCapabilities.useContext.value.ofType(Range)) | (TestScript.useContext.value.ofType(Quantity)) | (TestScript.useContext.value.ofType(Range)) | (ValueSet.useContext.value.ofType(Quantity)) | (ValueSet.useContext.value.ofType(Range))",
+        "base": [
+          "ActivityDefinition",
+          "ActorDefinition",
+          "CapabilityStatement",
+          "ChargeItemDefinition",
+          "Citation",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "ConditionDefinition",
+          "EventDefinition",
+          "Evidence",
+          "EvidenceReport",
+          "EvidenceVariable",
+          "ExampleScenario",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "Library",
+          "Measure",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "PlanDefinition",
+          "Questionnaire",
+          "Requirements",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "TestScript",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "security-service",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Security service"
+      },
+      "hint": {
+        "en-US": "OAuth | SMART-on-FHIR | NTLM | Basic | Kerberos | Certificates"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 17,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/restful-security-service",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CapabilityStatement-security-service",
+        "expression": "CapabilityStatement.rest.security.service",
+        "base": [
+          "CapabilityStatement"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "context",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Context"
+      },
+      "hint": {
+        "en-US": "A use context assigned to the capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 18,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CanonicalResource-context",
+        "expression": "(ActivityDefinition.useContext.value.ofType(CodeableConcept)) | (ActorDefinition.useContext.value.ofType(CodeableConcept)) | (CapabilityStatement.useContext.value.ofType(CodeableConcept)) | (ChargeItemDefinition.useContext.value.ofType(CodeableConcept)) | (Citation.useContext.value.ofType(CodeableConcept)) | (CodeSystem.useContext.value.ofType(CodeableConcept)) | (CompartmentDefinition.useContext.value.ofType(CodeableConcept)) | (ConceptMap.useContext.value.ofType(CodeableConcept)) | (ConditionDefinition.useContext.value.ofType(CodeableConcept)) | (EventDefinition.useContext.value.ofType(CodeableConcept)) | (Evidence.useContext.value.ofType(CodeableConcept)) | (EvidenceReport.useContext.value.ofType(CodeableConcept)) | (EvidenceVariable.useContext.value.ofType(CodeableConcept)) | (ExampleScenario.useContext.value.ofType(CodeableConcept)) | (GraphDefinition.useContext.value.ofType(CodeableConcept)) | (ImplementationGuide.useContext.value.ofType(CodeableConcept)) | (Library.useContext.value.ofType(CodeableConcept)) | (Measure.useContext.value.ofType(CodeableConcept)) | (MessageDefinition.useContext.value.ofType(CodeableConcept)) | (NamingSystem.useContext.value.ofType(CodeableConcept)) | (OperationDefinition.useContext.value.ofType(CodeableConcept)) | (PlanDefinition.useContext.value.ofType(CodeableConcept)) | (Questionnaire.useContext.value.ofType(CodeableConcept)) | (Requirements.useContext.value.ofType(CodeableConcept)) | (SearchParameter.useContext.value.ofType(CodeableConcept)) | (StructureDefinition.useContext.value.ofType(CodeableConcept)) | (StructureMap.useContext.value.ofType(CodeableConcept)) | (TerminologyCapabilities.useContext.value.ofType(CodeableConcept)) | (TestScript.useContext.value.ofType(CodeableConcept)) | (ValueSet.useContext.value.ofType(CodeableConcept))",
+        "base": [
+          "ActivityDefinition",
+          "ActorDefinition",
+          "CapabilityStatement",
+          "ChargeItemDefinition",
+          "Citation",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "ConditionDefinition",
+          "EventDefinition",
+          "Evidence",
+          "EvidenceReport",
+          "EvidenceVariable",
+          "ExampleScenario",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "Library",
+          "Measure",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "PlanDefinition",
+          "Questionnaire",
+          "Requirements",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "TestScript",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "name",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Name"
+      },
+      "hint": {
+        "en-US": "Computationally friendly name of the capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 19,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CanonicalResource-name",
+        "expression": "ActivityDefinition.name | CapabilityStatement.name | Citation.name | CodeSystem.name | CompartmentDefinition.name | ConceptMap.name | ConditionDefinition.name | EventDefinition.name | EvidenceVariable.name | ExampleScenario.name | GraphDefinition.name | ImplementationGuide.name | Library.name | Measure.name | MessageDefinition.name | NamingSystem.name | OperationDefinition.name | PlanDefinition.name | Questionnaire.name | Requirements.name | SearchParameter.name | StructureDefinition.name | StructureMap.name | TerminologyCapabilities.name | TestScript.name | ValueSet.name",
+        "base": [
+          "ActivityDefinition",
+          "CapabilityStatement",
+          "Citation",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "ConditionDefinition",
+          "EventDefinition",
+          "EvidenceVariable",
+          "ExampleScenario",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "Library",
+          "Measure",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "PlanDefinition",
+          "Questionnaire",
+          "Requirements",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "TestScript",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "publisher",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Publisher"
+      },
+      "hint": {
+        "en-US": "Name of the publisher of the capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 20,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CanonicalResource-publisher",
+        "expression": "ActivityDefinition.publisher | ActorDefinition.publisher | CapabilityStatement.publisher | ChargeItemDefinition.publisher | Citation.publisher | CodeSystem.publisher | CompartmentDefinition.publisher | ConceptMap.publisher | ConditionDefinition.publisher | EventDefinition.publisher | Evidence.publisher | EvidenceReport.publisher | EvidenceVariable.publisher | ExampleScenario.publisher | GraphDefinition.publisher | ImplementationGuide.publisher | Library.publisher | Measure.publisher | MessageDefinition.publisher | NamingSystem.publisher | OperationDefinition.publisher | PlanDefinition.publisher | Questionnaire.publisher | Requirements.publisher | SearchParameter.publisher | StructureDefinition.publisher | StructureMap.publisher | TerminologyCapabilities.publisher | TestScript.publisher | ValueSet.publisher",
+        "base": [
+          "ActivityDefinition",
+          "ActorDefinition",
+          "CapabilityStatement",
+          "ChargeItemDefinition",
+          "Citation",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "ConditionDefinition",
+          "EventDefinition",
+          "Evidence",
+          "EvidenceReport",
+          "EvidenceVariable",
+          "ExampleScenario",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "Library",
+          "Measure",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "PlanDefinition",
+          "Questionnaire",
+          "Requirements",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "TestScript",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "guide",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Guide"
+      },
+      "hint": {
+        "en-US": "Implementation guides supported"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 21,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "ImplementationGuide"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CapabilityStatement-guide",
+        "expression": "CapabilityStatement.implementationGuide",
+        "base": [
+          "CapabilityStatement"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "status",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Status"
+      },
+      "hint": {
+        "en-US": "The current status of the capability statement"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 22,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/publication-status",
+      "valueSetVersion": "5.0.0",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/CanonicalResource-status",
+        "expression": "ActivityDefinition.status | ActorDefinition.status | CapabilityStatement.status | ChargeItemDefinition.status | Citation.status | CodeSystem.status | CompartmentDefinition.status | ConceptMap.status | ConditionDefinition.status | EventDefinition.status | Evidence.status | EvidenceReport.status | EvidenceVariable.status | ExampleScenario.status | GraphDefinition.status | ImplementationGuide.status | Library.status | Measure.status | MedicationKnowledge.status | MessageDefinition.status | NamingSystem.status | ObservationDefinition.status | OperationDefinition.status | PlanDefinition.status | Questionnaire.status | Requirements.status | SearchParameter.status | SpecimenDefinition.status | StructureDefinition.status | StructureMap.status | SubscriptionTopic.status | TerminologyCapabilities.status | TestPlan.status | TestScript.status | ValueSet.status",
+        "base": [
+          "ActivityDefinition",
+          "ActorDefinition",
+          "CapabilityStatement",
+          "ChargeItemDefinition",
+          "Citation",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "ConditionDefinition",
+          "EventDefinition",
+          "Evidence",
+          "EvidenceReport",
+          "EvidenceVariable",
+          "ExampleScenario",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "Library",
+          "Measure",
+          "MedicationKnowledge",
+          "MessageDefinition",
+          "NamingSystem",
+          "ObservationDefinition",
+          "OperationDefinition",
+          "PlanDefinition",
+          "Questionnaire",
+          "Requirements",
+          "SearchParameter",
+          "SpecimenDefinition",
+          "StructureDefinition",
+          "StructureMap",
+          "SubscriptionTopic",
+          "TerminologyCapabilities",
+          "TestPlan",
+          "TestScript",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_id",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Id"
+      },
+      "hint": {
+        "en-US": "Search by resource identifier - e.g. same as the read interaction, but can return included resources"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 23,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/example",
+        "expression": "id",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_in",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": false,
+      "label": {
+        "en-US": "In"
+      },
+      "hint": {
+        "en-US": "Allows for the retrieval of resources that are active members of a CareTeam, Group, or List"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 24,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-in",
+        "expression": "Resource.id",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_language",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Language"
+      },
+      "hint": {
+        "en-US": "Language of the resource content"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 25,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-language",
+        "expression": "Resource.language",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_lastUpdated",
+      "origin": "package",
+      "parameterType": "date",
+      "included": false,
+      "label": {
+        "en-US": "Last updated"
+      },
+      "hint": {
+        "en-US": "When the resource version last changed"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 26,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-lastUpdated",
+        "expression": "Resource.meta.lastUpdated",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_profile",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": false,
+      "label": {
+        "en-US": "Profile"
+      },
+      "hint": {
+        "en-US": "Profiles this resource claims to conform to"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 27,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "StructureDefinition"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-profile",
+        "expression": "Resource.meta.profile",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_security",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Security"
+      },
+      "hint": {
+        "en-US": "Security Labels applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 28,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-security",
+        "expression": "Resource.meta.security",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_source",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Source"
+      },
+      "hint": {
+        "en-US": "Identifies where the resource comes from"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 29,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-source",
+        "expression": "Resource.meta.source",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_tag",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Tag"
+      },
+      "hint": {
+        "en-US": "Tags applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 30,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-tag",
+        "expression": "Resource.meta.tag",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_text",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Text"
+      },
+      "hint": {
+        "en-US": "Text search against the narrative"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 31,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-text",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    }
+  ]
+}

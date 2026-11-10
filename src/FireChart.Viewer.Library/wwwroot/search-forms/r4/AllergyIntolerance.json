@@ -1,0 +1,963 @@
+{
+  "formatVersion": 1,
+  "name": "generated",
+  "authoredForVersion": "4.0.1",
+  "isGenerated": true,
+  "title": {
+    "en-US": "Filter"
+  },
+  "description": {},
+  "groups": [],
+  "fields": [
+    {
+      "queryName": "severity",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Severity"
+      },
+      "hint": {
+        "en-US": "mild | moderate | severe (of event as a whole)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 1,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/reaction-event-severity",
+      "valueSetVersion": "4.0.1",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AllergyIntolerance-severity",
+        "expression": "AllergyIntolerance.reaction.severity",
+        "base": [
+          "AllergyIntolerance"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "date",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Date"
+      },
+      "hint": {
+        "en-US": "Date first version of the resource instance was recorded"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 2,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-date",
+        "expression": "AllergyIntolerance.recordedDate | CarePlan.period | CareTeam.period | ClinicalImpression.date | Composition.date | Consent.dateTime | DiagnosticReport.effective | Encounter.period | EpisodeOfCare.period | FamilyMemberHistory.date | Flag.period | Immunization.occurrence | List.date | Observation.effective | Procedure.performed | (RiskAssessment.occurrence as dateTime) | SupplyRequest.authoredOn",
+        "base": [
+          "AllergyIntolerance",
+          "CarePlan",
+          "CareTeam",
+          "ClinicalImpression",
+          "Composition",
+          "Consent",
+          "DiagnosticReport",
+          "Encounter",
+          "EpisodeOfCare",
+          "FamilyMemberHistory",
+          "Flag",
+          "Immunization",
+          "List",
+          "Observation",
+          "Procedure",
+          "RiskAssessment",
+          "SupplyRequest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "identifier",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Identifier"
+      },
+      "hint": {
+        "en-US": "External ids for this item"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 3,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-identifier",
+        "expression": "AllergyIntolerance.identifier | CarePlan.identifier | CareTeam.identifier | Composition.identifier | Condition.identifier | Consent.identifier | DetectedIssue.identifier | DeviceRequest.identifier | DiagnosticReport.identifier | DocumentManifest.masterIdentifier | DocumentManifest.identifier | DocumentReference.masterIdentifier | DocumentReference.identifier | Encounter.identifier | EpisodeOfCare.identifier | FamilyMemberHistory.identifier | Goal.identifier | ImagingStudy.identifier | Immunization.identifier | List.identifier | MedicationAdministration.identifier | MedicationDispense.identifier | MedicationRequest.identifier | MedicationStatement.identifier | NutritionOrder.identifier | Observation.identifier | Procedure.identifier | RiskAssessment.identifier | ServiceRequest.identifier | SupplyDelivery.identifier | SupplyRequest.identifier | VisionPrescription.identifier",
+        "base": [
+          "AllergyIntolerance",
+          "CarePlan",
+          "CareTeam",
+          "Composition",
+          "Condition",
+          "Consent",
+          "DetectedIssue",
+          "DeviceRequest",
+          "DiagnosticReport",
+          "DocumentManifest",
+          "DocumentReference",
+          "Encounter",
+          "EpisodeOfCare",
+          "FamilyMemberHistory",
+          "Goal",
+          "ImagingStudy",
+          "Immunization",
+          "List",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationRequest",
+          "MedicationStatement",
+          "NutritionOrder",
+          "Observation",
+          "Procedure",
+          "RiskAssessment",
+          "ServiceRequest",
+          "SupplyDelivery",
+          "SupplyRequest",
+          "VisionPrescription"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "manifestation",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Manifestation"
+      },
+      "hint": {
+        "en-US": "Clinical symptoms/signs associated with the Event"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 4,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/clinical-findings",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AllergyIntolerance-manifestation",
+        "expression": "AllergyIntolerance.reaction.manifestation",
+        "base": [
+          "AllergyIntolerance"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "recorder",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Recorder"
+      },
+      "hint": {
+        "en-US": "Who recorded the sensitivity"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 5,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Practitioner",
+          "Patient",
+          "PractitionerRole",
+          "RelatedPerson"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AllergyIntolerance-recorder",
+        "expression": "AllergyIntolerance.recorder",
+        "base": [
+          "AllergyIntolerance"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "code",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Code"
+      },
+      "hint": {
+        "en-US": "Code that identifies the allergy or intolerance"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 6,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-code",
+        "expression": "AllergyIntolerance.code | AllergyIntolerance.reaction.substance | Condition.code | (DeviceRequest.code as CodeableConcept) | DiagnosticReport.code | FamilyMemberHistory.condition.code | List.code | Medication.code | (MedicationAdministration.medication as CodeableConcept) | (MedicationDispense.medication as CodeableConcept) | (MedicationRequest.medication as CodeableConcept) | (MedicationStatement.medication as CodeableConcept) | Observation.code | Procedure.code | ServiceRequest.code",
+        "base": [
+          "AllergyIntolerance",
+          "Condition",
+          "DeviceRequest",
+          "DiagnosticReport",
+          "FamilyMemberHistory",
+          "List",
+          "Medication",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationRequest",
+          "MedicationStatement",
+          "Observation",
+          "Procedure",
+          "ServiceRequest"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "verification-status",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Verification status"
+      },
+      "hint": {
+        "en-US": "unconfirmed | confirmed | refuted | entered-in-error"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 7,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/allergyintolerance-verification",
+      "valueSetVersion": "4.0.1",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AllergyIntolerance-verification-status",
+        "expression": "AllergyIntolerance.verificationStatus",
+        "base": [
+          "AllergyIntolerance"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "criticality",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Criticality"
+      },
+      "hint": {
+        "en-US": "low | high | unable-to-assess"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 8,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/allergy-intolerance-criticality",
+      "valueSetVersion": "4.0.1",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AllergyIntolerance-criticality",
+        "expression": "AllergyIntolerance.criticality",
+        "base": [
+          "AllergyIntolerance"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "clinical-status",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Clinical status"
+      },
+      "hint": {
+        "en-US": "active | inactive | resolved"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 9,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/allergyintolerance-clinical",
+      "valueSetVersion": "4.0.1",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AllergyIntolerance-clinical-status",
+        "expression": "AllergyIntolerance.clinicalStatus",
+        "base": [
+          "AllergyIntolerance"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "type",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Type"
+      },
+      "hint": {
+        "en-US": "allergy | intolerance - Underlying mechanism (if known)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 10,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/allergy-intolerance-type",
+      "valueSetVersion": "4.0.1",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-type",
+        "expression": "AllergyIntolerance.type | Composition.type | DocumentManifest.type | DocumentReference.type | Encounter.type | EpisodeOfCare.type",
+        "base": [
+          "AllergyIntolerance",
+          "Composition",
+          "DocumentManifest",
+          "DocumentReference",
+          "Encounter",
+          "EpisodeOfCare"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "onset",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Onset"
+      },
+      "hint": {
+        "en-US": "Date(/time) when manifestations showed"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 11,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AllergyIntolerance-onset",
+        "expression": "AllergyIntolerance.reaction.onset",
+        "base": [
+          "AllergyIntolerance"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "route",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Route"
+      },
+      "hint": {
+        "en-US": "How the subject was exposed to the substance"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 12,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/route-codes",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AllergyIntolerance-route",
+        "expression": "AllergyIntolerance.reaction.exposureRoute",
+        "base": [
+          "AllergyIntolerance"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "asserter",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Asserter"
+      },
+      "hint": {
+        "en-US": "Source of the information about the allergy"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 13,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Practitioner",
+          "Patient",
+          "PractitionerRole",
+          "RelatedPerson"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AllergyIntolerance-asserter",
+        "expression": "AllergyIntolerance.asserter",
+        "base": [
+          "AllergyIntolerance"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "patient",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Patient"
+      },
+      "hint": {
+        "en-US": "Who the sensitivity is for"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 14,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Patient",
+          "Group"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-patient",
+        "expression": "AllergyIntolerance.patient | CarePlan.subject.where(resolve() is Patient) | CareTeam.subject.where(resolve() is Patient) | ClinicalImpression.subject.where(resolve() is Patient) | Composition.subject.where(resolve() is Patient) | Condition.subject.where(resolve() is Patient) | Consent.patient | DetectedIssue.patient | DeviceRequest.subject.where(resolve() is Patient) | DeviceUseStatement.subject | DiagnosticReport.subject.where(resolve() is Patient) | DocumentManifest.subject.where(resolve() is Patient) | DocumentReference.subject.where(resolve() is Patient) | Encounter.subject.where(resolve() is Patient) | EpisodeOfCare.patient | FamilyMemberHistory.patient | Flag.subject.where(resolve() is Patient) | Goal.subject.where(resolve() is Patient) | ImagingStudy.subject.where(resolve() is Patient) | Immunization.patient | List.subject.where(resolve() is Patient) | MedicationAdministration.subject.where(resolve() is Patient) | MedicationDispense.subject.where(resolve() is Patient) | MedicationRequest.subject.where(resolve() is Patient) | MedicationStatement.subject.where(resolve() is Patient) | NutritionOrder.patient | Observation.subject.where(resolve() is Patient) | Procedure.subject.where(resolve() is Patient) | RiskAssessment.subject.where(resolve() is Patient) | ServiceRequest.subject.where(resolve() is Patient) | SupplyDelivery.patient | VisionPrescription.patient",
+        "base": [
+          "AllergyIntolerance",
+          "CarePlan",
+          "CareTeam",
+          "ClinicalImpression",
+          "Composition",
+          "Condition",
+          "Consent",
+          "DetectedIssue",
+          "DeviceRequest",
+          "DeviceUseStatement",
+          "DiagnosticReport",
+          "DocumentManifest",
+          "DocumentReference",
+          "Encounter",
+          "EpisodeOfCare",
+          "FamilyMemberHistory",
+          "Flag",
+          "Goal",
+          "ImagingStudy",
+          "Immunization",
+          "List",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationRequest",
+          "MedicationStatement",
+          "NutritionOrder",
+          "Observation",
+          "Procedure",
+          "RiskAssessment",
+          "ServiceRequest",
+          "SupplyDelivery",
+          "VisionPrescription"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "category",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Category"
+      },
+      "hint": {
+        "en-US": "food | medication | environment | biologic"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 15,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/allergy-intolerance-category",
+      "valueSetVersion": "4.0.1",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AllergyIntolerance-category",
+        "expression": "AllergyIntolerance.category",
+        "base": [
+          "AllergyIntolerance"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "last-date",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Last date"
+      },
+      "hint": {
+        "en-US": "Date(/time) of last known occurrence of a reaction"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 16,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/AllergyIntolerance-last-date",
+        "expression": "AllergyIntolerance.lastOccurrence",
+        "base": [
+          "AllergyIntolerance"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_content",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Content"
+      },
+      "hint": {
+        "en-US": "Search on the entire content of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 17,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-content",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_id",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Id"
+      },
+      "hint": {
+        "en-US": "Search by resource identifier - e.g. same as the read interaction, but can return included resources"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 18,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/example",
+        "expression": "id",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_lastUpdated",
+      "origin": "package",
+      "parameterType": "date",
+      "included": false,
+      "label": {
+        "en-US": "Last updated"
+      },
+      "hint": {
+        "en-US": "When the resource version last changed"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 19,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-lastUpdated",
+        "expression": "Resource.meta.lastUpdated",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_profile",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Profile"
+      },
+      "hint": {
+        "en-US": "Profiles this resource claims to conform to"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 20,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-profile",
+        "expression": "Resource.meta.profile",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_query",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Query"
+      },
+      "hint": {
+        "en-US": "A custom search profile that describes a specific defined query operation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 21,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-query",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_security",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Security"
+      },
+      "hint": {
+        "en-US": "Security Labels applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 22,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-security",
+        "expression": "Resource.meta.security",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_source",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Source"
+      },
+      "hint": {
+        "en-US": "Identifies where the resource comes from"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 23,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-source",
+        "expression": "Resource.meta.source",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_tag",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Tag"
+      },
+      "hint": {
+        "en-US": "Tags applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 24,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-tag",
+        "expression": "Resource.meta.tag",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_text",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Text"
+      },
+      "hint": {
+        "en-US": "Search on the narrative of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 25,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DomainResource-text",
+        "base": [
+          "DomainResource"
+        ]
+      },
+      "notInPackage": false
+    }
+  ]
+}

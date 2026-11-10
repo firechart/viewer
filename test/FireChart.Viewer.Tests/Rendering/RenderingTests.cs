@@ -9,7 +9,7 @@ namespace FireChart.Viewer.Tests.Rendering;
 // The Liquid templates of FHIR resources: dispatch by path and type, client overrides over the vendor library
 public class RenderingTests
 {
-    private static readonly VendorTemplates s_vendor = new();
+    private static readonly VendorTemplates s_vendor = TestLibrary.Vendor;
 
     private static Patient SamplePatient(string family = "Chalmers")
     {
@@ -212,40 +212,55 @@ public class RenderingTests
     }
 
     [Test]
-    public async System.Threading.Tasks.Task ATileTemplate_WritesTheRowAsHtml_AndTheTextOfTheRowIsItsText()
+    public async System.Threading.Tasks.Task ATileTemplate_FillsSlots_TheFrameLaysOutTheRow_AndWhatIsOutsideTheSlotsIsDropped()
     {
-        var overrides = Override(Tpl("Patient@tile", "<li class=\"fx-list-row\"><div>{{ self.id }}</div><span class=\"fx-badge fx-badge-info\">51 y</span></li>"));
+        var overrides = Override(Tpl("Patient@tile", "outside{% slot \"title\" %}{{ self.id }}{% endslot %}{% slot \"trailing\" %}<span class=\"fx-badge fx-badge-info\">51 y</span>{% endslot %}"));
 
         var tile = await new FhirRenderer([overrides, s_vendor]).RenderTileAsync("""{ "resourceType": "Patient", "id": "p-1" }""");
 
         Assert.Multiple(() =>
         {
-            Assert.That(tile.Html, Is.EqualTo("<li class=\"fx-list-row\"><div>p-1</div><span class=\"fx-badge fx-badge-info\">51 y</span></li>"));
+            Assert.That(tile.Html, Is.EqualTo("<li class=\"fx-list-row\"><div class=\"fx-list-col-grow fx-tile\"><div class=\"fx-tile-main\"><div class=\"fx-tile-title\">p-1</div></div>" +
+                                              "<div class=\"fx-tile-end\"><span class=\"fx-badge fx-badge-info\">51 y</span></div></div></li>"));
             Assert.That(tile.Text, Is.EqualTo("p-1 51 y"));
         });
     }
 
     [Test]
-    public async System.Threading.Tasks.Task ATileTemplate_WithoutTheItemOfTheList_GetsOneAround()
+    public async System.Threading.Tasks.Task ATileTemplateWithoutATitleSlot_ShowsTheIdAndTheType()
     {
-        var overrides = Override(Tpl("Patient@tile", "<div>x</div>"));
+        var overrides = Override(Tpl("Patient@tile", "<div>x</div>{% slot \"subtitle\" %}s{% endslot %}"));
 
         var tile = await new FhirRenderer([overrides, s_vendor]).RenderTileAsync("""{ "resourceType": "Patient", "id": "p-1" }""");
 
-        Assert.That(tile.Html, Is.EqualTo("<li class=\"fx-list-row\"><div>x</div></li>"));
+        Assert.That(tile.Text, Is.EqualTo("p-1 Patient"));
+    }
+
+    [Test]
+    public async System.Threading.Tasks.Task TheOptionsOfTheRows_ShowTheStatusAndTheAge_WithoutRenderingTheTemplateAgain()
+    {
+        var overrides = Override(Tpl("Patient@tile", "{% slot \"title\" %}T{% endslot %}{% slot \"status\" %}S{% endslot %}"));
+
+        var tile = await new FhirRenderer([overrides, s_vendor]).RenderTileAsync("""{ "resourceType": "Patient", "id": "p-1" }""");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(tile.Text, Is.EqualTo("T S"), "the status is shown by default");
+            Assert.That(tile.WithOptions(new TileOptions(ShowStatus: false)).Text, Is.EqualTo("T"));
+        });
     }
 
     [Test]
     public async System.Threading.Tasks.Task ATileTemplate_CannotBringScriptsLinksOrImages_ButTheirTextStays()
     {
-        const string template = "<li class=\"fx-list-row\"><script>alert(1)</script><a href=\"javascript:x\" onclick=\"x()\">link</a><img src=x onerror=y><b onclick=\"x()\" style=\"color:red\" class=\"evil fx-ok\">bold</b></li>";
+        const string template = "{% slot \"title\" %}<script>alert(1)</script><a href=\"javascript:x\" onclick=\"x()\">link</a><img src=x onerror=y><b onclick=\"x()\" style=\"color:red\" class=\"evil fx-ok\">bold</b>{% endslot %}";
         var overrides = Override(Tpl("Patient@tile", template));
 
         var tile = await new FhirRenderer([overrides, s_vendor]).RenderTileAsync("""{ "resourceType": "Patient", "id": "p-1" }""");
 
         Assert.Multiple(() =>
         {
-            Assert.That(tile.Html, Is.EqualTo("<li class=\"fx-list-row\">link<b class=\"fx-ok\">bold</b></li>"));
+            Assert.That(tile.Html, Does.Contain("<div class=\"fx-tile-title\">link<b class=\"fx-ok\">bold</b></div>"));
             Assert.That(tile.Text, Is.EqualTo("linkbold"));
         });
     }
@@ -255,7 +270,7 @@ public class RenderingTests
     [TestCase("<script>alert(1)</script>", "&lt;script&gt;alert(1)&lt;/script&gt;")]
     public async System.Threading.Tasks.Task TheValuesOfARecord_AreText_NotMarkup(string family, string encoded)
     {
-        var overrides = Override(Tpl("Patient@tile", "<li class=\"fx-list-row\"><div>{{ self.name[0].family }}</div></li>"));
+        var overrides = Override(Tpl("Patient@tile", "{% slot \"title\" %}{{ self.name[0].family }}{% endslot %}"));
         var json = $$"""{ "resourceType": "Patient", "id": "p-1", "name": [ { "family": {{System.Text.Json.JsonSerializer.Serialize(family)}} } ] }""";
 
         var tile = await new FhirRenderer([overrides, s_vendor]).RenderTileAsync(json);
@@ -263,7 +278,7 @@ public class RenderingTests
         Assert.Multiple(() =>
         {
             Assert.That(tile.Text, Is.EqualTo(family), "the text of the record is shown as it is");
-            Assert.That(tile.Html, Is.EqualTo($"<li class=\"fx-list-row\"><div>{encoded}</div></li>"), "and it is not markup");
+            Assert.That(tile.Html, Does.Contain($"<div class=\"fx-tile-title\">{encoded}</div>"), "and it is not markup");
         });
     }
 
@@ -291,7 +306,7 @@ public class RenderingTests
     {
         var patient = SamplePatient();
         patient.Id = "p-1";
-        var overrides = Override(Tpl("Patient@tile", "<li class=\"fx-list-row\"><div>{{ self.id }}</div><div>{{ self.gender }}</div></li>"));
+        var overrides = Override(Tpl("Patient@tile", "{% slot \"title\" %}{{ self.id }}{% endslot %}{% slot \"subtitle\" %}{{ self.gender }}{% endslot %}"));
 
         var tile = await new FhirRenderer([overrides, s_vendor]).RenderTileAsync(patient);
 
@@ -327,7 +342,7 @@ public class RenderingTests
     {
         var patient = SamplePatient();
         patient.Id = "p-1";
-        var overrides = Override(Tpl("Patient@tile", "{% apply self.name mode: \"text,#current\" %}"), Tpl("HumanName@text", "T"));
+        var overrides = Override(Tpl("Patient@tile", "{% slot \"title\" %}{% apply self.name mode: \"text,#current\" %}{% endslot %}"), Tpl("HumanName@text", "T"));
 
         var tile = await new FhirRenderer([overrides, s_vendor]).RenderTileAsync(patient, "family-first");
 

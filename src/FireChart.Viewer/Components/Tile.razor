@@ -1,0 +1,35 @@
+@* The frame of a row of a list of records: the leading icon of the type, the click, the tooltip; the row itself is laid out of the slots its template
+   filled (TileModel), with the options of the list *@
+@using FireChart.Viewer.Core
+
+<div class="fx-summary-row" @onclick=@OnClick title=@Shown.Text>
+    @if (!string.IsNullOrEmpty(ResourceType))
+    {
+        <div class="fx-summary-icon"><IconResource ResourceType=@ResourceType/></div>
+    }
+    <ul class="fx-list fx-summary-tile">@((MarkupString)Shown.Html)</ul>
+</div>
+
+@code {
+
+    /// <summary>The row: the slots its template filled (<see cref="TileModel"/>).</summary>
+    [Parameter, EditorRequired]
+    public TileModel Model { get; set; } = null!;
+
+    /// <summary>
+    /// The options of the list (the age at the record, the status); <see langword="null"/> keeps the ones the row was rendered with.
+    /// </summary>
+    [Parameter]
+    public TileOptions? Options { get; set; }
+
+    /// <summary>The type of the record: its icon leads the row; none leaves the place empty.</summary>
+    [Parameter]
+    public string? ResourceType { get; set; }
+
+    /// <summary>What a click on the row does (opens the record).</summary>
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private TileModel Shown => Options is null ? Model : Model.WithOptions(Options);
+
+}

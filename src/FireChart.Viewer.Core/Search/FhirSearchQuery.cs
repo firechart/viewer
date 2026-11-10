@@ -50,8 +50,7 @@ public sealed record FhirSearchParameter
 /// The text form of a search (<c>name=value&amp;name:modifier=value</c>) and its limits.
 /// </summary>
 /// <remarks>
-/// Every name and value is percent-encoded inside the text, so a value may hold an ampersand; the text may itself travel as one value of a query option
-/// (<see cref="OPTION"/>).
+/// Every name and value is percent-encoded inside the text, so a value may hold an ampersand.
 /// </remarks>
 /// <example>
 /// <code>
@@ -61,11 +60,6 @@ public sealed record FhirSearchParameter
 /// </example>
 public static class FhirSearchQuery
 {
-    /// <summary>
-    /// The name of a query option that carries a whole search as one value (<c>?fhir=family%3DSmith</c>).
-    /// </summary>
-    public const string OPTION = "fhir";
-
     /// <summary>The most parameters a search may have.</summary>
     public const int MAX_PARAMETERS = 20;
 

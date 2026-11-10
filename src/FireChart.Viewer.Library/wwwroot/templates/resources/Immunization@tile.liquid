@@ -1,0 +1,10 @@
+{% fhir_include "Immunization:patient" %}
+{%- capture t0 -%}{% apply self.vaccineCode mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 | default: self.id -%}
+{%- capture s0 -%}{% if self.occurrence %}{% apply self.occurrence mode: "text" %}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% if self.lotNumber %}{{ "lot" | t }} {{ self.lotNumber }}{% endif %}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", p1: s0, p2: s1 %}{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}
+{% slot_data patient: self.patient, encounter: self.encounter, at: self.occurrence %}

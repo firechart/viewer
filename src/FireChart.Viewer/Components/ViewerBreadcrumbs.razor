@@ -41,6 +41,7 @@
                 { Page: ViewerPage.ClinicalSummary, Id: { } patient } =>
                     [server, new Crumb(Strings.Caption_ClinicalSummary, Session.HrefOf(new ViewerRoute(ViewerPage.ClinicalSummary))), new Crumb(patient, null)],
                 { Page: ViewerPage.ClinicalSummary } => [server, new Crumb(Strings.Caption_ClinicalSummary, null)],
+                { Page: ViewerPage.Bookmarks } => [server, new Crumb(FloxStrings.Caption_Bookmarks, null)],
                 _ => [server]
             };
         }

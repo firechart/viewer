@@ -1,89 +1,174 @@
 using System.Text.RegularExpressions;
+using FireChart.Viewer.Core;
+using Microsoft.Extensions.FileProviders;
 
 namespace FireChart.Viewer.Library;
 
 /// <summary>
-/// A token of the vendor style: a custom property <c>--fx-*</c> and its value.
+/// A design token of the kit: a custom property <c>--fx-*</c> and its vendor value.
 /// </summary>
-/// <param name="Name">The name of the custom property (<c>--fx-color-primary</c>).</param>
-/// <param name="Value">Its value in the vendor style.</param>
+/// <param name="Name">The name (<c>--fx-color-accent</c>).</param>
+/// <param name="Value">The value in the vendor style.</param>
 /// <example>
 /// <code>
-/// var primary = FxStyle.Tokens().First(token =&gt; token.Name == "--fx-color-primary").Value;
+/// foreach (var token in sheets.Tokens())
+/// {
+///     Console.WriteLine($"{token.Name}: {token.Value}");
+/// }
 /// </code>
 /// </example>
 public sealed record FxToken(string Name, string Value);
 
 /// <summary>
-/// The style of the visualization: the vendor style with the style of a customer over it.
+/// The vendor style of the kit fx-*: <c>wwwroot/styles/fx.css</c> (the classes and the tokens of the kit) and <c>wwwroot/styles/fx.daisy.css</c> (the subset of
+/// daisyUI 5 with the prefix fx-, built by <c>styles/daisy/build.cmd</c>).
 /// </summary>
-/// <remarks>
-/// The vendor style (the daisyUI components of the kit, then <c>fx.css</c>) is in the cascade layer <see cref="VendorLayer"/>, the customer's in
-/// <see cref="CustomLayer"/>, a later layer, so the customer's wins whatever the specificity of the selectors. Check the customer's style with
-/// <see cref="StyleChecks.Check"/> before it is composed.
-/// </remarks>
+/// <param name="Vendor">The text of <c>fx.css</c>.</param>
+/// <param name="Daisy">The text of <c>fx.daisy.css</c>.</param>
+/// <remarks>Read by a client from the static files of its host (<see cref="FxStyle.LoadAsync"/>), by a server from its web root, by a test from the folder.</remarks>
 /// <example>
 /// <code>
-/// var css = FxStyle.Compose(".fx-banner { border-radius: 0 }");
-/// // &lt;style&gt; with css in the page
+/// var sheets = await FxStyle.LoadAsync(assets);
+/// var css = sheets.Compose(customerCss);
 /// </code>
 /// </example>
-public static partial class FxStyle
+public sealed partial record FxStyleSheets(string Vendor, string Daisy)
 {
     /// <summary>
-    /// The cascade layer of the vendor style: <c>fx</c>.
+    /// The style of the visualization: the vendor style in the layer <see cref="FxStyle.VendorLayer"/>, the custom one in <see cref="FxStyle.CustomLayer"/>,
+    /// so a custom rule wins over a vendor one whatever their specificity.
+    /// </summary>
+    /// <param name="custom">The style of the customer (<c>fx.custom.css</c>); none: the vendor style only.</param>
+    /// <returns>The CSS text.</returns>
+    /// <example>
+    /// <code>
+    /// var css = sheets.Compose(".fx-root { --fx-gap: 1rem; }");
+    /// </code>
+    /// </example>
+    public string Compose(string? custom)
+    {
+        var text = $"@layer {FxStyle.VendorLayer}, {FxStyle.CustomLayer};\n@layer {FxStyle.VendorLayer} {{\n{Daisy}\n{Vendor}\n}}\n";
+        return string.IsNullOrWhiteSpace(custom) ? text : $"{text}@layer {FxStyle.CustomLayer} {{\n{custom}\n}}\n";
+    }
+
+    /// <summary>
+    /// The design tokens of the vendor style, in the order of their first declaration.
+    /// </summary>
+    /// <returns>The tokens, each once.</returns>
+    /// <example>
+    /// <code>
+    /// var accent = sheets.Tokens().First(token => token.Name == "--fx-color-accent").Value;
+    /// </code>
+    /// </example>
+    public IReadOnlyList<FxToken> Tokens()
+    {
+        return [.. TokenRegex().Matches(Vendor).Select(match => new FxToken(match.Groups[1].Value, match.Groups[2].Value.Trim())).DistinctBy(token => token.Name)];
+    }
+
+    [GeneratedRegex(@"(--fx-[a-z0-9-]+)\s*:\s*([^;]+);")]
+    private static partial Regex TokenRegex();
+}
+
+/// <summary>
+/// Where the vendor style is and how it is read (<see cref="FxStyleSheets"/>).
+/// </summary>
+/// <example>
+/// <code>
+/// var css = (await FxStyle.LoadAsync(assets)).Compose(null);
+/// </code>
+/// </example>
+public static class FxStyle
+{
+    /// <summary>
+    /// The cascade layer of the vendor style.
     /// </summary>
     public const string VendorLayer = "fx";
 
     /// <summary>
-    /// The cascade layer of the style of a customer: <c>fx-custom</c>.
+    /// The cascade layer of the style of the customer.
     /// </summary>
     public const string CustomLayer = "fx-custom";
 
-    private const string VendorResource = "fx.css";
-    private const string DaisyResource = "fx.daisy.css";
+    /// <summary>
+    /// The folder of the style in the <c>wwwroot</c> of the library.
+    /// </summary>
+    public const string Folder = "styles";
 
-    private static readonly Lazy<string> s_vendor = new(() => Read(VendorResource));
-    private static readonly Lazy<string> s_daisy = new(() => Read(DaisyResource));
+    private const string VendorFile = "fx.css";
+    private const string DaisyFile = "fx.daisy.css";
 
     /// <summary>
-    /// <c>fx.css</c>: the tokens and the classes of the kit.
+    /// Reads the vendor style from the static files of the host.
     /// </summary>
-    public static string Vendor => s_vendor.Value;
-
-    /// <summary>
-    /// The daisyUI components of the kit (the classes <c>fx-badge</c>, <c>fx-card</c>, <c>fx-list</c>...), built from <c>src/FireChart.Viewer.Library/styles/daisy</c>;
-    /// <see cref="Vendor"/> comes after it and wins.
-    /// </summary>
-    public static string Daisy => s_daisy.Value;
-
-    /// <summary>
-    /// Composes the style of the page: the order of the layers, the vendor style in its layer, the customer's style in the later layer.
-    /// </summary>
-    /// <param name="custom">The style of the customer, already checked by <see cref="StyleChecks.Check"/>; <see langword="null"/> or white space for none.</param>
-    /// <returns>The CSS text.</returns>
-    public static string Compose(string? custom)
+    /// <param name="assets">Reads the static files of the host.</param>
+    /// <param name="cancellationToken">Cancels the read.</param>
+    /// <returns>The style.</returns>
+    /// <exception cref="InvalidOperationException">The host does not serve the files of the style.</exception>
+    /// <exception cref="HttpRequestException">A file could not be read.</exception>
+    /// <example>
+    /// <code>
+    /// var sheets = await FxStyle.LoadAsync(assets);
+    /// </code>
+    /// </example>
+    public static async Task<FxStyleSheets> LoadAsync(IViewerAssets assets, CancellationToken cancellationToken = default)
     {
-        var text = $"@layer {VendorLayer}, {CustomLayer};\n@layer {VendorLayer} {{\n{Daisy}\n{Vendor}\n}}\n";
-        return string.IsNullOrWhiteSpace(custom) ? text : $"{text}@layer {CustomLayer} {{\n{custom}\n}}\n";
+        ArgumentNullException.ThrowIfNull(assets);
+        var vendor = assets.ReadTextAsync(VendorLibrary.UrlOf($"{Folder}/{VendorFile}"), cancellationToken);
+        var daisy = assets.ReadTextAsync(VendorLibrary.UrlOf($"{Folder}/{DaisyFile}"), cancellationToken);
+        return new FxStyleSheets(await vendor ?? throw Missing(VendorFile), await daisy ?? throw Missing(DaisyFile));
     }
 
     /// <summary>
-    /// The tokens (<c>--fx-*</c>) the vendor style defines, with their values: what a customer changes first.
+    /// Reads the vendor style through a file provider (the web root of a server).
     /// </summary>
-    /// <returns>The tokens in the order of the vendor style, each name once.</returns>
-    public static IReadOnlyList<FxToken> Tokens()
+    /// <param name="files">The files of the host.</param>
+    /// <param name="root">The folder of the library in it: <see cref="VendorLibrary.ContentRoot"/> in a web root.</param>
+    /// <returns>The style.</returns>
+    /// <exception cref="InvalidOperationException">The files of the style are not there.</exception>
+    /// <example>
+    /// <code>
+    /// var sheets = FxStyle.Read(environment.WebRootFileProvider, VendorLibrary.ContentRoot);
+    /// </code>
+    /// </example>
+    public static FxStyleSheets Read(IFileProvider files, string root)
     {
-        return [.. Token().Matches(Vendor).Select(match => new FxToken(match.Groups[1].Value, match.Groups[2].Value.Trim())).DistinctBy(token => token.Name)];
+        ArgumentNullException.ThrowIfNull(files);
+        ArgumentNullException.ThrowIfNull(root);
+        var prefix = root.Trim('/');
+        prefix = prefix.Length == 0 ? Folder : $"{prefix}/{Folder}";
+
+        string Text(string name)
+        {
+            var file = files.GetFileInfo($"{prefix}/{name}");
+            if (!file.Exists)
+            {
+                throw Missing(name);
+            }
+
+            using var reader = new StreamReader(file.CreateReadStream());
+            return reader.ReadToEnd();
+        }
+
+        return new FxStyleSheets(Text(VendorFile), Text(DaisyFile));
     }
 
-    [GeneratedRegex(@"(--fx-[a-z0-9-]+)\s*:\s*([^;]+);")]
-    private static partial Regex Token();
-
-    private static string Read(string resource)
+    /// <summary>
+    /// Reads the vendor style from a folder of a disk.
+    /// </summary>
+    /// <param name="webRoot">The <c>wwwroot</c> of the project <c>FireChart.Viewer.Library</c>.</param>
+    /// <returns>The style.</returns>
+    /// <example>
+    /// <code>
+    /// var sheets = FxStyle.ReadFolder(@"public\src\FireChart.Viewer.Library\wwwroot");
+    /// </code>
+    /// </example>
+    public static FxStyleSheets ReadFolder(string webRoot)
     {
-        using var stream = typeof(FxStyle).Assembly.GetManifestResourceStream(resource)!;
-        using var reader = new StreamReader(stream);
-        return reader.ReadToEnd();
+        return new FxStyleSheets(File.ReadAllText(Path.Combine(webRoot, Folder, VendorFile)), File.ReadAllText(Path.Combine(webRoot, Folder, DaisyFile)));
+    }
+
+    private static InvalidOperationException Missing(string name)
+    {
+        return new InvalidOperationException($"The vendor style {name} is not served by the host.");
     }
 }

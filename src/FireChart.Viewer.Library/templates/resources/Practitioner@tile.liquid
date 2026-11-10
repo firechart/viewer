@@ -1,9 +1,0 @@
-{%- assign nm = self.name | as_list | first -%}{%- assign q = self.qualification | as_list | first -%}{%- assign act = self.active | append: "" -%}
-{%- capture t0 -%}{% if nm %}{% apply nm mode: "text" %}{% endif %}{%- endcapture -%}
-{%- assign title = t0 | default: self.id -%}
-{%- capture s0 -%}{% if q %}{% apply q.code mode: "text" %}{% endif %}{%- endcapture -%}
-{%- capture s1 -%}{% if self.identifier %}{{ self.identifier | map: "value" | first }}{% endif %}{%- endcapture -%}
-{%- capture subtitle -%}{% render "parts", p1: s0, p2: s1 %}{%- endcapture -%}
-{%- capture trailing -%}{% if self.gender %}{% render "badge", text: self.gender %}{% endif %}{%- endcapture -%}
-{%- capture status -%}{% if act == "false" %}{% render "badge", text: "inactive", tone: "danger" %}{% endif %}{%- endcapture -%}
-{% render "tile-row", title: title, subtitle: subtitle, trailing: trailing, status: status, patient: nil, encounter: nil, at: nil %}

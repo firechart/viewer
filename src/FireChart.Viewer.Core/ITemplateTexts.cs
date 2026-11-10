@@ -18,7 +18,7 @@ namespace FireChart.Viewer.Core;
 ///     public string? Translate(string culture, string key) =&gt; culture == "ru" &amp;&amp; key == "Asserted by" ? "Со слов пациента" : null;
 /// }
 ///
-/// var renderer = new FhirRenderer([new MyTexts(), new VendorTemplates()]);
+/// var renderer = new FhirRenderer([new MyTexts(), new WebVendorTemplates(assets)]);
 /// </code>
 /// </example>
 public interface ITemplateTexts
@@ -30,4 +30,20 @@ public interface ITemplateTexts
     /// <param name="key">The English text, or the English text with a plural suffix of CLDR (<c>{{count}} images_one</c>).</param>
     /// <returns>The translation, or <see langword="null"/> when this layer has none (an empty translation counts as none).</returns>
     string? Translate(string culture, string key);
+
+    /// <summary>
+    /// Loads the translations of a culture before a render, when the layer loads them on demand; <see cref="Translate"/> answers from what is loaded.
+    /// </summary>
+    /// <param name="culture">The culture of the interface (<c>ru-RU</c>): its language and English are loaded too.</param>
+    /// <param name="cancellationToken">Cancels the load.</param>
+    /// <returns>A task that completes when the translations are at hand. By default nothing to load.</returns>
+    /// <example>
+    /// <code>
+    /// await texts.PrepareAsync(CultureInfo.CurrentUICulture);
+    /// </code>
+    /// </example>
+    ValueTask PrepareAsync(System.Globalization.CultureInfo culture, CancellationToken cancellationToken = default)
+    {
+        return ValueTask.CompletedTask;
+    }
 }

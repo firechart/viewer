@@ -9,16 +9,16 @@
     <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-md)">
         <RadzenImage Path=@Branding.Icon class="size-16 shrink-0 rounded-lg object-contain" AlternateText=@Branding.Title/>
         <RadzenText TextStyle="TextStyle.H5" class="text-accent-ink"><b>@Branding.Title</b></RadzenText>
-        @if (!string.IsNullOrEmpty(Branding.Version))
-        {
-            <RadzenBadge Variant="Radzen.Variant.Flat" BadgeStyle="Radzen.BadgeStyle.Secondary" IsPill="true" Text=@($"v{Branding.Version}")/>
-        }
     </RadzenStack>
 
     <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mt-2 rz-text-align-center">@Branding.Subtitle</RadzenText>
 </RadzenStack>
 
 <ListSection Caption=@Strings.Caption_AboutThisApp>
+    @if (!string.IsNullOrEmpty(Branding.Version))
+    {
+        <ListTile TitleText=@Strings.Caption_Version SubtitleText=@Branding.Version/>
+    }
     <ListTile TitleText=@Strings.Caption_Authors SubtitleText=@Branding.Authors/>
     @if (!string.IsNullOrEmpty(Branding.SourceCodeUrl))
     {

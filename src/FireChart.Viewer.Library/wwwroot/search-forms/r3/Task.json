@@ -1,0 +1,1297 @@
+{
+  "formatVersion": 1,
+  "name": "generated",
+  "authoredForVersion": "3.0.2",
+  "isGenerated": true,
+  "title": {
+    "en-US": "Filter"
+  },
+  "description": {},
+  "groups": [],
+  "fields": [
+    {
+      "queryName": "owner",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Owner"
+      },
+      "hint": {
+        "en-US": "Search by task owner"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 1,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Practitioner",
+          "Organization",
+          "Device",
+          "Patient",
+          "RelatedPerson"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-owner",
+        "expression": "Task.owner",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "requester",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Requester"
+      },
+      "hint": {
+        "en-US": "Search by task requester"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 2,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Practitioner",
+          "Organization",
+          "Device",
+          "Patient",
+          "RelatedPerson"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-requester",
+        "expression": "Task.requester.agent",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "identifier",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Identifier"
+      },
+      "hint": {
+        "en-US": "Search for a task instance by its business identifier"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 3,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-identifier",
+        "expression": "Task.identifier",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "business-status",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Business status"
+      },
+      "hint": {
+        "en-US": "Search by business status"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 4,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-business-status",
+        "expression": "Task.businessStatus",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "period",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Period"
+      },
+      "hint": {
+        "en-US": "Search by period Task is/was underway"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 5,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-period",
+        "expression": "Task.executionPeriod",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "code",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Code"
+      },
+      "hint": {
+        "en-US": "Search by task code"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 6,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-code",
+        "expression": "Task.code",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "performer",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Performer"
+      },
+      "hint": {
+        "en-US": "Search by recommended type of performer (e.g., Requester, Performer, Scheduler)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 7,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-performer",
+        "expression": "Task.performerType",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "subject",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Subject"
+      },
+      "hint": {
+        "en-US": "Search by subject"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 8,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Account",
+          "ActivityDefinition",
+          "AdverseEvent",
+          "AllergyIntolerance",
+          "Appointment",
+          "AppointmentResponse",
+          "AuditEvent",
+          "Basic",
+          "Binary",
+          "BodySite",
+          "Bundle",
+          "CapabilityStatement",
+          "CarePlan",
+          "CareTeam",
+          "ChargeItem",
+          "Claim",
+          "ClaimResponse",
+          "ClinicalImpression",
+          "CodeSystem",
+          "Communication",
+          "CommunicationRequest",
+          "CompartmentDefinition",
+          "Composition",
+          "ConceptMap",
+          "Condition",
+          "Consent",
+          "Contract",
+          "Coverage",
+          "DataElement",
+          "DetectedIssue",
+          "Device",
+          "DeviceComponent",
+          "DeviceMetric",
+          "DeviceRequest",
+          "DeviceUseStatement",
+          "DiagnosticReport",
+          "DocumentManifest",
+          "DocumentReference",
+          "EligibilityRequest",
+          "EligibilityResponse",
+          "Encounter",
+          "Endpoint",
+          "EnrollmentRequest",
+          "EnrollmentResponse",
+          "EpisodeOfCare",
+          "ExpansionProfile",
+          "ExplanationOfBenefit",
+          "FamilyMemberHistory",
+          "Flag",
+          "Goal",
+          "GraphDefinition",
+          "Group",
+          "GuidanceResponse",
+          "HealthcareService",
+          "ImagingManifest",
+          "ImagingStudy",
+          "Immunization",
+          "ImmunizationRecommendation",
+          "ImplementationGuide",
+          "Library",
+          "Linkage",
+          "List",
+          "Location",
+          "Measure",
+          "MeasureReport",
+          "Media",
+          "Medication",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationRequest",
+          "MedicationStatement",
+          "MessageDefinition",
+          "MessageHeader",
+          "NamingSystem",
+          "NutritionOrder",
+          "Observation",
+          "OperationDefinition",
+          "OperationOutcome",
+          "Organization",
+          "Patient",
+          "PaymentNotice",
+          "PaymentReconciliation",
+          "Person",
+          "PlanDefinition",
+          "Practitioner",
+          "PractitionerRole",
+          "Procedure",
+          "ProcedureRequest",
+          "ProcessRequest",
+          "ProcessResponse",
+          "Provenance",
+          "Questionnaire",
+          "QuestionnaireResponse",
+          "ReferralRequest",
+          "RelatedPerson",
+          "RequestGroup",
+          "ResearchStudy",
+          "ResearchSubject",
+          "RiskAssessment",
+          "Schedule",
+          "SearchParameter",
+          "Sequence",
+          "ServiceDefinition",
+          "Slot",
+          "Specimen",
+          "StructureDefinition",
+          "StructureMap",
+          "Subscription",
+          "Substance",
+          "SupplyDelivery",
+          "SupplyRequest",
+          "Task",
+          "TestReport",
+          "TestScript",
+          "ValueSet",
+          "VisionPrescription"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-subject",
+        "expression": "Task.for",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "focus",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Focus"
+      },
+      "hint": {
+        "en-US": "Search by task focus"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 9,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Account",
+          "ActivityDefinition",
+          "AdverseEvent",
+          "AllergyIntolerance",
+          "Appointment",
+          "AppointmentResponse",
+          "AuditEvent",
+          "Basic",
+          "Binary",
+          "BodySite",
+          "Bundle",
+          "CapabilityStatement",
+          "CarePlan",
+          "CareTeam",
+          "ChargeItem",
+          "Claim",
+          "ClaimResponse",
+          "ClinicalImpression",
+          "CodeSystem",
+          "Communication",
+          "CommunicationRequest",
+          "CompartmentDefinition",
+          "Composition",
+          "ConceptMap",
+          "Condition",
+          "Consent",
+          "Contract",
+          "Coverage",
+          "DataElement",
+          "DetectedIssue",
+          "Device",
+          "DeviceComponent",
+          "DeviceMetric",
+          "DeviceRequest",
+          "DeviceUseStatement",
+          "DiagnosticReport",
+          "DocumentManifest",
+          "DocumentReference",
+          "EligibilityRequest",
+          "EligibilityResponse",
+          "Encounter",
+          "Endpoint",
+          "EnrollmentRequest",
+          "EnrollmentResponse",
+          "EpisodeOfCare",
+          "ExpansionProfile",
+          "ExplanationOfBenefit",
+          "FamilyMemberHistory",
+          "Flag",
+          "Goal",
+          "GraphDefinition",
+          "Group",
+          "GuidanceResponse",
+          "HealthcareService",
+          "ImagingManifest",
+          "ImagingStudy",
+          "Immunization",
+          "ImmunizationRecommendation",
+          "ImplementationGuide",
+          "Library",
+          "Linkage",
+          "List",
+          "Location",
+          "Measure",
+          "MeasureReport",
+          "Media",
+          "Medication",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationRequest",
+          "MedicationStatement",
+          "MessageDefinition",
+          "MessageHeader",
+          "NamingSystem",
+          "NutritionOrder",
+          "Observation",
+          "OperationDefinition",
+          "OperationOutcome",
+          "Organization",
+          "Patient",
+          "PaymentNotice",
+          "PaymentReconciliation",
+          "Person",
+          "PlanDefinition",
+          "Practitioner",
+          "PractitionerRole",
+          "Procedure",
+          "ProcedureRequest",
+          "ProcessRequest",
+          "ProcessResponse",
+          "Provenance",
+          "Questionnaire",
+          "QuestionnaireResponse",
+          "ReferralRequest",
+          "RelatedPerson",
+          "RequestGroup",
+          "ResearchStudy",
+          "ResearchSubject",
+          "RiskAssessment",
+          "Schedule",
+          "SearchParameter",
+          "Sequence",
+          "ServiceDefinition",
+          "Slot",
+          "Specimen",
+          "StructureDefinition",
+          "StructureMap",
+          "Subscription",
+          "Substance",
+          "SupplyDelivery",
+          "SupplyRequest",
+          "Task",
+          "TestReport",
+          "TestScript",
+          "ValueSet",
+          "VisionPrescription"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-focus",
+        "expression": "Task.focus",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "part-of",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Part of"
+      },
+      "hint": {
+        "en-US": "Search by task this task is part of"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 10,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Task"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-part-of",
+        "expression": "Task.partOf",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "priority",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Priority"
+      },
+      "hint": {
+        "en-US": "Search by task priority"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 11,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-priority",
+        "expression": "Task.priority",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "authored-on",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Authored on"
+      },
+      "hint": {
+        "en-US": "Search by creation date"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 12,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-authored-on",
+        "expression": "Task.authoredOn",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "intent",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Intent"
+      },
+      "hint": {
+        "en-US": "Search by task intent"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 13,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-intent",
+        "expression": "Task.intent",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "group-identifier",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Group identifier"
+      },
+      "hint": {
+        "en-US": "Search by group identifier"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 14,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-group-identifier",
+        "expression": "Task.groupIdentifier",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "based-on",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Based on"
+      },
+      "hint": {
+        "en-US": "Search by requests this task is based on"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 15,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Account",
+          "ActivityDefinition",
+          "AdverseEvent",
+          "AllergyIntolerance",
+          "Appointment",
+          "AppointmentResponse",
+          "AuditEvent",
+          "Basic",
+          "Binary",
+          "BodySite",
+          "Bundle",
+          "CapabilityStatement",
+          "CarePlan",
+          "CareTeam",
+          "ChargeItem",
+          "Claim",
+          "ClaimResponse",
+          "ClinicalImpression",
+          "CodeSystem",
+          "Communication",
+          "CommunicationRequest",
+          "CompartmentDefinition",
+          "Composition",
+          "ConceptMap",
+          "Condition",
+          "Consent",
+          "Contract",
+          "Coverage",
+          "DataElement",
+          "DetectedIssue",
+          "Device",
+          "DeviceComponent",
+          "DeviceMetric",
+          "DeviceRequest",
+          "DeviceUseStatement",
+          "DiagnosticReport",
+          "DocumentManifest",
+          "DocumentReference",
+          "EligibilityRequest",
+          "EligibilityResponse",
+          "Encounter",
+          "Endpoint",
+          "EnrollmentRequest",
+          "EnrollmentResponse",
+          "EpisodeOfCare",
+          "ExpansionProfile",
+          "ExplanationOfBenefit",
+          "FamilyMemberHistory",
+          "Flag",
+          "Goal",
+          "GraphDefinition",
+          "Group",
+          "GuidanceResponse",
+          "HealthcareService",
+          "ImagingManifest",
+          "ImagingStudy",
+          "Immunization",
+          "ImmunizationRecommendation",
+          "ImplementationGuide",
+          "Library",
+          "Linkage",
+          "List",
+          "Location",
+          "Measure",
+          "MeasureReport",
+          "Media",
+          "Medication",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationRequest",
+          "MedicationStatement",
+          "MessageDefinition",
+          "MessageHeader",
+          "NamingSystem",
+          "NutritionOrder",
+          "Observation",
+          "OperationDefinition",
+          "OperationOutcome",
+          "Organization",
+          "Patient",
+          "PaymentNotice",
+          "PaymentReconciliation",
+          "Person",
+          "PlanDefinition",
+          "Practitioner",
+          "PractitionerRole",
+          "Procedure",
+          "ProcedureRequest",
+          "ProcessRequest",
+          "ProcessResponse",
+          "Provenance",
+          "Questionnaire",
+          "QuestionnaireResponse",
+          "ReferralRequest",
+          "RelatedPerson",
+          "RequestGroup",
+          "ResearchStudy",
+          "ResearchSubject",
+          "RiskAssessment",
+          "Schedule",
+          "SearchParameter",
+          "Sequence",
+          "ServiceDefinition",
+          "Slot",
+          "Specimen",
+          "StructureDefinition",
+          "StructureMap",
+          "Subscription",
+          "Substance",
+          "SupplyDelivery",
+          "SupplyRequest",
+          "Task",
+          "TestReport",
+          "TestScript",
+          "ValueSet",
+          "VisionPrescription"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-based-on",
+        "expression": "Task.basedOn",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "patient",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Patient"
+      },
+      "hint": {
+        "en-US": "Search by patient"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 16,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Patient"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-patient",
+        "expression": "Task.for",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "organization",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Organization"
+      },
+      "hint": {
+        "en-US": "Search by responsible organization"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 17,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Organization"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-organization",
+        "expression": "Task.requester.onBehalfOf",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "context",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Context"
+      },
+      "hint": {
+        "en-US": "Search by encounter or episode"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 18,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "EpisodeOfCare",
+          "Encounter"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-context",
+        "expression": "Task.context",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "modified",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Modified"
+      },
+      "hint": {
+        "en-US": "Search by last modification date"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 19,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-modified",
+        "expression": "Task.lastModified",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "status",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Status"
+      },
+      "hint": {
+        "en-US": "Search by task status"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 20,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Task-status",
+        "expression": "Task.status",
+        "base": [
+          "Task"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_content",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Content"
+      },
+      "hint": {
+        "en-US": "Search on the entire content of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 21,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-content",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_id",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Id"
+      },
+      "hint": {
+        "en-US": "Search by resource identifier - e.g. same as the read interaction, but can return included resources"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 22,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/example",
+        "expression": "id",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_lastUpdated",
+      "origin": "package",
+      "parameterType": "date",
+      "included": false,
+      "label": {
+        "en-US": "Last updated"
+      },
+      "hint": {
+        "en-US": "When the resource version last changed"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 23,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-lastUpdated",
+        "expression": "Resource.meta.lastUpdated",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_profile",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Profile"
+      },
+      "hint": {
+        "en-US": "Profiles this resource claims to conform to"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 24,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-profile",
+        "expression": "Resource.meta.profile",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_query",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Query"
+      },
+      "hint": {
+        "en-US": "A custom search profile that describes a specific defined query operation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 25,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-query",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_security",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Security"
+      },
+      "hint": {
+        "en-US": "Security Labels applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 26,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-security",
+        "expression": "Resource.meta.security",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_tag",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Tag"
+      },
+      "hint": {
+        "en-US": "Tags applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 27,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-tag",
+        "expression": "Resource.meta.tag",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_text",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Text"
+      },
+      "hint": {
+        "en-US": "Search on the narrative of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 28,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DomainResource-text",
+        "base": [
+          "DomainResource"
+        ]
+      },
+      "notInPackage": false
+    }
+  ]
+}

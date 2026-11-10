@@ -1,0 +1,55 @@
+@attribute [Route(SharedRoutes.HISTORY)]
+
+@using System.Globalization
+@using Flox.Core.Models
+@using Flox.Shared.Pages.Bookmarks
+@using Radzen
+
+@inherits StatefulWidget<HistoryState>
+
+@* The pages visited on this device, the newest first: no sign-in, never on a server *@
+<ListPage Title=@Strings.Caption_History Breadcrumbs=@Breadcrumbs OnRefresh=@State.RefreshAsync>
+    <ChildContent>
+        <Alert OneTime Key=@BookmarksPage.BookmarksOnDeviceAlert Size="AlertSize.Small" data-history="device">
+            @Strings.Notice_BookmarksOnDevice
+        </Alert>
+        <DataList State=@State Selectable>
+            <ItemTemplate Context="row">
+                <ListTile Row=@row TitleText=@row.Item.DisplayName SubtitleText=@row.Item.Category Href=@row.Item.Url Icon=@(row.Item.Icon ?? "history")
+                          TrailingText=@VisitedText(row.Item)/>
+            </ItemTemplate>
+            <RowMenu Context="menu">
+                <RadzenMenuItem Text=@Strings.Caption_Delete Icon="delete" IconColor="var(--rz-danger)" Click=@(() => DeleteAsync(menu.Targets))/>
+            </RowMenu>
+            <SelectionActions Context="selected">
+                <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Click=@(() => DeleteAsync([.. selected]))/>
+            </SelectionActions>
+        </DataList>
+    </ChildContent>
+</ListPage>
+
+@code {
+
+    // The time of the visit in the time zone of the device
+    private static string VisitedText(UserRecent visit)
+    {
+        return visit.VisitedAt.ToLocalTime().ToString("g", CultureInfo.CurrentCulture);
+    }
+
+    private async Task DeleteAsync(IReadOnlyList<UserRecent> visits)
+    {
+        if (await this.ConfirmAsync(Strings.Caption_ConfirmDelete))
+        {
+            await TryAsync(() => State.DeleteRowsAsync(visits));
+        }
+    }
+
+    protected override void InitBreadcrumbs()
+    {
+        base.InitBreadcrumbs();
+        Breadcrumbs.Add(Strings.Caption_History,
+                        href: NavigationManager.History()
+                                                .ToUrl());
+    }
+
+}

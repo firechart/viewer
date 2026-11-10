@@ -1,0 +1,1138 @@
+{
+  "formatVersion": 1,
+  "name": "generated",
+  "authoredForVersion": "4.0.1",
+  "isGenerated": true,
+  "title": {
+    "en-US": "Filter"
+  },
+  "description": {},
+  "groups": [],
+  "fields": [
+    {
+      "queryName": "date",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Date"
+      },
+      "hint": {
+        "en-US": "The message definition publication date"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 1,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/conformance-date",
+        "expression": "CapabilityStatement.date | CodeSystem.date | CompartmentDefinition.date | ConceptMap.date | GraphDefinition.date | ImplementationGuide.date | MessageDefinition.date | NamingSystem.date | OperationDefinition.date | SearchParameter.date | StructureDefinition.date | StructureMap.date | TerminologyCapabilities.date | ValueSet.date",
+        "base": [
+          "CapabilityStatement",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "identifier",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Identifier"
+      },
+      "hint": {
+        "en-US": "External identifier for the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 2,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/conformance-identifier",
+        "expression": "CodeSystem.identifier | ConceptMap.identifier | MessageDefinition.identifier | StructureDefinition.identifier | StructureMap.identifier | ValueSet.identifier",
+        "base": [
+          "CodeSystem",
+          "ConceptMap",
+          "MessageDefinition",
+          "StructureDefinition",
+          "StructureMap",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "parent",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Parent"
+      },
+      "hint": {
+        "en-US": "A resource that is the parent of the definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 3,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "PlanDefinition",
+          "ActivityDefinition"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-parent",
+        "expression": "MessageDefinition.parent",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "jurisdiction",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Jurisdiction"
+      },
+      "hint": {
+        "en-US": "Intended jurisdiction for the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "autocomplete",
+      "order": 4,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/jurisdiction",
+      "options": [],
+      "allowFreeText": true,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/conformance-jurisdiction",
+        "expression": "CapabilityStatement.jurisdiction | CodeSystem.jurisdiction | ConceptMap.jurisdiction | GraphDefinition.jurisdiction | ImplementationGuide.jurisdiction | MessageDefinition.jurisdiction | NamingSystem.jurisdiction | OperationDefinition.jurisdiction | SearchParameter.jurisdiction | StructureDefinition.jurisdiction | StructureMap.jurisdiction | TerminologyCapabilities.jurisdiction | ValueSet.jurisdiction",
+        "base": [
+          "CapabilityStatement",
+          "CodeSystem",
+          "ConceptMap",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "description",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Description"
+      },
+      "hint": {
+        "en-US": "The description of the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 5,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/conformance-description",
+        "expression": "CapabilityStatement.description | CodeSystem.description | CompartmentDefinition.description | ConceptMap.description | GraphDefinition.description | ImplementationGuide.description | MessageDefinition.description | NamingSystem.description | OperationDefinition.description | SearchParameter.description | StructureDefinition.description | StructureMap.description | TerminologyCapabilities.description | ValueSet.description",
+        "base": [
+          "CapabilityStatement",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "focus",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Focus"
+      },
+      "hint": {
+        "en-US": "A resource that is a permitted focus of the message"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 6,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/resource-types",
+      "valueSetVersion": "4.0.1",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-focus",
+        "expression": "MessageDefinition.focus.code",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "context-type",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Context type"
+      },
+      "hint": {
+        "en-US": "A type of use context assigned to the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 7,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/conformance-context-type",
+        "expression": "CapabilityStatement.useContext.code | CodeSystem.useContext.code | CompartmentDefinition.useContext.code | ConceptMap.useContext.code | GraphDefinition.useContext.code | ImplementationGuide.useContext.code | MessageDefinition.useContext.code | NamingSystem.useContext.code | OperationDefinition.useContext.code | SearchParameter.useContext.code | StructureDefinition.useContext.code | StructureMap.useContext.code | TerminologyCapabilities.useContext.code | ValueSet.useContext.code",
+        "base": [
+          "CapabilityStatement",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "title",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Title"
+      },
+      "hint": {
+        "en-US": "The human-friendly name of the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 8,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/conformance-title",
+        "expression": "CapabilityStatement.title | CodeSystem.title | ConceptMap.title | ImplementationGuide.title | MessageDefinition.title | OperationDefinition.title | StructureDefinition.title | StructureMap.title | TerminologyCapabilities.title | ValueSet.title",
+        "base": [
+          "CapabilityStatement",
+          "CodeSystem",
+          "ConceptMap",
+          "ImplementationGuide",
+          "MessageDefinition",
+          "OperationDefinition",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "version",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Version"
+      },
+      "hint": {
+        "en-US": "The business version of the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 9,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/conformance-version",
+        "expression": "CapabilityStatement.version | CodeSystem.version | CompartmentDefinition.version | ConceptMap.version | GraphDefinition.version | ImplementationGuide.version | MessageDefinition.version | OperationDefinition.version | SearchParameter.version | StructureDefinition.version | StructureMap.version | TerminologyCapabilities.version | ValueSet.version",
+        "base": [
+          "CapabilityStatement",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "MessageDefinition",
+          "OperationDefinition",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "url",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": true,
+      "label": {
+        "en-US": "Url"
+      },
+      "hint": {
+        "en-US": "The uri that identifies the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 10,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/conformance-url",
+        "expression": "CapabilityStatement.url | CodeSystem.url | CompartmentDefinition.url | ConceptMap.url | GraphDefinition.url | ImplementationGuide.url | MessageDefinition.url | OperationDefinition.url | SearchParameter.url | StructureDefinition.url | StructureMap.url | TerminologyCapabilities.url | ValueSet.url",
+        "base": [
+          "CapabilityStatement",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "MessageDefinition",
+          "OperationDefinition",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "context-quantity",
+      "origin": "package",
+      "parameterType": "quantity",
+      "included": true,
+      "label": {
+        "en-US": "Context quantity"
+      },
+      "hint": {
+        "en-US": "A quantity- or range-valued use context assigned to the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "quantity",
+      "order": 11,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [
+        {
+          "code": "kg",
+          "label": {
+            "en-US": "kg"
+          }
+        },
+        {
+          "code": "g",
+          "label": {
+            "en-US": "g"
+          }
+        },
+        {
+          "code": "mg",
+          "label": {
+            "en-US": "mg"
+          }
+        },
+        {
+          "code": "[lb_av]",
+          "label": {
+            "en-US": "lb"
+          }
+        },
+        {
+          "code": "cm",
+          "label": {
+            "en-US": "cm"
+          }
+        },
+        {
+          "code": "m",
+          "label": {
+            "en-US": "m"
+          }
+        },
+        {
+          "code": "[in_i]",
+          "label": {
+            "en-US": "in"
+          }
+        },
+        {
+          "code": "Cel",
+          "label": {
+            "en-US": "°C"
+          }
+        },
+        {
+          "code": "[degF]",
+          "label": {
+            "en-US": "°F"
+          }
+        },
+        {
+          "code": "mm[Hg]",
+          "label": {
+            "en-US": "mm[Hg]"
+          }
+        },
+        {
+          "code": "/min",
+          "label": {
+            "en-US": "/min"
+          }
+        },
+        {
+          "code": "%",
+          "label": {
+            "en-US": "%"
+          }
+        },
+        {
+          "code": "mmol/L",
+          "label": {
+            "en-US": "mmol/L"
+          }
+        },
+        {
+          "code": "mg/dL",
+          "label": {
+            "en-US": "mg/dL"
+          }
+        },
+        {
+          "code": "mL",
+          "label": {
+            "en-US": "mL"
+          }
+        },
+        {
+          "code": "L",
+          "label": {
+            "en-US": "L"
+          }
+        },
+        {
+          "code": "a",
+          "label": {
+            "en-US": "year"
+          }
+        },
+        {
+          "code": "mo",
+          "label": {
+            "en-US": "month"
+          }
+        },
+        {
+          "code": "wk",
+          "label": {
+            "en-US": "week"
+          }
+        },
+        {
+          "code": "d",
+          "label": {
+            "en-US": "day"
+          }
+        }
+      ],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/conformance-context-quantity",
+        "expression": "(CapabilityStatement.useContext.value as Quantity) | (CapabilityStatement.useContext.value as Range) | (CodeSystem.useContext.value as Quantity) | (CodeSystem.useContext.value as Range) | (CompartmentDefinition.useContext.value as Quantity) | (CompartmentDefinition.useContext.value as Range) | (ConceptMap.useContext.value as Quantity) | (ConceptMap.useContext.value as Range) | (GraphDefinition.useContext.value as Quantity) | (GraphDefinition.useContext.value as Range) | (ImplementationGuide.useContext.value as Quantity) | (ImplementationGuide.useContext.value as Range) | (MessageDefinition.useContext.value as Quantity) | (MessageDefinition.useContext.value as Range) | (NamingSystem.useContext.value as Quantity) | (NamingSystem.useContext.value as Range) | (OperationDefinition.useContext.value as Quantity) | (OperationDefinition.useContext.value as Range) | (SearchParameter.useContext.value as Quantity) | (SearchParameter.useContext.value as Range) | (StructureDefinition.useContext.value as Quantity) | (StructureDefinition.useContext.value as Range) | (StructureMap.useContext.value as Quantity) | (StructureMap.useContext.value as Range) | (TerminologyCapabilities.useContext.value as Quantity) | (TerminologyCapabilities.useContext.value as Range) | (ValueSet.useContext.value as Quantity) | (ValueSet.useContext.value as Range)",
+        "base": [
+          "CapabilityStatement",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "name",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Name"
+      },
+      "hint": {
+        "en-US": "Computationally friendly name of the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 12,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/conformance-name",
+        "expression": "CapabilityStatement.name | CodeSystem.name | CompartmentDefinition.name | ConceptMap.name | GraphDefinition.name | ImplementationGuide.name | MessageDefinition.name | NamingSystem.name | OperationDefinition.name | SearchParameter.name | StructureDefinition.name | StructureMap.name | TerminologyCapabilities.name | ValueSet.name",
+        "base": [
+          "CapabilityStatement",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "context",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Context"
+      },
+      "hint": {
+        "en-US": "A use context assigned to the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 13,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/conformance-context",
+        "expression": "(CapabilityStatement.useContext.value as CodeableConcept) | (CodeSystem.useContext.value as CodeableConcept) | (CompartmentDefinition.useContext.value as CodeableConcept) | (ConceptMap.useContext.value as CodeableConcept) | (GraphDefinition.useContext.value as CodeableConcept) | (ImplementationGuide.useContext.value as CodeableConcept) | (MessageDefinition.useContext.value as CodeableConcept) | (NamingSystem.useContext.value as CodeableConcept) | (OperationDefinition.useContext.value as CodeableConcept) | (SearchParameter.useContext.value as CodeableConcept) | (StructureDefinition.useContext.value as CodeableConcept) | (StructureMap.useContext.value as CodeableConcept) | (TerminologyCapabilities.useContext.value as CodeableConcept) | (ValueSet.useContext.value as CodeableConcept)",
+        "base": [
+          "CapabilityStatement",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "publisher",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Publisher"
+      },
+      "hint": {
+        "en-US": "Name of the publisher of the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 14,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/conformance-publisher",
+        "expression": "CapabilityStatement.publisher | CodeSystem.publisher | CompartmentDefinition.publisher | ConceptMap.publisher | GraphDefinition.publisher | ImplementationGuide.publisher | MessageDefinition.publisher | NamingSystem.publisher | OperationDefinition.publisher | SearchParameter.publisher | StructureDefinition.publisher | StructureMap.publisher | TerminologyCapabilities.publisher | ValueSet.publisher",
+        "base": [
+          "CapabilityStatement",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "event",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Event"
+      },
+      "hint": {
+        "en-US": "The event that triggers the message or link to the event definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 15,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-event",
+        "expression": "MessageDefinition.event",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "category",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Category"
+      },
+      "hint": {
+        "en-US": "The behavior associated with the message"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 16,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/message-significance-category",
+      "valueSetVersion": "4.0.1",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/MessageDefinition-category",
+        "expression": "MessageDefinition.category",
+        "base": [
+          "MessageDefinition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "status",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Status"
+      },
+      "hint": {
+        "en-US": "The current status of the message definition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "select",
+      "order": 17,
+      "valueSetUrl": "http://hl7.org/fhir/ValueSet/publication-status",
+      "valueSetVersion": "4.0.1",
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/conformance-status",
+        "expression": "CapabilityStatement.status | CodeSystem.status | CompartmentDefinition.status | ConceptMap.status | GraphDefinition.status | ImplementationGuide.status | MessageDefinition.status | NamingSystem.status | OperationDefinition.status | SearchParameter.status | StructureDefinition.status | StructureMap.status | TerminologyCapabilities.status | ValueSet.status",
+        "base": [
+          "CapabilityStatement",
+          "CodeSystem",
+          "CompartmentDefinition",
+          "ConceptMap",
+          "GraphDefinition",
+          "ImplementationGuide",
+          "MessageDefinition",
+          "NamingSystem",
+          "OperationDefinition",
+          "SearchParameter",
+          "StructureDefinition",
+          "StructureMap",
+          "TerminologyCapabilities",
+          "ValueSet"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_content",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Content"
+      },
+      "hint": {
+        "en-US": "Search on the entire content of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 18,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-content",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_id",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Id"
+      },
+      "hint": {
+        "en-US": "Search by resource identifier - e.g. same as the read interaction, but can return included resources"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 19,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/example",
+        "expression": "id",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_lastUpdated",
+      "origin": "package",
+      "parameterType": "date",
+      "included": false,
+      "label": {
+        "en-US": "Last updated"
+      },
+      "hint": {
+        "en-US": "When the resource version last changed"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 20,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq",
+        "ne",
+        "gt",
+        "ge",
+        "lt",
+        "le",
+        "sa",
+        "eb",
+        "ap"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-lastUpdated",
+        "expression": "Resource.meta.lastUpdated",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_profile",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Profile"
+      },
+      "hint": {
+        "en-US": "Profiles this resource claims to conform to"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 21,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-profile",
+        "expression": "Resource.meta.profile",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_query",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Query"
+      },
+      "hint": {
+        "en-US": "A custom search profile that describes a specific defined query operation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 22,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-query",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_security",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Security"
+      },
+      "hint": {
+        "en-US": "Security Labels applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 23,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-security",
+        "expression": "Resource.meta.security",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_source",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Source"
+      },
+      "hint": {
+        "en-US": "Identifies where the resource comes from"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 24,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-source",
+        "expression": "Resource.meta.source",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_tag",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Tag"
+      },
+      "hint": {
+        "en-US": "Tags applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 25,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-tag",
+        "expression": "Resource.meta.tag",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_text",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Text"
+      },
+      "hint": {
+        "en-US": "Search on the narrative of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 26,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DomainResource-text",
+        "base": [
+          "DomainResource"
+        ]
+      },
+      "notInPackage": false
+    }
+  ]
+}

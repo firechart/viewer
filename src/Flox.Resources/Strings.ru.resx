@@ -283,7 +283,7 @@
     <value>Язык</value>
   </data>
   <data name="Caption_DefaultPageSize" xml:space="preserve">
-    <value>Размер страницы по умолчанию</value>
+    <value>Количество записей на странице</value>
   </data>
   <data name="Caption_DataAndPrivacy" xml:space="preserve">
     <value>Данные и безопасность</value>
@@ -374,9 +374,6 @@
   </data>
   <data name="Message_InvalidValue" xml:space="preserve">
     <value>Недопустимое значение</value>
-  </data>
-  <data name="Message_BookmarkQueryString" xml:space="preserve">
-    <value>Закладка хранит место, а не поиск: в адресе есть строка запроса, а она может содержать данные пациента.</value>
   </data>
   <data name="Consent_Title" xml:space="preserve">
     <value>Диагностика и конфиденциальность</value>
@@ -542,5 +539,26 @@
   </data>
   <data name="Caption_CollapseAll" xml:space="preserve">
     <value>Свернуть все</value>
+  </data>
+  <data name="Notice_BookmarksOnDevice" xml:space="preserve">
+    <value>Закладки и недавние страницы хранятся только на этом устройстве и никогда не отправляются на сервер, поэтому на других ваших устройствах их нет. Чтобы перенести закладки, экспортируйте их в файл и импортируйте его там; в файле могут быть имена пациентов, храните его бережно. Одна учётная запись операционной системы — один пользователь: закладки этого браузера видит каждый, кто им пользуется.</value>
+  </data>
+  <data name="Caption_ExportBookmarks" xml:space="preserve">
+    <value>Экспорт</value>
+  </data>
+  <data name="Caption_ImportBookmarks" xml:space="preserve">
+    <value>Импорт</value>
+  </data>
+  <data name="Message_BookmarksImported" xml:space="preserve">
+    <value>Добавлено закладок: {0}; уже были: {1}.</value>
+  </data>
+  <data name="Message_BookmarksFileInvalid" xml:space="preserve">
+    <value>Файл не является экспортом закладок.</value>
+  </data>
+  <data name="Message_BookmarkSourceMissing" xml:space="preserve">
+    <value>Сервер этой закладки ({0}) здесь не зарегистрирован: зарегистрируйте его, чтобы открыть закладку.</value>
+  </data>
+  <data name="Caption_History" xml:space="preserve">
+    <value>История</value>
   </data>
 </root>

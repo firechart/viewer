@@ -1,11 +1,11 @@
 @implements IDisposable
 @inject NavigationManager Navigation
 
-@* The menu of a page: the button with the vertical ellipsis at the right of the app bar and a popup with what the page puts in it (any markup: a list
+@* The menu of a page: the button with the vertical ellipsis at the right of the app bar (or of the bar of SectionName) and a popup with what the page puts in it (any markup: a list
    of the sections of the page, switches, commands); PageMenuItem and PageMenuSeparator give the rows the common look. A page without it has no button.
    The content gets the menu as its context to close it after a choice of its own; the popup closes itself after a PageMenuItem, on a click outside,
    on Escape and when the page changes *@
-<SectionContent SectionName="appbar-menu">
+<SectionContent SectionName=@SectionName>
     <RadzenButton @ref=_button Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" title=@(Title ?? Strings.Caption_More)
                   aria-haspopup="true" Click=@ToggleAsync>
         <FloxIcon Icon="more_vert"/>
@@ -26,6 +26,10 @@
 
     private RadzenButton? _button;
     private RadzenPopup? _popup;
+
+    // Where the button goes: the app bar (appbar-menu) by default; a component that has its own bar (the Viewer) names its outlet
+    [Parameter]
+    public string SectionName { get; set; } = "appbar-menu";
 
     // The tooltip of the button; "More" when not given
     [Parameter]

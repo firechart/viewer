@@ -1,0 +1,16 @@
+{%- assign name = self.name | first -%}
+{%- assign mrn = self.identifier | as_list | first -%}
+{%- capture title -%}{% if name %}{% apply name mode: "text" %}{% endif %}{%- endcapture -%}
+{%- assign title = title | default: self.id -%}
+{%- capture s0 -%}{% if self.birthDate %}{{ self.birthDate | fhir_date }}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% if mrn %}{{ mrn.value }}{% endif %}{%- endcapture -%}
+{%- assign s1 = s1 | default: self.id -%}
+{%- slot "subtitle" -%}{% render "parts", p1: s0, p2: s1 %}{%- endslot -%}
+{%- assign years = self.birthDate | age -%}
+{%- assign act = self.active | append: "" -%}
+{%- slot "trailing" -%}
+  {%- if years %}{% render "badge", text: years %}{% endif -%}
+  {%- if self.gender %}{% render "badge", text: self.gender %}{% endif -%}
+{%- endslot -%}
+{%- slot "status" -%}{% if act == "false" %}{% render "badge", text: "inactive", tone: "danger" %}{% endif %}{%- endslot -%}
+{% slot "title" %}{{ title }}{% endslot %}

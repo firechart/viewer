@@ -6,7 +6,7 @@ namespace FireChart.Viewer.Tests.Rendering;
 // A code without a display is shown by the display a terminology server gave, when there is one (the pool carries the map), and by the code when there is not
 public class TerminologyTests
 {
-    private static readonly VendorTemplates s_vendor = new();
+    private static readonly VendorTemplates s_vendor = TestLibrary.Vendor;
 
     private const string Condition = """
         { "resourceType": "Condition", "id": "c1", "code": { "coding": [ { "system": "http://snomed.info/sct", "code": "38341003" } ] }, "clinicalStatus": { "coding": [ { "system": "http://terminology.hl7.org/CodeSystem/condition-clinical", "code": "active" } ] } }

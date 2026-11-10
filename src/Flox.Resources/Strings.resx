@@ -283,7 +283,7 @@
     <value>Language</value>
   </data>
   <data name="Caption_DefaultPageSize" xml:space="preserve">
-    <value>Default page size</value>
+    <value>Records per page</value>
   </data>
   <data name="Caption_DataAndPrivacy" xml:space="preserve">
     <value>Data and privacy</value>
@@ -374,9 +374,6 @@
   </data>
   <data name="Message_InvalidValue" xml:space="preserve">
     <value>The value is not valid</value>
-  </data>
-  <data name="Message_BookmarkQueryString" xml:space="preserve">
-    <value>A bookmark keeps a place, not a search: the address has a query string, which may carry data of a patient.</value>
   </data>
   <data name="Consent_Title" xml:space="preserve">
     <value>Diagnostics and privacy</value>
@@ -542,5 +539,26 @@
   </data>
   <data name="Caption_CollapseAll" xml:space="preserve">
     <value>Collapse all</value>
+  </data>
+  <data name="Notice_BookmarksOnDevice" xml:space="preserve">
+    <value>Bookmarks and recent pages are kept only on this device and never sent to the server, so they do not follow you to your other devices. To move bookmarks, export them to a file and import it there; the file may name patients, keep it safe. One account of the operating system is one user: the bookmarks of this browser are seen by everyone who uses it.</value>
+  </data>
+  <data name="Caption_ExportBookmarks" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="Caption_ImportBookmarks" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="Message_BookmarksImported" xml:space="preserve">
+    <value>Bookmarks added: {0}; already here: {1}.</value>
+  </data>
+  <data name="Message_BookmarksFileInvalid" xml:space="preserve">
+    <value>The file is not an export of bookmarks.</value>
+  </data>
+  <data name="Message_BookmarkSourceMissing" xml:space="preserve">
+    <value>The server of this bookmark ({0}) is not registered here: register it to open the bookmark.</value>
+  </data>
+  <data name="Caption_History" xml:space="preserve">
+    <value>History</value>
   </data>
 </root>

@@ -6,7 +6,7 @@ using Resource = Hl7.Fhir.Model.Resource;
 
 namespace FireChart.Viewer.Tests.Rendering;
 
-// The check of the template library (src/FireChart.Viewer.Library), the one FireChart.Viewer.Library embeds
+// The check of the template library (src/FireChart.Viewer.Library/wwwroot), the static files a client reads one by one
 public partial class TemplatePackageTests
 {
     private static readonly string s_package = FindPackage();
@@ -25,7 +25,7 @@ public partial class TemplatePackageTests
     private static Dictionary<string, string> Files()
     {
         var result = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (var path in Directory.EnumerateFiles(Path.Combine(s_package, "templates"), "*.liquid", System.IO.SearchOption.AllDirectories))
+        foreach (var path in Directory.EnumerateFiles(Path.Combine(s_package, VendorLibrary.WebRoot, VendorLibrary.TemplatesFolder), "*.liquid", System.IO.SearchOption.AllDirectories))
         {
             var key = Path.GetFileNameWithoutExtension(path);
             Assert.That(result.ContainsKey(key), Is.False, $"The key {key} is in two files");
@@ -54,7 +54,7 @@ public partial class TemplatePackageTests
     [Test]
     public async System.Threading.Tasks.Task EverySample_RendersThroughTheLibrary()
     {
-        var samples = Directory.EnumerateFiles(Path.Combine(s_package, "samples"), "*.json").ToList();
+        var samples = Directory.EnumerateFiles(Path.Combine(s_package, VendorLibrary.WebRoot, TemplateSamples.Folder), "*.json").ToList();
         var problems = new List<string>();
         var renderer = new FhirRenderer([new MemoryTemplateSource(Files())], problems.Add);
 
@@ -70,18 +70,49 @@ public partial class TemplatePackageTests
     }
 
     [Test]
-    public void TheLibraryInTheAssembly_IsTheLibraryOfThePackage()
+    public void EveryTemplate_IsWhereAClientLooksForIt()
     {
-        var vendor = new VendorTemplates();
-        var files = Files();
+        var root = Path.Combine(s_package, VendorLibrary.WebRoot);
+        var misplaced = Directory.EnumerateFiles(Path.Combine(root, VendorLibrary.TemplatesFolder), "*.liquid", System.IO.SearchOption.AllDirectories)
+                                 .Select(file => Path.GetRelativePath(root, file).Replace('\\', '/'))
+                                 .Where(path => VendorLibrary.TemplatePathOf(Path.GetFileNameWithoutExtension(path)) != path)
+                                 .ToList();
 
-        Assert.That(vendor.Keys.Order(StringComparer.Ordinal), Is.EqualTo(files.Keys.Order(StringComparer.Ordinal)));
-        foreach (var (key, text) in files)
+        Assert.That(misplaced, Is.Empty, "a client finds a template by its key only (VendorLibrary.TemplatePathOf)");
+    }
+
+    // The client loads a template when the engine asks for it, with the partials it renders: the rows are the ones of the whole library
+    [Test]
+    public async System.Threading.Tasks.Task ALibraryLoadedOnDemand_RendersAsTheWholeOne_ReadingOnlyWhatItNeeds()
+    {
+        var assets = TestLibrary.Assets;
+        var json = """{ "resourceType": "StructureDefinition", "id": "x1", "name": "USCorePatient", "kind": "resource", "type": "Patient", "derivation": "constraint", "status": "active" }""";
+
+        var onDemand = await new FhirRenderer([new WebVendorTemplates(assets)]).RenderTileAsync(json);
+        var whole = await new FhirRenderer([TestLibrary.Vendor]).RenderTileAsync(json);
+
+        Assert.Multiple(() =>
         {
-            Assert.That(TemplateHash.Of(vendor.Find(key)!), Is.EqualTo(TemplateHash.Of(text)), key);
-        }
+            Assert.That(onDemand.Html, Is.EqualTo(whole.Html));
+            Assert.That(assets.Read, Does.Contain("_content/FireChart.Viewer.Library/templates/resources/StructureDefinition@tile.liquid").And.Contain("_content/FireChart.Viewer.Library/templates/partials/status-badge.liquid"));
+            Assert.That(assets.Read.Count(path => path.Contains("/templates/", StringComparison.Ordinal)), Is.LessThan(20), "only what the row needs");
+        });
+    }
 
-        Assert.That(TemplateSamples.Names, Is.EquivalentTo(Directory.EnumerateFiles(Path.Combine(s_package, "samples"), "*.json").Select(Path.GetFileNameWithoutExtension)));
+    [Test]
+    public async System.Threading.Tasks.Task ATileLoadedOnDemand_NamesItsPatientAndTheAge_AsTheWholeLibraryDoes()
+    {
+        const string patient = """{ "resourceType": "Patient", "id": "p1", "name": [ { "family": "Smith" } ], "birthDate": "1986-03-02" }""";
+        const string observation = """
+            { "resourceType": "Observation", "id": "o1", "status": "final", "code": { "text": "Heart rate" }, "subject": { "reference": "Patient/p1" },
+              "effectiveDateTime": "2020-03-01" }
+            """;
+        var context = new TileContext([], new TileOptions(ShowAge: true));
+
+        var onDemand = await new FhirRenderer([new WebVendorTemplates(TestLibrary.Assets)]).RenderTileAsync(observation, pool: FhirRenderer.CreatePool([new PoolEntry(patient)]), context: context);
+        var whole = await new FhirRenderer([TestLibrary.Vendor]).RenderTileAsync(observation, pool: FhirRenderer.CreatePool([new PoolEntry(patient)]), context: context);
+
+        Assert.That(onDemand.Text, Is.EqualTo(whole.Text).And.Contain("Smith").And.Contain("(33"), "slot_data renders partials the template does not name");
     }
 
     [GeneratedRegex(@"\{%-?\s*render\s+""([^""]+)""")]

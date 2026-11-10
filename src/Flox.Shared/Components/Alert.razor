@@ -1,0 +1,114 @@
+@* A RadzenAlert of Flox. OneTime: shown once on this device, then never again (the mark is kept by ILocalDocumentStore, IndexedDB; with no store, or
+   when it fails, the alert is shown every time). It is marked when it is shown, and has the close button *@
+@using Radzen
+@using Radzen.Blazor
+@inject IServiceProvider Services
+
+@if (_visible)
+{
+    <RadzenAlert AlertStyle=@AlertStyle Variant=@Variant Size=@Size Shade=@Shade AllowClose=@(AllowClose || OneTime) Close=@CloseAsync Title=@Title Icon=@Icon ShowIcon=@ShowIcon
+                 class=@Class Style=@Style @attributes=@Attributes>
+        @ChildContent
+    </RadzenAlert>
+}
+
+@code {
+
+    // The collection of the marks of the one-time alerts on the device
+    public const string Collection = "FloxShownAlert";
+
+    private bool _visible;
+    private string? _checkedKey;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public AlertStyle AlertStyle { get; set; } = AlertStyle.Info;
+
+    [Parameter]
+    public Variant Variant { get; set; } = Variant.Flat;
+
+    [Parameter]
+    public AlertSize Size { get; set; } = AlertSize.Medium;
+
+    [Parameter]
+    public Shade Shade { get; set; } = Shade.Default;
+
+    [Parameter]
+    public bool AllowClose { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public bool ShowIcon { get; set; } = true;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    // Shown once on this device; needs Key
+    [Parameter]
+    public bool OneTime { get; set; }
+
+    // The name of the alert among the one-time ones; the same key on two pages is one alert
+    [Parameter]
+    public string? Key { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? Attributes { get; set; }
+
+    private ILocalDocumentStore? Store => Services.GetService<ILocalDocumentStore>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!OneTime)
+        {
+            _visible = true;
+            return;
+        }
+
+        ArgumentException.ThrowIfNullOrWhiteSpace(Key, nameof(Key));
+        if (_checkedKey == Key)
+        {
+            return;
+        }
+
+        // Hidden until the mark is read: a shown alert must not flash
+        _checkedKey = Key;
+        _visible = false;
+        if (Store is not { } store)
+        {
+            _visible = true;
+            return;
+        }
+
+        try
+        {
+            var shown = (await store.LoadAsync(Collection)).Any(row => row.Key == Key);
+            _visible = !shown;
+            if (!shown)
+            {
+                await store.PutAsync(Collection, [new LocalDocument(Key, "true")]);
+            }
+        }
+        catch (Exception ex) when (ex is JSException or JSDisconnectedException or InvalidOperationException)
+        {
+            // no store here (prerendering, a closed page): shown, and not marked
+            _visible = true;
+        }
+    }
+
+    private Task CloseAsync()
+    {
+        _visible = false;
+        return Task.CompletedTask;
+    }
+
+}

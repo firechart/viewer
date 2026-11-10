@@ -1,0 +1,8 @@
+{%- comment -%} The comparator, the number (the digits of the record; decimals: at most that many places) and the unit (unit, else code). The number and the unit
+are marked (fx-quantity-number, fx-quantity-unit) so that a narrow row cuts the digits, never the unit {%- endcomment -%}
+{%- assign unit = self.unit | default: self.code -%}
+{{- self.comparator -}}
+<span class="fx-quantity-number">{{- self.value | fhir_number: decimals -}}</span>
+{%- if unit -%}
+  {{- " " -}}<span class="fx-quantity-unit">{{- unit -}}</span>
+{%- endif -%}

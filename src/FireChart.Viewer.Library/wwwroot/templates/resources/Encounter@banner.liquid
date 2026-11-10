@@ -1,0 +1,34 @@
+{%- comment -%} The banner of an encounter (a sub-banner below the patient): the frame (BannerFrame) writes the header and the link of the title;
+the template fills the slots title, facts and flags {%- endcomment -%}
+{%- assign type = self.type | first -%}
+{%- assign cls = self.class | as_list | first -%}
+{%- assign period = self.period | default: self.actualPeriod -%}
+
+{%- capture kind -%}
+  {%- if type -%}
+    {%- apply type mode: "text" -%}
+  {%- elsif cls -%}
+    {%- apply cls mode: "text" -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- slot "title" -%}
+  {{ "Encounter" | t }}
+  {%- if kind != "" -%}
+    {{- ": " -}}
+    {{- kind -}}
+  {%- endif -%}
+{%- endslot -%}
+
+{%- slot "facts" -%}
+  {%- if period %}
+  <span>{% apply period mode: "text" -%}</span>
+  {%- endif %}
+  {%- if type and cls %}
+  <span>{% apply cls mode: "text" -%}</span>
+  {%- endif %}
+{%- endslot -%}
+
+{%- slot "flags" -%}
+  {%- render "status-badge", code: self.status -%}
+{%- endslot -%}

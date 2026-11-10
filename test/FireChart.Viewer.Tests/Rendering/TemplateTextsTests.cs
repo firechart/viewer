@@ -9,7 +9,7 @@ namespace FireChart.Viewer.Tests.Rendering;
 // The static texts of the templates in the language of the interface (locales/{language}/fhir-templates.json, the format of i18next)
 public partial class TemplateTextsTests
 {
-    private static readonly VendorTemplates s_vendor = new();
+    private static readonly VendorTemplates s_vendor = TestLibrary.Vendor;
 
     private const string Appointment = """{ "resourceType": "Appointment", "id": "a1", "status": "booked", "description": "Check-up", "participant": [ PARTICIPANTS ] }""";
 
@@ -69,8 +69,8 @@ public partial class TemplateTextsTests
     [Test]
     public void EveryTextOfTheTemplates_HasATranslation_InEveryLanguage()
     {
-        var folder = Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", "..", "..", "..", "src", "FireChart.Viewer.Library");
-        var keys = Directory.EnumerateFiles(Path.Combine(folder, "templates"), "*.liquid", System.IO.SearchOption.AllDirectories)
+        var folder = TestLibrary.WebRoot();
+        var keys = Directory.EnumerateFiles(Path.Combine(folder, VendorLibrary.TemplatesFolder), "*.liquid", System.IO.SearchOption.AllDirectories)
                             .SelectMany(file => TextOfATemplate().Matches(File.ReadAllText(file)))
                             .Select(match => match.Groups.Values.Skip(1).First(group => group.Success).Value)
                             .ToHashSet(StringComparer.Ordinal);
@@ -78,7 +78,7 @@ public partial class TemplateTextsTests
         var gaps = new List<string>();
         foreach (var language in new[] { "de", "es", "fr", "ru", "zh" })
         {
-            var texts = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(Path.Combine(folder, "locales", language, "fhir-templates.json")))!;
+            var texts = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(Path.Combine(folder, VendorLibrary.LocalesFolder, language, VendorLibrary.LocaleFile)))!;
             gaps.AddRange(keys.Where(key => !texts.ContainsKey(key) && !texts.ContainsKey(key + "_other")).Select(key => $"{language}: {key}"));
             gaps.AddRange(texts.Keys.Where(key => !keys.Contains(Regex.Replace(key, "_(zero|one|two|few|many|other)$", string.Empty))).Select(key => $"{language}: unused {key}"));
         }

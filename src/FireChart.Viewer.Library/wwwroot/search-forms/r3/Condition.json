@@ -1,0 +1,1544 @@
+{
+  "formatVersion": 1,
+  "name": "generated",
+  "authoredForVersion": "3.0.2",
+  "isGenerated": true,
+  "title": {
+    "en-US": "Filter"
+  },
+  "description": {},
+  "groups": [],
+  "fields": [
+    {
+      "queryName": "severity",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Severity"
+      },
+      "hint": {
+        "en-US": "The severity of the condition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 1,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-severity",
+        "expression": "Condition.severity",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "evidence-detail",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Evidence detail"
+      },
+      "hint": {
+        "en-US": "Supporting information found elsewhere"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 2,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Account",
+          "ActivityDefinition",
+          "AdverseEvent",
+          "AllergyIntolerance",
+          "Appointment",
+          "AppointmentResponse",
+          "AuditEvent",
+          "Basic",
+          "Binary",
+          "BodySite",
+          "Bundle",
+          "CapabilityStatement",
+          "CarePlan",
+          "CareTeam",
+          "ChargeItem",
+          "Claim",
+          "ClaimResponse",
+          "ClinicalImpression",
+          "CodeSystem",
+          "Communication",
+          "CommunicationRequest",
+          "CompartmentDefinition",
+          "Composition",
+          "ConceptMap",
+          "Condition",
+          "Consent",
+          "Contract",
+          "Coverage",
+          "DataElement",
+          "DetectedIssue",
+          "Device",
+          "DeviceComponent",
+          "DeviceMetric",
+          "DeviceRequest",
+          "DeviceUseStatement",
+          "DiagnosticReport",
+          "DocumentManifest",
+          "DocumentReference",
+          "EligibilityRequest",
+          "EligibilityResponse",
+          "Encounter",
+          "Endpoint",
+          "EnrollmentRequest",
+          "EnrollmentResponse",
+          "EpisodeOfCare",
+          "ExpansionProfile",
+          "ExplanationOfBenefit",
+          "FamilyMemberHistory",
+          "Flag",
+          "Goal",
+          "GraphDefinition",
+          "Group",
+          "GuidanceResponse",
+          "HealthcareService",
+          "ImagingManifest",
+          "ImagingStudy",
+          "Immunization",
+          "ImmunizationRecommendation",
+          "ImplementationGuide",
+          "Library",
+          "Linkage",
+          "List",
+          "Location",
+          "Measure",
+          "MeasureReport",
+          "Media",
+          "Medication",
+          "MedicationAdministration",
+          "MedicationDispense",
+          "MedicationRequest",
+          "MedicationStatement",
+          "MessageDefinition",
+          "MessageHeader",
+          "NamingSystem",
+          "NutritionOrder",
+          "Observation",
+          "OperationDefinition",
+          "OperationOutcome",
+          "Organization",
+          "Patient",
+          "PaymentNotice",
+          "PaymentReconciliation",
+          "Person",
+          "PlanDefinition",
+          "Practitioner",
+          "PractitionerRole",
+          "Procedure",
+          "ProcedureRequest",
+          "ProcessRequest",
+          "ProcessResponse",
+          "Provenance",
+          "Questionnaire",
+          "QuestionnaireResponse",
+          "ReferralRequest",
+          "RelatedPerson",
+          "RequestGroup",
+          "ResearchStudy",
+          "ResearchSubject",
+          "RiskAssessment",
+          "Schedule",
+          "SearchParameter",
+          "Sequence",
+          "ServiceDefinition",
+          "Slot",
+          "Specimen",
+          "StructureDefinition",
+          "StructureMap",
+          "Subscription",
+          "Substance",
+          "SupplyDelivery",
+          "SupplyRequest",
+          "Task",
+          "TestReport",
+          "TestScript",
+          "ValueSet",
+          "VisionPrescription"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-evidence-detail",
+        "expression": "Condition.evidence.detail",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "identifier",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Identifier"
+      },
+      "hint": {
+        "en-US": "A unique identifier of the condition record"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 3,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-identifier",
+        "expression": "DocumentManifest.masterIdentifier | DocumentManifest.identifier | Goal.identifier | Consent.identifier | DocumentReference.masterIdentifier | DocumentReference.identifier | SupplyRequest.identifier | RiskAssessment.identifier | CareTeam.identifier | ImagingStudy.identifier | FamilyMemberHistory.identifier | Encounter.identifier | DeviceRequest.identifier | AllergyIntolerance.identifier | CarePlan.identifier | EpisodeOfCare.identifier | Procedure.identifier | List.identifier | Immunization.identifier | VisionPrescription.identifier | ProcedureRequest.identifier | Observation.identifier | DiagnosticReport.identifier | NutritionOrder.identifier | Condition.identifier | Composition.identifier | DetectedIssue.identifier | SupplyDelivery.identifier",
+        "base": [
+          "DocumentManifest",
+          "Goal",
+          "Consent",
+          "DocumentReference",
+          "SupplyRequest",
+          "RiskAssessment",
+          "CareTeam",
+          "ImagingStudy",
+          "FamilyMemberHistory",
+          "Encounter",
+          "DeviceRequest",
+          "AllergyIntolerance",
+          "CarePlan",
+          "EpisodeOfCare",
+          "Procedure",
+          "List",
+          "Immunization",
+          "VisionPrescription",
+          "ProcedureRequest",
+          "Observation",
+          "DiagnosticReport",
+          "NutritionOrder",
+          "Condition",
+          "Composition",
+          "DetectedIssue",
+          "SupplyDelivery"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "onset-info",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Onset info"
+      },
+      "hint": {
+        "en-US": "Onsets as a string"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 4,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-onset-info",
+        "expression": "Condition.onset.as(string)",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "code",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Code"
+      },
+      "hint": {
+        "en-US": "Code for the condition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 5,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-code",
+        "expression": "FamilyMemberHistory.condition.code | DeviceRequest.code.as(CodeableConcept) | AllergyIntolerance.code | AllergyIntolerance.reaction.substance | Procedure.code | List.code | ProcedureRequest.code | Observation.code | DiagnosticReport.code | Condition.code",
+        "base": [
+          "FamilyMemberHistory",
+          "DeviceRequest",
+          "AllergyIntolerance",
+          "Procedure",
+          "List",
+          "ProcedureRequest",
+          "Observation",
+          "DiagnosticReport",
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "evidence",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Evidence"
+      },
+      "hint": {
+        "en-US": "Manifestation/symptom"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 6,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-evidence",
+        "expression": "Condition.evidence.code",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "subject",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Subject"
+      },
+      "hint": {
+        "en-US": "Who has the condition?"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 7,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Group",
+          "Patient"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-subject",
+        "expression": "Condition.subject",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "verification-status",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Verification status"
+      },
+      "hint": {
+        "en-US": "provisional | differential | confirmed | refuted | entered-in-error | unknown"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 8,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-verification-status",
+        "expression": "Condition.verificationStatus",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "clinical-status",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Clinical status"
+      },
+      "hint": {
+        "en-US": "The clinical status of the condition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 9,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-clinical-status",
+        "expression": "Condition.clinicalStatus",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "encounter",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Encounter"
+      },
+      "hint": {
+        "en-US": "Encounter when condition first asserted"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 10,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Encounter"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-encounter",
+        "expression": "Condition.context",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "abatement-boolean",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Abatement boolean"
+      },
+      "hint": {
+        "en-US": "Abatement boolean (boolean is true or non-boolean values are present)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 11,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-abatement-boolean",
+        "expression": "Condition.abatement.as(boolean) | Condition.abatement.is(dateTime) | Condition.abatement.is(Age) | Condition.abatement.is(Period) | Condition.abatement.is(Range) | Condition.abatement.is(string)",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "onset-date",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Onset date"
+      },
+      "hint": {
+        "en-US": "Date related onsets (dateTime and Period)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 12,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-onset-date",
+        "expression": "Condition.onset.as(dateTime) | Condition.onset.as(Period)",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "abatement-date",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Abatement date"
+      },
+      "hint": {
+        "en-US": "Date-related abatements (dateTime and period)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 13,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-abatement-date",
+        "expression": "Condition.abatement.as(dateTime) | Condition.abatement.as(Period)",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "asserter",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Asserter"
+      },
+      "hint": {
+        "en-US": "Person who asserts this condition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 14,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Practitioner",
+          "Patient",
+          "RelatedPerson"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-asserter",
+        "expression": "Condition.asserter",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "stage",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Stage"
+      },
+      "hint": {
+        "en-US": "Simple summary (disease specific)"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 15,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-stage",
+        "expression": "Condition.stage.summary",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "abatement-string",
+      "origin": "package",
+      "parameterType": "string",
+      "included": true,
+      "label": {
+        "en-US": "Abatement string"
+      },
+      "hint": {
+        "en-US": "Abatement as a string"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 16,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-abatement-string",
+        "expression": "Condition.abatement.as(string)",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "patient",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Patient"
+      },
+      "hint": {
+        "en-US": "Who has the condition?"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 17,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "Patient",
+          "Group"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/clinical-patient",
+        "expression": "ReferralRequest.subject | DocumentManifest.subject | Goal.subject | Consent.patient | DocumentReference.subject | ImagingManifest.patient | RiskAssessment.subject | CareTeam.subject | ImagingStudy.patient | FamilyMemberHistory.patient | Encounter.subject | DeviceUseStatement.subject | DeviceRequest.subject | AllergyIntolerance.patient | CarePlan.subject | EpisodeOfCare.patient | Procedure.subject | List.subject | Immunization.patient | VisionPrescription.patient | ProcedureRequest.subject | Flag.subject | Observation.subject | DiagnosticReport.subject | NutritionOrder.patient | Condition.subject | Composition.subject | DetectedIssue.patient | SupplyDelivery.patient | ClinicalImpression.subject",
+        "base": [
+          "ReferralRequest",
+          "DocumentManifest",
+          "Goal",
+          "Consent",
+          "DocumentReference",
+          "ImagingManifest",
+          "RiskAssessment",
+          "CareTeam",
+          "ImagingStudy",
+          "FamilyMemberHistory",
+          "Encounter",
+          "DeviceUseStatement",
+          "DeviceRequest",
+          "AllergyIntolerance",
+          "CarePlan",
+          "EpisodeOfCare",
+          "Procedure",
+          "List",
+          "Immunization",
+          "VisionPrescription",
+          "ProcedureRequest",
+          "Flag",
+          "Observation",
+          "DiagnosticReport",
+          "NutritionOrder",
+          "Condition",
+          "Composition",
+          "DetectedIssue",
+          "SupplyDelivery",
+          "ClinicalImpression"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "context",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Context"
+      },
+      "hint": {
+        "en-US": "Encounter or episode when condition first asserted"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 18,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [
+          "EpisodeOfCare",
+          "Encounter"
+        ],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-context",
+        "expression": "Condition.context",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "onset-age",
+      "origin": "package",
+      "parameterType": "quantity",
+      "included": true,
+      "label": {
+        "en-US": "Onset age"
+      },
+      "hint": {
+        "en-US": "Onsets as age or age range"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "quantity",
+      "order": 19,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [
+        {
+          "code": "kg",
+          "label": {
+            "en-US": "kg"
+          }
+        },
+        {
+          "code": "g",
+          "label": {
+            "en-US": "g"
+          }
+        },
+        {
+          "code": "mg",
+          "label": {
+            "en-US": "mg"
+          }
+        },
+        {
+          "code": "[lb_av]",
+          "label": {
+            "en-US": "lb"
+          }
+        },
+        {
+          "code": "cm",
+          "label": {
+            "en-US": "cm"
+          }
+        },
+        {
+          "code": "m",
+          "label": {
+            "en-US": "m"
+          }
+        },
+        {
+          "code": "[in_i]",
+          "label": {
+            "en-US": "in"
+          }
+        },
+        {
+          "code": "Cel",
+          "label": {
+            "en-US": "°C"
+          }
+        },
+        {
+          "code": "[degF]",
+          "label": {
+            "en-US": "°F"
+          }
+        },
+        {
+          "code": "mm[Hg]",
+          "label": {
+            "en-US": "mm[Hg]"
+          }
+        },
+        {
+          "code": "/min",
+          "label": {
+            "en-US": "/min"
+          }
+        },
+        {
+          "code": "%",
+          "label": {
+            "en-US": "%"
+          }
+        },
+        {
+          "code": "mmol/L",
+          "label": {
+            "en-US": "mmol/L"
+          }
+        },
+        {
+          "code": "mg/dL",
+          "label": {
+            "en-US": "mg/dL"
+          }
+        },
+        {
+          "code": "mL",
+          "label": {
+            "en-US": "mL"
+          }
+        },
+        {
+          "code": "L",
+          "label": {
+            "en-US": "L"
+          }
+        },
+        {
+          "code": "a",
+          "label": {
+            "en-US": "year"
+          }
+        },
+        {
+          "code": "mo",
+          "label": {
+            "en-US": "month"
+          }
+        },
+        {
+          "code": "wk",
+          "label": {
+            "en-US": "week"
+          }
+        },
+        {
+          "code": "d",
+          "label": {
+            "en-US": "day"
+          }
+        }
+      ],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-onset-age",
+        "expression": "Condition.onset.as(Age) | Condition.onset.as(Range)",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "abatement-age",
+      "origin": "package",
+      "parameterType": "quantity",
+      "included": true,
+      "label": {
+        "en-US": "Abatement age"
+      },
+      "hint": {
+        "en-US": "Abatement as age or age range"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "quantity",
+      "order": 20,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [
+        {
+          "code": "kg",
+          "label": {
+            "en-US": "kg"
+          }
+        },
+        {
+          "code": "g",
+          "label": {
+            "en-US": "g"
+          }
+        },
+        {
+          "code": "mg",
+          "label": {
+            "en-US": "mg"
+          }
+        },
+        {
+          "code": "[lb_av]",
+          "label": {
+            "en-US": "lb"
+          }
+        },
+        {
+          "code": "cm",
+          "label": {
+            "en-US": "cm"
+          }
+        },
+        {
+          "code": "m",
+          "label": {
+            "en-US": "m"
+          }
+        },
+        {
+          "code": "[in_i]",
+          "label": {
+            "en-US": "in"
+          }
+        },
+        {
+          "code": "Cel",
+          "label": {
+            "en-US": "°C"
+          }
+        },
+        {
+          "code": "[degF]",
+          "label": {
+            "en-US": "°F"
+          }
+        },
+        {
+          "code": "mm[Hg]",
+          "label": {
+            "en-US": "mm[Hg]"
+          }
+        },
+        {
+          "code": "/min",
+          "label": {
+            "en-US": "/min"
+          }
+        },
+        {
+          "code": "%",
+          "label": {
+            "en-US": "%"
+          }
+        },
+        {
+          "code": "mmol/L",
+          "label": {
+            "en-US": "mmol/L"
+          }
+        },
+        {
+          "code": "mg/dL",
+          "label": {
+            "en-US": "mg/dL"
+          }
+        },
+        {
+          "code": "mL",
+          "label": {
+            "en-US": "mL"
+          }
+        },
+        {
+          "code": "L",
+          "label": {
+            "en-US": "L"
+          }
+        },
+        {
+          "code": "a",
+          "label": {
+            "en-US": "year"
+          }
+        },
+        {
+          "code": "mo",
+          "label": {
+            "en-US": "month"
+          }
+        },
+        {
+          "code": "wk",
+          "label": {
+            "en-US": "week"
+          }
+        },
+        {
+          "code": "d",
+          "label": {
+            "en-US": "day"
+          }
+        }
+      ],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-abatement-age",
+        "expression": "Condition.abatement.as(Age) | Condition.abatement.as(Range) | Condition.abatement.as(Age)",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "asserted-date",
+      "origin": "package",
+      "parameterType": "date",
+      "included": true,
+      "label": {
+        "en-US": "Asserted date"
+      },
+      "hint": {
+        "en-US": "Date record was believed accurate"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 21,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-asserted-date",
+        "expression": "Condition.assertedDate",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "category",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Category"
+      },
+      "hint": {
+        "en-US": "The category of the condition"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 22,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-category",
+        "expression": "Condition.category",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "body-site",
+      "origin": "package",
+      "parameterType": "token",
+      "included": true,
+      "label": {
+        "en-US": "Body site"
+      },
+      "hint": {
+        "en-US": "Anatomical location, if relevant"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 23,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Condition-body-site",
+        "expression": "Condition.bodySite",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "based-on",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Based on"
+      },
+      "hint": {
+        "en-US": "Matches on the basedon extension value"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 24,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/condition-extensions-Condition-based-on",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "definition",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Definition"
+      },
+      "hint": {
+        "en-US": "Matches on the definition extension value"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 25,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/condition-extensions-Condition-definition",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "part-of",
+      "origin": "package",
+      "parameterType": "reference",
+      "included": true,
+      "label": {
+        "en-US": "Part of"
+      },
+      "hint": {
+        "en-US": "Matches on the partOf extension value"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "reference",
+      "order": 26,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "lookup": {
+        "targetTypes": [],
+        "mode": "dialog",
+        "minChars": 2
+      },
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/condition-extensions-Condition-part-of",
+        "base": [
+          "Condition"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_content",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Content"
+      },
+      "hint": {
+        "en-US": "Search on the entire content of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 27,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-content",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_id",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Id"
+      },
+      "hint": {
+        "en-US": "Search by resource identifier - e.g. same as the read interaction, but can return included resources"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 28,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [
+        "eq"
+      ],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/example",
+        "expression": "id",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_lastUpdated",
+      "origin": "package",
+      "parameterType": "date",
+      "included": false,
+      "label": {
+        "en-US": "Last updated"
+      },
+      "hint": {
+        "en-US": "When the resource version last changed"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "dateRange",
+      "order": 29,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-lastUpdated",
+        "expression": "Resource.meta.lastUpdated",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_profile",
+      "origin": "package",
+      "parameterType": "uri",
+      "included": false,
+      "label": {
+        "en-US": "Profile"
+      },
+      "hint": {
+        "en-US": "Profiles this resource claims to conform to"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 30,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-profile",
+        "expression": "Resource.meta.profile",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_query",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Query"
+      },
+      "hint": {
+        "en-US": "A custom search profile that describes a specific defined query operation"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 31,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-query",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_security",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Security"
+      },
+      "hint": {
+        "en-US": "Security Labels applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 32,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-security",
+        "expression": "Resource.meta.security",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_tag",
+      "origin": "package",
+      "parameterType": "token",
+      "included": false,
+      "label": {
+        "en-US": "Tag"
+      },
+      "hint": {
+        "en-US": "Tags applied to this resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 33,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/Resource-tag",
+        "expression": "Resource.meta.tag",
+        "base": [
+          "Resource"
+        ]
+      },
+      "notInPackage": false
+    },
+    {
+      "queryName": "_text",
+      "origin": "package",
+      "parameterType": "string",
+      "included": false,
+      "label": {
+        "en-US": "Text"
+      },
+      "hint": {
+        "en-US": "Search on the narrative of the resource"
+      },
+      "placeholder": {},
+      "required": false,
+      "control": "text",
+      "order": 34,
+      "options": [],
+      "allowFreeText": false,
+      "multipleOr": false,
+      "multipleAnd": false,
+      "comparators": [],
+      "modifiers": [],
+      "units": [],
+      "source": {
+        "parameterUrl": "http://hl7.org/fhir/SearchParameter/DomainResource-text",
+        "base": [
+          "DomainResource"
+        ]
+      },
+      "notInPackage": false
+    }
+  ]
+}

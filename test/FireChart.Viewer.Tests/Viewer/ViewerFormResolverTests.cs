@@ -117,7 +117,7 @@ public class ViewerFormResolverTests
     [Test]
     public async Task TheVendorSummaryProvider_HasTheDefaultForm_AndNoOtherCode()
     {
-        using var resolver = new ViewerFormResolver<SummaryFormKey, ClinicalSummaryFormDefinition>([new VendorSummaryFormProvider()], (_, _) => Task.FromResult(VendorSummaryForms.Default));
+        using var resolver = new ViewerFormResolver<SummaryFormKey, ClinicalSummaryFormDefinition>([new VendorSummaryFormProvider(TestLibrary.Assets)], (_, _) => Task.FromResult(TestLibrary.SummaryDefault));
 
         var found = await resolver.ResolveAsync(new SummaryFormKey(ClinicalSummaryFormDefinition.DefaultCode), CancellationToken.None);
         var missing = await resolver.ResolveAsync(new SummaryFormKey("no-such-form"), CancellationToken.None);

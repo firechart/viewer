@@ -1,8 +1,0 @@
-{%- assign kind = self.type | as_list | first -%}{%- assign adr = self.address | as_list | first -%}
-{%- capture t0 -%}{{ self.name }}{%- endcapture -%}
-{%- assign title = t0 | default: self.id -%}
-{%- capture s0 -%}{% if kind %}{% apply kind mode: "text" %}{% elsif self.physicalType %}{% apply self.physicalType mode: "text" %}{% endif %}{%- endcapture -%}
-{%- capture s1 -%}{% if adr %}{{ adr.city }}{% endif %}{%- endcapture -%}
-{%- capture subtitle -%}{% render "parts", p1: s0, p2: s1 %}{%- endcapture -%}
-{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
-{% render "tile-row", title: title, subtitle: subtitle, status: status, patient: nil, encounter: nil, at: nil %}

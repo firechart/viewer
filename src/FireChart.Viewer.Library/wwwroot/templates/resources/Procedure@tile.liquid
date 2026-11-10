@@ -1,0 +1,9 @@
+{% fhir_include "Procedure:subject" %}
+{% fhir_include "Procedure:encounter" %}
+{%- capture title -%}{% apply self.code mode: "text" %}{%- endcapture -%}
+{%- assign title = title | default: self.id -%}
+{%- slot "subtitle" -%}{% if self.performed %}{% apply self.performed mode: "text" %}{% endif %}{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}
+{% slot_data patient: self.subject, encounter: self.encounter, at: self.performed %}

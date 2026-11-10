@@ -1,0 +1,11 @@
+{%- assign svc = self.serviceType | as_list | first -%}{%- assign n = self.participant | as_list | size -%}
+{%- capture t0 -%}{{ self.description }}{%- endcapture -%}
+{%- capture t1 -%}{% if svc %}{% apply svc mode: "text" %}{% endif %}{%- endcapture -%}
+{%- capture t2 -%}{% apply self.appointmentType mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 | default: t1 | default: t2 | default: self.id -%}
+{%- capture s0 -%}{% if self.start %}{{ self.start | fhir_date }}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% if n > 0 %}{{ "{{count}} participants" | t: count: n }}{% endif %}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", p1: s0, p2: s1 %}{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}

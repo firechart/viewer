@@ -61,6 +61,60 @@ namespace FireChart.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No values to draw.
+        /// </summary>
+        public static string Caption_TrendNoValues {
+            get {
+                return ResourceManager.GetString("Caption_TrendNoValues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open the last record.
+        /// </summary>
+        public static string Caption_TrendOpenLast {
+            get {
+                return ResourceManager.GetString("Caption_TrendOpenLast", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Test.
+        /// </summary>
+        public static string Caption_LabTest {
+            get {
+                return ResourceManager.GetString("Caption_LabTest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Result.
+        /// </summary>
+        public static string Caption_LabResult {
+            get {
+                return ResourceManager.GetString("Caption_LabResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reference range.
+        /// </summary>
+        public static string Caption_LabReferenceRange {
+            get {
+                return ResourceManager.GetString("Caption_LabReferenceRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Flag.
+        /// </summary>
+        public static string Caption_LabFlag {
+            get {
+                return ResourceManager.GetString("Caption_LabFlag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add server.
         /// </summary>
         public static string Caption_AddFhirServer {
@@ -264,15 +318,6 @@ namespace FireChart.Resources {
         public static string Caption_FhirServerOAuth2Scope {
             get {
                 return ResourceManager.GetString("Caption_FhirServerOAuth2Scope", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Page size.
-        /// </summary>
-        public static string Caption_FhirServerPageSize {
-            get {
-                return ResourceManager.GetString("Caption_FhirServerPageSize", resourceCulture);
             }
         }
         
@@ -907,29 +952,20 @@ namespace FireChart.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Search all fields.
+        /// </summary>
+        public static string Placeholder_SearchAllFields {
+            get {
+                return ResourceManager.GetString("Placeholder_SearchAllFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This form was generated automatically from the search parameters of the resource, so it is not very convenient. The server may not support some of the parameters..
         /// </summary>
         public static string Message_SearchFormGenerated {
             get {
                 return ResourceManager.GetString("Message_SearchFormGenerated", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Sign in to use bookmarks.
-        /// </summary>
-        public static string Message_SignInForBookmarks {
-            get {
-                return ResourceManager.GetString("Message_SignInForBookmarks", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Sign in to see the pages you visited.
-        /// </summary>
-        public static string Message_SignInForRecentPages {
-            get {
-                return ResourceManager.GetString("Message_SignInForRecentPages", resourceCulture);
             }
         }
         
@@ -1056,6 +1092,51 @@ namespace FireChart.Resources {
         public static string Caption_SmartSignInHere {
             get {
                 return ResourceManager.GetString("Caption_SmartSignInHere", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to On the server {0}: open it from there..
+        /// </summary>
+        public static string Message_BookmarkOnOtherServer {
+            get {
+                return ResourceManager.GetString("Message_BookmarkOnOtherServer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All history.
+        /// </summary>
+        public static string Caption_AllHistory {
+            get {
+                return ResourceManager.GetString("Caption_AllHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FHIR packages.
+        /// </summary>
+        public static string Caption_FhirPackages {
+            get {
+                return ResourceManager.GetString("Caption_FhirPackages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indexing a FHIR package is a heavy operation: it runs on the server, and only administrators and developers can add and index packages..
+        /// </summary>
+        public static string Notice_PackageIndexing {
+            get {
+                return ResourceManager.GetString("Notice_PackageIndexing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open the FHIR Package Manager.
+        /// </summary>
+        public static string Caption_OpenPackageManager {
+            get {
+                return ResourceManager.GetString("Caption_OpenPackageManager", resourceCulture);
             }
         }
     }

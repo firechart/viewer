@@ -1,30 +1,54 @@
-﻿@attribute [Route(SharedRoutes.BOOKMARKS)]
-@attribute [Authorize]
+@attribute [Route(SharedRoutes.BOOKMARKS)]
 
-@using Flox.Core.Authorization
 @using Flox.Core.Models
+@using Flox.Shared.Services
+@using Radzen
 
 @inherits StatefulWidget<BookmarksState>
+@inject BookmarkLinks Links
 
+@* The bookmarks of this device: no sign-in, never on a server *@
 <ListPage Title=@Strings.Caption_Bookmarks Breadcrumbs=@Breadcrumbs OnRefresh=@State.RefreshAsync>
-    <DataList State=@State Selectable>
-        <ItemTemplate Context="row">
-            <ListTile Row=@row TitleText=@row.Item.DisplayName SubtitleText=@row.Item.Category Href=@row.Item.Url>
-                <Leading>
-                    <Bookmark Bookmarked/>
-                </Leading>
-            </ListTile>
-        </ItemTemplate>
-        <RowMenu Context="menu">
-            <RadzenMenuItem Text=@Strings.Caption_Delete Icon="delete" IconColor="var(--rz-danger)" Click=@(() => DeleteAsync(menu.Targets))/>
-        </RowMenu>
-        <SelectionActions Context="selected">
-            <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Click=@(() => DeleteAsync([.. selected]))/>
-        </SelectionActions>
-    </DataList>
+    <Commands>
+        <BookmarkTransfer OnImported=@State.RefreshAsync/>
+    </Commands>
+    <ChildContent>
+        <Alert OneTime Key=@BookmarksOnDeviceAlert Size="AlertSize.Small" data-bookmarks="device">
+            @Strings.Notice_BookmarksOnDevice
+        </Alert>
+        <DataList State=@State Selectable>
+            <ItemTemplate Context="row">
+                <ListTile Row=@row TitleText=@row.Item.DisplayName SubtitleText=@SubtitleOf(row.Item) OnClick=@(() => OpenAsync(row.Item))>
+                    <Leading>
+                        <Bookmark Bookmarked/>
+                    </Leading>
+                </ListTile>
+            </ItemTemplate>
+            <RowMenu Context="menu">
+                <RadzenMenuItem Text=@Strings.Caption_Delete Icon="delete" IconColor="var(--rz-danger)" Click=@(() => DeleteAsync(menu.Targets))/>
+            </RowMenu>
+            <SelectionActions Context="selected">
+                <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Click=@(() => DeleteAsync([.. selected]))/>
+            </SelectionActions>
+        </DataList>
+    </ChildContent>
 </ListPage>
 
 @code {
+
+    // Once per device: the page of the bookmarks of the Viewer shows the same notice under the same key
+    public const string BookmarksOnDeviceAlert = "bookmarks-on-device";
+
+    // The kind of the place and, for a place of a server, the server
+    public static string SubtitleOf(UserBookmark bookmark)
+    {
+        return string.IsNullOrEmpty(bookmark.SourceName) ? bookmark.Category : string.IsNullOrEmpty(bookmark.Category) ? bookmark.SourceName : $"{bookmark.Category} · {bookmark.SourceName}";
+    }
+
+    private async Task OpenAsync(UserBookmark bookmark)
+    {
+        await TryAsync(() => Links.OpenAsync(bookmark, NavigationManager, Notifications));
+    }
 
     private async Task DeleteAsync(IReadOnlyList<UserBookmark> bookmarks)
     {

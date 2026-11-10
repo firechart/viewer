@@ -6,8 +6,8 @@ using FireChart.Viewer.Library;
 
 namespace FireChart.Viewer.Tests.Viewer;
 
-// The vendor search forms of src/FireChart.Viewer.Library/search-forms/{release}/{type}.json (git first): the assembly carries every file, each file is a
-// valid form in its canonical text, and every resource type of a release with search parameters has one (once the files of the release are there)
+// The vendor search forms of src/FireChart.Viewer.Library/wwwroot/search-forms/{release}/{type}.json (git first): each file is a valid form in its
+// canonical text, every resource type of a release with search parameters has one and every file is of a resource type of the release
 public class VendorSearchFormsTests
 {
     // The releases of the FHIR core packages and the Firely assembly that knows their search parameters
@@ -27,7 +27,7 @@ public class VendorSearchFormsTests
             directory = directory.Parent;
         }
 
-        return Path.Combine(directory!.FullName, "src", "FireChart.Viewer.Library", "search-forms");
+        return Path.Combine(directory!.FullName, "src", "FireChart.Viewer.Library", VendorSearchForms.WebRoot, VendorSearchForms.Folder);
     }
 
     private static IEnumerable<string> Files(string release)
@@ -57,18 +57,26 @@ public class VendorSearchFormsTests
         return types;
     }
 
+    // Firely knows the search parameters of some resource types of R5 not (6.8.0: Linkage, InsurancePlan, GenomicStudy, ...), the core package does
+    private static SortedSet<string> ResourceTypes(string release)
+    {
+        var modelInfo = Type.GetType($"Hl7.Fhir.Model.ModelInfo, {s_releases[release]}", true)!;
+        var member = (MemberInfo?)modelInfo.GetProperty("SupportedResources", BindingFlags.Public | BindingFlags.Static) ?? modelInfo.GetField("SupportedResources", BindingFlags.Public | BindingFlags.Static);
+        var names = (IEnumerable<string>)(member is PropertyInfo property ? property.GetValue(null) : ((FieldInfo)member!).GetValue(null))!;
+        return new SortedSet<string>(names, StringComparer.Ordinal);
+    }
+
     [Test]
-    public void TheAssembly_CarriesEveryFile_AndEveryFileIsAFormInItsCanonicalText()
+    public void EveryFile_IsAFormInItsCanonicalText_AtTheAddressOfItsType()
     {
         var folders = Directory.Exists(Folder()) ? Directory.EnumerateDirectories(Folder()).Select(Path.GetFileName).ToList() : [];
         Assert.That(folders, Is.SubsetOf(s_releases.Keys), "a folder per release of a FHIR core package, lower case");
 
         foreach (var release in s_releases.Keys)
         {
-            var files = Files(release).ToList();
-            Assert.That(VendorSearchForms.ResourceTypes(release), Is.EquivalentTo(files.Select(Path.GetFileNameWithoutExtension)), release);
-            foreach (var file in files)
+            foreach (var file in Files(release))
             {
+                Assert.That(VendorSearchForms.PathOf(release, Path.GetFileNameWithoutExtension(file)), Is.EqualTo($"_content/FireChart.Viewer.Library/search-forms/{release}/{Path.GetFileName(file)}"));
                 var text = File.ReadAllText(file).ReplaceLineEndings("\n");
                 Assert.That(ViewerJson.Write(ViewerJson.Read<SearchFormDefinition>(text)), Is.EqualTo(text), file);
             }
@@ -84,11 +92,12 @@ public class VendorSearchFormsTests
             Assert.Ignore($"No vendor search forms of {release} yet: run \"Create the missing files\" in the Files mode and commit them.");
         }
 
-        var types = SearchableTypes(release);
+        var searchable = SearchableTypes(release);
+        var types = ResourceTypes(release);
         Assert.Multiple(() =>
         {
-            Assert.That(types.Where(type => !files.Contains(type)), Is.Empty, "without a form");
-            Assert.That(files.Where(file => !types.Contains(file!)), Is.Empty, "not a resource type with search parameters");
+            Assert.That(searchable.Where(type => !files.Contains(type)), Is.Empty, "without a form");
+            Assert.That(files.Where(file => !types.Contains(file!)), Is.Empty, "not a resource type");
         });
     }
 
@@ -100,8 +109,49 @@ public class VendorSearchFormsTests
         Assert.That(types, Does.Contain("Patient").And.Contain("Observation").And.Not.Contain("Resource"));
     }
 
+    [Test]
+    public async Task TheProvider_ReadsTheFileOfItsKey_AtTheAddressOfTheVersion_AndNothingForAnotherName()
+    {
+        if (!Files("r4").Any())
+        {
+            Assert.Ignore("No vendor search forms of r4 yet.");
+        }
+
+        var assets = new FolderAssets(Path.GetDirectoryName(Path.GetDirectoryName(Folder()))!);
+        var provider = new VendorSearchFormProvider(assets);
+
+        var patient = await provider.FindAsync(new SearchFormKey("R4", "Patient"), CancellationToken.None);
+        var missing = await provider.FindAsync(new SearchFormKey("r4", "NoSuchType"), CancellationToken.None);
+        var outside = await provider.FindAsync(new SearchFormKey("r4", "../r5/Patient"), CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(patient?.Definition.Fields, Is.Not.Empty);
+            Assert.That(missing, Is.Null);
+            Assert.That(outside, Is.Null);
+            Assert.That(assets.Paths, Is.EqualTo(new[]
+            {
+                $"_content/FireChart.Viewer.Library/search-forms/r4/Patient.json?v={Uri.EscapeDataString(VendorSearchForms.Version)}",
+                $"_content/FireChart.Viewer.Library/search-forms/r4/NoSuchType.json?v={Uri.EscapeDataString(VendorSearchForms.Version)}"
+            }));
+        });
+    }
+
     private static IEnumerable<string> Releases()
     {
         return s_releases.Keys;
+    }
+
+    // The static files of the library as a host serves them
+    private sealed class FolderAssets(string library) : IViewerAssets
+    {
+        public List<string> Paths { get; } = [];
+
+        public async Task<string?> ReadTextAsync(string path, CancellationToken cancellationToken)
+        {
+            Paths.Add(path);
+            var file = Path.Combine(library, VendorSearchForms.WebRoot, path.Split('?')[0][(VendorSearchForms.ContentRoot.Length + 1)..]);
+            return File.Exists(file) ? await File.ReadAllTextAsync(file, cancellationToken) : null;
+        }
     }
 }

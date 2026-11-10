@@ -1,0 +1,46 @@
+{%- comment -%} The banner of a patient: the frame (BannerFrame) writes the header, the link of the title (banner_link) and the blocks; the template fills
+the slots title, facts (each a span) and flags (badges) {%- endcomment -%}
+{%- assign name = self.name | first -%}
+{%- assign mrn = self.identifier | first -%}
+{%- assign dead = self.deceased | append: "" -%}
+{%- assign active = self.active | append: "" -%}
+
+{%- slot "title" -%}
+  {%- if name -%}
+    {%- apply name mode: "text" -%}
+  {%- else -%}
+    {{- self.id -}}
+  {%- endif -%}
+{%- endslot -%}
+
+{%- slot "facts" -%}
+  {%- if self.gender %}
+  <span>{{ self.gender }}</span>
+  {%- endif %}
+  {%- if self.birthDate %}
+  <span>
+    {{- self.birthDate | fhir_date -}}
+    {%- if dead != "" and dead != "false" -%}
+      {%- assign years = self.birthDate | age_at: dead -%}
+    {%- else -%}
+      {%- assign years = self.birthDate | age -%}
+    {%- endif -%}
+    {%- if years %} ({{ years }}){% endif -%}
+  </span>
+  {%- endif %}
+  {%- if mrn %}
+  <span>{{ "ID" | t }} {% apply mrn mode: "text" -%}</span>
+  {%- endif %}
+{%- endslot -%}
+
+{%- slot "flags" -%}
+  {%- if dead != "" and dead != "false" -%}
+    {%- render "badge", text: "Deceased", tone: "danger" -%}
+    {%- if dead != "true" -%}
+      <span class="fx-muted">{{ dead | fhir_date }}</span>
+    {%- endif -%}
+  {%- endif -%}
+  {%- if active == "false" -%}
+    {%- render "badge", text: "Inactive", tone: "warning" -%}
+  {%- endif -%}
+{%- endslot -%}

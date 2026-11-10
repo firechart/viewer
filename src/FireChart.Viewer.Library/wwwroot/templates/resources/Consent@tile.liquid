@@ -1,0 +1,11 @@
+{% fhir_include "Consent:patient" %}
+{%- assign cat = self.category | as_list | first -%}{%- assign prov = self.provision.type | append: "" -%}
+{%- capture t0 -%}{% apply self.scope mode: "text" %}{%- endcapture -%}
+{%- capture t1 -%}{% if cat %}{% apply cat mode: "text" %}{% endif %}{%- endcapture -%}
+{%- assign title = t0 | default: t1 | default: self.id -%}
+{%- slot "subtitle" -%}{% if self.dateTime %}{{ self.dateTime | fhir_date }}{% endif %}{%- endslot -%}
+{%- slot "trailing" -%}{% if prov != "" %}{% render "status-badge", code: prov %}{% endif %}{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}
+{% slot_data patient: self.patient, at: self.dateTime %}

@@ -1,9 +1,0 @@
-{% fhir_include "Consent:patient" %}
-{%- assign cat = self.category | as_list | first -%}{%- assign prov = self.provision.type | append: "" -%}
-{%- capture t0 -%}{% apply self.scope mode: "text" %}{%- endcapture -%}
-{%- capture t1 -%}{% if cat %}{% apply cat mode: "text" %}{% endif %}{%- endcapture -%}
-{%- assign title = t0 | default: t1 | default: self.id -%}
-{%- capture subtitle -%}{% if self.dateTime %}{{ self.dateTime | fhir_date }}{% endif %}{%- endcapture -%}
-{%- capture trailing -%}{% if prov != "" %}{% render "status-badge", code: prov %}{% endif %}{%- endcapture -%}
-{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
-{% render "tile-row", title: title, subtitle: subtitle, trailing: trailing, status: status, patient: self.patient, encounter: nil, at: self.dateTime %}

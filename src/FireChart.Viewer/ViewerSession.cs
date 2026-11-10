@@ -77,6 +77,17 @@ public sealed class ViewerSession
     public string? ClinicalSummaryForm { get; }
 
     /// <summary>
+    /// The pages show the star of a bookmark (when the host keeps bookmarks); <see langword="true"/> by default. A host whose own pages bookmark
+    /// otherwise (the lists of the Conformance Browser of FireChart) turns it off.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var session = new ViewerSession(server, location) { Bookmarks = false };
+    /// </code>
+    /// </example>
+    public bool Bookmarks { get; init; } = true;
+
+    /// <summary>
     /// A page of the Viewer as an <c>href</c> of the document.
     /// </summary>
     /// <param name="route">The page.</param>

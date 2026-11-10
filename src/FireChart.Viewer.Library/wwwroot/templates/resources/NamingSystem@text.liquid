@@ -1,0 +1,4 @@
+{%- capture t0 -%}{{ self.name }}{%- endcapture -%}
+{%- capture t1 -%}{{ self.title }}{%- endcapture -%}
+{%- assign title = t0 | default: t1 | default: self.id -%}
+{{- title -}}

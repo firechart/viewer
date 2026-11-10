@@ -391,3 +391,8 @@ html:root [dir="rtl"] .rz-breadcrumb-item + .rz-breadcrumb-item::before {
 html:root .rz-form-field.rz-variant-text {
     max-width: var(--fw-field-max-width, 40rem);
 }
+
+/* A slider with its value lines up with the form fields */
+.fw-slider {
+    max-width: var(--fw-field-max-width, 40rem);
+}

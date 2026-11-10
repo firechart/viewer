@@ -1,10 +1,11 @@
+using System.Text.RegularExpressions;
 using Fluid;
 
 namespace FireChart.Viewer.Core;
 
 // Layers from the strongest to the weakest (client overrides first, the vendor library last).
 // A template that does not parse is skipped, the next layer answers
-internal sealed class TemplateLibrary(IReadOnlyList<ITemplateSource> layers, FluidParser parser, Action<string>? onProblem = null)
+internal sealed partial class TemplateLibrary(IReadOnlyList<ITemplateSource> layers, FluidParser parser, Action<string>? onProblem = null)
 {
     private readonly Dictionary<string, ParsedTemplate> _parsed = [];
 
@@ -12,6 +13,70 @@ internal sealed class TemplateLibrary(IReadOnlyList<ITemplateSource> layers, Flu
     {
         return layers.Select(layer => layer.Find(key)).FirstOrDefault(text => text is not null);
     }
+
+    // The first layer that has the key, loading it on demand
+    public async ValueTask<string?> FindAsync(string key, CancellationToken cancellationToken = default)
+    {
+        foreach (var layer in layers)
+        {
+            if (await layer.FindAsync(key, cancellationToken) is { } text)
+            {
+                return text;
+            }
+        }
+
+        return null;
+    }
+
+    // ResolveKeyed with the templates loaded on demand: the keys in order until one has a template that parses (the weaker ones are not loaded),
+    // with the partials it renders, so the render finds them all in memory
+    public async ValueTask<ResolvedTemplate?> ResolveKeyedAsync(IEnumerable<string> keys, CancellationToken cancellationToken = default)
+    {
+        var chain = keys.ToList();
+        foreach (var key in chain)
+        {
+            if (await FindAsync(key, cancellationToken) is not { } text)
+            {
+                continue;
+            }
+
+            await LoadPartialsAsync(text, [], cancellationToken);
+            if (parser.TryParse(text, out _, out _))
+            {
+                break;
+            }
+        }
+
+        return ResolveKeyed(chain);
+    }
+
+    // {% render "name" %}: Fluid reads a partial through the file provider, synchronously, so it is loaded with the template that renders it
+    private async ValueTask LoadPartialsAsync(string text, HashSet<string> seen, CancellationToken cancellationToken)
+    {
+        // {% slot_data %} renders the partials of the context line of a tile itself
+        var names = RenderRegex().Matches(text).Select(match => match.Groups["name"].Value);
+        if (SlotDataRegex().IsMatch(text))
+        {
+            names = names.Concat(SlotDataPartials);
+        }
+
+        foreach (var file in names)
+        {
+            var name = Path.GetFileNameWithoutExtension(file);
+            if (seen.Add(name) && await FindAsync(name, cancellationToken) is { } partial)
+            {
+                await LoadPartialsAsync(partial, seen, cancellationToken);
+            }
+        }
+    }
+
+    [GeneratedRegex("""\{%-?\s*(?:render|include)\s+["'](?<name>[^"']+)["']""")]
+    private static partial Regex RenderRegex();
+
+    private static readonly string[] SlotDataPartials = ["tile-patient", "tile-encounter", "age-at"];
+
+    [GeneratedRegex("""\{%-?\s*slot_data""")]
+    private static partial Regex SlotDataRegex();
 
     public IFluidTemplate? Resolve(IEnumerable<string> keys)
     {

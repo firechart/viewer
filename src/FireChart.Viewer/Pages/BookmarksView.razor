@@ -1,0 +1,104 @@
+@* The bookmarks of the Viewer on this device: those of this server first, then those of the others (opened by the host, which chooses the server) *@
+@using Flox.Core.Models
+@inherits StatelessWidget
+@inject IServiceProvider Services
+
+<RadzenStack Gap="var(--gap-sm)" data-viewer="bookmarks">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="var(--gap-sm)" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-m-0 grow">@FloxStrings.Caption_Bookmarks</RadzenText>
+        <BookmarkTransfer OnImported=@LoadAsync/>
+    </RadzenStack>
+    <Alert OneTime Key=@Flox.Shared.Pages.Bookmarks.BookmarksPage.BookmarksOnDeviceAlert Size="AlertSize.Small" Class="rz-m-0">
+        @FloxStrings.Notice_BookmarksOnDevice
+    </Alert>
+
+    @if (_items is null)
+    {
+        <ListTileSkeleton/>
+    }
+    else if (_items.Count == 0)
+    {
+        <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0" data-viewer="no-bookmarks">@Strings.Message_NoBookmarks</RadzenText>
+    }
+    else
+    {
+        <div>
+            @foreach (var bookmark in _items)
+            {
+                var here = ViewerBookmarks.IsOf(bookmark, Session.Server);
+                var opens = here || OnOpenElsewhere.HasDelegate;
+                <ListTile TitleText=@bookmark.DisplayName SubtitleText=@SubtitleOf(bookmark, here) Icon=@(bookmark.Icon ?? "bookmark")
+                          Disabled=@(!opens) Bookmarked="true" OnBookmark=@(() => RemoveAsync(bookmark)) OnClick=@(() => OpenAsync(bookmark, here))
+                          Chevron=@opens/>
+            }
+        </div>
+    }
+</RadzenStack>
+
+@code {
+
+    private IReadOnlyList<UserBookmark>? _items;
+
+    /// <summary>The instance of the Viewer.</summary>
+    [CascadingParameter]
+    public ViewerSession Session { get; set; } = null!;
+
+    /// <summary>Opens a bookmark of another server: the host chooses that server and puts the Viewer at the location of the bookmark. None: such
+    /// bookmarks are shown, and only their server is named.</summary>
+    [Parameter]
+    public EventCallback<UserBookmark> OnOpenElsewhere { get; set; }
+
+    /// <inheritdoc/>
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        await TryAsync(async () =>
+        {
+            var all = await (ViewerBookmarks.Of(Services)?.ListAsync() ?? Task.FromResult<IReadOnlyList<UserBookmark>>([]));
+            _items = [.. all.OrderBy(row => ViewerBookmarks.IsOf(row, Session.Server) ? 0 : 1)];
+        });
+        _items ??= [];
+    }
+
+    private string SubtitleOf(UserBookmark bookmark, bool here)
+    {
+        if (here || OnOpenElsewhere.HasDelegate)
+        {
+            return here ? bookmark.Category : $"{bookmark.Category} · {bookmark.SourceName}";
+        }
+
+        return string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.Message_BookmarkOnOtherServer, bookmark.SourceName ?? bookmark.SourceAddress);
+    }
+
+    private async Task OpenAsync(UserBookmark bookmark, bool here)
+    {
+        if (!here)
+        {
+            await OnOpenElsewhere.InvokeAsync(bookmark);
+            return;
+        }
+
+        if (ViewerRoutes.Parse(bookmark.Location) is { } route)
+        {
+            Session.Navigate(route);
+        }
+    }
+
+    private async Task RemoveAsync(UserBookmark bookmark)
+    {
+        await TryAsync(async () =>
+        {
+            if (ViewerBookmarks.Of(Services) is { } bookmarks)
+            {
+                await bookmarks.RemoveAsync(bookmark.Uid);
+            }
+
+            _items = [.. (_items ?? []).Where(row => row.Uid != bookmark.Uid)];
+        });
+    }
+
+}

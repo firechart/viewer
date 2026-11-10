@@ -1,9 +1,0 @@
-{% fhir_include "Account:owner" %}
-{%- capture t0 -%}{{ self.name }}{%- endcapture -%}
-{%- capture t1 -%}{% apply self.type mode: "text" %}{%- endcapture -%}
-{%- assign title = t0 | default: t1 | default: self.id -%}
-{%- capture s0 -%}{% if self.servicePeriod %}{% apply self.servicePeriod mode: "text" %}{% endif %}{%- endcapture -%}
-{%- capture s1 -%}{% apply self.owner mode: "text" %}{%- endcapture -%}
-{%- capture subtitle -%}{% render "parts", p1: s0, p2: s1 %}{%- endcapture -%}
-{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
-{% render "tile-row", title: title, subtitle: subtitle, status: status, patient: nil, encounter: nil, at: nil %}

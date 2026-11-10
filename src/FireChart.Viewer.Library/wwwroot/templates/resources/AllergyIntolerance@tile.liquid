@@ -1,0 +1,15 @@
+{% fhir_include "AllergyIntolerance:patient" %}
+{%- assign crit = self.criticality | append: "" -%}
+{%- capture t0 -%}{% apply self.code mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 | default: self.id -%}
+{%- capture s0 -%}{% if self.onset %}{% apply self.onset mode: "text" %}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% if self.recordedDate %}{{ self.recordedDate | fhir_date }}{% endif %}{%- endcapture -%}
+{%- capture s2 -%}{% if self.category %}{{ self.category | join: ", " }}{% endif %}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", p1: s0, p2: s1, p3: s2 %}{%- endslot -%}
+{%- assign at = self.onset | default: self.recordedDate -%}
+{%- slot "trailing" -%}
+  {% if crit == "high" %}{% render "badge", text: "high risk", tone: "danger" %}{% elsif crit == "low" %}{% render "badge", text: "low risk" %}{% endif %}
+{%- endslot -%}
+{%- slot "status" -%}{% render "concept-badge", concept: self.clinicalStatus %}{%- endslot -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot_data patient: self.patient, encounter: self.encounter, at: at %}

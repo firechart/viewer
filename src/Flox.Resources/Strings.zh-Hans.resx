@@ -283,7 +283,7 @@
     <value>语言</value>
   </data>
   <data name="Caption_DefaultPageSize" xml:space="preserve">
-    <value>默认分页大小</value>
+    <value>每页记录数</value>
   </data>
   <data name="Caption_DataAndPrivacy" xml:space="preserve">
     <value>数据与隐私</value>
@@ -495,9 +495,6 @@
   <data name="Message_InvalidValue" xml:space="preserve">
     <value>值无效</value>
   </data>
-  <data name="Message_BookmarkQueryString" xml:space="preserve">
-    <value>书签保存的是位置而不是搜索：该地址包含查询字符串，其中可能带有患者数据。</value>
-  </data>
   <data name="Caption_Name" xml:space="preserve">
     <value>名称</value>
   </data>
@@ -542,5 +539,26 @@
   </data>
   <data name="Caption_CollapseAll" xml:space="preserve">
     <value>全部折叠</value>
+  </data>
+  <data name="Notice_BookmarksOnDevice" xml:space="preserve">
+    <value>书签和最近访问的页面只保存在此设备上，从不发送到服务器，因此不会出现在您的其他设备上。要转移书签，请将其导出为文件，再在其他设备上导入；文件中可能包含患者姓名，请妥善保管。一个操作系统账户就是一个用户：使用此浏览器的任何人都能看到其中的书签。</value>
+  </data>
+  <data name="Caption_ExportBookmarks" xml:space="preserve">
+    <value>导出</value>
+  </data>
+  <data name="Caption_ImportBookmarks" xml:space="preserve">
+    <value>导入</value>
+  </data>
+  <data name="Message_BookmarksImported" xml:space="preserve">
+    <value>已添加书签：{0}；已存在：{1}。</value>
+  </data>
+  <data name="Message_BookmarksFileInvalid" xml:space="preserve">
+    <value>该文件不是书签导出文件。</value>
+  </data>
+  <data name="Message_BookmarkSourceMissing" xml:space="preserve">
+    <value>此书签的服务器（{0}）未在此注册：请先注册该服务器再打开书签。</value>
+  </data>
+  <data name="Caption_History" xml:space="preserve">
+    <value>历史记录</value>
   </data>
 </root>

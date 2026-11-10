@@ -4,6 +4,7 @@ public static class SharedRoutes
 {
     public const string ABOUT = "/about";
     public const string BOOKMARKS = "/bookmark";
+    public const string HISTORY = "/history";
     public const string HOME = "/";
     public const string HOME_ALT = "/home";
     public const string LOGIN = "/login";
@@ -41,6 +42,11 @@ public static class NavigationExtensions
     public static NavigationLink Bookmarks(this NavigationManager navigationManager)
     {
         return new NavigationLink(navigationManager, SharedRoutes.BOOKMARKS);
+    }
+
+    public static NavigationLink History(this NavigationManager navigationManager)
+    {
+        return new NavigationLink(navigationManager, SharedRoutes.HISTORY);
     }
 
     public static NavigationLink Settings(this NavigationManager navigationManager)

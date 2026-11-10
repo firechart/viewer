@@ -63,7 +63,7 @@ public class ReleaseModelsTests
     {
         var overrides = new MemoryTemplateSource(new Dictionary<string, string>
         {
-            ["Encounter@tile"] = "{% for c in self.class %}<li class=\"fx-list-row\"><div>{{ c.coding[0].code }}</div><div>{{ self.actualPeriod.start }}</div></li>{% endfor %}"
+            ["Encounter@tile"] = "{% slot \"title\" %}{% for c in self.class %}{{ c.coding[0].code }}{% endfor %}{% endslot %}{% slot \"subtitle\" %}{{ self.actualPeriod.start }}{% endslot %}"
         });
         var renderer = new FhirRenderer([overrides]);
 

@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace FireChart.Viewer.Core.Forms;
@@ -23,9 +24,11 @@ namespace FireChart.Viewer.Core.Forms;
 public sealed class ClinicalSummaryFormDefinition
 {
     /// <summary>
-    /// The version of the format of the form this code writes.
+    /// The version of the format of the form this code writes: 2 (2026-11-10) gave a section its <see cref="ClinicalSummaryFormSection.Component"/>,
+    /// <see cref="ClinicalSummaryFormSection.Options"/> and <see cref="ClinicalSummaryFormSection.HideIfEmpty"/>; a form of version 1 reads as one whose
+    /// sections are all <see cref="SummaryComponents.Tiles"/>.
     /// </summary>
-    public const int CurrentFormatVersion = 1;
+    public const int CurrentFormatVersion = 2;
 
     /// <summary>
     /// The code of the form used when a FHIR server names none: <c>default</c>.
@@ -108,6 +111,29 @@ public sealed class ClinicalSummaryFormSection
     /// to search it.
     /// </summary>
     public bool HideIfUnsupported { get; set; } = true;
+
+    /// <summary>
+    /// Whether the section is dropped, header and all, when its searches found no record; leave it shown where "nothing" is itself clinical information
+    /// (allergies).
+    /// </summary>
+    public bool HideIfEmpty { get; set; }
+
+    /// <summary>
+    /// The component that shows the records of the section (<see cref="SummaryComponents"/>): <see cref="SummaryComponents.Tiles"/> by default.
+    /// </summary>
+    public string Component { get; set; } = SummaryComponents.Tiles;
+
+    /// <summary>
+    /// The options of the component, in the shape the component defines (<see cref="TilesOptions"/> for the tiles); <see langword="null"/> for its defaults.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "The JSON of the component, replaced whole, not a collection of the model")]
+    public JsonObject? Options { get; set; }
+
+    /// <summary>
+    /// How the values of the records of the section are shown (the value of an observation and of its components); <see langword="null"/> shows them as
+    /// the records have them.
+    /// </summary>
+    public ValueFormat? Format { get; set; }
 
     /// <summary>
     /// The searches the block is made from; their records are shown together, newest first.

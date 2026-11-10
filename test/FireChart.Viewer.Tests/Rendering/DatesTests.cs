@@ -99,6 +99,18 @@ public class DatesTests
         Assert.That(FhirFilters.Number("1.30", CultureInfo.GetCultureInfo(name)), Is.EqualTo(expected));
     }
 
+    [TestCase("ru-RU", "88,99")]
+    [TestCase("de-DE", "88,99")]
+    [TestCase("en-US", "88.99")]
+    public void ARoundedDecimal_UsesTheDecimalSeparatorOfTheCulture_AndNoGrouping(string name, string expected)
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(FhirFilters.Number("88.99215285075731", CultureInfo.GetCultureInfo(name), 2), Is.EqualTo(expected));
+            Assert.That(FhirFilters.Number("12345.678", CultureInfo.GetCultureInfo(name), 1), Is.EqualTo(name == "en-US" ? "12345.7" : "12345,7"));
+        });
+    }
+
     [TestCase("150", "150")]
     [TestCase("-0.5", "-0.5")]
     [TestCase("1e3", "1e3")]
@@ -115,7 +127,7 @@ public class DatesTests
     [TestCase("ja", "false", "No")]
     public void ABoolean_IsAWordOfTheLanguageOfTheApplication(string language, string value, string expected)
     {
-        Assert.That(FhirFilters.Bool(value, [new VendorTemplates()], CultureInfo.GetCultureInfo(language)), Is.EqualTo(expected));
+        Assert.That(FhirFilters.Bool(value, [TestLibrary.Vendor], CultureInfo.GetCultureInfo(language)), Is.EqualTo(expected));
     }
 
     [TestCase("")]
@@ -132,7 +144,7 @@ public class DatesTests
     private static async System.Threading.Tasks.Task<string> RowAsync(string resource, TimeProvider clock)
     {
         var pool = FhirRenderer.CreatePool([new PoolEntry(Patient, "Patient/p1")]);
-        var tile = await new FhirRenderer([new VendorTemplates()], null, clock).RenderTileAsync(resource, pool: pool, context: new TileContext(["Patient/p1"], new TileOptions(ShowAge: true)));
+        var tile = await new FhirRenderer([TestLibrary.Vendor], null, clock).RenderTileAsync(resource, pool: pool, context: new TileContext(["Patient/p1"], new TileOptions(ShowAge: true)));
         return tile.Html;
     }
 
@@ -179,7 +191,7 @@ public class DatesTests
     [TestCase("""{ "resourceType": "Patient", "id": "p1", "birthDate": "1986-03-02" }""", "(40 y)")]
     public async System.Threading.Tasks.Task ThePatientBanner_ShowsTheAgeAtDeath_NotTheAgeToday(string patient, string expected)
     {
-        var html = await new FhirRenderer([new VendorTemplates()], null, FixedClock.Offset(1)).RenderAsync(patient, "banner");
+        var html = await new FhirRenderer([TestLibrary.Vendor], null, FixedClock.Offset(1)).RenderAsync(patient, "banner");
 
         Assert.That(FxHtml.Sanitize(html), Does.Contain(expected));
     }

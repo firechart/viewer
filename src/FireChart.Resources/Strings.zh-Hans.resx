@@ -198,6 +198,9 @@
   <data name="Message_InvalidSearch" xml:space="preserve">
     <value>地址中的搜索无效。</value>
   </data>
+  <data name="Placeholder_SearchAllFields" xml:space="preserve">
+    <value>在所有字段中搜索</value>
+  </data>
   <data name="Message_SearchFormGenerated" xml:space="preserve">
     <value>此表单根据资源的搜索参数自动生成，因此不太方便。服务器可能不支持其中的某些参数。</value>
   </data>
@@ -206,9 +209,6 @@
   </data>
   <data name="Caption_FhirServerOAuth2ClientId" xml:space="preserve">
     <value>OAuth2 客户端 ID</value>
-  </data>
-  <data name="Caption_FhirServerPageSize" xml:space="preserve">
-    <value>每页大小</value>
   </data>
   <data name="Caption_FhirServerLiteEdition" xml:space="preserve">
     <value>此版本仅支持无需身份验证的公共 FHIR 服务器。</value>
@@ -360,12 +360,6 @@
   <data name="Message_NoCorePackages" xml:space="preserve">
     <value>尚未索引 FHIR 核心包</value>
   </data>
-  <data name="Message_SignInForBookmarks" xml:space="preserve">
-    <value>登录后即可使用书签</value>
-  </data>
-  <data name="Message_SignInForRecentPages" xml:space="preserve">
-    <value>登录后即可查看最近访问的页面</value>
-  </data>
   <data name="Conformance_Overview" xml:space="preserve">
     <value>概览</value>
   </data>
@@ -449,5 +443,38 @@
   </data>
   <data name="Caption_SmartSignInHere" xml:space="preserve">
     <value>在此处登录</value>
+  </data>
+  <data name="Message_BookmarkOnOtherServer" xml:space="preserve">
+    <value>位于服务器 {0}：请从该服务器打开。</value>
+  </data>
+  <data name="Caption_AllHistory" xml:space="preserve">
+    <value>全部历史记录</value>
+  </data>
+  <data name="Caption_FhirPackages" xml:space="preserve">
+    <value>FHIR 包</value>
+  </data>
+  <data name="Notice_PackageIndexing" xml:space="preserve">
+    <value>索引 FHIR 包是一项繁重的操作：它在服务器上运行，只有管理员和开发人员可以添加和索引包。</value>
+  </data>
+  <data name="Caption_OpenPackageManager" xml:space="preserve">
+    <value>打开 FHIR Package Manager</value>
+  </data>
+  <data name="Caption_LabTest" xml:space="preserve">
+    <value>检验项目</value>
+  </data>
+  <data name="Caption_LabResult" xml:space="preserve">
+    <value>结果</value>
+  </data>
+  <data name="Caption_LabReferenceRange" xml:space="preserve">
+    <value>参考范围</value>
+  </data>
+  <data name="Caption_LabFlag" xml:space="preserve">
+    <value>标识</value>
+  </data>
+  <data name="Caption_TrendNoValues" xml:space="preserve">
+    <value>没有可绘制的数值</value>
+  </data>
+  <data name="Caption_TrendOpenLast" xml:space="preserve">
+    <value>打开最新记录</value>
   </data>
 </root>

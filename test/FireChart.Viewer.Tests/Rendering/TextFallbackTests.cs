@@ -6,7 +6,7 @@ namespace FireChart.Viewer.Tests.Rendering;
 // What a person reads is made of the coded and the structured parts first; the free text of a concept, of a name or of an address is the fallback (it is optional and may disagree with the codes)
 public class TextFallbackTests
 {
-    private static readonly VendorTemplates s_vendor = new();
+    private static readonly VendorTemplates s_vendor = TestLibrary.Vendor;
 
     private static async System.Threading.Tasks.Task<string> TileTextAsync(string json)
     {

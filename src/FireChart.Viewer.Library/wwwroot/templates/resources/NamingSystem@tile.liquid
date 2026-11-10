@@ -1,0 +1,10 @@
+{%- capture t0 -%}{{ self.name }}{%- endcapture -%}
+{%- capture t1 -%}{{ self.title }}{%- endcapture -%}
+{%- assign title = t0 | default: t1 | default: self.id -%}
+{%- assign uid = self.uniqueId | as_list | first -%}
+{%- capture s0 -%}{% if uid %}{{ uid.value }}{% endif %}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", sep: " · ", p1: s0 %}{%- endslot -%}
+{%- slot "trailing" -%}{% render "badge", text: self.kind %}{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}

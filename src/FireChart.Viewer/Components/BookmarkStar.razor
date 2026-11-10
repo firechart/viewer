@@ -1,0 +1,71 @@
+@* The bookmark of a page of the Viewer: filled when the page is bookmarked; none when the host keeps no bookmarks *@
+@inject IServiceProvider Services
+
+@if (_bookmarks is not null && _known && Session.Bookmarks)
+{
+    <span class="contents" data-viewer="bookmark" data-bookmarked=@(_bookmarked ? "true" : "false")><BookmarkToggle Bookmarked=@_bookmarked OnToggle=@ToggleAsync/></span>
+}
+
+@code {
+
+    private ViewerBookmarks? _bookmarks;
+    private string? _loadedFor;
+    private bool _known;
+    private bool _bookmarked;
+
+    /// <summary>The instance of the Viewer.</summary>
+    [CascadingParameter]
+    public ViewerSession Session { get; set; } = null!;
+
+    /// <summary>The page to bookmark, with its query for a search.</summary>
+    [Parameter, EditorRequired]
+    public ViewerRoute Route { get; set; } = null!;
+
+    /// <summary>The title of the bookmark, asked when it is made (the text of a resource, a type with its search); none is the address.</summary>
+    [Parameter]
+    public Func<Task<string?>>? Title { get; set; }
+
+    /// <summary>What the place is, shown under the title (a resource type).</summary>
+    [Parameter]
+    public string Category { get; set; } = string.Empty;
+
+    /// <summary>The icon of the bookmark in the lists of the host.</summary>
+    [Parameter]
+    public string? Icon { get; set; }
+
+    /// <inheritdoc/>
+    protected override async Task OnParametersSetAsync()
+    {
+        _bookmarks ??= Session.Bookmarks ? ViewerBookmarks.Of(Services) : null;
+        var key = $"{Session.Server.BaseUrl}|{Route.Location}";
+        if (_bookmarks is null || key == _loadedFor)
+        {
+            return;
+        }
+
+        _loadedFor = key;
+        _known = false;
+        _bookmarked = await _bookmarks.ContainsAsync(Session.Server, Route);
+        _known = true;
+    }
+
+    private async Task ToggleAsync()
+    {
+        if (_bookmarks is null)
+        {
+            return;
+        }
+
+        if (_bookmarked)
+        {
+            await _bookmarks.RemoveAsync(ViewerBookmarks.KeyOf(Session.Server, Route));
+            _bookmarked = false;
+            return;
+        }
+
+        var title = Title is null ? null : await Title();
+        await _bookmarks.AddAsync(Session, Route, title ?? Route.Location, Category, Icon);
+        _bookmarked = true;
+    }
+
+}

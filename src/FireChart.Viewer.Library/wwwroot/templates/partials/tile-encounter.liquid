@@ -1,0 +1,22 @@
+{%- comment -%} The encounter of a row (ref: a Reference, or a list of them; at: the moment of the record): its kind, and its day only when the record has no
+moment of its own or is of another day (the record is almost always within its visit: the period would repeat its date); nothing when the page shows the
+encounter above (fhir_context); what the reference says when the encounter is not in the pool {%- endcomment -%}
+{%- assign r = ref | as_list | first -%}
+{%- assign shown = r | in_context -%}
+{%- unless shown -%}
+  {%- assign e = r | resolve -%}
+  {%- assign gone = r | missing -%}
+  {%- if gone -%}
+    {%- render "badge", text: "Encounter could not be loaded", tone: "warning" -%}
+  {%- elsif e -%}
+    {%- assign period = e.period | default: e.actualPeriod -%}
+    {%- assign visit_day = period | fhir_day -%}
+    {%- assign own_day = at | fhir_day -%}
+    {%- capture s0 -%}{% apply e mode: "text" %}{%- endcapture -%}
+    {%- capture s1 -%}{% if visit_day and visit_day != own_day %}{{ visit_day | fhir_date }}{% endif %}{%- endcapture -%}
+    {%- render "parts", p1: s0, p2: s1, sep: ", " -%}
+  {%- elsif r -%}
+    {%- capture said -%}{% apply r mode: "text" %}{%- endcapture -%}
+    {{- said | default: r.reference -}}
+  {%- endif -%}
+{%- endunless -%}

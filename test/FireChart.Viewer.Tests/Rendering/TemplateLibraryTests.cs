@@ -23,7 +23,7 @@ public class TemplateLibraryTests
     [Test]
     public void TheVendorLibrary_ListsItsKeys_AndEveryTemplateParses()
     {
-        var vendor = new VendorTemplates();
+        var vendor = TestLibrary.Vendor;
 
         Assert.That(vendor.Keys, Is.SupersetOf(new[] { "Patient", "HumanName", "Patient.contact", "_primitive", "_complex", "row" }));
         foreach (var key in vendor.Keys)
@@ -35,8 +35,10 @@ public class TemplateLibraryTests
     [Test]
     public void TheSamples_AreFoundByName()
     {
-        Assert.That(TemplateSamples.Names, Is.SupersetOf(new[] { "Patient-full", "Patient-minimal" }));
-        Assert.That(TemplateSamples.Find("Patient-full"), Does.Contain("\"resourceType\": \"Patient\""));
-        Assert.That(TemplateSamples.Find("nothing"), Is.Null);
+        var samples = TemplateSamples.ReadFolder(TestLibrary.WebRoot());
+
+        Assert.That(samples.Names, Is.SupersetOf(new[] { "Patient-full", "Patient-minimal" }));
+        Assert.That(samples.Find("Patient-full"), Does.Contain("\"resourceType\": \"Patient\""));
+        Assert.That(samples.Find("nothing"), Is.Null);
     }
 }

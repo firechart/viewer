@@ -1,0 +1,13 @@
+{% fhir_include "DiagnosticReport:subject" %}
+{% fhir_include "DiagnosticReport:encounter" %}
+{%- assign cat = self.category | as_list | first -%}
+{%- capture t0 -%}{% apply self.code mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 | default: self.id -%}
+{%- capture s0 -%}{% if cat %}{% apply cat mode: "text" %}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% if self.effective %}{% apply self.effective mode: "text" %}{% endif %}{% unless self.effective %}{% if self.issued %}{{ self.issued | fhir_date }}{% endif %}{% endunless %}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", p1: s0, p2: s1 %}{%- endslot -%}
+{%- assign at = self.effective | default: self.issued -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}
+{% slot_data patient: self.subject, encounter: self.encounter, at: at %}

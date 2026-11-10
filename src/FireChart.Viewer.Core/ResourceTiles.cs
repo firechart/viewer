@@ -48,6 +48,26 @@ public interface IResourceTiles
     /// <returns>A row for every resource, by its id.</returns>
     Task<IReadOnlyDictionary<string, TileModel>> RenderAsync(IReadOnlyList<ResourceSummary> items, string? release = null, IReadOnlyList<RelatedResource>? related = null, string? terminologyServer = null,
                                                              TileContext? context = null, IViewerServer? server = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Renders records through a template of slots (the cells of a row of a table: <see cref="FhirRenderer.RenderSlotsAsync"/>).
+    /// </summary>
+    /// <param name="items">The records.</param>
+    /// <param name="template">The key of the template (<c>lab-row</c>).</param>
+    /// <param name="release">The release of the server.</param>
+    /// <param name="related">What the records may reach through a Reference.</param>
+    /// <param name="terminologyServer">The terminology server for the display of codes.</param>
+    /// <param name="context">What the page shows above and the options (the format of the section).</param>
+    /// <param name="cancellationToken">Cancels the work.</param>
+    /// <returns>The slots of each record by its id; none for a record that could not be rendered.</returns>
+    /// <example>
+    /// <code>
+    /// var rows = await tiles.RenderSlotsAsync(observations, "lab-row", release, related, context: context);
+    /// </code>
+    /// </example>
+    Task<IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>>> RenderSlotsAsync(IReadOnlyList<ResourceSummary> items, string template, string? release = null,
+                                                                                             IReadOnlyList<RelatedResource>? related = null, string? terminologyServer = null,
+                                                                                             TileContext? context = null, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -100,7 +120,7 @@ public sealed class ResourceTiles(ITemplateRenderers renderers, IReleaseModels m
     {
         try
         {
-            return (await renderers.GetAsync(cancellationToken)).NeedsFor(resourceType, TileModel.Mode);
+            return await (await renderers.GetAsync(cancellationToken)).NeedsForAsync(resourceType, TileModel.Mode, cancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -145,6 +165,55 @@ public sealed class ResourceTiles(ITemplateRenderers renderers, IReleaseModels m
                 pool.Missing.UnionWith(fetched.Missing);
                 // Only the rows that looked for them: the others would come out the same
                 await RenderAllAsync(missed, renderer, model, pool, context, result);
+            }
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>>> RenderSlotsAsync(IReadOnlyList<ResourceSummary> items, string template, string? release = null,
+                                                                                                    IReadOnlyList<RelatedResource>? related = null, string? terminologyServer = null,
+                                                                                                    TileContext? context = null, CancellationToken cancellationToken = default)
+    {
+        var result = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.Ordinal);
+        if (items.Count == 0)
+        {
+            return result;
+        }
+
+        FhirRenderer renderer;
+        ModelInspector model;
+        try
+        {
+            renderer = await renderers.GetAsync(cancellationToken);
+            model = await models.GetAsync(release, cancellationToken);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            logger.LogWarning(ex, "The templates or the model of {Release} are not available, the rows of {Template} are not rendered", release, template);
+            return result;
+        }
+
+        var pool = FhirRenderer.CreatePool(items.Where(item => item.Json is not null).Select(item => new PoolEntry(item.Json!))
+                                                .Concat((related ?? []).Select(resource => new PoolEntry(resource.Json, resource.FullUrl))), model);
+        await TerminologyPool.AttachAsync(terminology, pool, terminologyServer, items.Where(item => item.Json is not null).Select(item => item.Json!), TimeSpan.FromSeconds(1), cancellationToken);
+        var slice = System.Diagnostics.Stopwatch.StartNew();
+        foreach (var item in items.Where(item => item.Json is not null))
+        {
+            if (renderYield is not null && slice.ElapsedMilliseconds > YieldAfterMs)
+            {
+                await renderYield.YieldAsync();
+                slice.Restart();
+            }
+
+            try
+            {
+                result[item.Id] = await renderer.RenderSlotsAsync(item.Json!, template, model, pool, context);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                logger.LogWarning(ex, "The row {Template} of {Type} {Id} cannot be rendered", template, item.ResourceType, item.Id);
             }
         }
 

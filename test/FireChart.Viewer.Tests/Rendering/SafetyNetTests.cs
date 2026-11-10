@@ -177,7 +177,7 @@ public class SafetyNetTests
               "contact": [ { "name": { "family": "du Marche" } } ] }
             """;
 
-        var html = await new FhirRenderer([new VendorTemplates()]).RenderViewAsync(patient, "view");
+        var html = await new FhirRenderer([TestLibrary.Vendor]).RenderViewAsync(patient, "view");
 
         Assert.That(html, Does.Not.Contain("fx-notice").And.Not.Contain("fx-other"));
     }
@@ -191,7 +191,7 @@ public class SafetyNetTests
               "extension": [ { "url": "http://example.org/StructureDefinition/lab-flag", "valueString": "rerun" } ] }
             """;
 
-        var html = await new FhirRenderer([new VendorTemplates()]).RenderViewAsync(observation, "view");
+        var html = await new FhirRenderer([TestLibrary.Vendor]).RenderViewAsync(observation, "view");
 
         Assert.That(html, Does.Contain("Not shown above: 2 elements (identifier, extension)").And.Contain("L-42").And.Contain("rerun").And.Contain("lab-flag"));
     }

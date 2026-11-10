@@ -1,4 +1,5 @@
 using System.Net;
+using FireChart.Viewer.Core.Forms;
 using FireChart.Viewer.Routing;
 using Flox.Shared.Components;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,7 +35,6 @@ public class ClinicalSummaryViewState : State
     private ClinicalSummaryKey? _key;
     private ResourceSummary? _patient;
     private string? _release;
-    private TileOptions _tileOptions = TileOptions.Default;
     // What the searches brought with their records (_include: the encounters of the rows)
     private readonly List<RelatedResource> _included = [];
 
@@ -80,10 +80,12 @@ public class ClinicalSummaryViewState : State
             foreach (var section in sections)
             {
                 section.Tiles.Clear();
+                section.Cells.Clear();
                 await RenderTilesAsync(sections, section);
+                await RenderLabAsync(sections, section);
+                await RenderTrendsAsync(section);
             }
 
-            Rebuild();
             NotifyChanged();
         }, nameof(OnTerminologyResolved));
     }
@@ -99,9 +101,6 @@ public class ClinicalSummaryViewState : State
 
     /// <summary>The blocks of the form the server can show.</summary>
     public IReadOnlyList<ClinicalSummarySection> Sections { get; private set; } = [];
-
-    /// <summary>The blocks laid out as one flat list of lines of one height: the header of a block, its cards, a line for loading, nothing, an error or "More".</summary>
-    public IReadOnlyList<SummaryRow> Rows { get; private set; } = [];
 
     /// <summary>The last load failed.</summary>
     public bool Failed { get; private set; }
@@ -158,7 +157,6 @@ public class ClinicalSummaryViewState : State
             CredentialsRejected = false;
             Banner = null;
             Sections = [];
-            Rows = [];
             _patient = null;
             lock (_included)
             {
@@ -183,7 +181,6 @@ public class ClinicalSummaryViewState : State
                 Banner = view?.Html ?? string.Empty;
                 Style = view?.Style ?? string.Empty;
                 Sections = await SectionsOfAsync(resolved);
-                Rebuild();
             }
             catch (HttpRequestException ex) when (ex.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.Gone)
             {
@@ -224,7 +221,6 @@ public class ClinicalSummaryViewState : State
         }
 
         var form = await ServiceProvider.GetRequiredService<ViewerSummaryForms>().GetAsync(_key!.Session.ClinicalSummaryForm);
-        _tileOptions = new TileOptions(form.ShowAge, form.ShowStatus);
         return ClinicalSummarySections.Build(form, declared, System.Globalization.CultureInfo.CurrentUICulture.Name);
     }
 
@@ -241,13 +237,117 @@ public class ClinicalSummaryViewState : State
             section.Add(pages.SelectMany(items => items));
             section.Failed = section.Searches.Any(search => search.Failed);
             await RenderTilesAsync(sections, section);
+            await RenderLabAsync(sections, section);
+            await RenderTrendsAsync(section);
         }
         finally
         {
             section.IsLoading = false;
-            Rebuild();
             NotifyChanged();
         }
+    }
+
+    // observation-trends: the measures of the block; the first one is chosen and its history loaded
+    private async Task RenderTrendsAsync(ClinicalSummarySection section)
+    {
+        if (section.Component != SummaryComponents.ObservationTrends)
+        {
+            return;
+        }
+
+        section.Trends = ObservationTrends.Group(section.Items);
+        if (section.SelectedTrend is null || section.Trends.All(trend => trend.Key != section.SelectedTrend))
+        {
+            section.SelectedTrend = section.Trends.Count > 0 ? section.Trends[0].Key : null;
+        }
+
+        await LoadTrendAsync(section);
+    }
+
+    /// <summary>Shows the chart of a measure of a block of <c>observation-trends</c>, loading its history the first time.</summary>
+    /// <param name="section">The block.</param>
+    /// <param name="key">The key of the measure.</param>
+    /// <returns>The task.</returns>
+    public async Task SelectTrendAsync(ClinicalSummarySection section, string key)
+    {
+        section.SelectedTrend = key;
+        NotifyChanged();
+        await LoadTrendAsync(section);
+    }
+
+    // The history of the chosen measure: a search by its code (newest first); a server that refuses it shows the records of the block
+    private async Task LoadTrendAsync(ClinicalSummarySection section)
+    {
+        if (section.Trends.FirstOrDefault(trend => trend.Key == section.SelectedTrend) is not { } trend || section.TrendHistory.ContainsKey(trend.Key))
+        {
+            return;
+        }
+
+        IReadOnlyList<ResourceSummary> history = trend.Records;
+        if (trend.Search is { } code && section.Searches.Count > 0)
+        {
+            section.TrendLoading = true;
+            NotifyChanged();
+            try
+            {
+                var query = section.Searches[0].HistoryQuery(_key!.PatientId, code, ObservationTrends.HistorySize);
+                var page = await _reader.SearchAsync(Server!, "Observation", FhirSearchState.Parse(query), FhirNeeds.None);
+                history = [.. page.Items.Concat(trend.Records).DistinctBy(item => item.Id)];
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                Logger.LogInformation(ex, "The history of {Code} is not available, the chart shows the records of the block", code);
+            }
+            finally
+            {
+                section.TrendLoading = false;
+            }
+        }
+
+        section.TrendHistory[trend.Key] = history;
+        NotifyChanged();
+    }
+
+    // lab-results: the results under their reports (the ones that came with the reports too), else by day; the results get their tiles (the narrow form)
+    // and their cells (the partial lab-row), the ones that are in keep theirs
+    private async Task RenderLabAsync(IReadOnlyList<ClinicalSummarySection> sections, ClinicalSummarySection section)
+    {
+        if (section.Component != SummaryComponents.LabResults)
+        {
+            return;
+        }
+
+        IReadOnlyList<ResourceSummary> included;
+        lock (_included)
+        {
+            included = LabResults.ObservationsOf(_included);
+        }
+
+        var groups = LabResults.Group(section.Items, included, TimeZoneInfo.Local);
+        var rows = groups.SelectMany(group => group.Rows).DistinctBy(ClinicalSummarySection.KeyOf).ToList();
+        var related = ContextOf(sections);
+        var context = new TileContext([$"Patient/{_key!.PatientId}"], section.TileOptions, section.Format);
+        var untiled = rows.Where(row => !section.Tiles.ContainsKey(ClinicalSummarySection.KeyOf(row))).ToList();
+        if (untiled.Count > 0)
+        {
+            var tiles = await _tiles.RenderAsync(untiled, _release, related, TerminologyServer, context, Server);
+            foreach (var row in untiled)
+            {
+                section.Tiles[ClinicalSummarySection.KeyOf(row)] = tiles.GetValueOrDefault(row.Id) ?? ResourceTiles.Plain(row);
+            }
+        }
+
+        var fresh = rows.Where(row => !section.Cells.ContainsKey(ClinicalSummarySection.KeyOf(row))).ToList();
+        if (fresh.Count > 0)
+        {
+            var cells = await _tiles.RenderSlotsAsync(fresh, LabResults.RowTemplate, _release, related, TerminologyServer, context);
+            foreach (var row in fresh)
+            {
+                section.Cells[ClinicalSummarySection.KeyOf(row)] = cells.GetValueOrDefault(row.Id) ?? new Dictionary<string, string>();
+            }
+        }
+
+        section.LabGroups = groups;
     }
 
     // The new records of the block get their rows; the ones that are in keep theirs
@@ -261,7 +361,7 @@ public class ClinicalSummaryViewState : State
 
         var related = ContextOf(sections);
         // the banner of the patient is above the blocks: the rows leave the patient out
-        var context = new TileContext([$"Patient/{_key!.PatientId}"], _tileOptions);
+        var context = new TileContext([$"Patient/{_key!.PatientId}"], section.TileOptions, section.Format);
         foreach (var run in fresh)
         {
             var tiles = await _tiles.RenderAsync([.. run], _release, related, TerminologyServer, context, Server);
@@ -272,48 +372,11 @@ public class ClinicalSummaryViewState : State
         }
     }
 
-    private void Rebuild()
-    {
-        var rows = new List<SummaryRow>();
-        foreach (var section in Sections.Where(section => !section.Hidden))
-        {
-            rows.Add(new SummaryRow(SummaryRowKind.Header, section));
-            if (section.Collapsed)
-            {
-                continue;
-            }
-
-            if (!section.IsLoaded && !section.Failed)
-            {
-                rows.Add(new SummaryRow(SummaryRowKind.Spinner, section));
-                continue;
-            }
-
-            if (section.IsLoaded && section.Items.Count == 0 && !section.Failed)
-            {
-                continue;
-            }
-
-            rows.AddRange(section.Items.Select(item => new SummaryRow(SummaryRowKind.Card, section, item, section.Tiles.GetValueOrDefault(ClinicalSummarySection.KeyOf(item)) ?? ResourceTiles.Plain(item))));
-            if (section.Failed)
-            {
-                rows.Add(new SummaryRow(SummaryRowKind.Error, section));
-            }
-            else if (section.HasMore)
-            {
-                rows.Add(new SummaryRow(SummaryRowKind.More, section));
-            }
-        }
-
-        Rows = rows;
-    }
-
     /// <summary>Opens or closes a block.</summary>
     /// <param name="section">The block.</param>
     public void Toggle(ClinicalSummarySection section)
     {
         section.Collapsed = !section.Collapsed;
-        Rebuild();
         NotifyChanged();
     }
 
@@ -326,31 +389,18 @@ public class ClinicalSummaryViewState : State
             section.Collapsed = collapsed;
         }
 
-        Rebuild();
         NotifyChanged();
     }
 
-    /// <summary>Opens a block.</summary>
+    /// <summary>Opens a block (the page then brings it to the top by its <see cref="ClinicalSummarySection.ElementId"/>).</summary>
     /// <param name="section">The block.</param>
-    /// <returns>The index of its title row (the page scrolls to it); -1 when it is not on the page.</returns>
-    public int OpenSection(ClinicalSummarySection section)
+    public void OpenSection(ClinicalSummarySection section)
     {
         if (section.Collapsed)
         {
             section.Collapsed = false;
-            Rebuild();
             NotifyChanged();
         }
-
-        for (var index = 0; index < Rows.Count; index++)
-        {
-            if (Rows[index].Kind == SummaryRowKind.Header && ReferenceEquals(Rows[index].Section, section))
-            {
-                return index;
-            }
-        }
-
-        return -1;
     }
 
     /// <summary>Goes to the page of a record.</summary>
@@ -365,7 +415,7 @@ public class ClinicalSummaryViewState : State
     {
         try
         {
-            var page = search.IsLoaded ? await _reader.GetPageAsync(Server!, search.Next!, search.ResourceType) : await FirstPageAsync(search);
+            var page = search.IsLoaded ? await _reader.GetPageAsync(Server!, search.Next!, search.ResourceType) : await FirstPageAsync(section, search);
             search.Next = page.Next;
             search.IsLoaded = true;
             search.Failed = false;
@@ -391,17 +441,27 @@ public class ClinicalSummaryViewState : State
     }
 
     // Newest first; a server that does not know the order is asked again without it
-    private async Task<ResourcePage> FirstPageAsync(SectionSearch search)
+    private async Task<ResourcePage> FirstPageAsync(ClinicalSummarySection section, SectionSearch search)
     {
+        var needs = await NeedsAsync(section, search.ResourceType);
         try
         {
-            return await _reader.SearchAsync(Server!, search.ResourceType, FhirSearchState.Parse(search.FirstQuery(_key!.PatientId, sorted: true)), await _tiles.NeedsAsync(search.ResourceType));
+            return await _reader.SearchAsync(Server!, search.ResourceType, FhirSearchState.Parse(search.FirstQuery(_key!.PatientId, sorted: true)), needs);
         }
         catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest && search.Sort.Length > 0)
         {
             search.ServerSorted = false;
-            return await _reader.SearchAsync(Server!, search.ResourceType, FhirSearchState.Parse(search.FirstQuery(_key!.PatientId, sorted: false)), await _tiles.NeedsAsync(search.ResourceType));
+            return await _reader.SearchAsync(Server!, search.ResourceType, FhirSearchState.Parse(search.FirstQuery(_key!.PatientId, sorted: false)), needs);
         }
+    }
+
+    // What the templates of the rows need, and what the component needs: the reports of lab-results bring their results
+    private async Task<FhirNeeds> NeedsAsync(ClinicalSummarySection section, string resourceType)
+    {
+        var needs = await _tiles.NeedsAsync(resourceType);
+        return section.Component == SummaryComponents.LabResults && resourceType == "DiagnosticReport" && !needs.Include.Contains(LabResults.ReportResults)
+            ? needs with { Include = [.. needs.Include, LabResults.ReportResults] }
+            : needs;
     }
 
     // What the rows may reach through a Reference: the patient and whatever the other blocks have so far

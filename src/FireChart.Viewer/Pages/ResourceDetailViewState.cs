@@ -67,6 +67,26 @@ public class ResourceDetailViewState : State
     public bool CredentialsRejected { get; private set; }
 
     /// <summary>
+    /// The resource as a line of text (its <c>text</c> template): the title of a bookmark of the page.
+    /// </summary>
+    /// <returns>The text; <see langword="null"/> before the resource is read or when it has no text.</returns>
+    /// <example>
+    /// <code>
+    /// var title = await state.TextAsync() ?? "Patient/123";
+    /// </code>
+    /// </example>
+    public async Task<string?> TextAsync()
+    {
+        if (_shown is not { } shown || Server is null)
+        {
+            return null;
+        }
+
+        var text = await _views.RenderAsync(shown.Resource, shown.Related, shown.Release, Link, ViewerText.Mode, _key!.Session.TerminologyServer, Server);
+        return ViewerText.Plain(text?.Html);
+    }
+
+    /// <summary>
     /// Reads the resource again.
     /// </summary>
     /// <returns>A task that completes when it is read.</returns>

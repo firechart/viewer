@@ -23,7 +23,7 @@ public class RelatedResourcesTests
           "subject": { "reference": "https://fhir.example.test/base/Patient/p1" } }
         """;
 
-    private static readonly VendorTemplates s_vendor = new();
+    private static readonly VendorTemplates s_vendor = TestLibrary.Vendor;
 
     private static ResourcePool PoolOf(params PoolEntry[] entries)
     {
@@ -89,7 +89,7 @@ public class RelatedResourcesTests
     }
 
     [Test]
-    public void TheDeclarationsOfATemplate_AreReadWithoutRenderingIt()
+    public async Task TheDeclarationsOfATemplate_AreReadWithoutRenderingIt()
     {
         var overrides = new MemoryTemplateSource(new Dictionary<string, string>
         {
@@ -98,15 +98,20 @@ public class RelatedResourcesTests
         });
         var renderer = new FhirRenderer([overrides, s_vendor]);
 
+        var condition = await renderer.NeedsForAsync("Condition", "tile");
+        var observation = await renderer.NeedsForAsync("Observation", "tile");
+        var location = await renderer.NeedsForAsync("Location", "tile");
+        var encounter = await renderer.NeedsForAsync("Encounter", "tile");
+        var plain = await renderer.NeedsForAsync("Encounter");
+
         Assert.Multiple(() =>
         {
-            var condition = renderer.NeedsFor("Condition", "tile");
             Assert.That(condition.Include, Is.EqualTo(["Condition:subject", "Condition:encounter"]));
             Assert.That(condition.RevInclude, Is.EqualTo(["Observation:focus"]));
-            Assert.That(renderer.NeedsFor("Observation", "tile").IsEmpty, Is.True, "a template that declares nothing asks for nothing");
-            Assert.That(renderer.NeedsFor("Location", "tile").IsEmpty, Is.True, "no row template, no needs");
-            Assert.That(renderer.NeedsFor("Encounter", "tile").Include, Is.EqualTo(["Encounter:subject"]));
-            Assert.That(renderer.NeedsFor("Encounter").IsEmpty, Is.True, "the plain template is another one");
+            Assert.That(observation.IsEmpty, Is.True, "a template that declares nothing asks for nothing");
+            Assert.That(location.IsEmpty, Is.True, "no row template, no needs");
+            Assert.That(encounter.Include, Is.EqualTo(["Encounter:subject"]));
+            Assert.That(plain.IsEmpty, Is.True, "the plain template is another one");
         });
     }
 }

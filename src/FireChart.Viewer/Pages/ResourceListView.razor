@@ -35,7 +35,7 @@
                     <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="var(--gap-sm)">
                         @foreach (var filter in State.ActiveFilters)
                         {
-                            <RadzenChip Size="ChipSize.Small" Text=@($"{filter.Caption}: {filter.Text}") RemoveChipTitle=@FloxStrings.Caption_Delete Close=@(() => State.RemoveFilter(filter))/>
+                            <RadzenChip Size="ChipSize.Small" Text=@($"{filter.Caption}: {filter.Text}") RemoveChipTitle=@FloxStrings.Caption_Delete Close=@(() => State.RemoveFilterAsync(filter))/>
                         }
                     </RadzenStack>
                 }
@@ -51,10 +51,15 @@
                     {
                         <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_ShowTotal IsBusy=@State.Counting Click=@State.ShowTotalAsync/>
                     }
-                    @if (State.CanFilter)
-                    {
-                        <FilterButton Count=@State.FilterCount OnClick=@FilterCallback/>
-                    }
+                    <SectionContent SectionName=@FhirViewer.PageCommandsSection>
+                        <BookmarkStar Route=@SearchRoute Title=@SearchTitleAsync Category=@ResourceType/>
+                    </SectionContent>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="var(--gap-xs)">
+                        @if (State.CanFilter)
+                        {
+                            <FilterButton Count=@State.FilterCount OnClick=@FilterCallback/>
+                        }
+                    </RadzenStack>
                 </RadzenStack>
 
                 <div class="fx-root fx-summary">
@@ -87,6 +92,16 @@
     [Parameter]
     public bool ClinicalSummary { get; set; }
 
+    // The list with its search: a bookmark of it is a saved search
+    private ViewerRoute SearchRoute => ClinicalSummary ? new ViewerRoute(ViewerPage.ClinicalSummary, Query: Query) : new ViewerRoute(ViewerPage.ResourceList, ResourceType, Query: Query);
+
+    private Task<string?> SearchTitleAsync()
+    {
+        var filters = string.Join("; ", State.ActiveFilters.Select(filter => $"{filter.Caption}: {filter.Text}"));
+        var list = ClinicalSummary ? Strings.Caption_ClinicalSummary : ResourceType;
+        return Task.FromResult<string?>(filters.Length == 0 ? list : $"{list} ({filters})");
+    }
+
 
     // The search of the list is in the address: a change of it (the form, the back button, a link) loads the list again
     protected override object? ActivationKey => new ResourceListKey(Session, ResourceType, Query, ClinicalSummary);
@@ -98,10 +113,7 @@
     {
         return row.Kind switch
         {
-            ListRowKind.Card => @<div class="fx-summary-row" @onclick=@(() => Open(row.Item!)) title=@row.Tile!.Text>
-                                    <div class="fx-summary-icon"><IconResource ResourceType=@row.Item!.ResourceType/></div>
-                                    <ul class="fx-list fx-summary-tile">@((MarkupString)row.Tile!.Html)</ul>
-                                </div>,
+            ListRowKind.Card => @<Tile Model=@(row.Tile!) ResourceType=@row.Item!.ResourceType OnClick=@(() => Open(row.Item!))/>,
             ListRowKind.Empty => @<div class="fx-summary-note">@FloxStrings.List_NoData</div>,
             _ => @<div class="fx-summary-note">
                      <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_More

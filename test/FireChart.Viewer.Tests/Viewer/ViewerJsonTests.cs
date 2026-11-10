@@ -58,4 +58,21 @@ public class ViewerJsonTests
 
         Assert.That(error!.Message, Does.Contain(named));
     }
+
+    [Test]
+    public void AFormOfVersion1_ReadsAsTiles_AndTheOptionsOfTheTilesAreReadByTheirClass()
+    {
+        var form = ViewerJson.Read<ClinicalSummaryFormDefinition>("""
+            { "formatVersion": 1, "code": "old", "sections": [ { "code": "s", "searches": [ { "resourceType": "Condition" } ] } ] }
+            """);
+        var options = SummaryComponents.ReadTilesOptions(System.Text.Json.Nodes.JsonNode.Parse("""{ "showAge": true }""")!.AsObject());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(form.Sections[0].Component, Is.EqualTo(SummaryComponents.Tiles));
+            Assert.That(form.Sections[0].HideIfEmpty, Is.False);
+            Assert.That(options.ShowAge, Is.True);
+            Assert.That(() => SummaryComponents.ReadTilesOptions(System.Text.Json.Nodes.JsonNode.Parse("""{ "showAgee": true }""")!.AsObject()), Throws.InstanceOf<System.Text.Json.JsonException>());
+        });
+    }
 }

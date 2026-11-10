@@ -22,6 +22,7 @@ where TEntity : class
         DataSource = serviceProvider.GetRequiredService<IDataSource<TKey, TEntity>>();
         Selection = new SelectionModel<TKey, TEntity>(DataSource.GetKey);
         _appSettingsProvider = serviceProvider.GetService<IAppSettingsProvider<GeneralAppSettings>>();
+        _appSettingsProvider?.SettingsChanged += OnAppSettingsChanged;
         Selection.Changed += (_, _) => NotifyChanged();
         if (ReplicatedType.IsReplicated(typeof(TEntity)) && serviceProvider.GetService<IReplicationService>() is { } replication)
         {
@@ -68,6 +69,12 @@ where TEntity : class
         });
     }
 
+    // The settings changed (the page size): read again when the list is opened next
+    private void OnAppSettingsChanged(object? sender, EventArgs e)
+    {
+        _appSettings = null;
+    }
+
     // A list shows the bookmark of a row only when its state says so: it costs a request about every page
     protected virtual bool BookmarksEnabled
     {
@@ -79,14 +86,6 @@ where TEntity : class
 
     // The last load failed; the rows are the ones of the last good load of the same request (none after a start)
     public Exception? LoadError { get; private set; }
-
-    public bool BookmarkedOnly
-    {
-        get
-        {
-            return DataSource.Request.BookmarkedOnly;
-        }
-    }
 
     // Resolved on first use: a list without bookmarks does not need the service
     public IUserBookmarkService<TKey, TEntity> BookmarkService
@@ -168,9 +167,10 @@ where TEntity : class
             }
         }
 
-        if (_appSettings != null)
+        if (_appSettings != null && DataSource.PageSize != _appSettings.PageSize)
         {
             DataSource.SetPageSize(_appSettings.PageSize);
+            DataSource.SetPage(0);
         }
     }
 
@@ -198,6 +198,7 @@ where TEntity : class
 
     protected override async Task OnResumeAsync()
     {
+        await ApplyPageSizeAsync();
         await RefreshAsync();
     }
 
@@ -282,13 +283,6 @@ where TEntity : class
         NotifyChanged();
     }
 
-    public async Task ToggleBookmarkModeAsync()
-    {
-        DataSource.Request.BookmarkedOnly = !BookmarkedOnly;
-        DataSource.SetPage(0);
-        Selection.Clear();
-        await RefreshAsync();
-    }
 
     void IListState<TEntity>.SetSearchText(string? text)
     {
@@ -307,8 +301,7 @@ where TEntity : class
             Skip = skip,
             PageSize = count,
             ReturnTotal = true,
-            FullTextSearchString = current.FullTextSearchString,
-            BookmarkedOnly = current.BookmarkedOnly
+            FullTextSearchString = current.FullTextSearchString
         };
         request.Filters.AddRange(current.Filters);
         request.Sorts.AddRange(current.Sorts);
@@ -435,6 +428,7 @@ where TEntity : class
         {
             _loadCts?.Cancel();
             _loadCts?.Dispose();
+            _appSettingsProvider?.SettingsChanged -= OnAppSettingsChanged;
             if (_replication is not null)
             {
                 _replication.StateChanged -= OnReplicationChanged;

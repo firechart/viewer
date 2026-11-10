@@ -41,6 +41,8 @@ public class ResourceListViewState : State
     private readonly IServerResourceTypeProvider _types;
     private readonly IResourceTiles _tiles;
     private readonly ITerminologyResolver _terminology;
+    private readonly IListSearchMemory _memory;
+    private bool _neverSearched;
     private readonly List<RelatedResource> _related = [];
     private ResourceListKey? _key;
 
@@ -58,6 +60,7 @@ public class ResourceListViewState : State
         _types = serviceProvider.GetRequiredService<IServerResourceTypeProvider>();
         _tiles = serviceProvider.GetRequiredService<IResourceTiles>();
         _terminology = serviceProvider.GetRequiredService<ITerminologyResolver>();
+        _memory = serviceProvider.GetRequiredService<IListSearchMemory>();
         _terminology.Resolved += OnTerminologyResolved;
     }
 
@@ -125,9 +128,10 @@ public class ResourceListViewState : State
     /// The same list without a filter; the other parameters stay.
     /// </summary>
     /// <param name="filter">The chip.</param>
-    public void RemoveFilter(ActiveFilter filter)
+    /// <returns>A task that completes when the search is kept and the address changed.</returns>
+    public Task RemoveFilterAsync(ActiveFilter filter)
     {
-        Go(Search.Replace([filter.Parameter], []));
+        return GoAsync(Search.Replace([filter.Parameter], []));
     }
 
     /// <summary>
@@ -145,7 +149,7 @@ public class ResourceListViewState : State
         var result = await SearchFormDialog.ShowAsync(DialogService, Form, Form.Title.Resolve(CultureInfo.CurrentUICulture.Name), read.Values);
         if (result is not null)
         {
-            Go(SearchFormSearchMapping.Apply(Search, read, result.Conditions));
+            await GoAsync(SearchFormSearchMapping.Apply(Search, read, result.Conditions));
         }
     }
 
@@ -225,6 +229,23 @@ public class ResourceListViewState : State
     protected override async Task OnStartAsync(object? key)
     {
         _key = (ResourceListKey)key!;
+        _neverSearched = false;
+        if (_key.Query.Length == 0)
+        {
+            var last = await _memory.GetAsync(_key.Session.Server, ListName);
+            if (last is { Length: > 0 })
+            {
+                Navigate(last, true);
+                return;
+            }
+
+            _neverSearched = last is null;
+        }
+        else
+        {
+            await _memory.SetAsync(_key.Session.Server, ListName, _key.Query);
+        }
+
         await LoadAsync();
     }
 
@@ -255,11 +276,22 @@ public class ResourceListViewState : State
         }, nameof(OnTerminologyResolved));
     }
 
-    private void Go(FhirSearchState search)
+    // The search is kept before the address changes: an empty one is a list the user cleared, not one to fill again
+    private async Task GoAsync(FhirSearchState search, bool replace = false)
+    {
+        var query = search.ToQueryString();
+        await _memory.SetAsync(_key!.Session.Server, ListName, query);
+        Navigate(query, replace);
+    }
+
+    private void Navigate(string query, bool replace)
     {
         var page = _key!.ClinicalSummaryForm ? new ViewerRoute(ViewerPage.ClinicalSummary) : new ViewerRoute(ViewerPage.ResourceList, _key.ResourceType);
-        _key.Session.Navigate(page with { Query = search.ToQueryString() });
+        _key.Session.Navigate(page with { Query = query }, replace);
     }
+
+    // The list of the patients of the clinical summary keeps its search apart from the list of the type
+    private string ListName => _key!.ClinicalSummaryForm ? $"{ViewerRoutes.Summary}:{_key.ResourceType}" : _key.ResourceType;
 
     private string Caption(FhirSearchParameter parameter)
     {
@@ -324,6 +356,10 @@ public class ResourceListViewState : State
             if (Access == ServerAccess.Ready)
             {
                 await LoadFormAsync(session.Server);
+                if (_neverSearched && Form is not null && SearchFormSearchMapping.Defaults(Form) is { Parameters.Count: > 0 } defaults)
+                {
+                    await GoAsync(defaults, true);
+                }
             }
         });
         NotifyChanged();

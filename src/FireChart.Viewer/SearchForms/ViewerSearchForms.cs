@@ -1,3 +1,4 @@
+using FireChart.Viewer.Core;
 using FireChart.Viewer.Core.Forms;
 using FireChart.Viewer.Library;
 using Flox.Core.Host;
@@ -78,7 +79,10 @@ public static class SearchFormDialog
             parameters[nameof(SearchFormView.Values)] = values;
         }
 
-        return await dialogs.OpenAsync<SearchFormView>(title, parameters, Flox.Shared.Components.SheetOptions.Modal()) as SearchFormDialogResult;
+        // No title bar: the form takes the height; Cancel, Esc and a click beside it close it
+        var options = Flox.Shared.Components.SheetOptions.Modal();
+        options.ShowTitle = false;
+        return await dialogs.OpenAsync<SearchFormView>(title, parameters, options) as SearchFormDialogResult;
     }
 }
 
@@ -101,10 +105,11 @@ public sealed class ViewerSearchForms : IDisposable
     /// Creates the service.
     /// </summary>
     /// <param name="providers">The providers of the host.</param>
+    /// <param name="assets">Reads the vendor forms, the static files of the vendor library.</param>
     /// <param name="logger">Logs a provider that failed.</param>
-    public ViewerSearchForms(IEnumerable<IViewerFormProvider<SearchFormKey, SearchFormDefinition>> providers, ILogger<ViewerSearchForms> logger)
+    public ViewerSearchForms(IEnumerable<IViewerFormProvider<SearchFormKey, SearchFormDefinition>> providers, IViewerAssets assets, ILogger<ViewerSearchForms> logger)
     {
-        _resolver = new ViewerFormResolver<SearchFormKey, SearchFormDefinition>([.. providers, new VendorSearchFormProvider()], (_, _) => Task.FromResult(new SearchFormDefinition()), logger);
+        _resolver = new ViewerFormResolver<SearchFormKey, SearchFormDefinition>([.. providers, new VendorSearchFormProvider(assets)], (_, _) => Task.FromResult(new SearchFormDefinition()), logger);
     }
 
     /// <summary>

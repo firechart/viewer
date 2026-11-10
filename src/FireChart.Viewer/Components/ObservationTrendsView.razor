@@ -1,0 +1,88 @@
+@using FireChart.Viewer.Pages
+@using FireChart.Viewer.Core
+@* The component observation-trends of a section of the clinical summary: the measures of the section, each the tile of its last record, and the chart of
+   the history of the chosen one (a line per value: blood pressure has two). Wide: the list and the chart side by side, the chart sticks below the header
+   of the section; narrow: the chart above the list *@
+
+<div class="fx-trends">
+    <div class="fx-trends-list">
+        @foreach (var trend in Section.Trends)
+        {
+            var latest = trend.Records[0];
+            <div class=@(trend.Key == Section.SelectedTrend ? "fx-summary-section-row fx-trend-selected" : "fx-summary-section-row") @key=trend.Key>
+                <Tile Model=@TileOf(latest) Options=@ListOptions ResourceType=@latest.ResourceType OnClick=@(() => OnSelect.InvokeAsync(trend.Key))/>
+            </div>
+        }
+    </div>
+
+    <div class="fx-trends-chart">
+        @if (Selected is { } selected)
+        {
+            var latest = selected.Records[0];
+            var lines = ObservationTrends.SeriesOf(Section.TrendHistory.GetValueOrDefault(selected.Key) ?? selected.Records, TimeZoneInfo.Local);
+            <div class="fx-trends-head">
+                <span class="fx-trends-title">@((MarkupString)TileOf(latest).Title)</span>
+                @if (Section.TrendLoading)
+                {
+                    <CircularProgress Size="ProgressBarCircularSize.ExtraSmall"/>
+                }
+                <RadzenButton Icon="open_in_new" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" title=@Strings.Caption_TrendOpenLast
+                              Click=@(() => OnOpen.InvokeAsync(latest))/>
+            </div>
+            @if (lines.Count == 0)
+            {
+                <div class="fx-summary-note">@Strings.Caption_TrendNoValues</div>
+            }
+            else
+            {
+                <RadzenChart class="fx-trends-plot">
+                    @foreach (var line in lines)
+                    {
+                        <RadzenLineSeries TItem="TrendPoint" Data=@line.Points CategoryProperty="Moment" ValueProperty="Value" Title=@TitleOf(line)>
+                            <RadzenMarkers MarkerType="MarkerType.Circle"/>
+                        </RadzenLineSeries>
+                    }
+                    <RadzenCategoryAxis FormatString="{0:d}"/>
+                    <RadzenValueAxis FormatString=@ValueFormat>
+                        <RadzenGridLines Visible="true"/>
+                    </RadzenValueAxis>
+                    <RadzenLegend Visible=@(lines.Count > 1) Position="LegendPosition.Bottom"/>
+                </RadzenChart>
+            }
+        }
+    </div>
+</div>
+
+@code {
+
+    /// <summary>The section: its measures (<see cref="ClinicalSummarySection.Trends"/>), the chosen one and its history.</summary>
+    [Parameter, EditorRequired]
+    public ClinicalSummarySection Section { get; set; } = null!;
+
+    /// <summary>Opens a record (the last one of the chosen measure).</summary>
+    [Parameter]
+    public EventCallback<ResourceSummary> OnOpen { get; set; }
+
+    /// <summary>Chooses a measure by its key.</summary>
+    [Parameter]
+    public EventCallback<string> OnSelect { get; set; }
+
+    // The list of the measures shows the last values without the status: "final" on every row is noise, the value needs the room
+    private TileOptions ListOptions => new(Section.TileOptions.ShowAge, ShowStatus: false);
+
+    private TrendGroup? Selected => Section.Trends.FirstOrDefault(trend => trend.Key == Section.SelectedTrend);
+
+    private TileModel TileOf(ResourceSummary item)
+    {
+        return Section.Tiles.GetValueOrDefault(ClinicalSummarySection.KeyOf(item)) ?? ResourceTiles.Plain(item);
+    }
+
+    // The format of the section on the axis and in the tooltips: at most that many places (0.##), the digits of the value without one
+    private string ValueFormat => Section.Format?.Decimals is { } places ? "{0:0." + new string('#', places) + "}" : "{0}";
+
+    private static string TitleOf(TrendSeries line)
+    {
+        return string.IsNullOrEmpty(line.Unit) ? line.Name : $"{line.Name}, {line.Unit}";
+    }
+
+}

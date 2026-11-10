@@ -1,0 +1,12 @@
+{%- capture t0 -%}{{ self.name }}{%- endcapture -%}
+{%- capture t1 -%}{{ self.title }}{%- endcapture -%}
+{%- assign title = t0 | default: t1 | default: self.id -%}
+{%- capture s0 -%}{{ self.kind }}{%- endcapture -%}
+{%- capture s1 -%}{{ self.type }}{%- endcapture -%}
+{%- capture s2 -%}{{ self.derivation }}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", sep: " · ", p1: s0, p2: s1, p3: s2 %}{%- endslot -%}
+{%- assign abs = self.abstract | append: "" -%}
+{%- slot "trailing" -%}{% if abs == "true" %}{% render "badge", text: "abstract" %}{% endif %}{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}

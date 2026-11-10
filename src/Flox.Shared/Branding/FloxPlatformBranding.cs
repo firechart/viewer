@@ -33,10 +33,7 @@ public static class FloxPlatformBranding
             LicenseUrl = B.Branding_LicenseUrl,
             SourceCodeUrl = B.Branding_SourceCode,
             Licenses = new LazyList<LicenseEntry>(LoadLicenses),
-            Version = typeof(FloxPlatformBranding).Assembly
-                                                  .GetName()
-                                                  .Version
-                                                 ?.ToString()
+            Version = FloxBranding.VersionOf(typeof(FloxPlatformBranding).Assembly)
         };
     }
 

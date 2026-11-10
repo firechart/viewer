@@ -1,0 +1,10 @@
+{% fhir_include "PractitionerRole:practitioner" %}
+{% fhir_include "PractitionerRole:organization" %}
+{%- assign role = self.code | as_list | first -%}{%- assign spec = self.specialty | as_list | first -%}{%- assign act = self.active | append: "" -%}
+{%- capture t0 -%}{% apply self.practitioner mode: "text" %}{%- endcapture -%}
+{%- assign title = t0 | default: self.id -%}
+{%- capture s0 -%}{% if role %}{% apply role mode: "text" %}{% elsif spec %}{% apply spec mode: "text" %}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% apply self.organization mode: "text" %}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", p1: s0, p2: s1 %}{%- endslot -%}
+{%- slot "status" -%}{% if act == "false" %}{% render "badge", text: "inactive", tone: "danger" %}{% endif %}{%- endslot -%}
+{% slot "title" %}{{ title }}{% endslot %}

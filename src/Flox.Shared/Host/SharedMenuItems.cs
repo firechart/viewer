@@ -42,6 +42,13 @@ public static class SharedMenuItems
         Icon = "bookmark"
     };
 
+    public static IFloxMenuItem History => new FloxMenuItem
+    {
+        Text = Strings.Caption_History,
+        Href = SharedRoutes.HISTORY,
+        Icon = "history"
+    };
+
     public static IFloxMenuItem About => new FloxMenuItem
     {
         Text = Strings.About,

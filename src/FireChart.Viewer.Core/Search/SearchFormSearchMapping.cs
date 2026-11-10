@@ -7,7 +7,8 @@ namespace FireChart.Viewer.Core.Search;
 /// <summary>
 /// What a form read from a search.
 /// </summary>
-/// <param name="Values">The values of its fields, by <see cref="SearchFormField.QueryName"/>; an empty field has its <see cref="SearchFormEvaluator.NewValue"/>.</param>
+/// <param name="Values">The values of its fields, by <see cref="SearchFormField.QueryName"/>; a field the search does not have is empty (its default
+/// comparator, modifier and unit, not its default value: the defaults of a form are the first search of a list, <see cref="SearchFormSearchMapping.Defaults"/>).</param>
 /// <param name="Consumed">The parameters it took, and so owns: the rest of the search is not the form's and stays when the form is applied again.</param>
 /// <example>
 /// <code>
@@ -66,10 +67,41 @@ public static class SearchFormSearchMapping
             var own = search.Parameters.Where(row => !consumed.Contains(row) && Modifier(field, row) is not null)
                             .ToList();
             var value = own.Count == 0 ? null : ReadField(field, own, consumed);
-            values[field.QueryName] = value ?? SearchFormEvaluator.NewValue(field);
+            values[field.QueryName] = value ?? Blank(field);
         }
 
         return new SearchFormRead(values, consumed);
+    }
+
+    /// <summary>
+    /// The search the default values of a form make: what a list starts with when it was never searched.
+    /// </summary>
+    /// <param name="definition">The form.</param>
+    /// <returns>The search; empty when no field has a default value.</returns>
+    /// <example>
+    /// <code>
+    /// var first = SearchFormSearchMapping.Defaults(definition).ToQueryString();   // kind=resource
+    /// </code>
+    /// </example>
+    public static FhirSearchState Defaults(SearchFormDefinition definition)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        var values = new Dictionary<string, SearchFieldValue>(StringComparer.Ordinal);
+        foreach (var field in definition.Fields)
+        {
+            values[field.QueryName] = SearchFormEvaluator.NewValue(field);
+        }
+
+        return FhirSearchState.Empty.Replace([], ToParameters(SearchFormEvaluator.Evaluate(definition, values)));
+    }
+
+    // A field without a value: how it is entered (the default comparator, modifier, unit), not what
+    private static SearchFieldValue Blank(SearchFormField field)
+    {
+        var value = SearchFormEvaluator.NewValue(field);
+        value.Text = null;
+        value.Selected.Clear();
+        return value;
     }
 
     /// <summary>

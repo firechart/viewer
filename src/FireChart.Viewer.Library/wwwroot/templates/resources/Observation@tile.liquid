@@ -1,0 +1,26 @@
+{% fhir_include "Observation:subject" %}
+{% fhir_include "Observation:encounter" %}
+{%- capture title -%}{% apply self.code mode: "text" %}{%- endcapture -%}
+{%- assign title = title | default: self.id -%}
+{%- assign components = self.component | as_list -%}
+{%- capture value -%}
+  {%- assign first = true -%}
+  {%- if self.value -%}{% apply self.value mode: "text", decimals: fhir_options.decimals %}{%- assign first = false -%}{%- endif -%}
+  {%- for c in components -%}
+    {%- if c.value -%}
+      {%- unless first %} / {% endunless -%}
+      {% apply c.value mode: "text", decimals: fhir_options.decimals %}
+      {%- assign first = false -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- slot "subtitle" -%}{% if self.effective %}{% apply self.effective mode: "text" %}{% endif %}{%- endslot -%}
+{%- assign interpretations = self.interpretation | as_list -%}
+{%- slot "trailing" -%}
+  {%- if value != "" %}<span class="fx-tile-value">{{ value }}</span>{% endif -%}
+  {%- for i in interpretations -%}{% render "interpretation-badge", concept: i %}{%- endfor -%}
+{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}
+{% slot_data patient: self.subject, encounter: self.encounter, at: self.effective %}

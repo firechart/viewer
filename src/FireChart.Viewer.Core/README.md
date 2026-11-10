@@ -36,7 +36,7 @@ A renderer takes layers (`ITemplateSource`); the first layer that has a key wins
 ```csharp
 var overrides = new MemoryTemplateSource(new Dictionary<string, string>
 {
-    ["Patient@tile"] = "<li class=\"fx-list-row\">{{ self.name | first | apply: \"text\" }}</li>"
+    ["Patient@tile"] = "{% slot \"title\" %}{% apply self.name mode: \"text\" %}{% endslot %}"
 });
 var renderer = new FhirRenderer([overrides, new VendorTemplates()]);
 ```

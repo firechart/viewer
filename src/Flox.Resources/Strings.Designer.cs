@@ -382,7 +382,7 @@ namespace Flox.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Default page size.
+        ///   Looks up a localized string similar to Records per page.
         /// </summary>
         public static string Caption_DefaultPageSize {
             get {
@@ -854,15 +854,6 @@ namespace Flox.Resources {
         public static string Message_InvalidValue {
             get {
                 return ResourceManager.GetString("Message_InvalidValue", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to A bookmark keeps a place, not a search: the address has a query string, which may carry data of a patient..
-        /// </summary>
-        public static string Message_BookmarkQueryString {
-            get {
-                return ResourceManager.GetString("Message_BookmarkQueryString", resourceCulture);
             }
         }
         
@@ -1398,6 +1389,69 @@ namespace Flox.Resources {
         public static string Caption_CollapseAll {
             get {
                 return ResourceManager.GetString("Caption_CollapseAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bookmarks and recent pages are kept only on this device and never sent to the server, so they do not follow you to your other devices. To move bookmarks, export them to a file and import it there; the file may name patients, keep it safe. One account of the operating system is one user: the bookmarks of this browser are seen by everyone who uses it..
+        /// </summary>
+        public static string Notice_BookmarksOnDevice {
+            get {
+                return ResourceManager.GetString("Notice_BookmarksOnDevice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export.
+        /// </summary>
+        public static string Caption_ExportBookmarks {
+            get {
+                return ResourceManager.GetString("Caption_ExportBookmarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import.
+        /// </summary>
+        public static string Caption_ImportBookmarks {
+            get {
+                return ResourceManager.GetString("Caption_ImportBookmarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bookmarks added: {0}; already here: {1}..
+        /// </summary>
+        public static string Message_BookmarksImported {
+            get {
+                return ResourceManager.GetString("Message_BookmarksImported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The file is not an export of bookmarks..
+        /// </summary>
+        public static string Message_BookmarksFileInvalid {
+            get {
+                return ResourceManager.GetString("Message_BookmarksFileInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The server of this bookmark ({0}) is not registered here: register it to open the bookmark..
+        /// </summary>
+        public static string Message_BookmarkSourceMissing {
+            get {
+                return ResourceManager.GetString("Message_BookmarkSourceMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to History.
+        /// </summary>
+        public static string Caption_History {
+            get {
+                return ResourceManager.GetString("Caption_History", resourceCulture);
             }
         }
     }

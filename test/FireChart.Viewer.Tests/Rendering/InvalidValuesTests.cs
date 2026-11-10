@@ -11,7 +11,7 @@ public class InvalidValuesTests
     {
         const string patient = """{ "resourceType": "Patient", "id": "p1", "birthDate": "1967-08-22T00:00:00", "name": [ { "family": "Smith", "given": [ "Ann" ] } ] }""";
         var problems = new List<string>();
-        var renderer = new FhirRenderer([new VendorTemplates()], problems.Add);
+        var renderer = new FhirRenderer([TestLibrary.Vendor], problems.Add);
 
         var tile = await renderer.RenderTileAsync(patient);
 

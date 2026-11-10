@@ -44,6 +44,7 @@ public sealed class FhirRenderer
     private const string ProblemsKey = "fhir:problems";
 
     private readonly TemplateLibrary _library;
+    private readonly IReadOnlyList<ITemplateTexts> _texts;
     private readonly TemplateOptions _options = new();
     private readonly Action<string>? _onProblem;
 
@@ -57,6 +58,7 @@ public sealed class FhirRenderer
     {
         _onProblem = onProblem;
         var texts = layers.OfType<ITemplateTexts>().ToList();
+        _texts = texts;
         FhirFilters.Register(_options.Filters, clock ?? TimeProvider.System, texts);
         var parser = new FhirTemplateParser(ApplyAsync);
         _options.Filters.AddFilter("json", (input, _, _) => ValueTask.FromResult<FluidValue>(new StringValue(ToJson(input), false)));
@@ -165,6 +167,46 @@ public sealed class FhirRenderer
     }
 
     /// <summary>
+    /// Renders a resource through a template of named slots (a partial such as <c>lab-row</c>, which fills <c>{% slot "value" %}</c>...): the cells of a
+    /// row of a table of a component.
+    /// </summary>
+    /// <param name="json">The resource as JSON.</param>
+    /// <param name="template">The key of the template (a partial of the library, overridable like any template); <c>self</c> is the resource.</param>
+    /// <param name="model">The model of the release of the resource; R4 when <see langword="null"/>.</param>
+    /// <param name="pool">The other resources the template may reach through a Reference (see <see cref="CreatePool"/>).</param>
+    /// <param name="context">What the page shows above and the options (<c>fhir_options.decimals</c> of the format of the section).</param>
+    /// <returns>The slots by name, each sanitized like a tile; empty when the template is missing or failed (the problem is reported).</returns>
+    /// <example>
+    /// <code>
+    /// var cells = await renderer.RenderSlotsAsync(observationJson, "lab-row", context: new TileContext([], TileOptions.Default, format));
+    /// var value = cells.GetValueOrDefault("value");
+    /// </code>
+    /// </example>
+    public async Task<IReadOnlyDictionary<string, string>> RenderSlotsAsync(string json, string template, ModelInspector? model = null, ResourcePool? pool = null, TileContext? context = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(template);
+        var slots = new FrameSlots();
+        var problems = new List<string>();
+        try
+        {
+            await RenderAsync(ToTyped(json, model ?? ModelInfo.ModelInspector), null, HtmlEncoder.Default, pool, null, problems, context, slots, template);
+        }
+        catch (InvalidOperationException ex)
+        {
+            problems.Add(ex.Message);
+        }
+
+        foreach (var problem in problems)
+        {
+            _onProblem?.Invoke(problem);
+        }
+
+        return problems.Count > 0
+            ? new Dictionary<string, string>(StringComparer.Ordinal)
+            : slots.Html.ToDictionary(slot => slot.Key, slot => FxHtml.SanitizeTile(slot.Value).Trim(), StringComparer.Ordinal);
+    }
+
+    /// <summary>
     /// Renders the row of a list for a resource as the JSON text the server sent: no POCO, any release.
     /// </summary>
     /// <param name="json">The resource as JSON.</param>
@@ -213,14 +255,20 @@ public sealed class FhirRenderer
     }
 
     /// <summary>
-    /// Whether the layers have a template for a type in a mode.
+    /// Whether the layers have a template for a type in a mode; a layer that loads its templates on demand loads it.
     /// </summary>
     /// <param name="resourceType">The type (<c>Patient</c>).</param>
     /// <param name="mode">The mode (<c>tile</c>); the plain templates of the elements do not count.</param>
+    /// <param name="cancellationToken">Cancels the load.</param>
     /// <returns><see langword="true"/> when <c>resourceType@mode</c> exists in a layer.</returns>
-    public bool HasTemplate(string resourceType, string mode)
+    /// <example>
+    /// <code>
+    /// var hasPage = await renderer.HasTemplateAsync("Observation", "view");
+    /// </code>
+    /// </example>
+    public async ValueTask<bool> HasTemplateAsync(string resourceType, string mode, CancellationToken cancellationToken = default)
     {
-        return _library.Find(FhirNode.ModeKey(resourceType, mode)) is not null;
+        return await _library.FindAsync(FhirNode.ModeKey(resourceType, mode), cancellationToken) is not null;
     }
 
     /// <summary>
@@ -229,13 +277,19 @@ public sealed class FhirRenderer
     /// <param name="resourceType">The type (<c>Encounter</c>).</param>
     /// <param name="mode">A chain of modes: the template of the first mode that has one; with no mode, the plain template.</param>
     /// <returns>The <c>_include</c> and <c>_revinclude</c> the template declares, or <see cref="FhirNeeds.None"/>.</returns>
-    public FhirNeeds NeedsFor(string resourceType, string? mode = null)
+    /// <param name="cancellationToken">Cancels the load of the template.</param>
+    /// <example>
+    /// <code>
+    /// var needs = await renderer.NeedsForAsync("Encounter", "tile");   // _include=Encounter:subject
+    /// </code>
+    /// </example>
+    public async ValueTask<FhirNeeds> NeedsForAsync(string resourceType, string? mode = null, CancellationToken cancellationToken = default)
     {
         var modes = FhirNode.ModesOf(mode);
         var keys = modes.Count == 0 ? [resourceType] : modes.Select(name => FhirNode.ModeKey(resourceType, name));
         foreach (var key in keys)
         {
-            if (_library.Find(key) is { } text)
+            if (await _library.FindAsync(key, cancellationToken) is { } text)
             {
                 return TemplateNeeds.Of(text);
             }
@@ -309,7 +363,7 @@ public sealed class FhirRenderer
         var type = root.InstanceType ?? root.Name;
         var id = root.Children("id").FirstOrDefault()?.Value as string;
         var plain = string.IsNullOrEmpty(id) ? TileModel.Plain(type, null) : TileModel.Plain(id, type);
-        if (_library.Find(FhirNode.ModeKey(type, TileModel.Mode)) is null)
+        if (await _library.FindAsync(FhirNode.ModeKey(type, TileModel.Mode)) is null)
         {
             return plain;
         }
@@ -317,14 +371,16 @@ public sealed class FhirRenderer
         try
         {
             var problems = new List<string>();
-            var html = await RenderAsync(root, string.Join(',', [TileModel.Mode, .. FhirNode.ModesOf(mode)]), HtmlEncoder.Default, pool, null, problems, tileContext);
+            var slots = new FrameSlots();
+            // what the template writes outside its slots is dropped
+            await RenderAsync(root, string.Join(',', [TileModel.Mode, .. FhirNode.ModesOf(mode)]), HtmlEncoder.Default, pool, null, problems, tileContext, slots);
             if (problems.Count > 0)
             {
                 return TileModel.Error(string.IsNullOrEmpty(id) ? type : id, string.Join("; ", problems));
             }
 
-            var tile = string.IsNullOrWhiteSpace(html) ? null : TileModel.FromTemplate(html);
-            if (tile is null || tile.Text.Length == 0)
+            var tile = TileOf(slots, (tileContext ?? TileContext.None).Options);
+            if (tile is null)
             {
                 // the template wrote no row for this data (a condition of its own): the id and the type, no error
                 _onProblem?.Invoke($"Template '{type}@{TileModel.Mode}' wrote no row");
@@ -337,6 +393,25 @@ public sealed class FhirRenderer
         {
             _onProblem?.Invoke($"Template '{type}@{TileModel.Mode}' failed: {ex.Message}");
             return TileModel.Error(string.IsNullOrEmpty(id) ? type : id, ex.Message);
+        }
+    }
+
+    // Each slot sanitized on its own; no row when the template filled no title
+    private static TileModel? TileOf(FrameSlots slots, TileOptions options)
+    {
+        var title = FxHtml.SanitizeTile(slots[FrameSlots.Title]).Trim();
+        if (FxHtml.PlainText(title).Length == 0)
+        {
+            return null;
+        }
+
+        return new TileModel(title, Slot(FrameSlots.Subtitle), Slot(FrameSlots.Trailing), Slot(FrameSlots.Status), Slot(FrameSlots.Patient), Slot(FrameSlots.Encounter),
+                             Slot(FrameSlots.Age), options);
+
+        string Slot(string name)
+        {
+            var html = FxHtml.SanitizeTile(slots[name]).Trim();
+            return FxHtml.PlainText(html).Length == 0 ? string.Empty : html;
         }
     }
 
@@ -379,17 +454,23 @@ public sealed class FhirRenderer
     // problems: when the caller passes the list, it shows the errors of the templates itself; otherwise they are written before the text (HTML only)
     // tileContext: every template sees fhir_context (the Type/id the page shows above) and fhir_options (show_age, show_status), the defaults when not given
     private async Task<string> RenderAsync(ITypedElement root, string? mode, TextEncoder encoder, ResourcePool? pool, RenderTracker? tracker = null, List<string>? problems = null,
-                                           TileContext? tileContext = null)
+                                           TileContext? tileContext = null, FrameSlots? slots = null, string? templateKey = null)
     {
+        foreach (var texts in _texts)
+        {
+            await texts.PrepareAsync(System.Globalization.CultureInfo.CurrentUICulture);
+        }
+
         using var writer = new StringWriter();
         var context = new TemplateContext(_options);
         tileContext ??= TileContext.None;
         context.AmbientValues[ContextKey] = tileContext;
         context.SetValue("fhir_context", new ArrayValue([.. tileContext.Shown.Select(shown => new StringValue(shown))]));
-        context.SetValue("fhir_options", FluidValue.Create(new Dictionary<string, object>(StringComparer.Ordinal)
+        context.SetValue("fhir_options", FluidValue.Create(new Dictionary<string, object?>(StringComparer.Ordinal)
         {
             ["show_age"] = tileContext.Options.ShowAge,
-            ["show_status"] = tileContext.Options.ShowStatus
+            ["show_status"] = tileContext.Options.ShowStatus,
+            ["decimals"] = tileContext.Format?.Decimals
         }, _options));
         var own = problems is null;
         problems ??= [];
@@ -404,7 +485,19 @@ public sealed class FhirRenderer
             context.AmbientValues[RenderTracker.Key] = tracker;
         }
 
-        await ApplyAsync(new FhirNode(root, tracker is not null), mode, writer, encoder, context);
+        if (slots is not null)
+        {
+            context.AmbientValues[FrameSlots.Key] = slots;
+        }
+
+        if (templateKey is null)
+        {
+            await ApplyAsync(new FhirNode(root, tracker is not null), mode, writer, encoder, context);
+        }
+        else
+        {
+            await RenderKeyAsync(new FhirNode(root, false), templateKey, encoder, context);
+        }
         return own && !ReferenceEquals(encoder, NullEncoder.Default) ? ProblemBlock(problems) + writer.ToString() : writer.ToString();
     }
 
@@ -435,6 +528,34 @@ public sealed class FhirRenderer
         _onProblem?.Invoke(problem);
     }
 
+    // A named template with the resource as self (a row of a table into its slots): what it writes outside the slots is dropped
+    private async ValueTask RenderKeyAsync(FhirNode node, string key, TextEncoder encoder, TemplateContext context)
+    {
+        var resolved = await _library.ResolveKeyedAsync([key]) ?? throw new InvalidOperationException($"No template '{key}'");
+        foreach (var skipped in resolved.Skipped)
+        {
+            Report(context, skipped);
+        }
+
+        context.EnterChildScope();
+        try
+        {
+            context.SetValue("self", new FhirNodeValue(node));
+            context.SetValue("fhir_type", node.TypeName);
+            context.SetValue("fhir_path", node.Path);
+            context.SetValue("fhir_is_primitive", node.IsPrimitive);
+            await resolved.Template.RenderAsync(TextWriter.Null, encoder, context);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Report(context, $"Template '{key}' failed: {ex.Message}");
+        }
+        finally
+        {
+            context.ReleaseScope();
+        }
+    }
+
     private async ValueTask ApplyAsync(FhirNode node, string? mode, TextWriter writer, TextEncoder encoder, TemplateContext context)
     {
         var depth = context.AmbientValues.TryGetValue(DepthKey, out var d) ? (int)d : 0;
@@ -445,7 +566,7 @@ public sealed class FhirRenderer
 
         var inherited = context.AmbientValues.TryGetValue(ModeKey, out var m) ? m as string : null;
         var effective = FhirNode.ExpandMode(mode, inherited);
-        var resolved = _library.ResolveKeyed(node.TemplateKeys(effective))
+        var resolved = await _library.ResolveKeyedAsync(node.TemplateKeys(effective))
                        ?? throw new InvalidOperationException($"No template for {node.Path} ({node.TypeName})");
 
         foreach (var skipped in resolved.Skipped)
@@ -463,6 +584,14 @@ public sealed class FhirRenderer
 
         context.AmbientValues[DepthKey] = depth + 1;
         context.AmbientValues[ModeKey] = effective;
+        // A banner is a frame: its template fills slots, BannerFrame writes the header (what the template writes outside the slots is dropped)
+        var banner = resolved.Key.EndsWith(TemplateKey.ModeSeparator + IResourceViews.BannerMode, StringComparison.Ordinal) ? new FrameSlots() : null;
+        context.AmbientValues.TryGetValue(FrameSlots.Key, out var outerSlots);
+        if (banner is not null)
+        {
+            context.AmbientValues[FrameSlots.Key] = banner;
+        }
+
         context.EnterChildScope();
         try
         {
@@ -470,7 +599,12 @@ public sealed class FhirRenderer
             context.SetValue("fhir_type", node.TypeName);
             context.SetValue("fhir_path", node.Path);
             context.SetValue("fhir_is_primitive", node.IsPrimitive);
-            await resolved.Template.RenderAsync(writer, encoder, context);
+            await resolved.Template.RenderAsync(banner is null ? writer : TextWriter.Null, encoder, context);
+            if (banner is not null)
+            {
+                var id = node.Element.Children("id").FirstOrDefault()?.Value as string;
+                await writer.WriteAsync(BannerFrame.Compose(banner, node.TypeName, id, context.GetValue("banner_link").ToBooleanValue()));
+            }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -479,6 +613,11 @@ public sealed class FhirRenderer
         finally
         {
             context.ReleaseScope();
+            if (banner is not null)
+            {
+                context.AmbientValues[FrameSlots.Key] = outerSlots;
+            }
+
             context.AmbientValues[DepthKey] = depth;
             context.AmbientValues[ModeKey] = inherited;
         }

@@ -9,13 +9,13 @@ namespace FireChart.Viewer.Core;
 /// </remarks>
 /// <example>
 /// <code>
-/// public sealed class VendorRenderers : ITemplateRenderers
+/// public sealed class VendorRenderers(IViewerAssets assets) : ITemplateRenderers
 /// {
-///     private readonly FhirRenderer _renderer = new([new VendorTemplates()]);
+///     private readonly FhirRenderer _renderer = new([new WebVendorTemplates(assets)]);
 ///
 ///     public Task&lt;FhirRenderer&gt; GetAsync(CancellationToken cancellationToken = default) =&gt; Task.FromResult(_renderer);
 ///
-///     public Task&lt;string&gt; GetStyleAsync(CancellationToken cancellationToken = default) =&gt; Task.FromResult(FxStyle.Compose(null));
+///     public async Task&lt;string&gt; GetStyleAsync(CancellationToken cancellationToken = default) =&gt; (await FxStyle.LoadAsync(assets, cancellationToken)).Compose(null);
 /// }
 /// </code>
 /// </example>

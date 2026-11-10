@@ -1551,16 +1551,6 @@
   },
   {
     "PackageId": "Microsoft.Extensions.FileProviders.Abstractions",
-    "PackageVersion": "9.0.0",
-    "PackageProjectUrl": "https://dot.net/",
-    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
-    "Authors": "Microsoft",
-    "License": "MIT",
-    "LicenseUrl": "https://licenses.nuget.org/MIT",
-    "LicenseInformationOrigin": 0
-  },
-  {
-    "PackageId": "Microsoft.Extensions.FileProviders.Abstractions",
     "PackageVersion": "10.0.14",
     "PackageProjectUrl": "https://dot.net/",
     "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
@@ -2033,86 +2023,6 @@
     "PackageId": "Microsoft.JSInterop.WebAssembly",
     "PackageVersion": "10.0.14",
     "PackageProjectUrl": "https://asp.net/",
-    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
-    "Authors": "Microsoft",
-    "License": "MIT",
-    "LicenseUrl": "https://licenses.nuget.org/MIT",
-    "LicenseInformationOrigin": 0
-  },
-  {
-    "PackageId": "Microsoft.Maui.Controls",
-    "PackageVersion": "10.0.120",
-    "PackageProjectUrl": "https://github.com/dotnet/maui",
-    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
-    "Authors": "Microsoft",
-    "License": "MIT",
-    "LicenseUrl": "https://licenses.nuget.org/MIT",
-    "LicenseInformationOrigin": 0
-  },
-  {
-    "PackageId": "Microsoft.Maui.Controls.Build.Tasks",
-    "PackageVersion": "10.0.120",
-    "PackageProjectUrl": "https://github.com/dotnet/maui",
-    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
-    "Authors": "Microsoft",
-    "License": "MIT",
-    "LicenseUrl": "https://licenses.nuget.org/MIT",
-    "LicenseInformationOrigin": 0
-  },
-  {
-    "PackageId": "Microsoft.Maui.Controls.Core",
-    "PackageVersion": "10.0.120",
-    "PackageProjectUrl": "https://github.com/dotnet/maui",
-    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
-    "Authors": "Microsoft",
-    "License": "MIT",
-    "LicenseUrl": "https://licenses.nuget.org/MIT",
-    "LicenseInformationOrigin": 0
-  },
-  {
-    "PackageId": "Microsoft.Maui.Controls.Xaml",
-    "PackageVersion": "10.0.120",
-    "PackageProjectUrl": "https://github.com/dotnet/maui",
-    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
-    "Authors": "Microsoft",
-    "License": "MIT",
-    "LicenseUrl": "https://licenses.nuget.org/MIT",
-    "LicenseInformationOrigin": 0
-  },
-  {
-    "PackageId": "Microsoft.Maui.Core",
-    "PackageVersion": "10.0.120",
-    "PackageProjectUrl": "https://github.com/dotnet/maui",
-    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
-    "Authors": "Microsoft",
-    "License": "MIT",
-    "LicenseUrl": "https://licenses.nuget.org/MIT",
-    "LicenseInformationOrigin": 0
-  },
-  {
-    "PackageId": "Microsoft.Maui.Essentials",
-    "PackageVersion": "10.0.120",
-    "PackageProjectUrl": "https://github.com/dotnet/maui",
-    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
-    "Authors": "Microsoft",
-    "License": "MIT",
-    "LicenseUrl": "https://licenses.nuget.org/MIT",
-    "LicenseInformationOrigin": 0
-  },
-  {
-    "PackageId": "Microsoft.Maui.Graphics",
-    "PackageVersion": "10.0.120",
-    "PackageProjectUrl": "https://github.com/dotnet/maui",
-    "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
-    "Authors": "Microsoft",
-    "License": "MIT",
-    "LicenseUrl": "https://licenses.nuget.org/MIT",
-    "LicenseInformationOrigin": 0
-  },
-  {
-    "PackageId": "Microsoft.Maui.Resizetizer",
-    "PackageVersion": "10.0.120",
-    "PackageProjectUrl": "https://github.com/dotnet/maui",
     "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
     "Authors": "Microsoft",
     "License": "MIT",

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -15,18 +15,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- The vendor library (templates, texts, styles, forms, samples) is the folders of this project; the assembly carries it as the fallback layer -->
-    <EmbeddedResource Include="templates\**\*.liquid" LogicalName="%(Filename)%(Extension)" />
-    <EmbeddedResource Include="samples\**\*.json" LogicalName="%(Filename)%(Extension)" />
-    <EmbeddedResource Include="locales\*\fhir-templates.json" LogicalName="locales.%(RecursiveDir)%(Filename)%(Extension)" />
-    <EmbeddedResource Include="summary-forms\*.json" LogicalName="summary-forms.%(Filename)%(Extension)" />
-    <EmbeddedResource Include="search-forms\**\*.json" LogicalName="search-forms.%(RecursiveDir)%(Filename)%(Extension)" />
-    <EmbeddedResource Include="styles\*.css" LogicalName="%(Filename)%(Extension)" />
-    <EmbeddedResource Include="styles\daisy\fx.daisy.css" LogicalName="fx.daisy.css" />
+    <SupportedPlatform Include="browser" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FireChart.Viewer.Core\FireChart.Viewer.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hl7.Fhir.R4" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" />
   </ItemGroup>
 
 </Project>

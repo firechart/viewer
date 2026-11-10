@@ -1,0 +1,75 @@
+@using FireChart.Viewer.Pages
+@* The shell of a section of the clinical summary, the same for every component: the sticky header (the icon, the title, the count, the toggle), the loading,
+   the failure with its retry and the button of the next page; the component of the section draws the records between them *@
+
+<section id=@Section.ElementId class="fx-summary-section">
+    <div class="fx-summary-section-head">
+        <div class=@(Empty ? "fx-summary-group fx-summary-group-empty" : "fx-summary-group") role="button" aria-expanded=@(Section.Collapsed ? "false" : "true")
+             style="cursor: pointer" @onclick=@OnToggle>
+            <RadzenIcon Icon=@(Section.Collapsed ? "chevron_right" : "expand_more")/>
+            <div class="fx-summary-icon"><IconResource ResourceType=@Section.IconType Autocolor/></div>
+            <span class="fx-summary-group-title">@Section.Title</span>
+            @if (Section.IsLoaded)
+            {
+                <span class="fx-badge fx-badge-sm fx-badge-ghost">@Section.CountText</span>
+            }
+            @if (Section.IsLoading)
+            {
+                <CircularProgress Size="ProgressBarCircularSize.ExtraSmall"/>
+            }
+        </div>
+    </div>
+
+    @if (!Section.Collapsed)
+    {
+        @if (!Section.IsLoaded && !Section.Failed)
+        {
+            <div class="fx-summary-section-row"><div class="fx-summary-note"><CircularProgress Size="ProgressBarCircularSize.Small"/></div></div>
+        }
+        else if (!Empty)
+        {
+            @ChildContent
+            @if (Section.Failed)
+            {
+                <div class="fx-summary-section-row">
+                    <div class="fx-summary-note">
+                        @Strings.Message_FhirServerUnavailable
+                        <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_Retry Click=@OnMore/>
+                    </div>
+                </div>
+            }
+            else if (Section.HasMore)
+            {
+                <div class="fx-summary-section-row">
+                    <div class="fx-summary-note">
+                        <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_More
+                                      IsBusy=@Section.IsLoading Click=@OnMore/>
+                    </div>
+                </div>
+            }
+        }
+    }
+</section>
+
+@code {
+
+    /// <summary>The section.</summary>
+    [Parameter, EditorRequired]
+    public ClinicalSummarySection Section { get; set; } = null!;
+
+    /// <summary>Opens or closes the section (a click on its header).</summary>
+    [Parameter]
+    public EventCallback OnToggle { get; set; }
+
+    /// <summary>Loads the next page of the section, or retries the one that failed.</summary>
+    [Parameter]
+    public EventCallback OnMore { get; set; }
+
+    /// <summary>The records of the section, drawn by its component.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    // Loaded, nothing found and no failure: the header alone, dimmed
+    private bool Empty => Section.IsLoaded && !Section.Failed && Section.Items.Count == 0;
+
+}

@@ -28,6 +28,10 @@
         else if (State.View is not null)
         {
             <style>@State.View.Style</style>
+            <SectionContent SectionName=@FhirViewer.PageCommandsSection>
+                <BookmarkStar Route=@(new ViewerRoute(ViewerPage.Resource, ResourceType, ResourceId)) Title=@State.TextAsync Category=@ResourceType/>
+            </SectionContent>
+            <div>
             <RadzenTabs class="rz-mt-2">
                 <Tabs>
                     <RadzenTabsItem Text=@FloxStrings.Caption_View>
@@ -39,6 +43,7 @@
                     </RadzenTabsItem>
                 </Tabs>
             </RadzenTabs>
+            </div>
         }
         else if (State.Json is not null)
         {

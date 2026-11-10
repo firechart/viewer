@@ -1,15 +1,17 @@
-/* The dialog is as high as the form and no higher than the screen: the body scrolls, the footer stays in view */
+/* The form fills the content of the dialog (whose height the dialog sets): only the body scrolls, the footer stays in view */
 .form-layout {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    max-height: calc(100dvh - 9rem);
+    height: 100%;
 }
 
 .form-body {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    /* The fields keep away from the scrollbar */
+    padding-right: 1rem;
     padding-bottom: 0.5rem;
 }
 

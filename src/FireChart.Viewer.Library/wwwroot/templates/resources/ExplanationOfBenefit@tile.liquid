@@ -1,0 +1,16 @@
+{% fhir_include "ExplanationOfBenefit:patient" %}
+{%- assign tot = self.total | as_list | first -%}{%- assign outcome = self.outcome | append: "" -%}
+{%- capture t0 -%}{% apply self.type mode: "text" %}{%- endcapture -%}
+{%- capture t1 -%}{% if self.use %}{{ "Explanation of benefit ({{use}})" | t: use: self.use }}{% endif %}{%- endcapture -%}
+{%- assign title = t0 | default: t1 | default: self.id -%}
+{%- capture s0 -%}{% if self.created %}{{ self.created | fhir_date }}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% apply self.insurer mode: "text" %}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", p1: s0, p2: s1 %}{%- endslot -%}
+{%- slot "trailing" -%}
+  {% if self.payment %}<span class="fx-tile-value">{% apply self.payment.amount mode: "text" %}</span>{% elsif tot %}<span class="fx-tile-value">{% apply tot.amount mode: "text" %}</span>{% endif %}
+  {% if outcome != "" %}{% render "status-badge", code: outcome %}{% endif %}
+{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}
+{% slot_data patient: self.patient, at: self.created %}

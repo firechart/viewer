@@ -1,0 +1,42 @@
+{%- comment -%} A row of the table of the laboratory results (component lab-results), self an Observation: the slots test (the name of the test), value
+(the value and the values of the components, the format of the section: fhir_options.decimals), range (the first reference range: its text, else
+low - high with the unit once, else > low or < high), flag (the interpretations as badges). Override it to change the cells; the table and its
+narrow form (the tiles) are the component's {%- endcomment -%}
+{%- slot "test" -%}
+  {%- capture name -%}{% apply self.code mode: "text" %}{%- endcapture -%}
+  {{- name | default: self.id -}}
+{%- endslot -%}
+
+{%- slot "value" -%}
+  {%- assign first = true -%}
+  {%- if self.value -%}{% apply self.value mode: "text", decimals: fhir_options.decimals %}{%- assign first = false -%}{%- endif -%}
+  {%- assign components = self.component | as_list -%}
+  {%- for c in components -%}
+    {%- if c.value -%}
+      {%- unless first %} / {% endunless -%}
+      {% apply c.value mode: "text", decimals: fhir_options.decimals %}
+      {%- assign first = false -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if first and self.dataAbsentReason -%}{% apply self.dataAbsentReason mode: "text" %}{%- endif -%}
+{%- endslot -%}
+
+{%- slot "range" -%}
+  {%- assign rr = self.referenceRange | as_list | first -%}
+  {%- if rr.text -%}
+    {{- rr.text -}}
+  {%- elsif rr.low and rr.high -%}
+    {{- rr.low.value | fhir_number: fhir_options.decimals -}}{{- " - " -}}{{- rr.high.value | fhir_number: fhir_options.decimals -}}
+    {%- assign unit = rr.high.unit | default: rr.low.unit | default: rr.high.code -%}
+    {%- if unit %} {{ unit }}{% endif -%}
+  {%- elsif rr.low -%}
+    {{- "> " -}}{% apply rr.low mode: "text", decimals: fhir_options.decimals %}
+  {%- elsif rr.high -%}
+    {{- "< " -}}{% apply rr.high mode: "text", decimals: fhir_options.decimals %}
+  {%- endif -%}
+{%- endslot -%}
+
+{%- slot "flag" -%}
+  {%- assign interpretations = self.interpretation | as_list -%}
+  {%- for i in interpretations -%}{% render "interpretation-badge", concept: i %}{%- endfor -%}
+{%- endslot -%}

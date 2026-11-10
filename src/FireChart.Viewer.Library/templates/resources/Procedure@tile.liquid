@@ -1,7 +1,0 @@
-{% fhir_include "Procedure:subject" %}
-{% fhir_include "Procedure:encounter" %}
-{%- capture title -%}{% apply self.code mode: "text" %}{%- endcapture -%}
-{%- assign title = title | default: self.id -%}
-{%- capture subtitle -%}{% if self.performed %}{% apply self.performed mode: "text" %}{% endif %}{%- endcapture -%}
-{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
-{% render "tile-row", title: title, subtitle: subtitle, status: status, patient: self.subject, encounter: self.encounter, at: self.performed %}

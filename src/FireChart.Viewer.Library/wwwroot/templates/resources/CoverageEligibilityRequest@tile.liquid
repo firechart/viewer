@@ -1,0 +1,10 @@
+{% fhir_include "CoverageEligibilityRequest:patient" %}
+{%- capture t0 -%}{% if self.purpose %}{% assign purposes = self.purpose | join: ", " %}{{ "Eligibility: {{purposes}}" | t: purposes: purposes }}{% endif %}{%- endcapture -%}
+{%- assign title = t0 | default: self.id -%}
+{%- capture s0 -%}{% if self.created %}{{ self.created | fhir_date }}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% apply self.insurer mode: "text" %}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", p1: s0, p2: s1 %}{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}
+{% slot_data patient: self.patient, at: self.created %}

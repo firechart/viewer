@@ -1,0 +1,95 @@
+@using FireChart.Viewer.Pages
+@using FireChart.Viewer.Core
+@* The component lab-results of a section of the clinical summary: a group per report (its tile as the header, then its results in the order of the report)
+   or per day; a table in a wide section (the cells of the partial lab-row), the tiles of the results in a narrow one (the container query of the stack) *@
+
+@foreach (var group in Section.LabGroups)
+{
+    <div class="fx-lab-group" @key=group.Key>
+        @if (group.Report is { } report)
+        {
+            <div class="fx-summary-section-row fx-lab-head">
+                <Tile Model=@TileOf(report) ResourceType=@report.ResourceType OnClick=@(() => OnOpen.InvokeAsync(report))/>
+            </div>
+        }
+        else
+        {
+            <div class="fx-lab-day">@DayOf(group)</div>
+        }
+
+        @if (group.Rows.Count > 0)
+        {
+            var range = Has(group, "range");
+            var flag = Has(group, "flag");
+            <div class="fx-lab-wide">
+                <table class="fx-table fx-table-sm fx-lab-table">
+                    <colgroup>
+                        <col class="fx-lab-col-test"/>
+                        <col class="fx-lab-col-value"/>
+                        <col class=@(range ? "fx-lab-col-range" : "fx-lab-col-none")/>
+                        <col class=@(flag ? "fx-lab-col-flag" : "fx-lab-col-none")/>
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>@Strings.Caption_LabTest</th>
+                            <th>@Strings.Caption_LabResult</th>
+                            <th>@(range ? Strings.Caption_LabReferenceRange : string.Empty)</th>
+                            <th>@(flag ? Strings.Caption_LabFlag : string.Empty)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in group.Rows)
+                        {
+                            var cells = Section.Cells.GetValueOrDefault(ClinicalSummarySection.KeyOf(row)) ?? Empty;
+                            <tr @key=row @onclick=@(() => OnOpen.InvokeAsync(row)) title=@TileOf(row).Text>
+                                <td class="fx-lab-test">@((MarkupString)(cells.GetValueOrDefault("test") ?? row.Id))</td>
+                                <td class="fx-lab-value">@((MarkupString)(cells.GetValueOrDefault("value") ?? string.Empty))</td>
+                                <td class="fx-lab-range">@((MarkupString)(cells.GetValueOrDefault("range") ?? string.Empty))</td>
+                                <td class="fx-lab-flag">@((MarkupString)(cells.GetValueOrDefault("flag") ?? string.Empty))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="fx-lab-narrow">
+                @foreach (var row in group.Rows)
+                {
+                    <div class="fx-summary-section-row" @key=row>
+                        <Tile Model=@TileOf(row) ResourceType=@row.ResourceType OnClick=@(() => OnOpen.InvokeAsync(row))/>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+
+    private static readonly IReadOnlyDictionary<string, string> Empty = new Dictionary<string, string>();
+
+    /// <summary>The section: its groups (<see cref="ClinicalSummarySection.LabGroups"/>), the cells and the tiles of its results.</summary>
+    [Parameter, EditorRequired]
+    public ClinicalSummarySection Section { get; set; } = null!;
+
+    /// <summary>Opens a record (a report or a result).</summary>
+    [Parameter]
+    public EventCallback<ResourceSummary> OnOpen { get; set; }
+
+    // Whether any row of the group has the cell: an empty column keeps its place (the groups stay aligned) without a header
+    private bool Has(LabGroup group, string cell)
+    {
+        return group.Rows.Any(row => Section.Cells.GetValueOrDefault(ClinicalSummarySection.KeyOf(row)) is { } cells && cells.TryGetValue(cell, out var html) && html.Length > 0);
+    }
+
+    private TileModel TileOf(ResourceSummary item)
+    {
+        return Section.Tiles.GetValueOrDefault(ClinicalSummarySection.KeyOf(item)) ?? ResourceTiles.Plain(item);
+    }
+
+    // The day in the format of the culture (as fhir_date writes a date); results without a moment have none
+    private static string DayOf(LabGroup group)
+    {
+        return group.Day is { } day ? day.ToString("d", System.Globalization.CultureInfo.CurrentCulture) : "—";
+    }
+
+}

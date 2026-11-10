@@ -2,7 +2,7 @@
 @using Radzen.Blazor
 @inject Radzen.DialogService Dialogs
 
-@* The dialog is as high as the form, and no higher than the screen: the fields scroll, the commands stay in view (SearchFormView.razor.css) *@
+@* The form fills the dialog: only the fields scroll, the commands stay in view (SearchFormView.razor.css) *@
 <div class="form-layout">
     <div class="form-body">
         <RadzenStack Gap="var(--gap-lg)">
@@ -12,39 +12,30 @@
                     @Strings.Message_SearchFormGenerated
                 </RadzenAlert>
             }
-            @* A form of many fields is searched, not scrolled through: what matches is shown, the closed groups open *@
-            @if (Definition.Fields.Count > SearchableFrom)
+            @* The full-text search of the form (_content, else _text) is the box on top, not one of the fields; Enter applies the form *@
+            @if (_fullText is { } fullText)
             {
-                <Search Value=@_find ValueChanged=@OnFind DebounceInterval="200" Placeholder=@FloxStrings.Caption_Search/>
+                <Search Value=@_values[fullText.QueryName].Text ValueChanged=@(text => _values[fullText.QueryName].Text = text) OnKeyDown=@OnSearchKey
+                        DebounceInterval="0" AutoFocus Placeholder=@Strings.Placeholder_SearchAllFields/>
             }
             @foreach (var section in _sections)
             {
-                var fields = Matching(section.Fields);
-                if (fields.Count == 0)
-                {
-                    continue;
-                }
-
                 if (section.Caption == null)
                 {
-                    @FieldGrid(fields)
+                    @FieldGrid(section.Fields)
                 }
                 else
                 {
-                    <RadzenFieldset Text=@section.Caption AllowCollapse="true" Collapsed=@(section.Collapsed && !Finding)>
-                        @FieldGrid(fields)
+                    <RadzenFieldset Text=@section.Caption AllowCollapse="true" Collapsed=@section.Collapsed>
+                        @FieldGrid(section.Fields)
                     </RadzenFieldset>
                 }
             }
-            @if (Matching(_more) is { Count: > 0 } more)
+            @if (_more.Count > 0)
             {
-                <RadzenFieldset Text=@FloxStrings.Caption_MoreFilters AllowCollapse="true" Collapsed=@(!Finding && !_more.Any(HasValue))>
-                    @FieldGrid(more)
+                <RadzenFieldset Text=@FloxStrings.Caption_MoreFilters AllowCollapse="true" Collapsed=@(!_more.Any(HasValue))>
+                    @FieldGrid(_more)
                 </RadzenFieldset>
-            }
-            @if (Finding && _sections.All(row => Matching(row.Fields).Count == 0) && Matching(_more).Count == 0)
-            {
-                <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0">@FloxStrings.List_NoData</RadzenText>
             }
         </RadzenStack>
     </div>
@@ -70,6 +61,7 @@
     private readonly Dictionary<string, string> _errors = new Dictionary<string, string>(StringComparer.Ordinal);
     private readonly List<Section> _sections = [];
     private readonly List<SearchFormField> _more = [];
+    private SearchFormField? _fullText;
     private string _culture = CultureInfo.CurrentUICulture.Name;
     private SearchFormDefinition? _loadedForm;
     private IReadOnlyDictionary<string, SearchFieldValue>? _loadedValues;
@@ -111,7 +103,9 @@
                           .ToList();
         var known = groups.Select(g => g.Code)
                            .ToHashSet(StringComparer.Ordinal);
+        _fullText = Definition.Fields.FirstOrDefault(f => f.QueryName == FullTextParameter) ?? Definition.Fields.FirstOrDefault(f => f.QueryName == NarrativeParameter);
         var ordered = Definition.Fields
+                           .Where(f => !ReferenceEquals(f, _fullText))
                            .OrderBy(f => f.Order)
                            .ToList();
 
@@ -138,30 +132,16 @@
 
     private bool HasValue(SearchFormField field) => SearchFormEvaluator.HasValue(field, _values[field.QueryName]);
 
-    // The search box is shown for a form with more fields than this
-    private const int SearchableFrom = 8;
+    // The full-text search of FHIR: the whole resource, else its narrative
+    private const string FullTextParameter = "_content";
+    private const string NarrativeParameter = "_text";
 
-    private string? _find;
-
-    private bool Finding => !string.IsNullOrWhiteSpace(_find);
-
-    private void OnFind(string? text)
+    private void OnSearchKey(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
     {
-        _find = text;
-    }
-
-    // The fields whose label, hint or name have the text; all of them when nothing is searched for
-    private List<SearchFormField> Matching(List<SearchFormField> fields)
-    {
-        if (!Finding)
+        if (args.Key == "Enter")
         {
-            return fields;
+            Apply();
         }
-
-        var text = _find!.Trim();
-        return [.. fields.Where(field => field.QueryName.Contains(text, StringComparison.OrdinalIgnoreCase) ||
-                                         field.Label.Resolve(_culture).Contains(text, StringComparison.OrdinalIgnoreCase) ||
-                                         field.Hint.Resolve(_culture).Contains(text, StringComparison.OrdinalIgnoreCase))];
     }
 
     private RenderFragment FieldGrid(List<SearchFormField> fields) =>
@@ -177,6 +157,7 @@
             }
         </RadzenRow>;
 
+    // The form as a list starts (its defaults), applied at once: the dialog closes and the list loads again
     private void Reset()
     {
         _errors.Clear();
@@ -184,6 +165,8 @@
         {
             _values[field.QueryName] = SearchFormEvaluator.NewValue(field);
         }
+
+        Apply();
     }
 
     private void Apply()

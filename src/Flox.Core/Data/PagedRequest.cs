@@ -81,11 +81,6 @@ public class PagedRequest<TEntity>
     /// </summary>
     public string? FullTextSearchString { get; set; }
 
-    /// <summary>
-    ///     Should be handled by storage if user bookmarks are supported
-    /// </summary>
-    public bool BookmarkedOnly { get; set; }
-
     internal void Reset()
     {
         Filters.Clear();
@@ -96,6 +91,5 @@ public class PagedRequest<TEntity>
         Sorts.Clear();
         Fields.Clear();
         FullTextSearchString = null;
-        BookmarkedOnly = false;
     }
 }

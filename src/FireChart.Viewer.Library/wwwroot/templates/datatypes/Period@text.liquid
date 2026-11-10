@@ -1,0 +1,18 @@
+{%- comment -%} start - end through fhir_date, an open end as …; one day with times: the date once (2018-03-30 07:34 - 08:14); one date: once {%- endcomment -%}
+{%- if self.start or self.end -%}
+  {%- assign d0 = self.start | fhir_day -%}
+  {%- assign d1 = self.end | fhir_day -%}
+  {%- assign t0 = self.start | fhir_time -%}
+  {%- assign t1 = self.end | fhir_time -%}
+  {%- assign z0 = false -%}{%- if t0 contains "(no time zone)" -%}{%- assign z0 = true -%}{%- endif -%}
+  {%- assign z1 = false -%}{%- if t1 contains "(no time zone)" -%}{%- assign z1 = true -%}{%- endif -%}
+  {%- if d0 and d0 == d1 and t0 and t1 and z0 == z1 -%}
+    {{- self.start | fhir_date -}}{{- " - " -}}{{- t1 -}}
+  {%- elsif d0 and d0 == d1 and t0 == nil and t1 == nil -%}
+    {{- self.start | fhir_date -}}
+  {%- else -%}
+    {%- if self.start -%}{{- self.start | fhir_date -}}{%- else -%}…{%- endif -%}
+    {{- " - " -}}
+    {%- if self.end -%}{{- self.end | fhir_date -}}{%- else -%}…{%- endif -%}
+  {%- endif -%}
+{%- endif -%}

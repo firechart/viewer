@@ -1,0 +1,9 @@
+{%- assign nm = self.name | as_list | first -%}{%- assign q = self.qualification | as_list | first -%}{%- assign act = self.active | append: "" -%}
+{%- capture t0 -%}{% if nm %}{% apply nm mode: "text" %}{% endif %}{%- endcapture -%}
+{%- assign title = t0 | default: self.id -%}
+{%- capture s0 -%}{% if q %}{% apply q.code mode: "text" %}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% if self.identifier %}{{ self.identifier | map: "value" | first }}{% endif %}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", p1: s0, p2: s1 %}{%- endslot -%}
+{%- slot "trailing" -%}{% if self.gender %}{% render "badge", text: self.gender %}{% endif %}{%- endslot -%}
+{%- slot "status" -%}{% if act == "false" %}{% render "badge", text: "inactive", tone: "danger" %}{% endif %}{%- endslot -%}
+{% slot "title" %}{{ title }}{% endslot %}

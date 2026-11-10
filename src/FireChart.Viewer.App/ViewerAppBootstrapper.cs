@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using FireChart.Viewer.Core;
+using Flox.Core.Data;
+using Flox.Core.Models;
 using Flox.Core.Services;
 using Flox.Shared.Bootstrap;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -18,6 +20,9 @@ public sealed class ViewerAppBootstrapper : FloxBootstrapper
         Services.AddScoped<AuthenticationStateProvider, AnonymousAuthenticationStateProvider>();
         Services.AddScoped<IAuthenticationService, AnonymousAuthenticationService>();
         Services.AddScoped<ITemplateRenderers, VendorTemplateRenderers>();
+
+        // The bookmarks of the Viewer, on the device (IndexedDB); a frame and the sandbox of one origin share them
+        Services.AddLocalEntity<UserBookmark>();
         Services.AddScoped<ViewerAppConfigLoader>();
         Services.AddScoped<Sandbox.DemoPresets>();
         AddModule(new FhirViewerCoreModule());

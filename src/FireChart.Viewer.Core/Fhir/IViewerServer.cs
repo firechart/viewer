@@ -72,4 +72,25 @@ public interface IViewerServer
     /// More parameters of the authorization request, as a query (<c>prompt=login&amp;kc_idp_hint=x</c>).
     /// </summary>
     string? OAuth2ExtraParameters => null;
+
+    /// <summary>
+    /// Whether a search asks for the summary of the resources (<c>_summary=true</c>): for a server whose resources are large and whose lists
+    /// need only their summary elements (the FHIR facade of a FireChart package: a <c>StructureDefinition</c> without its snapshot).
+    /// </summary>
+    /// <remarks>
+    /// Off by default: the tiles of clinical resources may show elements that are not summary elements. The page of a resource always reads it
+    /// whole.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// public sealed record PackageServer(string Key, string Name, string BaseUrl) : IViewerServer
+    /// {
+    ///     public AuthenticationType AuthenticationType =&gt; AuthenticationType.None;
+    ///     public FhirRelease? FhirRelease =&gt; null;
+    ///     public int PageSize =&gt; 50;
+    ///     public bool SearchSummary =&gt; true;
+    /// }
+    /// </code>
+    /// </example>
+    bool SearchSummary => false;
 }

@@ -1,4 +1,5 @@
 using FireChart.Viewer.Core;
+using FireChart.Viewer.Core.Forms;
 using FireChart.Viewer.Library;
 
 namespace FireChart.Viewer.Tests.Rendering;
@@ -32,7 +33,7 @@ public class ClinicalSummaryTemplatesTests
           "effectiveDateTime": "2020-03-01T10:20:00+03:00" }
         """;
 
-    private static readonly VendorTemplates s_vendor = new();
+    private static readonly VendorTemplates s_vendor = TestLibrary.Vendor;
 
     private static readonly TileContext s_summary = new(["Patient/p1"], TileOptions.Default);
 
@@ -53,8 +54,8 @@ public class ClinicalSummaryTemplatesTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(root.Text, Is.EqualTo("Heart rate 2020-03-01 10:20 · Ann Smith, female, 1986-03-02, MRN-12345 · V-77, 2020-03-01 10:15 - 2020-03-01 11:00, Office visit 150 bpm High final"));
-            Assert.That(summary.Text, Is.EqualTo("Heart rate 2020-03-01 10:20 · V-77, 2020-03-01 10:15 - 2020-03-01 11:00, Office visit 150 bpm High final"));
+            Assert.That(root.Text, Is.EqualTo("Heart rate 2020-03-01 10:20 · Ann Smith, female, 1986-03-02, MRN-12345 · Office visit 150 bpm High final"));
+            Assert.That(summary.Text, Is.EqualTo("Heart rate 2020-03-01 10:20 · Office visit 150 bpm High final"));
             Assert.That(visit.Text, Is.EqualTo("Heart rate 2020-03-01 10:20 150 bpm High final"));
         });
     }
@@ -69,6 +70,18 @@ public class ClinicalSummaryTemplatesTests
         Assert.That(tile.Text, Does.Contain("Patient/p2"));
     }
 
+    [TestCase("2020-03-01T10:20:00+03:00", "Heart rate 2020-03-01 10:20 · Office visit 150 bpm High final")]
+    [TestCase("2020-03-05", "Heart rate 2020-03-05 · Office visit, 2020-03-01 150 bpm High final")]
+    [TestCase(null, "Heart rate Office visit, 2020-03-01 150 bpm High final")]
+    public async System.Threading.Tasks.Task TheVisitOfARecord_IsItsKind_AndItsDayOnlyWhenTheRecordIsOfAnotherDay(string? effective, string expected)
+    {
+        var json = Observation.Replace("\"effectiveDateTime\": \"2020-03-01T10:20:00+03:00\"", effective is null ? "\"issued\": \"2020-03-01T10:20:00+03:00\"" : $"\"effectiveDateTime\": \"{effective}\"", StringComparison.Ordinal);
+
+        var tile = await TileAsync(json, s_summary);
+
+        Assert.That(tile.Text, Is.EqualTo(expected));
+    }
+
     [Test]
     public async System.Threading.Tasks.Task TheOptions_ShowTheAgeAtTheEvent_AndHideTheStatus()
     {
@@ -76,7 +89,7 @@ public class ClinicalSummaryTemplatesTests
 
         var tile = await TileAsync(Observation, options);
 
-        Assert.That(tile.Text, Is.EqualTo("Heart rate 2020-03-01 10:20 (33 y) · V-77, 2020-03-01 10:15 - 2020-03-01 11:00, Office visit 150 bpm High"));
+        Assert.That(tile.Text, Is.EqualTo("Heart rate 2020-03-01 10:20 (33 y) · Office visit 150 bpm High"));
     }
 
     [Test]
@@ -103,8 +116,8 @@ public class ClinicalSummaryTemplatesTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(root.Text, Is.EqualTo("Ann Smith, 1986-03-02 | V-77 Office visit - 2020-03-01 10:15 - 2020-03-01 11:00 finished"));
-            Assert.That(summary.Text, Is.EqualTo("Office visit V-77 - 2020-03-01 10:15 - 2020-03-01 11:00 finished"));
+            Assert.That(root.Text, Is.EqualTo("Ann Smith, 1986-03-02 | V-77 Office visit - 2020-03-01 10:15 - 11:00 finished"));
+            Assert.That(summary.Text, Is.EqualTo("Office visit V-77 - 2020-03-01 10:15 - 11:00 finished"));
         });
     }
 
@@ -112,6 +125,11 @@ public class ClinicalSummaryTemplatesTests
     [TestCase("""{ "start": "2022-01-01" }""", "2022-01-01 - …")]
     [TestCase("""{ "end": "2022-01-02" }""", "… - 2022-01-02")]
     [TestCase("""{ }""", "")]
+    [TestCase("""{ "start": "2022-01-01T10:00:00+03:00", "end": "2022-01-01T11:30:00+03:00" }""", "2022-01-01 10:00 - 11:30")]
+    [TestCase("""{ "start": "2022-01-01T23:00:00+03:00", "end": "2022-01-02T01:00:00+03:00" }""", "2022-01-01 23:00 - 2022-01-02 01:00")]
+    [TestCase("""{ "start": "2022-01-01", "end": "2022-01-01" }""", "2022-01-01")]
+    [TestCase("""{ "start": "2022-01-01T10:00:00", "end": "2022-01-01T11:30:00" }""", "2022-01-01 10:00 (no time zone) - 11:30 (no time zone)")]
+    [TestCase("""{ "start": "2022-01-01T10:00:00+03:00", "end": "2022-01-01T11:30:00" }""", "2022-01-01 10:00 - 2022-01-01 11:30 (no time zone)")]
     public async System.Threading.Tasks.Task APeriod_ShowsAnOpenEndAsEllipsis_AndNothingWhenBothEndsAreEmpty(string period, string expected)
     {
         var json = $$"""{ "resourceType": "Procedure", "id": "p", "status": "done", "code": { "text": "X" }, "performedPeriod": {{period}} }""";
@@ -133,6 +151,45 @@ public class ClinicalSummaryTemplatesTests
         Assert.That(tile.Text, Is.EqualTo($"X {expected} final"));
     }
 
+    [TestCase("88.99215285075731", 1, "89.0 mg")]
+    [TestCase("2.5", 0, "3 mg")]
+    [TestCase("-2.5", 0, "-3 mg")]
+    [TestCase("1.30", 3, "1.30 mg")]
+    [TestCase("1.3", 2, "1.3 mg")]
+    [TestCase("1.35", 1, "1.4 mg")]
+    public async System.Threading.Tasks.Task AFieldThatAsksForDecimals_RoundsToAtMostThatManyPlaces_NeverPads_AndAFieldThatDoesNot_KeepsTheDigitsOfTheRecord(string value, int decimals, string rounded)
+    {
+        var json = $$"""{ "resourceType": "Observation", "id": "o", "status": "final", "code": { "text": "X" }, "valueQuantity": { "value": {{value}}, "unit": "mg" } }""";
+        var tile = new MemoryTemplateSource(new Dictionary<string, string>
+        {
+            ["Observation@tile"] = $"{{% slot \"title\" %}}{{% apply self.value mode: \"text\", decimals: {decimals} %}}{{% endslot %}}" +
+                                   "{% slot \"subtitle\" %}{% apply self.value mode: \"text\" %}{% endslot %}"
+        });
+
+        var row = await new FhirRenderer([tile, s_vendor], null, FixedClock.Offset(3)).RenderTileAsync(json);
+
+        Assert.That(row.Text, Is.EqualTo($"{rounded} {value} mg"));
+    }
+
+    [Test]
+    public async System.Threading.Tasks.Task TheFormatOfTheSection_RoundsTheValuesOfAnObservationAndItsComponents()
+    {
+        const string json = """
+            { "resourceType": "Observation", "id": "o", "status": "final", "code": { "text": "X" }, "valueQuantity": { "value": 88.99215285075731, "unit": "mg" },
+              "component": [ { "code": { "text": "C" }, "valueQuantity": { "value": 1.3, "unit": "mg" } } ] }
+            """;
+        var renderer = new FhirRenderer([s_vendor], null, FixedClock.Offset(3));
+
+        var formatted = await renderer.RenderTileAsync(json, context: new TileContext([], new TileOptions(ShowStatus: false), new ValueFormat { Decimals = 2 }));
+        var plain = await renderer.RenderTileAsync(json, context: new TileContext([], new TileOptions(ShowStatus: false)));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(formatted.Text, Is.EqualTo("X 88.99 mg / 1.3 mg"), "at most two places, never padded");
+            Assert.That(plain.Text, Is.EqualTo("X 88.99215285075731 mg / 1.3 mg"), "no format: the digits of the record");
+        });
+    }
+
     [Test]
     public async System.Threading.Tasks.Task TheTileOfAnObservation_JoinsTheValuesOfItsComponents()
     {
@@ -144,6 +201,29 @@ public class ClinicalSummaryTemplatesTests
         var tile = await new FhirRenderer([s_vendor], null, FixedClock.Offset(3)).RenderTileAsync(json, context: new TileContext([], new TileOptions(ShowStatus: false)));
 
         Assert.That(tile.Text, Is.EqualTo("Blood pressure 120 mmHg / 80 mmHg"));
+    }
+
+    [Test]
+    public async System.Threading.Tasks.Task ABannerTemplate_FillsSlots_TheFrameWritesTheHeader_AndWhatIsOutsideTheSlotsIsDropped()
+    {
+        var overrides = new MemoryTemplateSource(new Dictionary<string, string>
+        {
+            ["Patient@banner"] = "outside{% slot \"title\" %}T{% endslot %}{% slot \"facts\" %}<span>F</span>{% endslot %}",
+            ["Encounter@banner"] = "{% slot \"flags\" %}B{% endslot %}",
+            ["Patient@view"] = "{% assign banner_link = true %}{% apply self mode: \"banner\" %}"
+        });
+        var renderer = new FhirRenderer([overrides, s_vendor]);
+
+        var patient = await renderer.RenderAsync(Patient, "banner");
+        var visit = await renderer.RenderAsync(Visit, "banner");
+        var linked = await renderer.RenderAsync(Patient, "view");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(patient, Is.EqualTo("""<header class="fx-banner"><h2 class="fx-banner-title">T</h2><div class="fx-banner-facts"><span>F</span></div><div class="fx-banner-flags"></div></header>"""));
+            Assert.That(visit, Does.StartWith("""<header class="fx-banner fx-banner-sub"><h2 class="fx-banner-title">e1</h2>"""), "no title: the id; not a patient: a sub-banner");
+            Assert.That(linked, Does.Contain("""<h2 class="fx-banner-title"><a href="fhir:Patient/p1">T</a></h2>"""), "the frame makes the link when the caller asks");
+        });
     }
 
     [Test]

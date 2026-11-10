@@ -1,8 +1,0 @@
-{% fhir_include "Condition:subject" %}
-{% fhir_include "Condition:encounter" %}
-{%- capture title -%}{% apply self.code mode: "text" %}{%- endcapture -%}
-{%- assign title = title | default: self.id -%}
-{%- assign since = self.onset | default: self.recordedDate -%}
-{%- capture subtitle -%}{% if since %}{% apply since mode: "text" %}{% endif %}{%- endcapture -%}
-{%- capture status -%}{% render "concept-badge", concept: self.clinicalStatus %}{%- endcapture -%}
-{% render "tile-row", title: title, subtitle: subtitle, status: status, patient: self.subject, encounter: self.encounter, at: since %}

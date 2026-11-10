@@ -1,0 +1,10 @@
+{%- capture t0 -%}{{ self.name }}{%- endcapture -%}
+{%- capture t1 -%}{{ self.title }}{%- endcapture -%}
+{%- assign title = t0 | default: t1 | default: self.id -%}
+{%- capture s0 -%}{{ self.software.name }}{%- endcapture -%}
+{%- capture s1 -%}{{ self.fhirVersion }}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", sep: " · ", p1: s0, p2: s1 %}{%- endslot -%}
+{%- slot "trailing" -%}{% render "badge", text: self.kind %}{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}

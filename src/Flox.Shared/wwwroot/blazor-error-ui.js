@@ -401,10 +401,19 @@ ${arg.stack ?? ''}` : String(arg))).join(' ');
     // unhandled-exception callback to call window.showBlazorFatalError(...)
     // explicitly instead of resurrecting a blanket console.error hook.
 
+    // A notice of the browser, not a failure: a ResizeObserver whose callback changed the size it watches (a chart in a sticky column with container
+    // queries) gets the rest of its notifications in the next frame. Nothing is broken, so it is remembered and not shown as fatal
+    const BENIGN_ERROR = /^ResizeObserver loop (completed with undelivered notifications|limit exceeded)/;
+
     // Catches everything a targeted signal can: pre-boot failures and any other
     // truly uncaught error or rejection, on every platform this script runs on
     // (browser, or the WKWebView/Chromium WebView hosting a MAUI BlazorWebView).
     window.addEventListener('error', (e) => {
+        if (!e.error && BENIGN_ERROR.test(e.message ?? '')) {
+            remember(e.message, false);
+            return;
+        }
+
         const detail = e.error instanceof Error
             ? `${e.error.message}\n${e.error.stack ?? ''}`
             : (e.message || 'Unknown error');

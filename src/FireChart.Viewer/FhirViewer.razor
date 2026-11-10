@@ -21,10 +21,14 @@ else if (_session is not null)
 
     var route = ViewerRoutes.Parse(_session.Location.Location);
     <CascadingValue Value="_session" IsFixed="false">
+        @* The crumbs (unless the host draws its own), then the toolbar of the page: its commands (PageCommandsSection: the bookmark; later share, export,
+           print) and its menu (PageMenuSection), the Viewer's own in a frame and in any host. An empty toolbar takes no room *@
         @if (ShowBreadcrumbs)
         {
             <ViewerBreadcrumbs Route=@route/>
         }
+
+        <div class="fx-viewer-toolbar flex items-center justify-end gap-1 empty:hidden" data-viewer="toolbar"><SectionOutlet SectionName=@PageCommandsSection/><SectionOutlet SectionName=@PageMenuSection/></div>
 
         @switch (route)
         {
@@ -39,6 +43,9 @@ else if (_session is not null)
                 break;
             case { Page: ViewerPage.ClinicalSummary, Id: { } patient }:
                 <ClinicalSummaryView PatientId=@patient/>
+                break;
+            case { Page: ViewerPage.Bookmarks }:
+                <BookmarksView OnOpenElsewhere=@OnOpenBookmark/>
                 break;
             case { Page: ViewerPage.ClinicalSummary, Id: null } summary:
                 <ResourceListView ResourceType="Patient" Query=@summary.Query ClinicalSummary/>
@@ -70,6 +77,28 @@ else if (_session is not null)
     /// off.</summary>
     [Parameter]
     public bool ShowBreadcrumbs { get; set; } = true;
+
+    /// <summary>
+    /// The outlet of the menu of a page of the Viewer (the button with the vertical ellipsis in the bar of the Viewer): a page gives its menu with
+    /// <c>&lt;PageMenu SectionName=@FhirViewer.PageMenuSection&gt;</c>.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// &lt;PageMenu SectionName=@FhirViewer.PageMenuSection&gt;&lt;PageMenuItem Text="Vital signs" OnClick=@GoToVitals/&gt;&lt;/PageMenu&gt;
+    /// </code>
+    /// </example>
+    public const string PageMenuSection = "fx-viewer-page-menu";
+
+    /// <summary>
+    /// The outlet of the commands of a page of the Viewer in its toolbar, before the menu (the bookmark of the page): a page gives them with
+    /// <c>&lt;SectionContent SectionName=@FhirViewer.PageCommandsSection&gt;</c>.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// &lt;SectionContent SectionName=@FhirViewer.PageCommandsSection&gt;&lt;BookmarkStar Route=@route/&gt;&lt;/SectionContent&gt;
+    /// </code>
+    /// </example>
+    public const string PageCommandsSection = "fx-viewer-page-commands";
 
     /// <summary>Raised for an option of the configuration that cannot be used and is left out.</summary>
     [Parameter]
@@ -105,6 +134,13 @@ else if (_session is not null)
     /// <summary>The code of the clinical summary form of the server; none is <c>default</c>. Another one starts a new session.</summary>
     [Parameter]
     public string? ClinicalSummaryForm { get; set; }
+
+    /// <summary>Opens a bookmark of another server from the page of the bookmarks (<c>bookmarks</c>): the host chooses the server of
+    /// <see cref="Flox.Core.Models.UserBookmark.SourceAddress"/> and puts the Viewer at <see cref="Flox.Core.Models.UserBookmark.Location"/>. None:
+    /// such bookmarks are listed with the name of their server and do not open. The bookmarks are kept by the host (an
+    /// <c>IGuidEntityStorage&lt;UserBookmark&gt;</c>, on the device); a host without them shows no bookmarks.</summary>
+    [Parameter]
+    public EventCallback<Flox.Core.Models.UserBookmark> OnOpenBookmark { get; set; }
 
 
     // WebAssembly in a browser, WebView in MAUI; never a server

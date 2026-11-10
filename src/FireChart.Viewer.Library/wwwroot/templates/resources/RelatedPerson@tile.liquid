@@ -1,0 +1,9 @@
+{% fhir_include "RelatedPerson:patient" %}
+{%- assign nm = self.name | as_list | first -%}{%- assign rel = self.relationship | as_list | first -%}{%- assign act = self.active | append: "" -%}
+{%- capture t0 -%}{% if nm %}{% apply nm mode: "text" %}{% endif %}{%- endcapture -%}
+{%- assign title = t0 | default: self.id -%}
+{%- slot "subtitle" -%}{% if rel %}{% apply rel mode: "text" %}{% endif %}{%- endslot -%}
+{%- slot "trailing" -%}{% if self.gender %}{% render "badge", text: self.gender %}{% endif %}{%- endslot -%}
+{%- slot "status" -%}{% if act == "false" %}{% render "badge", text: "inactive", tone: "danger" %}{% endif %}{%- endslot -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot_data patient: self.patient %}

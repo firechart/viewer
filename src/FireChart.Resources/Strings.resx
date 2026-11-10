@@ -198,6 +198,9 @@
   <data name="Message_InvalidSearch" xml:space="preserve">
     <value>The search in the address is not valid.</value>
   </data>
+  <data name="Placeholder_SearchAllFields" xml:space="preserve">
+    <value>Search all fields</value>
+  </data>
   <data name="Message_SearchFormGenerated" xml:space="preserve">
     <value>This form was generated automatically from the search parameters of the resource, so it is not very convenient. The server may not support some of the parameters.</value>
   </data>
@@ -206,9 +209,6 @@
   </data>
   <data name="Caption_FhirServerOAuth2ClientId" xml:space="preserve">
     <value>OAuth2 client ID</value>
-  </data>
-  <data name="Caption_FhirServerPageSize" xml:space="preserve">
-    <value>Page size</value>
   </data>
   <data name="Caption_FhirServerLiteEdition" xml:space="preserve">
     <value>This edition only supports public FHIR servers that do not require authentication.</value>
@@ -360,12 +360,6 @@
   <data name="Message_NoCorePackages" xml:space="preserve">
     <value>No FHIR core packages are indexed</value>
   </data>
-  <data name="Message_SignInForBookmarks" xml:space="preserve">
-    <value>Sign in to use bookmarks</value>
-  </data>
-  <data name="Message_SignInForRecentPages" xml:space="preserve">
-    <value>Sign in to see the pages you visited</value>
-  </data>
   <data name="Conformance_Overview" xml:space="preserve">
     <value>Overview</value>
   </data>
@@ -449,5 +443,38 @@
   </data>
   <data name="Caption_SmartSignInHere" xml:space="preserve">
     <value>Sign in here</value>
+  </data>
+  <data name="Message_BookmarkOnOtherServer" xml:space="preserve">
+    <value>On the server {0}: open it from there.</value>
+  </data>
+  <data name="Caption_AllHistory" xml:space="preserve">
+    <value>All history</value>
+  </data>
+  <data name="Caption_FhirPackages" xml:space="preserve">
+    <value>FHIR packages</value>
+  </data>
+  <data name="Notice_PackageIndexing" xml:space="preserve">
+    <value>Indexing a FHIR package is a heavy operation: it runs on the server, and only administrators and developers can add and index packages.</value>
+  </data>
+  <data name="Caption_OpenPackageManager" xml:space="preserve">
+    <value>Open the FHIR Package Manager</value>
+  </data>
+  <data name="Caption_LabTest" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="Caption_LabResult" xml:space="preserve">
+    <value>Result</value>
+  </data>
+  <data name="Caption_LabReferenceRange" xml:space="preserve">
+    <value>Reference range</value>
+  </data>
+  <data name="Caption_LabFlag" xml:space="preserve">
+    <value>Flag</value>
+  </data>
+  <data name="Caption_TrendNoValues" xml:space="preserve">
+    <value>No values to draw</value>
+  </data>
+  <data name="Caption_TrendOpenLast" xml:space="preserve">
+    <value>Open the last record</value>
   </data>
 </root>

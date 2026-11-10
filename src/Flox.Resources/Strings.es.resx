@@ -283,7 +283,7 @@
     <value>Idioma</value>
   </data>
   <data name="Caption_DefaultPageSize" xml:space="preserve">
-    <value>Tamaño de página predeterminado</value>
+    <value>Registros por página</value>
   </data>
   <data name="Caption_DataAndPrivacy" xml:space="preserve">
     <value>Datos y privacidad</value>
@@ -495,9 +495,6 @@
   <data name="Message_InvalidValue" xml:space="preserve">
     <value>El valor no es válido</value>
   </data>
-  <data name="Message_BookmarkQueryString" xml:space="preserve">
-    <value>Un marcador guarda un lugar, no una búsqueda: la dirección tiene una cadena de consulta que puede contener datos de un paciente.</value>
-  </data>
   <data name="Caption_Name" xml:space="preserve">
     <value>Nombre</value>
   </data>
@@ -542,5 +539,26 @@
   </data>
   <data name="Caption_CollapseAll" xml:space="preserve">
     <value>Contraer todo</value>
+  </data>
+  <data name="Notice_BookmarksOnDevice" xml:space="preserve">
+    <value>Los marcadores y las páginas recientes se guardan solo en este dispositivo y nunca se envían al servidor, por lo que no están en sus otros dispositivos. Para trasladar los marcadores, expórtelos a un archivo e impórtelo allí; el archivo puede contener nombres de pacientes, guárdelo con cuidado. Una cuenta del sistema operativo es un usuario: los marcadores de este navegador los ve cualquiera que lo use.</value>
+  </data>
+  <data name="Caption_ExportBookmarks" xml:space="preserve">
+    <value>Exportar</value>
+  </data>
+  <data name="Caption_ImportBookmarks" xml:space="preserve">
+    <value>Importar</value>
+  </data>
+  <data name="Message_BookmarksImported" xml:space="preserve">
+    <value>Marcadores añadidos: {0}; ya existentes: {1}.</value>
+  </data>
+  <data name="Message_BookmarksFileInvalid" xml:space="preserve">
+    <value>El archivo no es una exportación de marcadores.</value>
+  </data>
+  <data name="Message_BookmarkSourceMissing" xml:space="preserve">
+    <value>El servidor de este marcador ({0}) no está registrado aquí: regístrelo para abrir el marcador.</value>
+  </data>
+  <data name="Caption_History" xml:space="preserve">
+    <value>Historial</value>
   </data>
 </root>

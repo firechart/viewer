@@ -1,0 +1,14 @@
+{% fhir_include "CoverageEligibilityResponse:patient" %}
+{% fhir_include "CoverageEligibilityResponse:insurer" %}
+{%- assign outcome = self.outcome | append: "" -%}
+{%- capture t0 -%}{% if self.purpose %}{% assign purposes = self.purpose | join: ", " %}{{ "Eligibility: {{purposes}}" | t: purposes: purposes }}{% endif %}{%- endcapture -%}
+{%- assign title = t0 | default: self.id -%}
+{%- capture s0 -%}{% if self.created %}{{ self.created | fhir_date }}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% apply self.insurer mode: "text" %}{%- endcapture -%}
+{%- capture s2 -%}{{ self.disposition }}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", p1: s0, p2: s1, p3: s2 %}{%- endslot -%}
+{%- slot "trailing" -%}{% if outcome != "" %}{% render "status-badge", code: outcome %}{% endif %}{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}
+{% slot_data patient: self.patient, at: self.created %}

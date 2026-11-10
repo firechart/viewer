@@ -1,3 +1,4 @@
+using System.Reflection;
 using Flox.Core.Services;
 
 namespace Flox.Core.Branding;
@@ -27,4 +28,21 @@ public sealed class FloxBranding
     public string? SourceCodeUrl { get; init; }
     public IReadOnlyList<LicenseEntry> Licenses { get; init; } = [];
     public string? Version { get; init; }
+
+    // The version of the build (MinVer: 0.54.0, 0.54.1-alpha.0.3) without the commit; AssemblyVersion carries only the major part
+    public static string? VersionOf(Assembly assembly)
+    {
+        ArgumentNullException.ThrowIfNull(assembly);
+        var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                             ?.InformationalVersion;
+        if (string.IsNullOrEmpty(version))
+        {
+            return assembly.GetName()
+                           .Version
+                          ?.ToString(3);
+        }
+
+        var metadata = version.IndexOf('+', StringComparison.Ordinal);
+        return metadata < 0 ? version : version[..metadata];
+    }
 }

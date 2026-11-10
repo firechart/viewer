@@ -88,7 +88,7 @@ public sealed class ResourceViews(ITemplateRenderers renderers, IReleaseModels m
     {
         try
         {
-            return (await renderers.GetAsync(cancellationToken)).NeedsFor(resourceType, IResourceViews.Mode);
+            return await (await renderers.GetAsync(cancellationToken)).NeedsForAsync(resourceType, IResourceViews.Mode, cancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -109,7 +109,7 @@ public sealed class ResourceViews(ITemplateRenderers renderers, IReleaseModels m
         try
         {
             var renderer = await renderers.GetAsync(cancellationToken);
-            if (!renderer.HasTemplate(resource.ResourceType, mode))
+            if (!await renderer.HasTemplateAsync(resource.ResourceType, mode, cancellationToken))
             {
                 return null;
             }

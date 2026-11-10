@@ -32,7 +32,15 @@
                 <DataList TItem="string" Items=@State.Visible Layout="ListLayout.Content" ShowSearch="false" PullToRefresh="false"
                           OnRowClick=@Open>
                     <ItemTemplate Context="row">
-                        @if (row.Item == ResourceTypesViewState.ClinicalSummaryEntry)
+                        @if (row.Item == ResourceTypesViewState.BookmarksEntry)
+                        {
+                            <ListTile Row=@row TitleText=@FloxStrings.Caption_Bookmarks Chevron>
+                                <Leading>
+                                    <FloxIcon Icon="bookmarks" Title=@FloxStrings.Caption_Bookmarks/>
+                                </Leading>
+                            </ListTile>
+                        }
+                        else if (row.Item == ResourceTypesViewState.ClinicalSummaryEntry)
                         {
                             <ListTile Row=@row TitleText=@Strings.Caption_ClinicalSummary Chevron>
                                 <Leading>
@@ -66,9 +74,12 @@
 
     private void Open(string type)
     {
-        Session.Navigate(type == ResourceTypesViewState.ClinicalSummaryEntry
-                             ? new ViewerRoute(ViewerPage.ClinicalSummary)
-                             : new ViewerRoute(ViewerPage.ResourceList, type));
+        Session.Navigate(type switch
+        {
+            ResourceTypesViewState.BookmarksEntry => new ViewerRoute(ViewerPage.Bookmarks),
+            ResourceTypesViewState.ClinicalSummaryEntry => new ViewerRoute(ViewerPage.ClinicalSummary),
+            _ => new ViewerRoute(ViewerPage.ResourceList, type)
+        });
     }
 
 }

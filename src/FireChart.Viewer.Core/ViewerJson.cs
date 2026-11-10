@@ -84,4 +84,5 @@ public static class ViewerJson
     RespectRequiredConstructorParameters = true)]
 [JsonSerializable(typeof(SearchFormDefinition))]
 [JsonSerializable(typeof(ClinicalSummaryFormDefinition))]
+[JsonSerializable(typeof(TilesOptions))]
 internal sealed partial class ViewerJsonContext : JsonSerializerContext;

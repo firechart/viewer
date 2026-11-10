@@ -148,7 +148,7 @@ public sealed partial class FhirServerReader(IHttpClientFactory httpClientFactor
     /// <inheritdoc/>
     public async Task<ResourcePage> SearchAsync(IViewerServer server, string resourceType, FhirSearchState? search = null, FhirNeeds? needs = null, CancellationToken cancellationToken = default)
     {
-        var url = $"{TypeUrl(server, resourceType)}?{(search ?? FhirSearchState.Empty).ToSearchQuery(server.PageSize)}";
+        var url = $"{TypeUrl(server, resourceType)}?{(search ?? FhirSearchState.Empty).ToSearchQuery(server.PageSize)}{(server.SearchSummary ? "&_summary=true" : string.Empty)}";
         var key = $"{server.BaseUrl}|{resourceType}";
         if (needs is null || needs.IsEmpty || _withoutIncludes.ContainsKey(key))
         {

@@ -1,0 +1,15 @@
+{% fhir_include "ImagingStudy:subject" %}
+{% fhir_include "ImagingStudy:encounter" %}
+{%- assign mod = self.modality | as_list | first -%}
+{%- capture t0 -%}{{ self.description }}{%- endcapture -%}
+{%- capture t1 -%}{% if mod %}{{ mod | coding_display | default: mod.code }}{% endif %}{%- endcapture -%}
+{%- assign title = t0 | default: t1 | default: self.id -%}
+{%- capture s0 -%}{% if mod %}{{ mod | coding_display | default: mod.code }}{% endif %}{%- endcapture -%}
+{%- capture s1 -%}{% if self.started %}{{ self.started | fhir_date }}{% endif %}{%- endcapture -%}
+{%- capture s2 -%}{% if self.numberOfSeries %}{{ "{{count}} series" | t: count: self.numberOfSeries }}{% endif %}{%- endcapture -%}
+{%- capture s3 -%}{% if self.numberOfInstances %}{{ "{{count}} images" | t: count: self.numberOfInstances }}{% endif %}{%- endcapture -%}
+{%- slot "subtitle" -%}{% render "parts", p1: s0, p2: s1, p3: s2, p4: s3 %}{%- endslot -%}
+{%- capture status -%}{% render "status-badge", code: self.status %}{%- endcapture -%}
+{% slot "title" %}{{ title }}{% endslot %}
+{% slot "status" %}{{ status }}{% endslot %}
+{% slot_data patient: self.subject, encounter: self.encounter, at: self.started %}

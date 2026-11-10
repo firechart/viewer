@@ -6,7 +6,7 @@ namespace FireChart.Viewer.Tests.Rendering;
 // The vendor tiles of the most used resources of R4: each type has a row with its name, the facts that matter and the status as a badge
 public class TileCatalogTests
 {
-    private static readonly VendorTemplates s_vendor = new();
+    private static readonly VendorTemplates s_vendor = TestLibrary.Vendor;
 
     public sealed record Sample(string Type, string Json, string[] Facts)
     {

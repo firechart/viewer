@@ -26,10 +26,13 @@ public sealed class ViewerSummaryForms : IDisposable
     /// Creates the service.
     /// </summary>
     /// <param name="providers">The providers of the host.</param>
+    /// <param name="assets">Reads the vendor forms, the static files of the vendor library.</param>
     /// <param name="logger">Logs a provider that failed.</param>
-    public ViewerSummaryForms(IEnumerable<IViewerFormProvider<SummaryFormKey, ClinicalSummaryFormDefinition>> providers, ILogger<ViewerSummaryForms> logger)
+    public ViewerSummaryForms(IEnumerable<IViewerFormProvider<SummaryFormKey, ClinicalSummaryFormDefinition>> providers, IViewerAssets assets, ILogger<ViewerSummaryForms> logger)
     {
-        _resolver = new ViewerFormResolver<SummaryFormKey, ClinicalSummaryFormDefinition>([.. providers, new VendorSummaryFormProvider()], (_, _) => Task.FromResult(VendorSummaryForms.Default), logger);
+        _resolver = new ViewerFormResolver<SummaryFormKey, ClinicalSummaryFormDefinition>([.. providers, new VendorSummaryFormProvider(assets)], async (_, cancellationToken) =>
+            await VendorSummaryForms.FindAsync(assets, ClinicalSummaryFormDefinition.DefaultCode, cancellationToken)
+            ?? throw new InvalidOperationException("The vendor library has no default summary form."), logger);
     }
 
     /// <summary>
