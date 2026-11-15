@@ -2,8 +2,14 @@ using System.Linq.Expressions;
 
 namespace Flox.Core.Util;
 
+/// <summary>
+/// Helpers for expression trees.
+/// </summary>
 public static class ExpressionUtil
 {
+    /// <summary>
+    /// Combines two conditions on the same entity with a logical AND.
+    /// </summary>
     public static Expression<Func<T, bool>> AndAlso<T>(this Expression<Func<T, bool>> left, Expression<Func<T, bool>> right)
     {
         var parameter = left.Parameters[0];

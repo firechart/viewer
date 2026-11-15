@@ -1,6 +1,6 @@
 # FireChart Viewer SDK
 
-FireChart Viewer in any web page: resource types, lists, resources and the clinical summary of a patient, straight from a FHIR server. The
+FireChart Viewer in any web page: resource types, lists, resources and the summary of a patient, straight from a FHIR server. The
 Viewer runs in an iframe of its own origin (`FireChart.Viewer.App`, served by you with its Docker image, or by us); this SDK creates the frame,
 gives it the configuration and turns its messages into events and promises. One ES module, no dependencies, no build.
 
@@ -43,11 +43,11 @@ docker run -d -p 8080:8080 -v "$PWD/host.json:/usr/share/nginx/html/host.json:ro
 | `Viewer.create(config, options)` | A Viewer; `config` is the configuration (the keys of `viewer.json`), `options` `{ url, height?, title? }` |
 | `mount(target)` | Puts the frame into an element or the first element of a selector |
 | `on(event, handler)` / `off` | `ready`, `navigate`, `restarting`, `updated`, `error`; `on` returns the function that unsubscribes |
-| `update(changes)` | Changes `locale`, `appearance`, `terminology`, `clinicalSummary` without a restart; resolves with `{ applied }` |
+| `update(changes)` | Changes `locale`, `appearance`, `terminology` without a restart; resolves with `{ applied }` |
 | `restart(config)` | Starts anew with another configuration (another server, another SMART client) |
 | `configure(config)` | Restarts or updates, whichever the difference from the configuration in effect needs: for the props of a component (see `HOWTO.md`) |
 | `print()` | The print dialog of the browser for the page of the Viewer |
-| `navigate(location, { replace })` | Goes to an address of the Viewer: `resources/Patient`, `resources/Patient/123`, `summary/123`, `resources/Observation?code=8867-4` |
+| `navigate(location, { replace })` | Goes to an address of the Viewer: `resources/Patient`, `resources/Patient/123`, `summary/Patient/123`, `resources/Observation?code=8867-4` |
 | `location`, `options` | The address of the Viewer and the configuration in effect |
 | `destroy()` | Removes the frame |
 
@@ -55,7 +55,7 @@ docker run -d -p 8080:8080 -v "$PWD/host.json:/usr/share/nginx/html/host.json:ro
 
 `appearance.theme: "inherit"` and `locale: "inherit"` take the theme and the language of your page (`data-theme`, `data-bs-theme`, the class
 `dark`, `color-scheme`; `lang` of `<html>`) and follow their changes. `urlParam: "fhir"` keeps the address of the Viewer in the address of your
-page (`?fhir=summary/123`), so a link or a reload opens the Viewer where it was.
+page (`?fhir=summary/Patient/123`), so a link or a reload opens the Viewer where it was.
 
 A request the Viewer refuses rejects its promise with a `ViewerError` (`type`, `code`, `param`, `message`): `update({ server })` is
 `restart_required`, `navigate("https://...")` is `invalid_location`, a wrong key is `unknown_option` with a hint (`Did you mean 'appearance'?`).

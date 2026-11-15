@@ -3,6 +3,9 @@ using System.Text.Json;
 
 namespace Flox.Core.Util;
 
+/// <summary>
+/// Helpers for reflection over types, properties and assembly resources.
+/// </summary>
 public static class ReflectionUtil
 {
     private static bool IsEnumerableType(Type type)
@@ -21,6 +24,9 @@ public static class ReflectionUtil
                                                                                                        .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
     }
 
+    /// <summary>
+    /// Deserializes a JSON resource of the assembly; returns null when there is no such resource.
+    /// </summary>
     public static T? Deserialize<T>(Assembly assembly, string resourceName) where T : class
     {
         using var stream = assembly.GetManifestResourceStream(resourceName);
@@ -32,12 +38,18 @@ public static class ReflectionUtil
         return JsonSerializer.Deserialize<T>(stream);
     }
 
+    /// <summary>
+    /// Returns the enums declared in the namespace.
+    /// </summary>
     public static IEnumerable<Type> GetEnumsFromNamespace(Assembly asm, string namespaceName)
     {
         return asm.GetTypes()
                   .Where(type => type.Namespace == namespaceName && type.IsEnum);
     }
 
+    /// <summary>
+    /// Returns a copy of an embedded resource as a stream, or null when there is none.
+    /// </summary>
     public static Stream? GetResourceAsStream(Assembly assembly, string resourceName)
     {
         using var stream = assembly.GetManifestResourceStream(resourceName);
@@ -52,6 +64,9 @@ public static class ReflectionUtil
         return memoryStream;
     }
 
+    /// <summary>
+    /// Returns an embedded resource as text, or null when there is none.
+    /// </summary>
     public static string? GetResourceAsString(Assembly assembly, string resourceName)
     {
         using var stream = assembly.GetManifestResourceStream(resourceName);
@@ -64,6 +79,9 @@ public static class ReflectionUtil
         return streamReader.ReadToEnd();
     }
 
+    /// <summary>
+    /// Returns the classes of a namespace of the assembly, or of every loaded assembly when none is given.
+    /// </summary>
     public static IEnumerable<Type> GetTypesFromNamespace(Assembly? asm, string? namespaceName = null)
     {
         if (asm != null)
@@ -99,6 +117,9 @@ public static class ReflectionUtil
         }
     }
 
+    /// <summary>
+    /// Tells whether the type is a class that is not a primitive, a collection or a nullable value type.
+    /// </summary>
     public static (bool result, bool isNullable) IsClass(Type type)
     {
         if (Nullable.GetUnderlyingType(type) is not null || !type.IsClass || IsPrimitive(type) || IsEnumerableType(type))
@@ -109,6 +130,9 @@ public static class ReflectionUtil
         return (true, false);
     }
 
+    /// <summary>
+    /// Tells whether the property holds such a class and whether it is nullable.
+    /// </summary>
     public static (bool result, bool isNullable) IsClassProperty(PropertyInfo property)
     {
         var type = property.PropertyType;
@@ -123,6 +147,9 @@ public static class ReflectionUtil
         return (true, nullabilityInfo.ReadState == NullabilityState.Nullable);
     }
 
+    /// <summary>
+    /// Tells whether the property is a collection (a string is not) and gives its element type.
+    /// </summary>
     public static bool IsCollection(PropertyInfo property, out Type? elementType)
     {
         elementType = null;
@@ -154,6 +181,9 @@ public static class ReflectionUtil
         return false;
     }
 
+    /// <summary>
+    /// Tells whether the type is a JsonElement and whether it is nullable.
+    /// </summary>
     public static (bool result, bool isNullable) IsJsonElement(Type type)
     {
         if (Nullable.GetUnderlyingType(type) == typeof(JsonElement))
@@ -169,11 +199,17 @@ public static class ReflectionUtil
         return (false, false);
     }
 
+    /// <summary>
+    /// Tells whether the property holds a JsonElement and whether it is nullable.
+    /// </summary>
     public static (bool result, bool isNullable) IsJsonElementProperty(PropertyInfo propertyInfo)
     {
         return IsJsonElement(propertyInfo.PropertyType);
     }
 
+    /// <summary>
+    /// Tells whether the property accepts null.
+    /// </summary>
     public static bool IsNullableProperty(PropertyInfo property)
     {
         var type = property.PropertyType;
@@ -190,6 +226,9 @@ public static class ReflectionUtil
         return info.WriteState == NullabilityState.Nullable || info.ReadState == NullabilityState.Nullable;
     }
 
+    /// <summary>
+    /// Tells whether the type is a simple value: a primitive, an enum, a string, a number, a date, a Guid or the like (or its nullable).
+    /// </summary>
     public static bool IsPrimitive(Type type)
     {
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
@@ -200,6 +239,9 @@ public static class ReflectionUtil
         return type.IsPrimitive || type.IsEnum || type == typeof(string) || type == typeof(decimal) || type == typeof(DateTime) || type == typeof(DateTimeOffset) || type == typeof(DateOnly) || type == typeof(TimeOnly) || type == typeof(TimeSpan) || type == typeof(Guid);
     }
 
+    /// <summary>
+    /// Tells whether the property is a collection of simple values and gives their type.
+    /// </summary>
     public static bool IsPrimitiveCollection(PropertyInfo property, out Type? elementType)
     {
         elementType = null;
@@ -219,6 +261,9 @@ public static class ReflectionUtil
         return true;
     }
 
+    /// <summary>
+    /// Tells whether the property is a collection of classes and gives their type.
+    /// </summary>
     public static bool IsClassCollection(PropertyInfo property, out Type? elementType)
     {
         elementType = null;
@@ -239,6 +284,9 @@ public static class ReflectionUtil
         return true;
     }
 
+    /// <summary>
+    /// Tells whether the property holds a simple value and whether it is nullable.
+    /// </summary>
     public static (bool result, bool isNullable) IsPrimitiveProperty(PropertyInfo property)
     {
         var type = property.PropertyType;
@@ -264,6 +312,9 @@ public static class ReflectionUtil
         return (false, false);
     }
 
+    /// <summary>
+    /// Tells whether the type is an enum or a nullable enum, whether it is nullable and gives the enum type.
+    /// </summary>
     public static (bool result, bool isNullable) IsEnumOrNullableEnum(Type type, out Type? enumType)
     {
         if (type.IsEnum)
@@ -283,9 +334,12 @@ public static class ReflectionUtil
         return (false, false);
     }
 
+    /// <summary>
+    /// Tells whether the type derives from or implements the parent type; an open generic parent is matched by its definition.
+    /// </summary>
     /// <remarks>
-    /// InheritsFrom(typeof(List<int>), typeof(IEnumerable<>))  // true
-    /// InheritsFrom(typeof(List<int>), typeof(IDisposable))    // false
+    /// InheritsFrom(typeof(List&lt;int&gt;), typeof(IEnumerable&lt;&gt;))  // true
+    /// InheritsFrom(typeof(List&lt;int&gt;), typeof(IDisposable))    // false
     /// InheritsFrom(typeof(MyEntity), typeof(Entity))          // true
     /// InheritsFrom(typeof(int), typeof(object))               // false
     /// </remarks>

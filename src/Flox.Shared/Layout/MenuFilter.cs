@@ -2,10 +2,14 @@ using System.Security.Claims;
 
 namespace Flox.Shared.Layout;
 
-// The items of the menus a user may see, as nodes: what the navigation menu and the More page show
+/// <summary>
+/// The items of the menus a user may see, as nodes: what the navigation menu and the More page show.
+/// </summary>
 public static class MenuFilter
 {
-    // One entry per menu that has something to show. Top-level items are split by placement; the children follow their parent
+    /// <summary>
+    /// Builds one entry per menu that has something to show. Top-level items are split by placement; the children follow their parent.
+    /// </summary>
     public static async Task<List<(IFloxMenu Menu, List<NavMenuNode> Nodes)>> BuildAsync(IFloxShell shell, IAuthorizationService authorization, ClaimsPrincipal user, FloxMenuPlacement placement)
     {
         var result = new List<(IFloxMenu Menu, List<NavMenuNode> Nodes)>();

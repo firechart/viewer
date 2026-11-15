@@ -176,7 +176,7 @@ public class RenderingTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(tile.Html, Does.StartWith("<li class=\"fx-list-row\">").And.Contain("fx-badge").And.Contain("fx-tile-title"));
+            Assert.That(tile.Html, Does.StartWith("<div class=\"fx-list-row\">").And.Contain("fx-badge").And.Contain("fx-tile-title"));
             Assert.That(tile.Text, Does.Contain("Peter James Chalmers").And.Contain("1974-12-25").And.Contain("p-1").And.Contain("male"));
         });
     }
@@ -197,6 +197,30 @@ public class RenderingTests
         });
     }
 
+    [TestCase("""{ "status": "generated", "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Home visit</b> requested</p><p>by Dr. A</p></div>" }""", "Home visit requested by Dr. A Basic")]
+    [TestCase("""{ "status": "empty", "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">No text</div>" }""", "b1 Basic")]
+    [TestCase(null, "b1 Basic")]
+    public async System.Threading.Tasks.Task ATypeWithoutATileTemplate_ShowsTheBeginningOfItsNarrative_ElseTheIdAndTheType(string? narrative, string expected)
+    {
+        var text = narrative is null ? string.Empty : $", \"text\": {narrative}";
+        var json = $$"""{ "resourceType": "Basic", "id": "b1", "code": { "text": "x" }{{text}} }""";
+
+        var tile = await new FhirRenderer([Override(), s_vendor]).RenderTileAsync(json);
+
+        Assert.That(tile.Text, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public async System.Threading.Tasks.Task ALongNarrative_IsCutForTheRow()
+    {
+        var words = string.Join(' ', Enumerable.Repeat("word", 100));
+        var json = $$"""{ "resourceType": "Basic", "id": "b1", "code": { "text": "x" }, "text": { "status": "generated", "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">{{words}}</div>" } }""";
+
+        var tile = await new FhirRenderer([Override(), s_vendor]).RenderTileAsync(json);
+
+        Assert.That(FxHtml.PlainText(tile.Title), Has.Length.LessThanOrEqualTo(161).And.EndsWith("…"));
+    }
+
     [Test]
     public async System.Threading.Tasks.Task ATypeWithoutATileTemplate_ShowsTheIdAndTheType_WithoutAProblem()
     {
@@ -207,7 +231,7 @@ public class RenderingTests
         var tile = await new FhirRenderer([Override()], problems.Add).RenderTileAsync(patient);
 
         Assert.That(tile.Text, Is.EqualTo("p-1 Patient"));
-        Assert.That(tile.Html, Does.StartWith("<li class=\"fx-list-row\">"));
+        Assert.That(tile.Html, Does.StartWith("<div class=\"fx-list-row\">"));
         Assert.That(problems, Is.Empty);
     }
 
@@ -220,8 +244,8 @@ public class RenderingTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(tile.Html, Is.EqualTo("<li class=\"fx-list-row\"><div class=\"fx-list-col-grow fx-tile\"><div class=\"fx-tile-main\"><div class=\"fx-tile-title\">p-1</div></div>" +
-                                              "<div class=\"fx-tile-end\"><span class=\"fx-badge fx-badge-info\">51 y</span></div></div></li>"));
+            Assert.That(tile.Html, Is.EqualTo("<div class=\"fx-list-row\"><div class=\"fx-list-col-grow fx-tile\"><div class=\"fx-tile-main\"><div class=\"fx-tile-title\">p-1</div></div>" +
+                                              "<div class=\"fx-tile-end\"><span class=\"fx-badge fx-badge-info\">51 y</span></div></div></div>"));
             Assert.That(tile.Text, Is.EqualTo("p-1 51 y"));
         });
     }

@@ -4,9 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Description>FireChart Viewer: a client-side Blazor component that browses the data of a FHIR server (resource types, lists, resources, the clinical summary of a patient). Runs on Blazor WebAssembly and Blazor Hybrid, on the client side of Flox.</Description>
+    <Description>FireChart Viewer: a client-side Blazor component that browses the data of a FHIR server (resource types, lists, resources, the patient summary of a patient). Runs on Blazor WebAssembly and Blazor Hybrid, on the client side of Flox.</Description>
     <PackageTags>fhir;hl7;smart-on-fhir;blazor;healthcare;viewer</PackageTags>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

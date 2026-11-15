@@ -2,10 +2,14 @@ using System.Text.Json;
 
 namespace Flox.Core.Util;
 
-// Turns a JSON document into the flat "a:b:0" keys of Microsoft.Extensions.Configuration, so arrays
-// and nested objects (Flox:Oidc:Scopes, Flox:Oidc:AdditionalParameters) bind like they do from appsettings.json
+/// <summary>
+/// Turns a JSON document into the flat "a:b:0" keys of Microsoft.Extensions.Configuration, so arrays and nested objects (Flox:Oidc:Scopes, Flox:Oidc:AdditionalParameters) bind like they do from appsettings.json.
+/// </summary>
 public static class JsonConfigurationFlattener
 {
+    /// <summary>
+    /// Flattens the JSON document into configuration keys and values.
+    /// </summary>
     public static Dictionary<string, string?> Flatten(string json)
     {
         using var document = JsonDocument.Parse(json);

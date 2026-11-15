@@ -1,65 +1,45 @@
 @if (!string.IsNullOrWhiteSpace(Icon))
 {
-    @if (Icon.StartsWith('<') || FloxIcons.Find(Icon, Filled) is not null)
-    {
-        @((MarkupString)GetSvg())
-    }
-    else
-    {
-        <RadzenIcon Icon=@Icon IconColor=@Color Style=@GetFontStyle() class=@Class title=@Title/>
-    }
+    <RadzenIcon Icon=@Icon IconColor=@Color Style=@GetFontStyle() class=@($"shrink-0 {Class}") title=@Title/>
 }
 
 @code {
 
-    // Name of a Material Symbols icon (an inline SVG when it is bundled in FloxIcons, a font ligature otherwise),
-    // a full <svg> or the inner paths of a 24x24 SVG (trusted code constants only)
+    /// <summary>
+    /// Name of a Material Symbols icon, drawn by the icon font (Flox Symbols, app.css).
+    /// </summary>
     [Parameter]
     public string? Icon { get; set; }
 
+    /// <summary>
+    /// Color of the icon (any CSS color); the color of the text when not set.
+    /// </summary>
     [Parameter]
     public string? Color { get; set; }
 
+    /// <summary>
+    /// Size of the icon (any CSS length); the size of the theme when not set.
+    /// </summary>
     [Parameter]
     public string? Size { get; set; }
 
+    /// <summary>
+    /// Whether the icon is drawn filled (the axis FILL of the font).
+    /// </summary>
     [Parameter]
     public bool Filled { get; set; }
 
+    /// <summary>
+    /// Extra CSS classes of the icon.
+    /// </summary>
     [Parameter]
     public string? Class { get; set; }
 
+    /// <summary>
+    /// Tooltip of the icon.
+    /// </summary>
     [Parameter]
     public string? Title { get; set; }
-
-    private string GetSvg()
-    {
-        var icon = Icon!.TrimStart();
-        var attributes = $"class=\"inline-block size-5 shrink-0 fill-current {Class}\" style=\"{GetSvgStyle()}\" {(string.IsNullOrEmpty(Title) ? string.Empty : $"aria-label=\"{Title}\"")}";
-
-        if (FloxIcons.Find(icon, Filled) is { } path)
-        {
-            return $"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"{FloxIcons.ViewBox}\" {attributes}><path d=\"{path}\"/></svg>";
-        }
-
-        return icon.StartsWith("<svg", StringComparison.OrdinalIgnoreCase) ? $"<svg {attributes}{icon[4..]}" : $"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" {attributes}>{icon}</svg>";
-    }
-
-    private string GetSvgStyle()
-    {
-        var style = string.Empty;
-        if (!string.IsNullOrEmpty(Color))
-        {
-            style += $"color: {Color};";
-        }
-
-        if (!string.IsNullOrEmpty(Size))
-        {
-            style += $"width: {Size}; height: {Size};";
-        }
-
-        return style;
-    }
 
     private string? GetFontStyle()
     {

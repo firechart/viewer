@@ -89,11 +89,6 @@ internal static class CodeSnippets
             code.AppendLine().Append(CultureInfo.InvariantCulture, $"            TerminologyServer=\"{terminology}\"");
         }
 
-        if (setup.ClinicalSummaryForm is { } form)
-        {
-            code.AppendLine().Append(CultureInfo.InvariantCulture, $"            ClinicalSummaryForm=\"{form}\"");
-        }
-
         var appearance = setup.Appearance;
         var hasAppearance = config["appearance"] is JsonObject;
         if (hasAppearance)
@@ -112,6 +107,11 @@ internal static class CodeSnippets
             code.AppendLine("    private readonly ViewerAppearance _appearance = new()");
             code.AppendLine("    {");
             code.Append(CultureInfo.InvariantCulture, $"        Theme = ViewerTheme.{appearance.Theme}");
+            if (appearance.Style is { } style)
+            {
+                code.AppendLine(",").Append(CultureInfo.InvariantCulture, $"        Style = \"{style}\"");
+            }
+
             if (appearance.Variables.Count > 0)
             {
                 code.AppendLine(",").AppendLine("        Variables =").AppendLine("        {");

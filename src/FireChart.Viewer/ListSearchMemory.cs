@@ -41,7 +41,7 @@ public interface IListSearchMemory
 }
 
 /// <summary>
-/// The <see cref="IListSearchMemory"/> in the <see cref="ILocalDocumentStore"/> of the host (IndexedDB of the browser, the store of the bookmarks and
+/// The <see cref="IListSearchMemory"/> in the <see cref="ILocalDocumentStore"/> of the host (SQLite of the browser, the store of the bookmarks and
 /// the recent pages too), so a search outlives a reload and the end of the session. Scoped: the searches are read once per scope and kept in memory.
 /// </summary>
 /// <param name="store">The documents of the device.</param>

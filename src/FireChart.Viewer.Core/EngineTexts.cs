@@ -6,5 +6,10 @@ internal static class EngineTexts
     public const string Yes = "Yes";
     public const string No = "No";
 
-    public static IReadOnlyList<string> Keys { get; } = [Yes, No];
+    // The age of a patient: whole years, else months, else days (the filters age and age_at)
+    public const string Years = "{{count}} y";
+    public const string Months = "{{count}} mo";
+    public const string Days = "{{count}} d";
+
+    public static IReadOnlyList<string> Keys { get; } = [Yes, No, Years, Months, Days];
 }

@@ -1,0 +1,182 @@
+@* The summary of a record (a patient, an encounter): the banners, then the sections of the form of its type (summary-forms/{Type}.json), a stack in
+   one scroller: each section is its shell
+   (SectionShell: the sticky header, the loading, the failure, the next page) around the records its component draws (tiles so far) *@
+@inherits StatefulWidget<SummaryViewState>
+
+@if (State.Sections.Any(section => !section.Hidden))
+{
+    <PageMenu SectionName=@FhirViewer.PageMenuSection>
+        @foreach (var section in State.Sections.Where(section => !section.Hidden))
+        {
+            <PageMenuItem Text=@section.Title Note=@(section.IsLoaded ? section.CountText : null) OnClick=@(() => GoToAsync(section))>
+                <Leading><IconResource ResourceType=@section.IconType Autocolor/></Leading>
+            </PageMenuItem>
+        }
+        <PageMenuSeparator/>
+        <PageMenuItem Icon="unfold_more" Text=@FloxStrings.Caption_ExpandAll OnClick=@(() => State.SetCollapsed(false))/>
+        <PageMenuItem Icon="unfold_less" Text=@FloxStrings.Caption_CollapseAll OnClick=@(() => State.SetCollapsed(true))/>
+        <PageMenuSeparator/>
+        <PageMenuItem Icon="downloading" Text=@Strings.Caption_LoadAll OnClick=@LoadAllAsync/>
+        <PageMenuItem Icon="print" Text=@Strings.Caption_Print OnClick=@PrintAsync/>
+    </PageMenu>
+}
+
+<BusyOverlay Busy=@State.IsBusy Concealed=@State.Activating>
+    @if (State.NotFound)
+    {
+        <NotFoundWidget/>
+    }
+    else if (State.Server is not null)
+    {
+        @if (State.Access == ServerAccess.NotSupported)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+                @Strings.Message_FhirServerAuthenticationNotSupported
+            </RadzenAlert>
+        }
+        else if (State.Access is ServerAccess.NeedsAuthorization or ServerAccess.NeedsCredentials)
+        {
+            <ServerAccessPanel Server=@State.Server Access=@State.Access Rejected=@State.CredentialsRejected OnRetry=@State.RetryAsync/>
+        }
+        else if (State.Failed)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+                @Strings.Message_FhirServerUnavailable
+                <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Text=@FloxStrings.Caption_Retry Click=@State.RetryAsync/>
+            </RadzenAlert>
+        }
+        else if (State.Banner is not null)
+        {
+            <style>@State.Style</style>
+            @* The HTML of the templates has passed the white list of FxHtml *@
+            <div class="fx-root fx-summary">
+                <SectionContent SectionName=@FhirViewer.PageCommandsSection>
+                    <SummarySwitch ResourceType=@ContextType ResourceId=@ContextId Summary/>
+                    <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Icon="print" title=@Strings.Caption_Print aria-label=@Strings.Caption_Print
+                                  IsBusy=@State.LoadingAll Click=@PrintAsync data-viewer="print"/>
+                    <BookmarkStar Route=@(new ViewerRoute(ViewerPage.Summary, ContextType, ContextId)) Title=@BannerTitleAsync Category=@SummaryCaption.Of(ContextType) Icon="history"/>
+                </SectionContent>
+                @if (State.PrintRefused)
+                {
+                    <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-my-2 print:hidden" data-error="print_refused">
+                        @Strings.Message_PrintRefused
+                    </RadzenAlert>
+                }
+                @if (!State.IsComplete)
+                {
+                    <p class="fx-print-incomplete" role="note">@Strings.Message_PrintIncomplete</p>
+                }
+                <div class="fx-summary-patient">
+                    @((MarkupString)State.Banner)
+                    <p class="fx-muted fx-summary-zone" title=@Strings.Caption_TimesInDeviceZone><span class="fx-visually-hidden">@Strings.Caption_TimesInDeviceZone: </span>@DisplayZone.Text()</p>
+                </div>
+                @* One polite status for the page: the sections that failed are said once, not by an alert of each *@
+                <p class="fx-visually-hidden" role="status">@FailedText</p>
+
+                <div class="fx-summary-list">
+                    <SummaryStack @ref=_stack Memory=@Scroll>
+                        @foreach (var section in State.Sections.Where(section => !section.Hidden))
+                        {
+                            <SectionShell @key=section Section=@section OnToggle=@(() => State.Toggle(section)) OnMore=@(() => State.LoadMoreAsync(section))>
+                                @if (section.Component == FireChart.Viewer.Core.Forms.SummaryComponents.LabResults)
+                                {
+                                    <LabResultsView Section=@section OnOpen=@(item => State.OpenAsync(section, item)) HrefOf=@(item => State.HrefOf(section, item))/>
+                                }
+                                else if (section.Component == FireChart.Viewer.Core.Forms.SummaryComponents.ObservationTrends)
+                                {
+                                    <ObservationTrendsView Section=@section OnOpen=@(item => State.OpenAsync(section, item)) OnSelect=@(key => State.SelectTrendAsync(section, key))/>
+                                }
+                                else
+                                {
+                                    @TilesOf(section)
+                                }
+                            </SectionShell>
+                        }
+                    </SummaryStack>
+                </div>
+            </div>
+        }
+    }
+</BusyOverlay>
+
+@code {
+
+    private SummaryStack? _stack;
+
+    private string FailedText => State.Sections.Count(section => !section.Hidden && section.Failed) is var failed and > 0
+        ? string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.Message_SectionsFailed, failed)
+        : string.Empty;
+    private bool _printing;
+
+    private async Task LoadAllAsync()
+    {
+        await State.LoadAllAsync();
+    }
+
+    // Print only a complete page: every record is loaded first, the browser prints after the page has drawn them
+    private async Task PrintAsync()
+    {
+        if (await State.PrepareToPrintAsync())
+        {
+            _printing = true;
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_printing)
+        {
+            _printing = false;
+            await JS.InvokeVoidAsync("print");
+        }
+    }
+
+    // The menu of the page: the block is opened, the stack brings it to the top after it has drawn its records
+    private async Task GoToAsync(SummarySection section)
+    {
+        State.OpenSection(section);
+        if (_stack is not null)
+        {
+            await Task.Yield();
+            await _stack.ScrollToAsync(section.ElementId);
+        }
+    }
+
+    // The component tiles: a row per record, the frame Tile lays out the slots the template of its type filled
+    private RenderFragment TilesOf(SummarySection section)
+    {
+        return @<text>
+                   <div role="list">
+                       @foreach (var item in section.Items)
+                       {
+                           var tile = section.Tiles.GetValueOrDefault(SummarySection.KeyOf(item)) ?? ResourceTiles.Plain(item);
+                           <div class="fx-summary-section-row" role="listitem" @key=item>
+                               <Tile Model=@tile ResourceType=@item.ResourceType Href=@State.HrefOf(section, item) OnClick=@(() => State.OpenAsync(section, item))/>
+                           </div>
+                       }
+                   </div>
+               </text>;
+    }
+
+    /// <summary>The instance of the Viewer.</summary>
+    [CascadingParameter]
+    public ViewerSession Session { get; set; } = null!;
+
+    /// <summary>The type of the record the summary grows from (<see cref="SummaryContexts"/>): <c>Patient</c>, <c>Encounter</c>.</summary>
+    [Parameter]
+    public string ContextType { get; set; } = SummaryContexts.Patient;
+
+    /// <summary>The id of the record the summary grows from.</summary>
+    [Parameter, EditorRequired]
+    public string ContextId { get; set; } = string.Empty;
+
+
+    protected override object? ActivationKey => new SummaryKey(Session, ContextType, ContextId);
+
+    private Task<string?> BannerTitleAsync()
+    {
+        return Task.FromResult(ViewerText.Plain(State.Banner));
+    }
+
+}

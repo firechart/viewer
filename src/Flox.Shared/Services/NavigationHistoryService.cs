@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Routing;
 
 namespace Flox.Services;
 
+/// <summary>Keeps the stack of the pages the user visited, to go back through.</summary>
 [FloxService(typeof(INavigationHistoryService))]
 public sealed class NavigationHistoryService : IDisposable, INavigationHistoryService
 {
@@ -10,6 +11,7 @@ public sealed class NavigationHistoryService : IDisposable, INavigationHistorySe
     private bool _isNavigatingBack;
     private string? _currentUri;
 
+    /// <summary>Creates the service and starts following the navigation manager.</summary>
     public NavigationHistoryService(NavigationManager navigationManager)
     {
         _navigationManager = navigationManager;
@@ -17,8 +19,10 @@ public sealed class NavigationHistoryService : IDisposable, INavigationHistorySe
         _navigationManager.LocationChanged += OnLocationChanged;
     }
 
+    /// <inheritdoc />
     public event EventHandler? HistoryChanged;
 
+    /// <inheritdoc />
     public bool CanGoBack
     {
         get
@@ -27,6 +31,7 @@ public sealed class NavigationHistoryService : IDisposable, INavigationHistorySe
         }
     }
 
+    /// <inheritdoc />
     public void GoBack()
     {
         if (!CanGoBack)
@@ -40,6 +45,7 @@ public sealed class NavigationHistoryService : IDisposable, INavigationHistorySe
         NotifyHistoryChanged();
     }
 
+    /// <inheritdoc />
     public void ClearHistory()
     {
         _history.Clear();
@@ -110,6 +116,7 @@ public sealed class NavigationHistoryService : IDisposable, INavigationHistorySe
         HistoryChanged?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         _navigationManager.LocationChanged -= OnLocationChanged;

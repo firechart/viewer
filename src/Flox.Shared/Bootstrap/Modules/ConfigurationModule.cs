@@ -3,8 +3,12 @@ using Serilog;
 
 namespace Flox.Shared.Bootstrap.Modules;
 
+/// <summary>
+/// Loads the appsettings files and environment variables into the configuration of the host.
+/// </summary>
 public class ConfigurationModule : BootstrapModule
 {
+    /// <inheritdoc />
     public override void ConfigureServices()
     {
         var env = Bootstrapper.Environment;

@@ -1,7 +1,7 @@
 # FireChart FHIR® Viewer
 
 **Readable FHIR® data in your own application.** FireChart Viewer shows what a FHIR server holds about patients: the resource types of the
-server, searchable lists, each resource as a readable card or as its source, and a **clinical summary** of one patient (problems, medications,
+server, searchable lists, each resource as a readable card or as its source, and the **patient summary** of a patient (problems, medications,
 allergies, results, encounters and more, on one page). It is read-only, signs in with **SMART on FHIR**, speaks FHIR STU3, R4, R4B, R5 and R6,
 and comes in English, German, Spanish, Russian and Chinese.
 
@@ -123,7 +123,7 @@ The simplest integration: the frame shows the server of `viewer.json`.
         style="width: 100%; height: 800px; border: 0"></iframe>
 ```
 
-An address inside the Viewer can follow `/embed/`, e.g. `https://viewer.firechart.org/embed/summary/123` opens the clinical summary of patient
+An address inside the Viewer can follow `/embed/`, e.g. `https://viewer.firechart.org/embed/summary/Patient/123` opens the patient summary of patient
 `123` ([addresses](#addresses-inside-the-viewer)).
 
 If the frame is `sandbox`ed, allow `allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox` (the last two
@@ -168,7 +168,7 @@ The origin of your page must be in `host.json` of that instance, or the frame ig
 | `mount(target)` | Puts the frame into an element, or into the first element of a selector |
 | `on(event, handler)`, `off(...)` | Events `ready`, `navigate`, `restarting`, `updated`, `error`; `on` returns the function that unsubscribes |
 | `navigate(location, { replace })` | Goes to an [address of the Viewer](#addresses-inside-the-viewer) |
-| `update(changes)` | Changes `locale`, `appearance`, `terminology`, `clinicalSummary` without a restart; resolves with `{ applied }` |
+| `update(changes)` | Changes `locale`, `appearance`, `terminology`, `summary` without a restart; resolves with `{ applied }` |
 | `restart(config)` | Starts anew with another configuration (another server, another SMART client) |
 | `configure(config)` | Updates or restarts, whichever the difference needs: for the props of a component |
 | `print()` | Opens the print dialog for the page of the Viewer only |
@@ -176,7 +176,7 @@ The origin of your page must be in `host.json` of that instance, or the frame ig
 | `destroy()` | Removes the frame |
 
 - `height: "fill"` (default) fills the element, so give the element a height; `height: "auto"` makes the frame as high as its content.
-- `urlParam: "fhir"` keeps the address of the Viewer in the address of your page (`?fhir=summary/123`): links and reloads open the Viewer
+- `urlParam: "fhir"` keeps the address of the Viewer in the address of your page (`?fhir=summary/Patient/123`): links and reloads open the Viewer
   where it was.
 - A refused request rejects its promise with a `ViewerError` (`type`, `code`, `param`, `message`): `update({ server })` is
   `restart_required`, `navigate("https://...")` is `invalid_location`, a misspelt key is `unknown_option` with a hint
@@ -222,7 +222,7 @@ The same object is `viewer.json` of an instance and the `config` of the SDK. Onl
   },
   "locale": "auto",
   "terminology": { "server": "https://tx.fhir.org/r4" },
-  "clinicalSummary": { "form": "default" },
+  "summary": { "form": "default" },
   "appearance": {
     "theme": "auto",
     "variables": { "colorPrimary": "#0a7f5a", "borderRadius": "6px" },
@@ -237,18 +237,36 @@ The same object is `viewer.json` of an instance and the `config` of the SDK. Onl
 | `server.name` | The name shown in the title and the breadcrumbs (default: the host name) |
 | `server.fhirRelease` | `STU3`, `R4`, `R4B`, `R5` or `R6`, used when the server does not answer `/metadata` (default: read from `/metadata`) |
 | `server.pageSize` | Resources per page of a list (default 50) |
+| `server.timeoutSeconds` | How long one request to the server may take, in seconds, 5 to 600 (default 60) |
 | `smart` | Present when the server needs a sign-in. A public client with PKCE: there is no secret |
 | `smart.clientId` | The client id registered at the authorization server. Required within `smart` |
 | `smart.scopes` | The scopes asked for (e.g. `openid fhirUser launch/patient patient/*.rs`) |
 | `smart.flow` | `redirect` (default) or `popup`: see [SMART](#smart-on-fhir-sign-in) |
 | `smart.authority` | The OpenID authority, when it is not found by the SMART discovery of the server (`.well-known/smart-configuration`) |
 | `smart.extraParameters` | More parameters of the authorization request, as a query (`prompt=login&kc_idp_hint=x`) |
-| `locale` | `auto` (the language of the browser), `en`, `de`, `es`, `ru`, `zh-Hans`, with a region if wanted (`de-AT`); in the SDK also `inherit` |
+| `locale` | `auto` (the language of the browser), `en`, `de`, `es`, `he`, `ru`, `zh-Hans`, with a region if wanted (`de-AT`); in the SDK also `inherit` |
 | `terminology.server` | A FHIR terminology server that turns bare codes into words; none: codes are shown as they are. `tx.fhir.org` is a public demo, without licensed code systems |
-| `clinicalSummary.form` | The form of the clinical summary (its blocks and their searches); `default` is the built-in one |
+| `summary.form` | The form of the patient summary (its blocks and their searches); `default` is the built-in one |
 | `appearance.theme` | `light`, `dark`, `auto` (the operating system); in the SDK also `inherit` (the mode of your page) |
-| `appearance.variables` | `colorPrimary`, `colorBackground`, `colorSurface`, `colorText`, `colorTextSecondary`, `colorBorder`, `colorDanger`, `colorWarning`, `colorSuccess`, `colorInfo`, `fontFamily`, `borderRadius` |
+| `appearance.style` | A theme of the library, `styles/themes/{style}.css`: `fluent`, `compact`, or your own (see [Themes](#themes)). The whole Viewer follows it: the records, the buttons, the fields, the fonts |
+| `appearance.fonts` | Fonts to load for the style: `[{ "family": "Brand Sans", "src": "https://.../brand.woff2", "weight": "400 700" }]`, https only |
+| `appearance.variables` | Single tokens over the style: `colorPrimary`, `colorBackground`, `colorSurface`, `colorText`, `colorTextSecondary`, `colorBorder`, `colorDanger`, `colorWarning`, `colorSuccess`, `colorInfo`, `fontFamily`, `borderRadius` |
 | `appearance.rules` | Properties for the public selectors `.Banner`, `.Tile`, `.Badge`, `.Card`, `.Table` (and their `:hover`): colours, borders, radius, shadow, font, spacing |
+
+### Themes
+
+A theme is one CSS file of tokens, `styles/themes/{name}.css` of the library: the colours (`--fx-color-accent`, `--fx-color-background`,
+`--fx-color-surface`, `--fx-color-text`, `--fx-color-muted`, `--fx-color-border`, the statuses...), the fonts (`--fx-font`, `--fx-font-mono`), the
+sizes, the radius and the spacing, on `:root`, the dark ones on `:root[data-theme="dark"]`. The Viewer passes them to its buttons, fields and lists
+too, so the whole frame takes the look of your system. The library has two to start from: `fluent` (in the manner of Fluent 2) and `compact` (a dense
+clinical screen). Your own goes into the appearance folder of the image (`/usr/share/nginx/appearance/styles/themes/acme.css`) and is chosen with
+`"appearance": { "style": "acme" }`. A theme sets the tokens only: it may not load anything from outside (the fonts are `appearance.fonts`) and may not
+hide the notices of the Viewer about data it does not show. Without a style the Viewer keeps the look of the vendor (or, inside FireChart, of the
+application).
+
+**Print.** The command Print of a summary (the toolbar, the menu of the page, `viewer.print()`) loads every record and opens every block first, and
+prints only a complete page; Load all in the menu does the loading alone. A page printed otherwise (Ctrl+P, a list) carries a note on paper that the
+printout may be incomplete. The printout is black on white whatever the theme.
 
 The configuration is checked strictly: an unknown key, a missing one or a wrong value is shown in the page with its path and a hint
 (`'apperance' is not an option. Did you mean 'appearance'?`), and the Viewer does not start with a wrong configuration. A value of the
@@ -265,8 +283,8 @@ The same addresses work after `/embed/`, in `navigate()`, in the `navigate` even
 | (empty), `resources` | The resource types of the server |
 | `resources/Patient` | A list; a FHIR search may follow: `resources/Observation?code=8867-4&patient=123` |
 | `resources/Patient/123` | One resource (View and Source tabs) |
-| `summary` | The choice of a patient for the clinical summary |
-| `summary/123` | The clinical summary of patient `123` |
+| `summary` | The choice of a patient for the patient summary |
+| `summary/Patient/123` | The patient summary of patient `123` |
 
 Only relative addresses of the Viewer are accepted (no scheme, host, `..` or encoded separators).
 
@@ -328,7 +346,7 @@ rename the namespace.
 <link rel="stylesheet" href="_content/Flox.Shared/css/Flox.Shared.Tailwind.css" />
 <link rel="stylesheet" href="_content/FireChart.Viewer/css/FireChart.Viewer.Tailwind.css" />
 <link rel="stylesheet" href="YourApp.styles.css" />
-<script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+<script src="_content/Radzen.Blazor/Radzen.Blazor.min.js"></script>
 ```
 
 and in `App.razor`, before the router: `<RadzenTheme Theme="standard"/>` and `<RadzenComponents/>`.
@@ -375,14 +393,14 @@ and in `App.razor`, before the router: `<RadzenTheme Theme="standard"/>` and `<R
 | `SmartFlow` | `Redirect` (default) or `Popup` |
 | `SmartPopupRedirectUri` | The return page of the popup; default `_content/FireChart.Viewer/smart-callback.html` of your app |
 | `TerminologyServer` | Words for bare codes; none: codes as they are |
-| `ClinicalSummaryForm` | The form of the clinical summary (`default`) |
+| `SummaryForm` | The form of the patient summary (`default`) |
 | `Appearance` | `ViewerAppearance`: `Theme` (`Inherit` by default: your app owns the theme; `Light`, `Dark`, `Auto` make the Viewer own it), `Variables`, `Rules`, `Fonts`, `AdvancedStylesheet` |
 | `ShowBreadcrumbs` | The chain server > type > id above the page (on by default) |
 | `OnConfigError` | Called for an appearance value that was left out |
 
 **5. The SMART callback** (only for servers that need a sign-in). Copy `Pages/SmartCallbackPage.razor` of the app and change its targets to
 your prefix: at `smart/callback` it completes the sign-in with `ISmartAuthorizer.CompleteAsync(NavigationManager.Uri)` and navigates to the
-clinical summary of the patient of the launch context, or back where the sign-in began.
+patient summary of the patient of the launch context, or back where the sign-in began.
 
 The routing of the component is experimental: it has a small router of its own below `RoutePrefix`, which may change in a later version.
 
@@ -404,7 +422,7 @@ A server with `smart` (SDK, `viewer.json`) or `AuthenticationType.OAuth2` (Blazo
   is in a frame.** It needs a click (browsers allow windows only at a click), `allow-popups` on a sandboxed frame, and no
   `Cross-Origin-Opener-Policy: same-origin` on your page (`same-origin-allow-popups` is fine). When the window cannot open, the Viewer says
   why and offers to try again or to sign in inside the frame.
-- A sign-in **with patient context** (scope `launch/patient`) opens the clinical summary of the patient the user chose or was launched with.
+- A sign-in **with patient context** (scope `launch/patient`) opens the patient summary of the patient the user chose or was launched with.
 - The token lives in the storage of the frame's tab (partitioned by the browser in a cross-site frame); there is no silent renewal: when it
   ends, the user signs in again.
 - Testing: the SMART App Launcher (`https://launch.smarthealthit.org/v/r4/fhir`, any client id, extra parameters `launch=e30` for a
@@ -438,8 +456,8 @@ docker compose up --build          # the image, as published
 | Project | What it is |
 |---|---|
 | `src/FireChart.Viewer` | The Razor component `<FhirViewer>`, its pages, SMART, appearance ([README](src/FireChart.Viewer/README.md)) |
-| `src/FireChart.Viewer.Core` | The engine: FHIR client per release, Liquid (Fluid) rendering, clinical summary forms, SMART authorizer ([README](src/FireChart.Viewer.Core/README.md)) |
-| `src/FireChart.Viewer.Library` | The built-in templates of the resources and the vendor clinical summary forms ([README](src/FireChart.Viewer.Library/README.md)) |
+| `src/FireChart.Viewer.Core` | The engine: FHIR client per release, Liquid (Fluid) rendering, summary forms, SMART authorizer ([README](src/FireChart.Viewer.Core/README.md)) |
+| `src/FireChart.Viewer.Library` | The built-in templates of the resources and the vendor summary forms ([README](src/FireChart.Viewer.Library/README.md)) |
 | `src/FireChart.Viewer.App` | The application: sandbox, `/embed`, the JavaScript SDK in `wwwroot/sdk` ([README](src/FireChart.Viewer.App/README.md), [SDK](src/FireChart.Viewer.App/Sdk/README.md), [HOWTO](src/FireChart.Viewer.App/Sdk/HOWTO.md)) |
 | `src/Flox.Core`, `src/Flox.Shared`, `src/Flox.Resources`, `src/FireChart.Resources` | The client side of the Flox platform the Viewer is built on, and the texts |
 | `test/` | Unit tests of the Viewer and of the client Flox |

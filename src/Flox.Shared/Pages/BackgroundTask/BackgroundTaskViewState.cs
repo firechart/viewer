@@ -2,20 +2,24 @@ namespace Flox.Shared.Pages.BackgroundTask;
 
 using Core.Models;
 
+/// <summary>State of the page of one background task: loads it and can cancel or delete it.</summary>
 public class BackgroundTaskViewState : State
 {
     private readonly IDataSource<Guid, BackgroundTask> _tasks;
     private readonly IHttpClientFactory _httpClientFactory;
     private Guid _id;
 
+    /// <summary>Creates the state over the data source of tasks and the factory of HTTP clients.</summary>
     public BackgroundTaskViewState(IServiceProvider serviceProvider, IDataSource<Guid, BackgroundTask> tasks, IHttpClientFactory httpClientFactory) : base(serviceProvider)
     {
         _tasks = tasks;
         _httpClientFactory = httpClientFactory;
     }
 
+    /// <summary>The task being shown; <c>null</c> until it is loaded.</summary>
     public BackgroundTask? Item { get; private set; }
 
+    /// <inheritdoc />
     protected override async Task OnStartAsync(object? key)
     {
         if (key is Guid id)
@@ -26,11 +30,13 @@ public class BackgroundTaskViewState : State
         }
     }
 
+    /// <inheritdoc />
     protected override async Task OnResumeAsync()
     {
         await LoadAsync();
     }
 
+    /// <summary>Deletes the task on the server.</summary>
     public async Task DeleteAsync()
     {
         if (Item == null)
@@ -50,6 +56,7 @@ public class BackgroundTaskViewState : State
         }
     }
 
+    /// <summary>Asks the server to cancel the task when it is running.</summary>
     public async Task CancelAsync()
     {
         if (Item is { Status: BackgroundTaskStatus.Running })

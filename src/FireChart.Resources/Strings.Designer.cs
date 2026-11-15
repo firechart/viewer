@@ -79,6 +79,51 @@ namespace FireChart.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Times are shown in the time zone of this device.
+        /// </summary>
+        public static string Caption_TimesInDeviceZone {
+            get {
+                return ResourceManager.GetString("Caption_TimesInDeviceZone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sections that could not be loaded: {0}.
+        /// </summary>
+        public static string Message_SectionsFailed {
+            get {
+                return ResourceManager.GetString("Message_SectionsFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Values.
+        /// </summary>
+        public static string Caption_TrendValues {
+            get {
+                return ResourceManager.GetString("Caption_TrendValues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Date.
+        /// </summary>
+        public static string Caption_TrendDate {
+            get {
+                return ResourceManager.GetString("Caption_TrendDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} values, {1} – {2}.
+        /// </summary>
+        public static string Caption_TrendSummary {
+            get {
+                return ResourceManager.GetString("Caption_TrendSummary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Test.
         /// </summary>
         public static string Caption_LabTest {
@@ -151,20 +196,47 @@ namespace FireChart.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Clinical Summary.
+        ///   Looks up a localized string similar to Record.
         /// </summary>
-        public static string Caption_ClinicalSummary {
+        public static string Caption_Record {
             get {
-                return ResourceManager.GetString("Caption_ClinicalSummary", resourceCulture);
+                return ResourceManager.GetString("Caption_Record", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Clinical summary form.
+        ///   Looks up a localized string similar to Summary.
         /// </summary>
-        public static string Caption_ClinicalSummaryForm {
+        public static string Caption_Summary {
             get {
-                return ResourceManager.GetString("Caption_ClinicalSummaryForm", resourceCulture);
+                return ResourceManager.GetString("Caption_Summary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Encounter Summary.
+        /// </summary>
+        public static string Caption_EncounterSummary {
+            get {
+                return ResourceManager.GetString("Caption_EncounterSummary", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Open as a page.
+        /// </summary>
+        public static string Caption_OpenAsPage {
+            get {
+                return ResourceManager.GetString("Caption_OpenAsPage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Patient Summary.
+        /// </summary>
+        public static string Caption_PatientSummary {
+            get {
+                return ResourceManager.GetString("Caption_PatientSummary", resourceCulture);
             }
         }
         
@@ -330,6 +402,60 @@ namespace FireChart.Resources {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to The server refused the search.
+        /// </summary>
+        public static string Caption_SearchRefused {
+            get {
+                return ResourceManager.GetString("Caption_SearchRefused", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The server could not run the search.
+        /// </summary>
+        public static string Caption_SearchServerError {
+            get {
+                return ResourceManager.GetString("Caption_SearchServerError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No answer within {0} seconds.
+        /// </summary>
+        public static string Caption_SearchTimedOut {
+            get {
+                return ResourceManager.GetString("Caption_SearchTimedOut", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The answer of the server could not be read.
+        /// </summary>
+        public static string Caption_SearchUnreadable {
+            get {
+                return ResourceManager.GetString("Caption_SearchUnreadable", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to A search of this section failed.
+        /// </summary>
+        public static string Caption_SectionFailed {
+            get {
+                return ResourceManager.GetString("Caption_SectionFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Timeout, seconds.
+        /// </summary>
+        public static string Caption_FhirServerTimeout {
+            get {
+                return ResourceManager.GetString("Caption_FhirServerTimeout", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to FHIR release (if /metadata is unavailable).
         /// </summary>
@@ -961,6 +1087,24 @@ namespace FireChart.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show all fields.
+        /// </summary>
+        public static string Caption_ShowAllFields {
+            get {
+                return ResourceManager.GetString("Caption_ShowAllFields", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Only the fields of the form.
+        /// </summary>
+        public static string Caption_ShowFormFields {
+            get {
+                return ResourceManager.GetString("Caption_ShowFormFields", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to This form was generated automatically from the search parameters of the resource, so it is not very convenient. The server may not support some of the parameters..
         /// </summary>
         public static string Message_SearchFormGenerated {
@@ -1137,6 +1281,133 @@ namespace FireChart.Resources {
         public static string Caption_OpenPackageManager {
             get {
                 return ResourceManager.GetString("Caption_OpenPackageManager", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Load all.
+        /// </summary>
+        public static string Caption_LoadAll {
+            get {
+                return ResourceManager.GetString("Caption_LoadAll", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Print.
+        /// </summary>
+        public static string Caption_Print {
+            get {
+                return ResourceManager.GetString("Caption_Print", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This printout may be incomplete: not every record of the page is loaded. Print a summary with its command Print, which loads every record first..
+        /// </summary>
+        public static string Message_PrintIncomplete {
+            get {
+                return ResourceManager.GetString("Message_PrintIncomplete", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Not every record could be loaded, so the page is not printed. Retry the sections that failed, then print again..
+        /// </summary>
+        public static string Message_PrintRefused {
+            get {
+                return ResourceManager.GetString("Message_PrintRefused", resourceCulture);
+            }
+        }
+
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download.
+        /// </summary>
+        public static string PackageBase_Download {
+            get {
+                return ResourceManager.GetString("PackageBase_Download", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update.
+        /// </summary>
+        public static string PackageBase_UpdateButton {
+            get {
+                return ResourceManager.GetString("PackageBase_UpdateButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The download failed: {0}.
+        /// </summary>
+        public static string PackageBase_Failed {
+            get {
+                return ResourceManager.GetString("PackageBase_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This package is not on the device. Download it ({0}; {1} on the device) to browse it offline..
+        /// </summary>
+        public static string PackageBase_NotOnDevice {
+            get {
+                return ResourceManager.GetString("PackageBase_NotOnDevice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downloading: {0} of {1}.
+        /// </summary>
+        public static string PackageBase_Progress {
+            get {
+                return ResourceManager.GetString("PackageBase_Progress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to On the device.
+        /// </summary>
+        public static string PackageBase_OnDevice {
+            get {
+                return ResourceManager.GetString("PackageBase_OnDevice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete from the device.
+        /// </summary>
+        public static string PackageBase_Delete {
+            get {
+                return ResourceManager.GetString("PackageBase_Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A newer version of the package is available ({0})..
+        /// </summary>
+        public static string PackageBase_UpdateAvailable {
+            get {
+                return ResourceManager.GetString("PackageBase_UpdateAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The list of the FHIR packages cannot be read now: the application cannot reach its server. The packages on the device keep working..
+        /// </summary>
+        public static string PackageBase_ListUnavailable {
+            get {
+                return ResourceManager.GetString("PackageBase_ListUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packages on the device: {0}, taking {1}.
+        /// </summary>
+        public static string PackageBase_Occupied {
+            get {
+                return ResourceManager.GetString("PackageBase_Occupied", resourceCulture);
             }
         }
     }

@@ -4,15 +4,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Flox.Core.Authorization;
 
-// Single source of truth for Flox's own authorization policies (ADMIN/AUTHENTICATED/ANONYMOUS/
-// DEVELOPER, the dynamic "perm:<Operation>" policy) - called from both the client's
-// AuthorizationPoliciesModule (a BootstrapModule) and the server's AuthorizationPoliciesStartup
-// (an Orchard StartupBase of the server), which otherwise had this exact policy setup
-// duplicated verbatim. Deliberately framework-agnostic (no Blazor-specific registration such as
-// AddCascadingAuthenticationState) - callers add that themselves alongside this call, since not
-// every IServiceCollection this runs against is building a Blazor render pipeline.
+/// <summary>
+/// Single source of the Flox authorization policies (ADMIN, AUTHENTICATED, ANONYMOUS, DEVELOPER and the dynamic "perm:Operation" policy), shared by the client and the server. Framework-agnostic: callers add the Blazor-specific registration themselves.
+/// </summary>
 public static class FloxAuthorizationServiceCollectionExtensions
 {
+    /// <summary>
+    /// Registers the Flox authorization handlers and the named policies.
+    /// </summary>
     public static IServiceCollection AddFloxAuthorizationPolicies(this IServiceCollection services)
     {
         services.AddScoped<IAuthorizationHandler, AuthenticatedUserHandler>();
@@ -46,8 +45,9 @@ public static class FloxAuthorizationServiceCollectionExtensions
         return services;
     }
 
-    // Client side of "perm:<Operation>": looks it up in the permissions the server computed for the user
-    // (the host adds an IEffectivePermissionsLoader); the server evaluates them in Orchard instead
+    /// <summary>
+    /// Registers the client side of the "perm:Operation" policy: it looks the operation up in the permissions the server computed for the user (the host adds an IEffectivePermissionsLoader). The server evaluates them in Orchard instead.
+    /// </summary>
     public static IServiceCollection AddFloxEffectivePermissions(this IServiceCollection services)
     {
         services.AddScoped<IEffectivePermissionsProvider, EffectivePermissionsProvider>();

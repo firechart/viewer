@@ -4,16 +4,16 @@ using System.Text.Json.Nodes;
 namespace FireChart.Viewer.Core.Forms;
 
 /// <summary>
-/// The components a section of the clinical summary can be shown with, and the reading of their options.
+/// The components a section of the patient summary can be shown with, and the reading of their options.
 /// </summary>
 /// <remarks>
-/// A section names its component (<see cref="ClinicalSummaryFormSection.Component"/>) and gives its options as a JSON object
-/// (<see cref="ClinicalSummaryFormSection.Options"/>); each component reads them into its own class with the rules of <see cref="ViewerJson"/> (an unknown
-/// key is an error). The catalog grows with the components of the Viewer (<c>.tasks/viewer/components.md</c>).
+/// A section names its component (<see cref="SummaryFormSection.Component"/>) and gives its options as a JSON object
+/// (<see cref="SummaryFormSection.Options"/>); each component reads them into its own class with the rules of <see cref="ViewerJson"/> (an unknown
+/// key is an error). The catalog grows with the components of the Viewer.
 /// </remarks>
 /// <example>
 /// <code>
-/// var section = new ClinicalSummaryFormSection { Code = "problems", Options = new JsonObject { ["showStatus"] = false } };
+/// var section = new SummaryFormSection { Code = "problems", Options = new JsonObject { ["showStatus"] = false } };
 /// var options = SummaryComponents.TileOptionsOf(form, section);   // ShowStatus false, ShowAge of the form
 /// </code>
 /// </example>
@@ -79,7 +79,7 @@ public static class SummaryComponents
     /// var rows = SummaryComponents.TileOptionsOf(form, section);
     /// </code>
     /// </example>
-    public static TileOptions TileOptionsOf(ClinicalSummaryFormDefinition form, ClinicalSummaryFormSection section)
+    public static TileOptions TileOptionsOf(SummaryFormDefinition form, SummaryFormSection section)
     {
         ArgumentNullException.ThrowIfNull(form);
         ArgumentNullException.ThrowIfNull(section);
@@ -93,7 +93,7 @@ public static class SummaryComponents
             own = new TilesOptions();
         }
 
-        return new TileOptions(own.ShowAge ?? form.ShowAge, own.ShowStatus ?? form.ShowStatus);
+        return new TileOptions(own.ShowAge ?? form.ShowAge, own.ShowStatus ?? form.ShowStatus, own.CodeSystems);
     }
 }
 
@@ -107,9 +107,15 @@ public static class SummaryComponents
 /// </example>
 public sealed class TilesOptions
 {
-    /// <summary>Whether a row shows the age of the patient at the record; <see langword="null"/> takes <see cref="ClinicalSummaryFormDefinition.ShowAge"/>.</summary>
+    /// <summary>Whether a row shows the age of the patient at the record; <see langword="null"/> takes <see cref="SummaryFormDefinition.ShowAge"/>.</summary>
     public bool? ShowAge { get; set; }
 
-    /// <summary>Whether a row shows its status; <see langword="null"/> takes <see cref="ClinicalSummaryFormDefinition.ShowStatus"/>.</summary>
+    /// <summary>Whether a row shows its status; <see langword="null"/> takes <see cref="SummaryFormDefinition.ShowStatus"/>.</summary>
     public bool? ShowStatus { get; set; }
+
+    /// <summary>
+    /// The code systems whose code a row shows before its title, in the order of preference (<see cref="TileOptions.CodeSystems"/>): the ICD of a problem
+    /// list; <see langword="null"/> for none.
+    /// </summary>
+    public string[]? CodeSystems { get; set; }
 }

@@ -16,7 +16,7 @@ namespace FireChart.Viewer;
 /// <param name="navigationManager">Knows the base address of the page.</param>
 /// <example>
 /// <code>
-/// var text = await assets.ReadTextAsync("_content/FireChart.Viewer.Library/search-forms/r4/Patient.json?v=1.2.0", cancellationToken);
+/// var text = await assets.ReadTextAsync("library/search-forms/r4/Patient.json?v=1.2.0", cancellationToken);
 /// </code>
 /// </example>
 [FloxService(typeof(IViewerAssets), ServiceLifetime.Scoped)]

@@ -6,6 +6,7 @@ namespace Flox.Shared.Errors;
 [FloxService(typeof(IUiExceptionFilter), ServiceLifetime.Scoped, Multiple = true)]
 public sealed class CancellationExceptionFilter : IUiExceptionFilter
 {
+    /// <inheritdoc />
     public int Order
     {
         get
@@ -14,6 +15,7 @@ public sealed class CancellationExceptionFilter : IUiExceptionFilter
         }
     }
 
+    /// <inheritdoc />
     public ValueTask HandleAsync(UiExceptionContext context)
     {
         if (context.Exception is OperationCanceledException)
@@ -38,6 +40,7 @@ public sealed class UnauthenticatedExceptionFilter
     IServiceProvider services
 ) : IUiExceptionFilter
 {
+    /// <inheritdoc />
     public int Order
     {
         get
@@ -46,6 +49,7 @@ public sealed class UnauthenticatedExceptionFilter
         }
     }
 
+    /// <inheritdoc />
     public async ValueTask HandleAsync(UiExceptionContext context)
     {
         if (context.Exception is not UnauthenticatedException)
@@ -73,6 +77,7 @@ public sealed class ForbiddenExceptionFilter
     IUiNotifier notifier
 ) : IUiExceptionFilter
 {
+    /// <inheritdoc />
     public int Order
     {
         get
@@ -81,6 +86,7 @@ public sealed class ForbiddenExceptionFilter
         }
     }
 
+    /// <inheritdoc />
     public ValueTask HandleAsync(UiExceptionContext context)
     {
         if (context.Exception is UnauthorizedAccessException)
@@ -103,6 +109,7 @@ public sealed class DataExceptionFilter
     IUiNotifier notifier
 ) : IUiExceptionFilter
 {
+    /// <inheritdoc />
     public int Order
     {
         get
@@ -111,6 +118,7 @@ public sealed class DataExceptionFilter
         }
     }
 
+    /// <inheritdoc />
     public ValueTask HandleAsync(UiExceptionContext context)
     {
         if (context.Exception is NotFoundException or DuplicateException or ConcurrentUpdateException)
@@ -133,6 +141,7 @@ public sealed class NetworkExceptionFilter
     IUiNotifier notifier
 ) : IUiExceptionFilter
 {
+    /// <inheritdoc />
     public int Order
     {
         get
@@ -141,6 +150,7 @@ public sealed class NetworkExceptionFilter
         }
     }
 
+    /// <inheritdoc />
     public ValueTask HandleAsync(UiExceptionContext context)
     {
         if (context.Exception is HttpRequestException { StatusCode: null })

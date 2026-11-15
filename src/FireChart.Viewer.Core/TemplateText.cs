@@ -47,6 +47,12 @@ internal static class PluralRules
         {
             "en" or "de" or "es" or "it" or "nl" or "pt" => integer && i == 1 ? "one" : "other",
             "fr" => i is 0 or 1 ? "one" : "other",
+            "he" or "iw" when integer => i switch
+            {
+                1 => "one",
+                2 => "two",
+                _ => "other"
+            },
             "ru" or "uk" when integer => (i % 10, i % 100) switch
             {
                 (1, not 11) => "one",

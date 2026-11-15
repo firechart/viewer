@@ -2,7 +2,8 @@
 @inject IFloxRuntime Runtime
 @inject NavigationManager Navigation
 
-<RadzenCard Variant="Radzen.Variant.Outlined">
+@* Rendered in place of what failed: an alert, so a screen reader tells it at once *@
+<RadzenCard Variant="Radzen.Variant.Outlined" role="alert">
     <IconTitle Icon="error" IconColor="var(--rz-danger)" Text=@Strings.Caption_Error/>
     <RadzenText>@Strings.Caption_ErrorNotification</RadzenText>
     @if (ErrorBoundary is AppErrorBoundary { CorrelationId: { } reference })
@@ -24,7 +25,10 @@
         </AuthorizeView>
     }
     <DialogActions>
-        <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Secondary" Text=@Strings.Caption_Home Click="@(() => Navigation.NavigateToRoute("/", true))"/>
+        @* A link that looks like Radzen's text button: it opens in a new tab too; a click loads the page again, which leaves the broken state *@
+        <a href=@AppUrl.ToHref("/") class="rz-button rz-button-md rz-variant-text rz-secondary rz-shade-default no-underline" @onclick=@GoHome @onclick:preventDefault>
+            <span class="rz-button-box"><span class="rz-button-text">@Strings.Caption_Home</span></span>
+        </a>
         <RadzenButton ButtonStyle="Radzen.ButtonStyle.Warning" Text=@Strings.Caption_Retry Click="@RecoverAsync"/>
     </DialogActions>
 </RadzenCard>
@@ -43,6 +47,11 @@
     // initialization) instead of just clearing the boundary.
     [Parameter]
     public EventCallback OnRetry { get; set; }
+
+    private void GoHome()
+    {
+        Navigation.NavigateToRoute("/", true);
+    }
 
     private async Task RecoverAsync()
     {

@@ -5,6 +5,62 @@ the notes of a release are the section of that version. Patch: a fix of a text. 
 
 ## Unreleased
 
+- Accessibility of the kit (patch, the classes and the slots are the same): a field (partial `field`) is a `dl` of its `dt` (`fx-label`) and `dd`
+  (`fx-value`), so a reader links the label to the value; a banner is a `div class="fx-banner"` (the frame and the partial `view-header`), no more a
+  `header`, which made two or three banner landmarks of a page; a tile row is a `div class="fx-list-row"` (the frame; the list of the rows is the
+  container). `fx.css`: the text of a soft badge is its tone mixed toward the text (4.5:1), a link in running text is underlined, a value and a
+  range of the lab table wrap instead of losing the unit, the layout of a field follows the width of the view (container `fx-view`), the rows grow
+  with the user's line height (`lh`), forced colours and `prefers-contrast: more` are handled, hover only where there is one; the muted colour of
+  the vendor palette is darker (4.5:1 on the banner), `--color-warning-content` is `--fx-color-on-warning`, Fluent's text on warning is dark.
+
+- **Major:** a summary form is named by the type it grows from: `summary-forms/Patient.json` (was `default.json`) and `summary-forms/Encounter.json`
+  (was `encounter.json`); its `code` is the type. A type with a form has a summary, and the page of its record switches to it (**Record | Summary**).
+  There is no default form any more, and a FHIR server does not choose a form (`summary.form` of the configuration is gone).
+- The search dialog has **Show all fields** when the form hides some: the hidden fields and groups appear in their places. A hidden field
+  that has a value (a default value, a parameter of the address) is always shown, so nothing that narrows the list is out of sight; the list shows
+  it as a chip too.
+- **Major:** the search forms are of format 2 (`formatVersion`): `hidden` instead of `included`, `fhirRelease` (`R4`) instead of
+  `authoredForVersion` (`4.0.1`, a form of the core resources serves every package on them). A form of format 1 is upgraded when it is read; the
+  Viewer reads a search form laxly (`SearchFormReader`: an unknown property ignored, an unknown value replaced by the default, a field it cannot
+  read left out, each with a warning in the log). The engine needs `SearchFormReader`.
+- The metadata of R4 and R5 are generated from the current builds of their core packages (the registry republished them): the bindings of the
+  units of `Age`, `Distance` and `Duration` are new. The generator is public: `public/tools/FireChart.FhirMetadata`.
+- `schemas/search-form.schema.json`: the JSON Schema of a search form, made from the model of the Viewer (strict: no other property).
+- **Major:** a field of a search form is hidden with `hidden: true` (optional, `false` when missing) instead of `included: false`, and a group
+  can be hidden too (its fields with it); a hidden field still sends its value (a default value is a fixed filter). The search dialog has no
+  "More filters" section any more: a hidden field is not shown at all. A form with `included` is refused by the Viewer; the vendor forms are rewritten.
+  The engine needs `SearchFormField.Hidden`, `SearchFormGroup.Hidden`.
+- **Major:** the vendor search forms are the designed ones of the types used most (Patient, Encounter, Organization, Practitioner, the clinical types
+  and the conformance resources: 180 files instead of 531); the form of any other type is generated at run time from the metadata of the release
+  (`SearchFormGenerator`; the engine needs it and `FhirMetadata.ResourceTypes`, `ParametersOf`).
+- **Major:** the fields of the search forms have no `options` any more (`SearchFormField.Options`, `SearchFormOption` removed; the key is gone from
+  every file of `search-forms`, where it was always empty). A coded field names its value set (`valueSetUrl`) and the Viewer asks the FHIR server of
+  the search for its codes (`ValueSet/$expand`); a form with `options` is refused by the Viewer.
+- **Major:** the tokens of the kit (`--fx-*`) are declared on `:root`, not on `.fx-root` (a style that set them on `.fx-root` still works there), and
+  are the public contract of the look; new tokens `--fx-font-mono`, `--fx-color-background`, `--fx-color-neutral`, `--fx-color-on-accent`,
+  `--fx-color-link`, `--fx-color-on-warning`. Themes of the Viewer: `styles/themes/fluent.css` and `compact.css` (tokens only) and
+  `styles/fx.themed.css`, the base of a theme (the vendor palette as values and the bridge from the tokens to the Radzen variables). The engine
+  needs `FxStyle.LoadThemeAsync`, `FxThemeSheets`. The customer style of the server (`fx.custom.css` of FireChart, edited at FireChart > FHIR Style)
+  is gone: a theme is a file of the appearance folder.
+- Print: `@media print` in `fx.css` (black on white, no break inside a banner, a row or a card, no buttons) and `fx-print-incomplete`, the note on paper
+  of a page that is not complete.
+- Hebrew: `locales/he/fhir-templates.json` (plurals one, two, other) and the texts of the vendor summary forms. The styles of the kit say start and
+  end (`margin-inline-start`, `inset-inline-end`...), so a right-to-left page turns them. The age of a patient is an engine text in every language
+  (`{{count}} y`, `{{count}} mo`, `{{count}} d`); the engine needs it.
+- The vendor summary forms have their titles and descriptions in every language of the product (a test keeps every text of them so).
+- New vendor form `summary-forms/encounter.json`: the summary of an encounter (diagnoses, procedures, results, vital signs, medication orders, orders,
+  documents, care plans). Summary forms are of format 3: the form names its `context` (`Patient`, `Encounter`), a search its `contextParam`
+  (`patientParam` before, still read). The engine needs `SummaryFormDefinition.Context`.
+- Renamed, nothing in the templates changed: the "clinical summary" is the patient summary (`SummaryFormDefinition`, `summary/Patient/<id>`, the
+  configuration key `summary` instead of `clinicalSummary`, the entity `SummaryForm`; the older address `summary/<id>` still opens).
+- The value of a blood pressure reads systolic / diastolic (LOINC 8480-6 first) in a tile and in `lab-results`, whatever the order of the components of the
+  record; the new partial `observation-values` joins the values.
+- The page of a record names the resources of any type it refers to (the reason of a prescription was a bare `Condition/…`): the engine fetches the
+  references the page did not get, not only patients and encounters (`IReferenceFetcher.FetchAsync(anyType: true)`, at most 50).
+- A tile may show the code of its record before the title, in the systems a section of the clinical summary names (`options.codeSystems`, in the order of
+  preference): the vendor form shows the ICD code (ICD-10, ICD-10-CM, ICD-11, ICD-9-CM) of a problem. The tiles of Condition, Procedure, Observation,
+  DiagnosticReport, AllergyIntolerance and Immunization name their codings with `{% slot_data codes: self.code %}`; the class `fx-tile-code`. The engine
+  needs `slot_data codes` and `TileOptions.CodeSystems`; nothing changes without the option.
 - First library: Patient, Patient.contact, HumanName, the generic primitive and complex views, the row partial.
 - The page of a resource (mode `view`) on the classes of the kit fx-*: Patient, Encounter, Observation, Procedure, Condition. The resources other than Patient
   start with the banners of the patient and the encounter (mode `banner`, partial `view-header`), found through the references of the resource.
@@ -42,3 +98,6 @@ the notes of a release are the section of that version. Patch: a fix of a text. 
 - The vendor summary form `default` is of format 2: every section names its component (`tiles`) and whether it hides when empty (`hideIfEmpty`: the empty sections are dropped but the three required ones of IPS, medications, allergies and problems). The engine needs `ClinicalSummaryFormDefinition` of format 2.
 - The partial `lab-row`: the cells of a row of the laboratory results (slots `test`, `value`, `range`, `flag`) for the component `lab-results`; the vendor summary form shows the diagnostic results with it, rounded to two places. The engine needs `RenderSlotsAsync` and the component.
 - The vendor summary form shows the vital signs with the component `observation-trends` (the measures and the chart of the history of the chosen one).
+- The engine shows a record of a type without a `@tile` (Basic and the other rare types) as the beginning of its narrative with the type below, else its id and type: no template is needed for such types.
+- **Major (the delivery, no template changes):** the library is the folder `public/library`, a package of the designer with its manifest `firechart.project.json` (name `firechart-vendor`, version of the release, `engine` 1), served as `library/...` instead of `_content/FireChart.Viewer.Library/...`; the project `FireChart.Viewer.Library` holds only the readers. A host that read the old address must read `VendorLibrary.ContentRoot`.
+- The style of the error tile of a failed search of a section of the clinical summary: `fx-summary-error` (with `-icon`, `-text`, `-title`, `-detail`) and the sign in the header `fx-summary-failed`; `fx.custom.css` may restyle them.

@@ -4,6 +4,7 @@ using Flox.Core.Settings;
 
 namespace Flox.Shared.Services;
 
+/// <summary>Reads and saves the settings of type <typeparamref name="T"/> as JSON in the settings store; settings of the system scope can be read but not saved here.</summary>
 [FloxService(typeof(IAppSettingsProvider<>))]
 public sealed class AppSettingsProvider<T> : IAppSettingsProvider<T>, IDisposable where T : class, new()
 {
@@ -15,6 +16,7 @@ public sealed class AppSettingsProvider<T> : IAppSettingsProvider<T>, IDisposabl
     private readonly ISettingsStore _store;
     private readonly ISystemSettingsStore _systemStore;
 
+    /// <summary>Creates the provider and starts following changes of the settings store.</summary>
     public AppSettingsProvider(ISettingsStore store, ISystemSettingsStore systemStore, ILogger<AppSettingsProvider<T>> logger)
     {
         _store = store;
@@ -23,8 +25,10 @@ public sealed class AppSettingsProvider<T> : IAppSettingsProvider<T>, IDisposabl
         _store.Changed += OnStoreChanged;
     }
 
+    /// <inheritdoc />
     public event EventHandler? SettingsChanged;
 
+    /// <inheritdoc />
     public Type SettingsType
     {
         get
@@ -33,11 +37,13 @@ public sealed class AppSettingsProvider<T> : IAppSettingsProvider<T>, IDisposabl
         }
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         _store.Changed -= OnStoreChanged;
     }
 
+    /// <inheritdoc />
     public async Task<T> GetValue()
     {
         try
@@ -52,21 +58,25 @@ public sealed class AppSettingsProvider<T> : IAppSettingsProvider<T>, IDisposabl
         }
     }
 
+    /// <inheritdoc />
     public async Task<object> GetObjectAsync()
     {
         return await GetValue();
     }
 
+    /// <inheritdoc />
     public async Task ResetAsync()
     {
         await SetAsync(null);
     }
 
+    /// <inheritdoc />
     public async Task SaveObjectAsync(object value)
     {
         await SaveValue((T)value);
     }
 
+    /// <inheritdoc />
     public async Task SaveValue(T value)
     {
         ArgumentNullException.ThrowIfNull(value);

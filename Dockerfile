@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG VERSION=0.0.0-local
 WORKDIR /src
 COPY . .
@@ -11,6 +11,12 @@ RUN rm -f /publish/wwwroot/viewer.json.* /publish/wwwroot/host.json.*
 FROM nginxinc/nginx-unprivileged:1.27-alpine
 COPY --from=build /publish/wwwroot /usr/share/nginx/html
 COPY <<EOF /etc/nginx/conf.d/default.conf
+# The modules of sqlite-wasm are .mjs, which the mime.types of nginx 1.27 does not know (application/octet-stream): a browser refuses to load such a
+# module, and the SQLite worker of the Viewer failed. Added to the types of the http block (a types block adds to what mime.types gave)
+types {
+    text/javascript mjs;
+}
+
 server {
     listen 8080;
     root /usr/share/nginx/html;
@@ -24,6 +30,12 @@ server {
     # The files of the libraries: a missing one is a 404, never the page (the Viewer asks for templates that may not exist)
     location /_content/ {
         try_files \$uri =404;
+    }
+    # The library: a file of the customer layer (a folder of the designer mounted at /usr/share/nginx/appearance) wins over the vendor one;
+    # a missing file is a 404, never the page
+    location ~ ^/library/(.*)\$ {
+        root /usr/share/nginx;
+        try_files /appearance/\$1 /html/library/\$1 =404;
     }
     # The JavaScript SDK is imported as an ES module by pages of other origins: CORS for any, and revalidated so a page never mixes versions
     location /sdk/ {

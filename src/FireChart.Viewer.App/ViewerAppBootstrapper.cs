@@ -4,6 +4,7 @@ using Flox.Core.Data;
 using Flox.Core.Models;
 using Flox.Core.Services;
 using Flox.Shared.Bootstrap;
+using Flox.Sqlite;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -13,6 +14,9 @@ namespace FireChart.Viewer.App;
 // [FloxService] types; the application adds the vendor templates and an anonymous user
 public sealed class ViewerAppBootstrapper : FloxBootstrapper
 {
+    // The pool of OPFS of the application, apart from those of FireChart on one origin
+    public const string Pool = "firechart-viewer";
+
     public ViewerAppBootstrapper(IServiceCollection services, IConfigurationBuilder configuration, ILoggingBuilder loggingBuilder, string? baseAddress, string? environment)
         : base(services, configuration, loggingBuilder, baseAddress, environment)
     {
@@ -21,8 +25,11 @@ public sealed class ViewerAppBootstrapper : FloxBootstrapper
         Services.AddScoped<IAuthenticationService, AnonymousAuthenticationService>();
         Services.AddScoped<ITemplateRenderers, VendorTemplateRenderers>();
 
-        // The bookmarks of the Viewer, on the device (IndexedDB); a frame and the sandbox of one origin share them
-        Services.AddLocalEntity<UserBookmark>();
+        // The bookmarks and the last searches of the Viewer, on the device: flox.sqlite of the pool of the application; the frames and the sandbox
+        // of one origin share them
+        Services.AddBrowserSqlite(Pool)
+                .AddSqliteDocuments()
+                .AddLocalEntity<UserBookmark>();
         Services.AddScoped<ViewerAppConfigLoader>();
         Services.AddScoped<Sandbox.DemoPresets>();
         AddModule(new FhirViewerCoreModule());

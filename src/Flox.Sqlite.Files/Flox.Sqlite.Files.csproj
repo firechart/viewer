@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The ISqliteEngine of the SQLite files of a folder through Microsoft.Data.Sqlite: the tests on .NET, the server, the tools. Never referenced by a
+       browser client: its native SQLite would relink the WebAssembly runtime (the browser has BrowserSqliteEngine of Flox.Sqlite) -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Flox.Sqlite\Flox.Sqlite.csproj" />
+  </ItemGroup>
+
+</Project>

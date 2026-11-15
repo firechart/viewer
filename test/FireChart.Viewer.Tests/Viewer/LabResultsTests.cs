@@ -1,3 +1,5 @@
+using Bunit;
+using FireChart.Viewer.Components;
 using FireChart.Viewer.Core;
 using FireChart.Viewer.Core.Forms;
 using FireChart.Viewer.Library;
@@ -59,6 +61,25 @@ public class LabResultsTests
             Assert.That(FxHtml.PlainText(cells["value"]), Is.EqualTo("4.51 mmol/L"));
             Assert.That(FxHtml.PlainText(cells["range"]), Is.EqualTo("3.5 - 5.1 mmol/L"));
             Assert.That(cells["flag"], Does.Contain("High").And.Contain("fx-badge-warning"));
+        });
+    }
+
+    // A row without the cell "test" (its template failed) shows its id, which comes from the server unchecked: as text, never as markup
+    [Test]
+    public void ARowWithoutItsTestCell_ShowsTheIdOfTheServerAsText()
+    {
+        const string id = "<img src=x onerror=alert(1)>";
+        var section = new SummarySection(new SummaryFormSection { Code = "labs" }, [], "en");
+        section.LabGroups = [new LabGroup("day:2020-03-01", null, new DateOnly(2020, 3, 1), [Obs(id, "2020-03-01T08:00:00Z")])];
+        using var context = new BunitContext();
+
+        var view = context.Render<LabResultsView>(parameters => parameters.Add(component => component.Section, section));
+
+        var cell = view.Find("td.fx-lab-test");
+        Assert.Multiple(() =>
+        {
+            Assert.That(cell.QuerySelector("img"), Is.Null);
+            Assert.That(cell.TextContent.Trim(), Is.EqualTo(id));
         });
     }
 }

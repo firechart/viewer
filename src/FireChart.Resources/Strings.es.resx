@@ -177,6 +177,24 @@
   <data name="Caption_FhirServerOAuth2ExtraParameters" xml:space="preserve">
     <value>Parámetros adicionales de OAuth2 (clave=valor&amp;clave=valor)</value>
   </data>
+  <data name="Caption_FhirServerTimeout" xml:space="preserve">
+    <value>Tiempo de espera, segundos</value>
+  </data>
+  <data name="Caption_SearchRefused" xml:space="preserve">
+    <value>El servidor rechazó la búsqueda</value>
+  </data>
+  <data name="Caption_SearchServerError" xml:space="preserve">
+    <value>El servidor no pudo ejecutar la búsqueda</value>
+  </data>
+  <data name="Caption_SearchTimedOut" xml:space="preserve">
+    <value>Sin respuesta en {0} segundos</value>
+  </data>
+  <data name="Caption_SearchUnreadable" xml:space="preserve">
+    <value>No se pudo leer la respuesta del servidor</value>
+  </data>
+  <data name="Caption_SectionFailed" xml:space="preserve">
+    <value>Una búsqueda de esta sección falló</value>
+  </data>
   <data name="Caption_FhirServerRelease" xml:space="preserve">
     <value>Versión de FHIR (si /metadata no está disponible)</value>
   </data>
@@ -189,17 +207,20 @@
   <data name="Message_FhirServerAuthenticationNotSupported" xml:space="preserve">
     <value>La conexión a servidores con este tipo de autenticación aún no es compatible.</value>
   </data>
-  <data name="Caption_ClinicalSummary" xml:space="preserve">
-    <value>Resumen clínico</value>
-  </data>
-  <data name="Caption_ClinicalSummaryForm" xml:space="preserve">
-    <value>Formulario del resumen clínico</value>
+  <data name="Caption_PatientSummary" xml:space="preserve">
+    <value>Resumen del paciente</value>
   </data>
   <data name="Message_InvalidSearch" xml:space="preserve">
     <value>La búsqueda de la dirección no es válida.</value>
   </data>
   <data name="Placeholder_SearchAllFields" xml:space="preserve">
     <value>Buscar en todos los campos</value>
+  </data>
+  <data name="Caption_ShowAllFields" xml:space="preserve">
+    <value>Mostrar todos los campos</value>
+  </data>
+  <data name="Caption_ShowFormFields" xml:space="preserve">
+    <value>Solo los campos del formulario</value>
   </data>
   <data name="Message_SearchFormGenerated" xml:space="preserve">
     <value>Este formulario se generó automáticamente a partir de los parámetros de búsqueda del recurso, por lo que no es muy cómodo. Es posible que el servidor no admita algunos parámetros.</value>
@@ -476,5 +497,74 @@
   </data>
   <data name="Caption_TrendOpenLast" xml:space="preserve">
     <value>Abrir el último registro</value>
+  </data>
+  <data name="Caption_TimesInDeviceZone" xml:space="preserve">
+    <value>Las horas se muestran en la zona horaria de este dispositivo</value>
+  </data>
+  <data name="Message_SectionsFailed" xml:space="preserve">
+    <value>Secciones que no se pudieron cargar: {0}</value>
+  </data>
+  <data name="Caption_TrendValues" xml:space="preserve">
+    <value>Valores</value>
+  </data>
+  <data name="Caption_TrendDate" xml:space="preserve">
+    <value>Fecha</value>
+  </data>
+  <data name="Caption_TrendSummary" xml:space="preserve">
+    <value>{0} valores, {1} – {2}</value>
+  </data>
+  <data name="Caption_OpenAsPage" xml:space="preserve">
+    <value>Abrir como página</value>
+  </data>
+  <data name="Caption_EncounterSummary" xml:space="preserve">
+    <value>Resumen del encuentro</value>
+  </data>
+  <data name="Caption_LoadAll" xml:space="preserve">
+    <value>Cargar todo</value>
+  </data>
+  <data name="Caption_Print" xml:space="preserve">
+    <value>Imprimir</value>
+  </data>
+  <data name="Message_PrintIncomplete" xml:space="preserve">
+    <value>Esta impresión puede estar incompleta: no se han cargado todos los registros de la página. Imprima un resumen con su comando Imprimir, que primero carga todos los registros.</value>
+  </data>
+  <data name="Message_PrintRefused" xml:space="preserve">
+    <value>No se pudieron cargar todos los registros, así que la página no se imprime. Reintente las secciones que fallaron y vuelva a imprimir.</value>
+  </data>
+  <data name="Caption_Record" xml:space="preserve">
+    <value>Registro</value>
+  </data>
+  <data name="Caption_Summary" xml:space="preserve">
+    <value>Resumen</value>
+  </data>
+  <data name="PackageBase_Download" xml:space="preserve">
+    <value>Descargar</value>
+  </data>
+  <data name="PackageBase_UpdateButton" xml:space="preserve">
+    <value>Actualizar</value>
+  </data>
+  <data name="PackageBase_Failed" xml:space="preserve">
+    <value>La descarga falló: {0}</value>
+  </data>
+  <data name="PackageBase_NotOnDevice" xml:space="preserve">
+    <value>Este paquete no está en el dispositivo. Descárguelo ({0}; {1} en el dispositivo) para consultarlo sin conexión.</value>
+  </data>
+  <data name="PackageBase_Progress" xml:space="preserve">
+    <value>Descargando: {0} de {1}</value>
+  </data>
+  <data name="PackageBase_OnDevice" xml:space="preserve">
+    <value>En el dispositivo</value>
+  </data>
+  <data name="PackageBase_Delete" xml:space="preserve">
+    <value>Eliminar del dispositivo</value>
+  </data>
+  <data name="PackageBase_UpdateAvailable" xml:space="preserve">
+    <value>Hay una versión más reciente del paquete ({0}).</value>
+  </data>
+  <data name="PackageBase_ListUnavailable" xml:space="preserve">
+    <value>La lista de paquetes FHIR no se puede leer ahora: la aplicación no llega a su servidor. Los paquetes del dispositivo siguen funcionando.</value>
+  </data>
+  <data name="PackageBase_Occupied" xml:space="preserve">
+    <value>Paquetes en el dispositivo: {0}, ocupan {1}</value>
   </data>
 </root>

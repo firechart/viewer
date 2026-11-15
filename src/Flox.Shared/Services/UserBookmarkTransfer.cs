@@ -6,13 +6,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Flox.Shared.Services;
 
-// The bookmarks of this device as a file and back: the way to move them to another device, since they are never sent to a server. An import adds
-// what the device has not got (one place is one bookmark) and leaves the rest as it is
+/// <summary>The bookmarks of this device as a file and back: the way to move them to another device, since they are never sent to a server. An import adds what the device has not got (one place is one bookmark) and leaves the rest as it is.</summary>
 [FloxService(typeof(UserBookmarkTransfer), ServiceLifetime.Scoped)]
 public sealed class UserBookmarkTransfer(IGuidEntityStorage<UserBookmark> storage)
 {
+    /// <summary>Name of the file format.</summary>
     public const string Format = "flox-bookmarks";
+    /// <summary>Version of the file format.</summary>
     public const int Version = 1;
+    /// <summary>The largest file an import accepts, in bytes.</summary>
     public const long MaxFileSize = 16 * 1024 * 1024;
 
     private static readonly JsonSerializerOptions s_json = new(JsonSerializerDefaults.Web)
@@ -21,11 +23,13 @@ public sealed class UserBookmarkTransfer(IGuidEntityStorage<UserBookmark> storag
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
+    /// <summary>The suggested name of the export file for a day.</summary>
     public static string FileName(DateTimeOffset now)
     {
         return $"bookmarks-{now.UtcDateTime:yyyy-MM-dd}.json";
     }
 
+    /// <summary>Writes the bookmarks of the device as a JSON file, the oldest first.</summary>
     public async Task<byte[]> ExportAsync(CancellationToken cancellationToken = default)
     {
         var request = new PagedRequest<UserBookmark>
@@ -39,7 +43,7 @@ public sealed class UserBookmarkTransfer(IGuidEntityStorage<UserBookmark> storag
         return JsonSerializer.SerializeToUtf8Bytes(file, s_json);
     }
 
-    // A file that is not an export of bookmarks is refused as a whole (InvalidDataException); its entries without a type or an identity are skipped
+    /// <summary>Adds the bookmarks of an export file that the device has not got. A file that is not an export of bookmarks is refused as a whole (<see cref="InvalidDataException"/>); its entries without a type or an identity are skipped.</summary>
     public async Task<BookmarkImportResult> ImportAsync(Stream content, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(content);
@@ -131,4 +135,10 @@ public sealed class UserBookmarkTransfer(IGuidEntityStorage<UserBookmark> storag
     }
 }
 
+/// <summary>
+/// The outcome of an import of bookmarks.
+/// </summary>
+/// <param name="Added">Bookmarks that were new and are added.</param>
+/// <param name="Existing">Bookmarks the device already had.</param>
+/// <param name="Skipped">Entries that could not be used.</param>
 public sealed record BookmarkImportResult(int Added, int Existing, int Skipped);

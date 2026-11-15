@@ -1,5 +1,5 @@
 @* A row of the menu of a page: what stands first (an icon by name, or Leading), the text, a short note at the end (a count); the menu closes after the click *@
-<button type="button" role="menuitem" class="page-menu-item" title=@Text @onclick=@OnClickAsync>
+<button type="button" class="page-menu-item" @onclick=@OnClickAsync>
     @if (Leading is not null)
     {
         @Leading

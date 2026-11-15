@@ -65,7 +65,7 @@ public class TileCatalogTests
         Assert.Multiple(() =>
         {
             Assert.That(problems, Is.Empty);
-            Assert.That(tile.Html, Does.StartWith("<li class=\"fx-list-row\">").And.Not.Contain("Template error"));
+            Assert.That(tile.Html, Does.StartWith("<div class=\"fx-list-row\">").And.Not.Contain("Template error"));
             foreach (var fact in sample.Facts)
             {
                 Assert.That(tile.Text, Does.Contain(fact), sample.Type);

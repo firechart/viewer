@@ -17,14 +17,14 @@
                                                class=@GetOuterClass() Style=@Style @onclick=@HandleStackClick>
                                      @if (IsSelectable)
                                      {
-                                         <div class="group/lead relative flex size-8 shrink-0 cursor-pointer items-center justify-center"
-                                              role="checkbox" aria-checked=@(IsSelected ? "true" : "false")
-                                              @onclick=@ToggleSelectedAsync @onclick:stopPropagation @onclick:preventDefault>
+                                         <button type="button" class="group/lead relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-inherit"
+                                                 role="checkbox" aria-checked=@(IsSelected ? "true" : "false") aria-label=@SelectLabel
+                                                 @onclick=@ToggleSelectedAsync @onclick:stopPropagation @onclick:preventDefault>
                                              @leadingContent
                                              <span aria-hidden="true" class=@GetSelectionMarkClass()>
                                                  <FloxIcon Icon="done" Size="1.25rem"/>
                                              </span>
-                                         </div>
+                                         </button>
                                      }
                                      else if (Leading != null || Icon != null)
                                      {
@@ -71,7 +71,7 @@
 
                                      @if (!string.IsNullOrEmpty(Warning))
                                      {
-                                         <span class="flex shrink-0" title=@Warning aria-label=@Warning>
+                                         <span class="flex shrink-0" role="img" title=@Warning aria-label=@Warning>
                                              <FloxIcon Icon="sync_problem" Color="var(--rz-danger)"/>
                                          </span>
                                      }
@@ -98,9 +98,22 @@
     }
 }
 
-@tileHrefContent
+@if (InList)
+{
+    <div role="listitem">@tileHrefContent</div>
+}
+else
+{
+    @tileHrefContent
+}
 
 @code {
+
+    // The name of the cascade of ListSection.List
+    public const string ListCascade = "FloxListSectionRows";
+
+    [CascadingParameter(Name = ListCascade)]
+    private bool InList { get; set; }
 
     private bool HasHref => !string.IsNullOrWhiteSpace(Href);
 
@@ -112,6 +125,8 @@
     private bool IsSelectionActive => Row?.SelectionActive ?? SelectionActive;
 
     private bool TapSelects => IsSelectable && IsSelectionActive;
+
+    private string SelectLabel => string.IsNullOrEmpty(TitleText) ? Strings.Caption_Select : string.Format(Strings.Caption_SelectItem, TitleText);
 
     // With a link the anchor owns the click, without one the stack does
     private async Task HandleStackClick()

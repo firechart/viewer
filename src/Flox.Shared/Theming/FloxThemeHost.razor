@@ -1,6 +1,7 @@
 @using Flox.Shared.Settings
 @inject IJSRuntime JS
 @inject Radzen.ThemeService RadzenThemes
+@implements IAsyncDisposable
 
 @* The Radzen base theme is switched through its service; data-theme drives the FloxWind overlay and the dark: variant *@
 <RadzenTheme Theme=@_initialTheme/>
@@ -9,6 +10,9 @@
     private string? _initialTheme;
     private string? _currentTheme;
     private bool? _appliedDark;
+    private IJSObjectReference? _colorScheme;
+
+    private const string ColorSchemeModule = "./_content/Flox.Shared/flox-color-scheme.js";
 
     [Parameter]
     public bool Dark { get; set; } = ThemeSettings.DEFAULT_DARK;
@@ -32,6 +36,25 @@
         {
             _appliedDark = Dark;
             await JS.InvokeVoidAsync("document.documentElement.setAttribute", "data-theme", Dark ? "dark" : "light");
+            // The bar of the browser and of the installed window takes the colour of the bar of the application in the new theme
+            _colorScheme ??= await JS.ImportModuleAsync(ColorSchemeModule);
+            await _colorScheme.InvokeVoidAsync("syncThemeColor");
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        if (_colorScheme is not null)
+        {
+            try
+            {
+                await _colorScheme.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // the page is gone
+            }
         }
     }
 

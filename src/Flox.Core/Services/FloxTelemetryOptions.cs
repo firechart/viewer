@@ -1,11 +1,15 @@
 namespace Flox.Core.Services;
 
-// Should be bound to the section "Flox:OpenTelemetry"
+/// <summary>Settings of the telemetry export, bound to the <c>Flox:OpenTelemetry</c> section.</summary>
 public class FloxTelemetryOptions
 {
+    /// <summary>Whether telemetry is exported.</summary>
     public bool Enabled { get; set; }
+    /// <summary>The address of the OTLP collector.</summary>
     public string? OtlpEndpoint { get; set; }
 
+    /// <summary>Checks that the options are complete when telemetry is on.</summary>
+    /// <exception cref="InvalidOperationException">The endpoint is missing.</exception>
     public void Validate()
     {
         if (!Enabled)

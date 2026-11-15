@@ -6,10 +6,14 @@ using Flox.Shared.Logging;
 using Flox.Shared.Services;
 using Flox.Shared.Settings;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
 
 namespace Flox.Shared.Layout;
 
+/// <summary>
+/// The main layout of the application: the header, the navigation menu and the page.
+/// </summary>
 public sealed partial class MainLayout : IAsyncDisposable
 {
     // Snapshot of whatever culture the host (browser-negotiated in WASM) resolved before this
@@ -21,7 +25,11 @@ public sealed partial class MainLayout : IAsyncDisposable
     // Another language rebuilds the whole layout: components that do not take parameters are not rendered again by their parent
     private int _cultureVersion;
     private bool _isDarkMode = ThemeSettings.DEFAULT_DARK;
+    private bool _systemDark;
+    private SystemColorScheme? _systemColorScheme;
     private AppErrorBoundary? _bodyErrorBoundary;
+    private const string TelemetryEnabledKey = "Flox:OpenTelemetry:Enabled";
+
     private bool _isLoading = true;
     private string? _progressMessage;
     private Exception? _initializationException;
@@ -123,11 +131,14 @@ public sealed partial class MainLayout : IAsyncDisposable
             }
 
             ApplyLanguage(appSettings.Language);
+            await DocumentDirection.ApplyAsync(JS, CultureInfo.CurrentUICulture);
             ApplyTelemetryConsent(appSettings);
 
             SetSplashMessage("Loading theme...");
 
             _themeSettings = themeSettings!;
+            _systemColorScheme = new SystemColorScheme(JS, OnSystemDarkChangedAsync);
+            _systemDark = await _systemColorScheme.WatchAsync();
             ApplyTheme();
             SetSplashMessage("Theme loaded");
 
@@ -180,8 +191,15 @@ public sealed partial class MainLayout : IAsyncDisposable
 
     private void ApplyTheme()
     {
-        ThemeService.ApplyThemeSettings(_themeSettings);
+        ThemeService.ApplyThemeSettings(_themeSettings, _systemDark);
         _isDarkMode = ThemeService.IsDarkMode;
+    }
+
+    private async Task OnSystemDarkChangedAsync(bool dark)
+    {
+        _systemDark = dark;
+        ApplyTheme();
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task RetryInitialization()
@@ -198,6 +216,7 @@ public sealed partial class MainLayout : IAsyncDisposable
         DynamicBinderWarmup.Run();
     }
 
+    /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -206,11 +225,18 @@ public sealed partial class MainLayout : IAsyncDisposable
             await PerformInititializationAsync();
             _ = WarmUpDialogsAsync();
         }
-        else if (!_isLoading && _initializationException is null && _consentBanner is null && !NavigationManager.IsEmbedded() && _generalAppSettingsProvider is not null)
+        else if (!_isLoading && _initializationException is null && _consentBanner is null && !NavigationManager.IsEmbedded() && _generalAppSettingsProvider is not null
+                 && TelemetryEnabled())
         {
             _consentBanner = new TelemetryConsentBanner(JS, OnBannerTelemetryChangedAsync);
             await _consentBanner.ShowAsync((await _generalAppSettingsProvider.GetValue()).AllowTelemetry);
         }
+    }
+
+    // No telemetry (Lite, the Viewer, a server without it): nothing to consent to, no banner
+    private bool TelemetryEnabled()
+    {
+        return bool.TryParse(ServiceProvider.GetService<IConfiguration>()?[TelemetryEnabledKey], out var enabled) && enabled;
     }
 
     private async Task OnBannerTelemetryChangedAsync(bool allowed)
@@ -275,6 +301,7 @@ public sealed partial class MainLayout : IAsyncDisposable
                         if (language != CultureInfo.CurrentUICulture.Name)
                         {
                             _cultureVersion++;
+                            await DocumentDirection.ApplyAsync(JS, CultureInfo.CurrentUICulture);
                         }
 
                         ApplyTelemetryConsent(appSettings);
@@ -340,13 +367,22 @@ public sealed partial class MainLayout : IAsyncDisposable
         }
     }
 
-    public ValueTask DisposeAsync()
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
     {
         EventsConsumer.OnMessage -= EventsConsumer_OnMessage;
         _themeSettingsProvider?.SettingsChanged -= OnThemeProviderSettingsChanged;
         _generalAppSettingsProvider?.SettingsChanged -= OnGeneralAppSettingsProviderSettingsChanged;
         NavigationManager.OnNotFound -= NavigationManager_OnNotFoundAsync;
         AuthenticationStateProvider.AuthenticationStateChanged -= AuthenticationStateProvider_AuthenticationStateChanged;
-        return _consentBanner?.DisposeAsync() ?? ValueTask.CompletedTask;
+        if (_systemColorScheme is not null)
+        {
+            await _systemColorScheme.DisposeAsync();
+        }
+
+        if (_consentBanner is not null)
+        {
+            await _consentBanner.DisposeAsync();
+        }
     }
 }

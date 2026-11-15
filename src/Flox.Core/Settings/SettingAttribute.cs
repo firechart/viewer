@@ -1,14 +1,15 @@
 namespace Flox.Core.Settings;
 
-// What [Display], [Range] and the other DataAnnotations cannot say about the editor of a setting
+/// <summary>Says what <c>[Display]</c>, <c>[Range]</c> and the other data annotations cannot about the editor of a setting.</summary>
 [AttributeUsage(AttributeTargets.Property)]
 public sealed class SettingAttribute : Attribute
 {
+    /// <summary>The control that edits the setting.</summary>
     public SettingControl Control { get; init; }
 
-    // An ISettingOptionsSource for a value that is not an enum
+    /// <summary>An <see cref="ISettingOptionsSource"/> that lists the values of a setting that is not an enum.</summary>
     public Type? OptionsSource { get; init; }
 
-    // The step of a slider; 0 is the default of the control
+    /// <summary>The step of a slider; 0 is the default of the control.</summary>
     public int Step { get; init; }
 }

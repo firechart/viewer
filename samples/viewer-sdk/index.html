@@ -92,7 +92,7 @@
     document.getElementById("page-lang").onchange = e => document.documentElement.lang = e.target.value;
     document.getElementById("print").onclick = () => run("print", () => viewer.print());
     document.getElementById("locale").onchange = e => run("update locale", () => viewer.update({ locale: e.target.value }));
-    document.getElementById("patient").onclick = () => run("navigate", () => viewer.navigate("summary/13a00221-8417-4973-961e-e21b32ece95a"));
+    document.getElementById("patient").onclick = () => run("navigate", () => viewer.navigate("summary/Patient/13a00221-8417-4973-961e-e21b32ece95a"));
     document.getElementById("types").onclick = () => run("navigate", () => viewer.navigate("resources"));
     document.getElementById("hapi").onclick = () => run("restart", () => viewer.restart({ server: { url: "https://hapi.fhir.org/baseR4", name: "HAPI R4" } }));
     document.getElementById("wrong").onclick = () => run("update server", () => viewer.update({ server: { url: "https://example.org" } }));

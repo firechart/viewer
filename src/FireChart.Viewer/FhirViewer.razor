@@ -3,6 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject Radzen.ThemeService RadzenThemes
+@inject FireChart.Viewer.Core.IViewerAssets ViewerAssets
 @using Microsoft.Extensions.Logging
 @inject ILogger<FhirViewer> Logger
 
@@ -16,45 +17,51 @@ else if (_session is not null)
 {
     @if (_stylesheet.Css.Length > 0)
     {
-        <style>@((MarkupString)_stylesheet.Css)</style>
+        <style>@_stylesheet.Css</style>
     }
 
     var route = ViewerRoutes.Parse(_session.Location.Location);
     <CascadingValue Value="_session" IsFixed="false">
-        @* The crumbs (unless the host draws its own), then the toolbar of the page: its commands (PageCommandsSection: the bookmark; later share, export,
-           print) and its menu (PageMenuSection), the Viewer's own in a frame and in any host. An empty toolbar takes no room *@
-        @if (ShowBreadcrumbs)
-        {
-            <ViewerBreadcrumbs Route=@route/>
-        }
+        @* The page; while a record is over it (the sheet), the sheet makes it inert: the keyboard and a reader stay in the sheet *@
+        <div @ref=_page class="contents">
+            @* The crumbs (unless the host draws its own), then the toolbar of the page: its commands (PageCommandsSection: the bookmark; later share, export,
+               print) and its menu (PageMenuSection), the Viewer's own in a frame and in any host. An empty toolbar takes no room *@
+            @if (ShowBreadcrumbs)
+            {
+                <ViewerBreadcrumbs Route=@route/>
+            }
 
-        <div class="fx-viewer-toolbar flex items-center justify-end gap-1 empty:hidden" data-viewer="toolbar"><SectionOutlet SectionName=@PageCommandsSection/><SectionOutlet SectionName=@PageMenuSection/></div>
+            <div class="fx-viewer-toolbar flex items-center justify-end gap-1 empty:hidden print:hidden" data-viewer="toolbar"><SectionOutlet SectionName=@PageCommandsSection/><SectionOutlet SectionName=@PageMenuSection/></div>
 
-        @switch (route)
+            @switch (route)
+            {
+                case { Page: ViewerPage.ResourceTypes }:
+                    <ResourceTypesView/>
+                    break;
+                case { Page: ViewerPage.ResourceList } list:
+                    <ResourceListView ResourceType=@(list.ResourceType!) Query=@list.Query/>
+                    break;
+                case { Page: ViewerPage.Resource } resource:
+                    <ResourceDetailView ResourceType=@(resource.ResourceType!) ResourceId=@(resource.Id!)/>
+                    break;
+                case { Page: ViewerPage.Summary, ResourceType: { } context, Id: { } id }:
+                    <SummaryView ContextType=@context ContextId=@id/>
+                    break;
+                case { Page: ViewerPage.Bookmarks }:
+                    <BookmarksView OnOpenElsewhere=@OnOpenBookmark/>
+                    break;
+                default:
+                    <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" data-error="invalid_location">
+                        @Strings.Message_ViewerUnknownAddress
+                    </RadzenAlert>
+                    break;
+            }
+        </div>
+
+        @* A record over the page (the patient summary): the address holds it, so Back closes it *@
+        @if (route?.Peek is { } peek)
         {
-            case { Page: ViewerPage.ResourceTypes }:
-                <ResourceTypesView/>
-                break;
-            case { Page: ViewerPage.ResourceList } list:
-                <ResourceListView ResourceType=@(list.ResourceType!) Query=@list.Query/>
-                break;
-            case { Page: ViewerPage.Resource } resource:
-                <ResourceDetailView ResourceType=@(resource.ResourceType!) ResourceId=@(resource.Id!)/>
-                break;
-            case { Page: ViewerPage.ClinicalSummary, Id: { } patient }:
-                <ClinicalSummaryView PatientId=@patient/>
-                break;
-            case { Page: ViewerPage.Bookmarks }:
-                <BookmarksView OnOpenElsewhere=@OnOpenBookmark/>
-                break;
-            case { Page: ViewerPage.ClinicalSummary, Id: null } summary:
-                <ResourceListView ResourceType="Patient" Query=@summary.Query ClinicalSummary/>
-                break;
-            default:
-                <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" data-error="invalid_location">
-                    @Strings.Message_ViewerUnknownAddress
-                </RadzenAlert>
-                break;
+            <RecordSheet Route=@peek Behind=@_page OnClose=@CloseSheetAsync OnOpenPage=@(() => _session.Navigate(peek))/>
         }
     </CascadingValue>
 }
@@ -62,6 +69,7 @@ else if (_session is not null)
 @code {
 
     private ViewerSession? _session;
+    private ElementReference _page;
     private string? _sessionKey;
     private ViewerAppearance? _composedFor;
     private AppearanceStylesheet _stylesheet = new(string.Empty, []);
@@ -131,10 +139,6 @@ else if (_session is not null)
     [Parameter]
     public string? TerminologyServer { get; set; }
 
-    /// <summary>The code of the clinical summary form of the server; none is <c>default</c>. Another one starts a new session.</summary>
-    [Parameter]
-    public string? ClinicalSummaryForm { get; set; }
-
     /// <summary>Opens a bookmark of another server from the page of the bookmarks (<c>bookmarks</c>): the host chooses the server of
     /// <see cref="Flox.Core.Models.UserBookmark.SourceAddress"/> and puts the Viewer at <see cref="Flox.Core.Models.UserBookmark.Location"/>. None:
     /// such bookmarks are listed with the name of their server and do not open. The bookmarks are kept by the host (an
@@ -152,7 +156,7 @@ else if (_session is not null)
         if (!ReferenceEquals(_composedFor, Appearance))
         {
             _composedFor = Appearance;
-            _stylesheet = AppearanceCss.Compose(Appearance);
+            _stylesheet = AppearanceCss.Compose(Appearance, await LoadThemeAsync(Appearance));
             foreach (var error in _stylesheet.Errors)
             {
                 Logger.LogWarning("Appearance: {Param}: {Message}", error.Param, error.Message);
@@ -160,7 +164,7 @@ else if (_session is not null)
             }
         }
 
-        var key = $"{Server.Key}|{Server.BaseUrl}|{RoutePrefix}|{TerminologyServer}|{ClinicalSummaryForm}|{SmartRedirectUri}|{SmartFlow}|{SmartPopupRedirectUri}";
+        var key = $"{Server.Key}|{Server.BaseUrl}|{RoutePrefix}|{TerminologyServer}|{SmartRedirectUri}|{SmartFlow}|{SmartPopupRedirectUri}";
         if (key == _sessionKey)
         {
             return;
@@ -171,12 +175,40 @@ else if (_session is not null)
         var location = new UrlLocationStore(NavigationManager, RoutePrefix);
         location.LocationChanged += OnLocationChanged;
         var popupCallback = SmartPopupRedirectUri ?? NavigationManager.ToAbsoluteUri("_content/FireChart.Viewer/smart-callback.html").ToString();
-        _session = new ViewerSession(Server, location, SmartRedirectUri, TerminologyServer, ClinicalSummaryForm, SmartFlow, popupCallback);
+        _session = new ViewerSession(Server, location, SmartRedirectUri, TerminologyServer, SmartFlow, popupCallback);
+    }
+
+    // The base of a theme and its file, when the appearance makes the Viewer its own; none on an error (the vendor look stays)
+    private async Task<FireChart.Viewer.Library.FxThemeSheets?> LoadThemeAsync(ViewerAppearance? appearance)
+    {
+        if (!AppearanceCss.IsThemed(appearance))
+        {
+            return null;
+        }
+
+        try
+        {
+            return await FireChart.Viewer.Library.FxStyle.LoadThemeAsync(ViewerAssets, appearance!.Style);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
+        {
+            Logger.LogWarning(ex, "The theme of the Viewer could not be read");
+            return null;
+        }
     }
 
     private void OnLocationChanged(object? sender, EventArgs e)
     {
+        _session?.OnLocationChanged();
         _ = InvokeAsync(StateHasChanged);
+    }
+
+    private async Task CloseSheetAsync()
+    {
+        if (_session?.CloseSheet() == true)
+        {
+            await JS.InvokeVoidAsync("history.back");
+        }
     }
 
     private void Close()
@@ -200,7 +232,7 @@ else if (_session is not null)
         }
 
         _appliedTheme = theme;
-        _themeModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./_content/FireChart.Viewer/js/viewer-theme.js");
+        _themeModule ??= await JS.ImportModuleAsync("./_content/FireChart.Viewer/js/viewer-theme.js");
         _systemTheme ??= DotNetObjectReference.Create(new SystemThemeListener(dark => InvokeAsync(() => ApplyBaseTheme(dark))));
         ApplyBaseTheme(await _themeModule.InvokeAsync<bool>("setTheme", theme.ToString().ToLowerInvariant(), _systemTheme));
     }

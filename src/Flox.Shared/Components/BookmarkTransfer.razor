@@ -23,7 +23,7 @@
 
     private async Task<IJSObjectReference> ModuleAsync()
     {
-        return _module ??= await JS.InvokeAsync<IJSObjectReference>("import", ModulePath);
+        return _module ??= await JS.ImportModuleAsync(ModulePath);
     }
 
     private async Task ExportAsync()

@@ -1,10 +1,9 @@
 namespace Flox.Core.Host;
 
-// Used with Bootstrapper.ReplaceModule to neutralize a module a shared base class always adds
-// (e.g. ConfigurationModule, EventsConsumerModule) for a platform where it doesn't apply,
-// without touching the shared base class itself.
+/// <summary>A module that does nothing; replaces, through <see cref="Bootstrapper.ReplaceModule(System.Type, BootstrapModule)"/>, a module that a shared base class always adds and that does not apply to a platform.</summary>
 public sealed class NoOpModule : BootstrapModule
 {
+    /// <summary>Does nothing.</summary>
     public override void ConfigureServices()
     {
     }

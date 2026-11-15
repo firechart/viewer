@@ -1,7 +1,6 @@
 using System.Reflection;
 using System.Security.Claims;
 using Flox.Core.Host;
-using Flox.Core.Replication;
 using Flox.Core.Services;
 using Flox.Shared.Host;
 using Flox.Shared.Layout;
@@ -37,19 +36,6 @@ public class MoreMenuTests
         }
     }
 
-    // What the host's container says about its services; with replication or without
-    internal static IServiceProviderIsService ServicesOf(bool replicated = false)
-    {
-        var services = new ServiceCollection();
-        if (replicated)
-        {
-            services.AddScoped<IReplicationService>(_ => throw new NotSupportedException());
-        }
-
-        return services.BuildServiceProvider()
-                       .GetRequiredService<IServiceProviderIsService>();
-    }
-
     private sealed class FakeRuntime(string environment) : FloxRuntime
     {
         public override FloxPlatform Platform => FloxPlatform.Wasm;
@@ -59,7 +45,7 @@ public class MoreMenuTests
 
     private static bool HasDiagnostics(string environment)
     {
-        var menu = new SharedMenuSource(new FakeRuntime(environment), ServicesOf()).GetMenu(new ClaimsPrincipal(new ClaimsIdentity()));
+        var menu = new SharedMenuSource(new FakeRuntime(environment)).GetMenu(new ClaimsPrincipal(new ClaimsIdentity()));
         return menu.Items.Any(row => row.Href == SharedMenuItems.Diagnostics.Href);
     }
 
@@ -115,7 +101,7 @@ public class MoreMenuTests
 
     private async Task ThePlatformMenu_KeepsTheEverydayItemsAndMovesTheRestToMore()
     {
-        var shell = new FakeShell(new SharedMenuSource(new FakeRuntime("Development"), ServicesOf()).GetMenu(s_signedIn));
+        var shell = new FakeShell(new SharedMenuSource(new FakeRuntime("Development")).GetMenu(s_signedIn));
 
         var main = await TextsAsync(shell, FloxMenuPlacement.Main);
         var more = await TextsAsync(shell, FloxMenuPlacement.More);
@@ -127,20 +113,6 @@ public class MoreMenuTests
             Assert.That(main, Does.Not.Contain(SharedMenuItems.Tasks.Text));
             Assert.That(more, Does.Contain(SharedMenuItems.Tasks.Text));
             Assert.That(more, Does.Contain(SharedMenuItems.About.Text));
-        });
-    }
-
-    private async Task TheSyncPage_IsOfferedToASignedInUser_OnlyWhereTheApplicationReplicates()
-    {
-        var withReplication = new FakeShell(new SharedMenuSource(new FakeRuntime("Production"), ServicesOf(true)).GetMenu(s_signedIn));
-        var without = new FakeShell(new SharedMenuSource(new FakeRuntime("Production"), ServicesOf()).GetMenu(s_signedIn));
-        var visitor = new FakeShell(new SharedMenuSource(new FakeRuntime("Production"), ServicesOf(true)).GetMenu(new ClaimsPrincipal(new ClaimsIdentity())));
-
-        await Assert.MultipleAsync(async () =>
-        {
-            Assert.That(await TextsAsync(withReplication, FloxMenuPlacement.More), Does.Contain(SharedMenuItems.Sync.Text));
-            Assert.That(await TextsAsync(without, FloxMenuPlacement.More), Does.Not.Contain(SharedMenuItems.Sync.Text), "no local store, nothing to monitor");
-            Assert.That(await TextsAsync(visitor, FloxMenuPlacement.More), Does.Not.Contain(SharedMenuItems.Sync.Text), "nobody is signed in");
         });
     }
 
@@ -165,7 +137,6 @@ public class MoreMenuTests
             await AMenuWithNothingToShow_IsLeftOut();
             await AGroup_IsHiddenWhenAllItsChildrenAre();
             await ThePlatformMenu_KeepsTheEverydayItemsAndMovesTheRestToMore();
-            await TheSyncPage_IsOfferedToASignedInUser_OnlyWhereTheApplicationReplicates();
             TheDiagnosticsPages_AreOnlyInADebugBuildInDevelopment();
         });
     }

@@ -1,3 +1,4 @@
+using Flox.Services;
 using FireChart.Viewer.Core.Smart;
 using Flox.Core.Host;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +41,6 @@ public sealed class TabSmartStorage(IJSRuntime js) : ISmartStorage
 
     private async Task<IJSObjectReference> ModuleAsync()
     {
-        return _module ??= await js.InvokeAsync<IJSObjectReference>("import", "./_content/FireChart.Viewer/js/smart-storage.js");
+        return _module ??= await js.ImportModuleAsync("./_content/FireChart.Viewer/js/smart-storage.js");
     }
 }

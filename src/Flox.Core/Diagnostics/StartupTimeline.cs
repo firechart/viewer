@@ -5,10 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Flox.Core.Diagnostics;
 
-// Where the time of a start goes: marks and spans on one clock that starts with the first use (so touch it as early as
-// possible), printed as one table and available as a tree of entries (IStartupTraceExporter turns it into a trace).
-// The clock is the process's own: in the browser the time before Main (download, runtime) is not on it, the report
-// of the client says how late the timeline began.
+/// <summary>
+/// Where the time of a start goes: marks and spans on one clock that starts with the first use (so touch it as early as possible), printed as one table and available as a tree of entries (IStartupTraceExporter turns it into a trace). The clock is the process's own: in the browser the time before Main (download, runtime) is not on it, the report of the client says how late the timeline began.
+/// </summary>
 public static class StartupTimeline
 {
     private static readonly long s_origin = Stopwatch.GetTimestamp();
@@ -18,6 +17,9 @@ public static class StartupTimeline
     private static readonly AsyncLocal<Scope?> s_current = new AsyncLocal<Scope?>();
     private static long s_lastId;
 
+    /// <summary>
+    /// Milliseconds since the zero of the timeline.
+    /// </summary>
     public static double ElapsedMilliseconds
     {
         get
@@ -27,7 +29,9 @@ public static class StartupTimeline
         }
     }
 
-    // The wall-clock time of the zero of the timeline
+    /// <summary>
+    /// The wall-clock time of the zero of the timeline.
+    /// </summary>
     public static DateTime OriginUtc
     {
         get
@@ -36,20 +40,26 @@ public static class StartupTimeline
         }
     }
 
-    // A moment: "something has happened by now"
+    /// <summary>
+    /// Records a moment: something has happened by now.
+    /// </summary>
     public static void Mark(string name)
     {
         var parent = s_current.Value;
         Add(new TimelineEntry(NextId(), parent?.Id, name, ElapsedMilliseconds, null, parent?.Depth + 1 ?? 0));
     }
 
-    // A stretch: dispose it when the work is done. Spans nest, the table indents the inner ones
+    /// <summary>
+    /// Starts a stretch of work; dispose it when the work is done. Spans nest, the table indents the inner ones.
+    /// </summary>
     public static IDisposable Span(string name)
     {
         return new Scope(name);
     }
 
-    // Everything recorded so far, in the order of the start
+    /// <summary>
+    /// Returns everything recorded so far, in the order of the start.
+    /// </summary>
     public static IReadOnlyList<TimelineEntry> Snapshot()
     {
         lock (s_lock)
@@ -58,13 +68,18 @@ public static class StartupTimeline
         }
     }
 
-    // Everything recorded so far; call it again later for a longer table
+    /// <summary>
+    /// Writes everything recorded so far to the log as one table; call it again later for a longer table.
+    /// </summary>
     public static void Report(ILogger logger, string title)
     {
         ArgumentNullException.ThrowIfNull(logger);
         logger.LogInformation("{Title}{NewLine}{Table}", title, Environment.NewLine, Format());
     }
 
+    /// <summary>
+    /// Returns everything recorded so far as a text table.
+    /// </summary>
     public static string Format()
     {
         var table = new StringBuilder();

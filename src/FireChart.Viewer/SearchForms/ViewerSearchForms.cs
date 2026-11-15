@@ -1,5 +1,7 @@
 using FireChart.Viewer.Core;
+using FireChart.Viewer.Core.Fhir;
 using FireChart.Viewer.Core.Forms;
+using FireChart.Viewer.Core.Search;
 using FireChart.Viewer.Library;
 using Flox.Core.Host;
 using Microsoft.AspNetCore.Components;
@@ -59,14 +61,19 @@ public static class SearchFormDialog
     /// <param name="definition">The form.</param>
     /// <param name="title">The title of the sheet.</param>
     /// <param name="values">The values the form opens with (<see cref="SearchFormSearchMapping.Read"/>); none: the defaults.</param>
+    /// <param name="server">
+    /// The FHIR server the search goes to: a field bound to a value set offers the codes this server expands (<see cref="IValueSetExpander"/>); none, or a
+    /// server that does not expand it: the codes of the <see cref="ISearchFormOptionSource"/> of the host, else a text box.
+    /// </param>
     /// <returns>The conditions and the values, or <see langword="null"/> when the user cancelled.</returns>
     /// <example>
     /// <code>
     /// var read = SearchFormSearchMapping.Read(definition, search);
-    /// var result = await SearchFormDialog.ShowAsync(dialogs, definition, "Patients", read.Values);
+    /// var result = await SearchFormDialog.ShowAsync(dialogs, definition, "Patients", read.Values, server);
     /// </code>
     /// </example>
-    public static async Task<SearchFormDialogResult?> ShowAsync(DialogService dialogs, SearchFormDefinition definition, string title, IReadOnlyDictionary<string, SearchFieldValue>? values = null)
+    public static async Task<SearchFormDialogResult?> ShowAsync(DialogService dialogs, SearchFormDefinition definition, string title, IReadOnlyDictionary<string, SearchFieldValue>? values = null,
+        IViewerServer? server = null)
     {
         ArgumentNullException.ThrowIfNull(dialogs);
         ArgumentNullException.ThrowIfNull(definition);
@@ -79,6 +86,11 @@ public static class SearchFormDialog
             parameters[nameof(SearchFormView.Values)] = values;
         }
 
+        if (server is not null)
+        {
+            parameters[nameof(SearchFormView.Server)] = server;
+        }
+
         // No title bar: the form takes the height; Cancel, Esc and a click beside it close it
         var options = Flox.Shared.Components.SheetOptions.Modal();
         options.ShowTitle = false;
@@ -88,7 +100,9 @@ public static class SearchFormDialog
 
 /// <summary>
 /// The search form of a resource type, chosen by a <see cref="ViewerFormResolver{TKey, TDefinition}"/> among the providers of the host
-/// (<see cref="IViewerFormProvider{TKey, TDefinition}"/> services) and the vendor forms of the library. Scoped: the answers are kept for the scope.
+/// (<see cref="IViewerFormProvider{TKey, TDefinition}"/> services) and the designed forms of the library (<c>search-forms/{release}/{type}.json</c>);
+/// when none has one, the form is generated from the metadata of the release (<see cref="SearchFormGenerator"/>). Scoped: the answers are kept for
+/// the scope.
 /// </summary>
 /// <example>
 /// <code>
@@ -109,7 +123,9 @@ public sealed class ViewerSearchForms : IDisposable
     /// <param name="logger">Logs a provider that failed.</param>
     public ViewerSearchForms(IEnumerable<IViewerFormProvider<SearchFormKey, SearchFormDefinition>> providers, IViewerAssets assets, ILogger<ViewerSearchForms> logger)
     {
-        _resolver = new ViewerFormResolver<SearchFormKey, SearchFormDefinition>([.. providers, new VendorSearchFormProvider(assets)], (_, _) => Task.FromResult(new SearchFormDefinition()), logger);
+        _resolver = new ViewerFormResolver<SearchFormKey, SearchFormDefinition>([.. providers, new VendorSearchFormProvider(assets, logger)],
+                                                                                (key, _) => Task.FromResult(SearchFormGenerator.Generate(key.Release, key.ResourceType) ?? new SearchFormDefinition()),
+                                                                                logger);
     }
 
     /// <summary>
@@ -117,11 +133,17 @@ public sealed class ViewerSearchForms : IDisposable
     /// </summary>
     /// <param name="key">The release in lower case and the resource type.</param>
     /// <param name="cancellationToken">Cancels the resolution.</param>
-    /// <returns>The form, or <see langword="null"/> when no provider has one (the list then has no filter).</returns>
+    /// <returns>The form of a provider, else the generated one; <see langword="null"/> for a release without metadata or a type it does not have (the
+    /// list then has no filter).</returns>
+    /// <example>
+    /// <code>
+    /// var form = await searchForms.FindAsync(new SearchFormKey("r4", "Basic"));   // generated: nobody designs a form of Basic
+    /// </code>
+    /// </example>
     public async Task<SearchFormDefinition?> FindAsync(SearchFormKey key, CancellationToken cancellationToken = default)
     {
         var resolved = await _resolver.ResolveAsync(key, cancellationToken);
-        return resolved.Source == FormSource.Fallback ? null : resolved.Definition;
+        return resolved.Source == FormSource.Fallback && resolved.Definition.Fields.Count == 0 ? null : resolved.Definition;
     }
 
     /// <summary>

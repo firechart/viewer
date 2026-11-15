@@ -1,7 +1,7 @@
 namespace FireChart.Viewer.Core.Forms;
 
 /// <summary>
-/// How a value is shown where a form asks for it: a section of the clinical summary for the values of its records, later a column of a table.
+/// How a value is shown where a form asks for it: a section of the patient summary for the values of its records, later a column of a table.
 /// </summary>
 /// <remarks>
 /// Without it a value keeps the digits of the record (<c>1.30</c> stays <c>1.30</c>: trailing zeros are significant figures). The templates get it as
@@ -9,7 +9,7 @@ namespace FireChart.Viewer.Core.Forms;
 /// </remarks>
 /// <example>
 /// <code>
-/// var results = new ClinicalSummaryFormSection { Code = "results", Format = new ValueFormat { Decimals = 2 } };
+/// var results = new SummaryFormSection { Code = "results", Format = new ValueFormat { Decimals = 2 } };
 /// </code>
 /// </example>
 public sealed class ValueFormat

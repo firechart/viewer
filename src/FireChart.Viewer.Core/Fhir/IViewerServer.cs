@@ -93,4 +93,26 @@ public interface IViewerServer
     /// </code>
     /// </example>
     bool SearchSummary => false;
+
+    /// <summary>
+    /// How long one request to the server may take, in seconds (<see cref="FhirServerHttp.DefaultTimeoutSeconds"/> by default). A request that takes longer
+    /// fails with a <see cref="TimeoutException"/>; the value is kept within <see cref="FhirServerHttp.MinTimeoutSeconds"/> and
+    /// <see cref="FhirServerHttp.MaxTimeoutSeconds"/>.
+    /// </summary>
+    /// <remarks>
+    /// A large server may need more for a search over many records of a patient (a laboratory search without an order took more than 30 seconds on a
+    /// Blaze server with a research data set).
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// public sealed record SlowServer(string Key, string Name, string BaseUrl) : IViewerServer
+    /// {
+    ///     public AuthenticationType AuthenticationType =&gt; AuthenticationType.None;
+    ///     public FhirRelease? FhirRelease =&gt; null;
+    ///     public int PageSize =&gt; 20;
+    ///     public int TimeoutSeconds =&gt; 120;
+    /// }
+    /// </code>
+    /// </example>
+    int TimeoutSeconds => FhirServerHttp.DefaultTimeoutSeconds;
 }

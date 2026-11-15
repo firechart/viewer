@@ -14,8 +14,7 @@ namespace FireChart.Viewer.Pages;
 /// <param name="Session">The instance of the Viewer.</param>
 /// <param name="ResourceType">The type.</param>
 /// <param name="Query">The search: the query of the address, without the question mark.</param>
-/// <param name="ClinicalSummaryForm">The list is the one of the patients that leads to the clinical summary of the one that is chosen.</param>
-public sealed record ResourceListKey(ViewerSession Session, string ResourceType, string Query, bool ClinicalSummaryForm = false);
+public sealed record ResourceListKey(ViewerSession Session, string ResourceType, string Query);
 
 /// <summary>
 /// A parameter of the search of a list as a chip.
@@ -42,6 +41,7 @@ public class ResourceListViewState : State
     private readonly IResourceTiles _tiles;
     private readonly ITerminologyResolver _terminology;
     private readonly IListSearchMemory _memory;
+    private readonly IValueSetExpander _expander;
     private bool _neverSearched;
     private readonly List<RelatedResource> _related = [];
     private ResourceListKey? _key;
@@ -61,6 +61,7 @@ public class ResourceListViewState : State
         _tiles = serviceProvider.GetRequiredService<IResourceTiles>();
         _terminology = serviceProvider.GetRequiredService<ITerminologyResolver>();
         _memory = serviceProvider.GetRequiredService<IListSearchMemory>();
+        _expander = serviceProvider.GetRequiredService<IValueSetExpander>();
         _terminology.Resolved += OnTerminologyResolved;
     }
 
@@ -73,7 +74,7 @@ public class ResourceListViewState : State
     /// <summary>What narrows the list now, one chip each (not <c>_count</c> and <c>_sort</c>).</summary>
     public IReadOnlyList<ActiveFilter> ActiveFilters =>
         [.. Search.Parameters.Where(row => row.Modifier is not null || row.Name is not (FhirSearchState.CountParameter or "_sort"))
-                  .Select(row => new ActiveFilter(Caption(row), string.Join(", ", row.Values.Select(FhirSearchQuery.Unescape)), row))];
+                  .Select(row => new ActiveFilter(Caption(row), string.Join(", ", row.Values.Select(value => TextOf(row, value))), row))];
 
     /// <summary>How many parameters of the search the form shows.</summary>
     public int FilterCount => Form is null ? 0 : SearchFormSearchMapping.Read(Form, Search).Consumed.Count;
@@ -146,7 +147,7 @@ public class ResourceListViewState : State
         }
 
         var read = SearchFormSearchMapping.Read(Form, Search);
-        var result = await SearchFormDialog.ShowAsync(DialogService, Form, Form.Title.Resolve(CultureInfo.CurrentUICulture.Name), read.Values);
+        var result = await SearchFormDialog.ShowAsync(DialogService, Form, Form.Title.Resolve(CultureInfo.CurrentUICulture.Name), read.Values, Server);
         if (result is not null)
         {
             await GoAsync(SearchFormSearchMapping.Apply(Search, read, result.Conditions));
@@ -286,20 +287,58 @@ public class ResourceListViewState : State
 
     private void Navigate(string query, bool replace)
     {
-        var page = _key!.ClinicalSummaryForm ? new ViewerRoute(ViewerPage.ClinicalSummary) : new ViewerRoute(ViewerPage.ResourceList, _key.ResourceType);
-        _key.Session.Navigate(page with { Query = query }, replace);
+        _key!.Session.Navigate(new ViewerRoute(ViewerPage.ResourceList, _key.ResourceType, Query: query), replace);
     }
 
-    // The list of the patients of the clinical summary keeps its search apart from the list of the type
-    private string ListName => _key!.ClinicalSummaryForm ? $"{ViewerRoutes.Summary}:{_key.ResourceType}" : _key.ResourceType;
+    private string ListName => _key!.ResourceType;
 
     private string Caption(FhirSearchParameter parameter)
     {
-        var name = parameter.Modifier is null ? parameter.Name : $"{parameter.Name}:{parameter.Modifier}";
-        var field = Form?.Fields.Where(row => name == row.QueryName || name.StartsWith(row.QueryName + ":", StringComparison.Ordinal))
-                         .OrderByDescending(row => row.QueryName.Length)
-                         .FirstOrDefault();
-        return field is null ? name : field.Label.Resolve(CultureInfo.CurrentUICulture.Name) is { Length: > 0 } label ? label : name;
+        var name = NameOf(parameter);
+        return FieldOf(parameter) is { } field && field.Label.Resolve(CultureInfo.CurrentUICulture.Name) is { Length: > 0 } label ? label : name;
+    }
+
+    private static string NameOf(FhirSearchParameter parameter)
+    {
+        return parameter.Modifier is null ? parameter.Name : $"{parameter.Name}:{parameter.Modifier}";
+    }
+
+    private SearchFormField? FieldOf(FhirSearchParameter parameter)
+    {
+        var name = NameOf(parameter);
+        return Form?.Fields.Where(row => name == row.QueryName || name.StartsWith(row.QueryName + ":", StringComparison.Ordinal))
+                   .OrderByDescending(row => row.QueryName.Length)
+                   .FirstOrDefault();
+    }
+
+    // A code of the value set of its field reads as its display (Final, not http://hl7.org/fhir/observation-status|final) once the server expanded it
+    private string TextOf(FhirSearchParameter parameter, string value)
+    {
+        return Server is not null && FieldOf(parameter) is { ValueSetUrl: { Length: > 0 } valueSet } field
+               && _expander.DisplayOf(Server, valueSet, field.ValueSetVersion, value) is { Length: > 0 } display
+            ? display
+            : FhirSearchQuery.Unescape(value);
+    }
+
+    // The value sets of the coded fields the search uses are expanded (once per server), so the chips show the displays of their codes
+    private async Task DescribeFiltersAsync(IViewerServer server)
+    {
+        var valueSets = Search.Parameters.Select(FieldOf)
+                              .OfType<SearchFormField>()
+                              .Where(f => f.ValueSetUrl is { Length: > 0 } && f.Control is SearchFieldControl.Select or SearchFieldControl.MultiSelect or SearchFieldControl.Autocomplete)
+                              .DistinctBy(f => (f.ValueSetUrl, f.ValueSetVersion))
+                              .ToList();
+        if (valueSets.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var field in valueSets)
+        {
+            await _expander.ExpandAsync(server, field.ValueSetUrl!, field.ValueSetVersion, null);
+        }
+
+        NotifyChanged();
     }
 
     // Each load starts from the first page: the position in the list is not kept
@@ -356,6 +395,7 @@ public class ResourceListViewState : State
             if (Access == ServerAccess.Ready)
             {
                 await LoadFormAsync(session.Server);
+                _ = DescribeFiltersAsync(session.Server);
                 if (_neverSearched && Form is not null && SearchFormSearchMapping.Defaults(Form) is { Parameters.Count: > 0 } defaults)
                 {
                     await GoAsync(defaults, true);

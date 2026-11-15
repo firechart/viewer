@@ -1,15 +1,22 @@
 namespace Flox.Shared.Pages.Diagnostics;
 
+/// <summary>
+/// A row of the demo list.
+/// </summary>
+/// <param name="number">The number of the row.</param>
 public sealed class DemoRow(int number)
 {
+    /// <summary>The number of the row.</summary>
     public int Number { get; } = number;
 
+    /// <summary>The name of the row.</summary>
     public string Name { get; } = $"Item {number}";
 
+    /// <summary>The detail text of the row.</summary>
     public string Detail { get; } = $"Row {number} of the demo list";
 }
 
-// A list state without a server: 95 rows in memory, paged and searched, with switches for a slow load, a failed load and no rows
+/// <summary>A list state without a server: 95 rows in memory, paged and searched, with switches for a slow load, a failed load and no rows.</summary>
 public sealed class DemoListState : IListState<DemoRow>
 {
     private const int Size = 20;
@@ -22,15 +29,19 @@ public sealed class DemoListState : IListState<DemoRow>
     private int _currentPage;
     private int _loads;
 
+    /// <inheritdoc />
     public event EventHandler? Changed;
 
+    /// <summary>Makes the next load fail once.</summary>
     public bool FailNext { get; set; }
 
+    /// <summary>Makes the list have no rows.</summary>
     public bool Empty { get; set; }
 
+    /// <summary>Makes loads slow.</summary>
     public bool Slow { get; set; }
 
-    // 5000 rows instead of 95, for the virtual list
+    /// <summary>Uses 5000 rows instead of 95, for the virtual list.</summary>
     public bool Big { get; set; }
 
     private List<DemoRow> All
@@ -46,6 +57,7 @@ public sealed class DemoListState : IListState<DemoRow>
         return Empty ? [] : [.. All.Where(row => string.IsNullOrWhiteSpace(SearchText) || row.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase))];
     }
 
+    /// <inheritdoc />
     public IReadOnlyList<DemoRow> Items
     {
         get
@@ -54,6 +66,7 @@ public sealed class DemoListState : IListState<DemoRow>
         }
     }
 
+    /// <inheritdoc />
     public long Total
     {
         get
@@ -62,6 +75,7 @@ public sealed class DemoListState : IListState<DemoRow>
         }
     }
 
+    /// <inheritdoc />
     public int PageSize
     {
         get
@@ -70,6 +84,7 @@ public sealed class DemoListState : IListState<DemoRow>
         }
     }
 
+    /// <inheritdoc />
     public int CurrentPage
     {
         get
@@ -78,12 +93,16 @@ public sealed class DemoListState : IListState<DemoRow>
         }
     }
 
+    /// <inheritdoc />
     public bool IsBusy { get; private set; }
 
+    /// <inheritdoc />
     public Exception? LoadError { get; private set; }
 
+    /// <inheritdoc />
     public string? SearchText { get; private set; }
 
+    /// <inheritdoc />
     public bool CanSearch
     {
         get
@@ -92,8 +111,10 @@ public sealed class DemoListState : IListState<DemoRow>
         }
     }
 
+    /// <inheritdoc />
     public DemoRow? Current { get; set; }
 
+    /// <inheritdoc />
     public IReadOnlyCollection<DemoRow> SelectedItems
     {
         get
@@ -102,6 +123,7 @@ public sealed class DemoListState : IListState<DemoRow>
         }
     }
 
+    /// <inheritdoc />
     public Task SearchAsync(string? text)
     {
         SearchText = text;
@@ -109,12 +131,14 @@ public sealed class DemoListState : IListState<DemoRow>
         return RefreshAsync();
     }
 
+    /// <inheritdoc />
     public Task GoToPageAsync(int page)
     {
         _currentPage = page;
         return RefreshAsync();
     }
 
+    /// <inheritdoc />
     public async Task RefreshAsync()
     {
         var load = ++_loads;
@@ -148,6 +172,7 @@ public sealed class DemoListState : IListState<DemoRow>
         }
     }
 
+    /// <inheritdoc />
     public void SetSearchText(string? text)
     {
         SearchText = text;
@@ -156,6 +181,7 @@ public sealed class DemoListState : IListState<DemoRow>
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <inheritdoc />
     public async Task<ListRange<DemoRow>> LoadRangeAsync(int skip, int count, CancellationToken cancellationToken)
     {
         IsBusy = true;
@@ -181,6 +207,7 @@ public sealed class DemoListState : IListState<DemoRow>
         }
     }
 
+    /// <summary>Removes the rows from the demo data and reloads.</summary>
     public void Delete(IReadOnlyCollection<DemoRow> rows)
     {
         foreach (var row in rows)
@@ -193,11 +220,13 @@ public sealed class DemoListState : IListState<DemoRow>
         _ = RefreshAsync();
     }
 
+    /// <inheritdoc />
     public bool IsSelected(DemoRow item)
     {
         return _selected.Contains(item);
     }
 
+    /// <inheritdoc />
     public void ToggleSelected(DemoRow item)
     {
         if (!_selected.Remove(item))
@@ -208,12 +237,14 @@ public sealed class DemoListState : IListState<DemoRow>
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <inheritdoc />
     public void ClearSelection()
     {
         _selected.Clear();
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <inheritdoc />
     public IReadOnlyList<DemoRow> Targets(DemoRow row)
     {
         return _selected.Contains(row) ? [.. _selected] : [row];

@@ -1,61 +1,77 @@
 @using FireChart.Viewer.Pages
-@* The shell of a section of the clinical summary, the same for every component: the sticky header (the icon, the title, the count, the toggle), the loading,
+@* The shell of a section of the patient summary, the same for every component: the sticky header (the icon, the title, the count, the toggle), the loading,
    the failure with its retry and the button of the next page; the component of the section draws the records between them *@
 
-<section id=@Section.ElementId class="fx-summary-section">
+@* --rows: the place of a section out of view before it is laid out (content-visibility of the kit), the header and the rows *@
+<section id=@Section.ElementId class="fx-summary-section" style=@($"--rows: {Rows}")>
     <div class="fx-summary-section-head">
-        <div class=@(Empty ? "fx-summary-group fx-summary-group-empty" : "fx-summary-group") role="button" aria-expanded=@(Section.Collapsed ? "false" : "true")
-             style="cursor: pointer" @onclick=@OnToggle>
-            <RadzenIcon Icon=@(Section.Collapsed ? "chevron_right" : "expand_more")/>
-            <div class="fx-summary-icon"><IconResource ResourceType=@Section.IconType Autocolor/></div>
-            <span class="fx-summary-group-title">@Section.Title</span>
-            @if (Section.IsLoaded)
-            {
-                <span class="fx-badge fx-badge-sm fx-badge-ghost">@Section.CountText</span>
-            }
+        @* A heading, so a reader goes from section to section; the toggle is a native button inside it (focus, Enter, Space), the rest stands beside it *@
+        <h3 class=@(Empty ? "fx-summary-group fx-summary-heading fx-summary-group-empty" : "fx-summary-group fx-summary-heading")>
+            <button type="button" class="fx-summary-toggle" aria-expanded=@(Section.Collapsed ? "false" : "true") aria-controls=@BodyId @onclick=@OnToggle>
+                <RadzenIcon Icon=@(Section.Collapsed ? "chevron_right" : "expand_more") class="rtl:-scale-x-100"/>
+                <span class="fx-summary-icon"><IconResource ResourceType=@Section.IconType Autocolor/></span>
+                <span class="fx-summary-group-title">@Section.Title</span>
+                @if (Section.Failed)
+                {
+                    <span class="fx-summary-failed" role="img" title=@Strings.Caption_SectionFailed aria-label=@Strings.Caption_SectionFailed><RadzenIcon Icon="error"/></span>
+                }
+                @if (Section.IsLoaded)
+                {
+                    <span class="fx-badge fx-badge-sm fx-badge-ghost">@Section.CountText</span>
+                }
+            </button>
             @if (Section.IsLoading)
             {
                 <CircularProgress Size="ProgressBarCircularSize.ExtraSmall"/>
             }
-        </div>
+        </h3>
     </div>
 
-    @if (!Section.Collapsed)
-    {
-        @if (!Section.IsLoaded && !Section.Failed)
+    <div id=@BodyId class="fx-summary-section-body">
+        @if (!Section.Collapsed)
         {
-            <div class="fx-summary-section-row"><div class="fx-summary-note"><CircularProgress Size="ProgressBarCircularSize.Small"/></div></div>
-        }
-        else if (!Empty)
-        {
-            @ChildContent
-            @if (Section.Failed)
+            @if (!Section.IsLoaded && !Section.Failed)
             {
-                <div class="fx-summary-section-row">
-                    <div class="fx-summary-note">
-                        @Strings.Message_FhirServerUnavailable
-                        <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_Retry Click=@OnMore/>
-                    </div>
-                </div>
+                <div class="fx-summary-section-row"><div class="fx-summary-note"><CircularProgress Size="ProgressBarCircularSize.Small"/></div></div>
             }
-            else if (Section.HasMore)
+            else if (!Empty)
             {
-                <div class="fx-summary-section-row">
-                    <div class="fx-summary-note">
-                        <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_More
-                                      IsBusy=@Section.IsLoading Click=@OnMore/>
+                @ChildContent
+                @if (Section.Failed)
+                {
+                    @foreach (var search in Section.FailedSearches)
+                    {
+                        @* Plain markup on the first load (the page says once how many sections failed); an alert only for the failure of a retry *@
+                        <div class="fx-summary-error" role=@(_retried ? "alert" : null)>
+                            <RadzenIcon Icon="error" class="fx-summary-error-icon"/>
+                            <div class="fx-summary-error-text">
+                                <div class="fx-summary-error-title">@TitleOf(search.Failure!)</div>
+                                <div class="fx-summary-error-detail">@DetailOf(search)</div>
+                            </div>
+                            <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_Retry
+                                          IsBusy=@Section.IsLoading Click=@RetryAsync/>
+                        </div>
+                    }
+                }
+                else if (Section.HasMore)
+                {
+                    <div class="fx-summary-section-row">
+                        <div class="fx-summary-note">
+                            <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_More
+                                          IsBusy=@Section.IsLoading Click=@OnMore/>
+                        </div>
                     </div>
-                </div>
+                }
             }
         }
-    }
+    </div>
 </section>
 
 @code {
 
     /// <summary>The section.</summary>
     [Parameter, EditorRequired]
-    public ClinicalSummarySection Section { get; set; } = null!;
+    public SummarySection Section { get; set; } = null!;
 
     /// <summary>Opens or closes the section (a click on its header).</summary>
     [Parameter]
@@ -68,6 +84,38 @@
     /// <summary>The records of the section, drawn by its component.</summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    private static string TitleOf(SearchFailure failure)
+    {
+        return failure.Kind switch
+        {
+            SearchFailureKind.Refused => Strings.Caption_SearchRefused,
+            SearchFailureKind.ServerError => Strings.Caption_SearchServerError,
+            SearchFailureKind.Timeout => string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.Caption_SearchTimedOut, failure.TimeoutSeconds),
+            SearchFailureKind.Unreachable => Strings.Message_FhirServerUnavailable,
+            _ => Strings.Caption_SearchUnreadable,
+        };
+    }
+
+    // The type, the status and what the server said: Observation · 400 · Unknown search-param `date` in sort clause.
+    private static string DetailOf(SectionSearch search)
+    {
+        return string.Join(" · ", new[] { search.ResourceType, search.Failure!.Status?.ToString(System.Globalization.CultureInfo.InvariantCulture), search.Failure.Detail }
+            .Where(part => !string.IsNullOrWhiteSpace(part)));
+    }
+
+    private bool _retried;
+
+    // The id of the body of the section, the region the toggle opens and closes
+    private string BodyId => Section.ElementId + "-body";
+
+    private async Task RetryAsync()
+    {
+        _retried = true;
+        await OnMore.InvokeAsync();
+    }
+
+    private int Rows => Section.Collapsed ? 1 : 1 + Math.Max(1, Section.Items.Count) + Section.FailedSearches.Count + (Section.HasMore ? 1 : 0);
 
     // Loaded, nothing found and no failure: the header alone, dimmed
     private bool Empty => Section.IsLoaded && !Section.Failed && Section.Items.Count == 0;

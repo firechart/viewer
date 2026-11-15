@@ -7,15 +7,18 @@ namespace Flox.Shared.Services;
 /// </summary>
 public class EventMessage : GuidEntity
 {
+    /// <summary>Creates an empty message.</summary>
     public EventMessage()
     {
     }
 
+    /// <summary>Creates a message that carries <paramref name="payload"/>.</summary>
     public EventMessage(object? payload)
     {
         Serialize(payload);
     }
 
+    /// <summary>Stores the payload as JSON together with its CLR type name.</summary>
     public void Serialize(object? payload)
     {
         if (payload == null)
@@ -38,6 +41,7 @@ public class EventMessage : GuidEntity
         }
     }
 
+    /// <summary>Reads the payload as an object of the given type.</summary>
     public object? Deserialize(Type type)
     {
         if (Payload == null)
@@ -51,6 +55,7 @@ public class EventMessage : GuidEntity
         return result;
     }
 
+    /// <summary>Reads the payload as <typeparamref name="T"/>.</summary>
     public T? Deserialize<T>()
     {
         return (T?)Deserialize(typeof(T));
@@ -62,6 +67,7 @@ public class EventMessage : GuidEntity
     /// <summary>Application-level event type; not the name of the SignalR client method.</summary>
     public string EventType { get; set; } = DefaultEventType;
 
+    /// <summary>The payload as JSON.</summary>
     public string? Payload { get; set; }
 
     /// <summary>Full CLR type name of the payload; consumers match on it before deserializing.</summary>
@@ -70,6 +76,7 @@ public class EventMessage : GuidEntity
     /// <summary>The <c>sub</c> of the addressee; <c>null</c> for a broadcast.</summary>
     public string? Receiver { get; set; }
 
+    /// <summary>Whether the message is for every user rather than for one addressee.</summary>
     public bool IsBroadcast
     {
         get

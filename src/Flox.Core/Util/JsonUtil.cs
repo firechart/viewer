@@ -5,10 +5,19 @@ using Flox.Core.Serialization;
 
 namespace Flox.Core.Util;
 
+/// <summary>
+/// Shared JSON serializer options and helpers.
+/// </summary>
 public static class JsonUtil
 {
+    /// <summary>
+    /// Shared camel-case options meant to skip null values; currently built with the same settings as DefaultCamelCaseOptions.
+    /// </summary>
     public static JsonSerializerOptions DefaultCamelCaseIgnoreNullOptions { get; } = CreateNewDefaultCamelCaseOptions(false);
 
+    /// <summary>
+    /// Shared camel-case options: tolerant reading, enums as strings, nulls written.
+    /// </summary>
     public static JsonSerializerOptions DefaultCamelCaseOptions { get; } = CreateNewDefaultCamelCaseOptions(false);
 
     private static JsonSerializerOptions _jso = new JsonSerializerOptions
@@ -17,6 +26,9 @@ public static class JsonUtil
         Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
+    /// <summary>
+    /// Copies the settings and converters of one set of options to another, optionally putting an extra resolver in front of the resolver.
+    /// </summary>
     public static void ApplyTo(JsonSerializerOptions source, JsonSerializerOptions target, IJsonTypeInfoResolver? extraResolver = null)
     {
         target.AllowTrailingCommas = source.AllowTrailingCommas;
@@ -36,6 +48,9 @@ public static class JsonUtil
         target.TypeInfoResolver = extraResolver is null ? source.TypeInfoResolver : JsonTypeInfoResolver.Combine(extraResolver, source.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver());
     }
 
+    /// <summary>
+    /// Formats JSON text with indentation; text that is not valid JSON is returned as is, an empty one gives an empty string.
+    /// </summary>
     public static string Beautify(string? json)
     {
         if (string.IsNullOrWhiteSpace(json))
@@ -60,6 +75,9 @@ public static class JsonUtil
         }
     }
 
+    /// <summary>
+    /// Creates options for reading files written by hand: tolerant to comments and trailing commas, strict about unknown members.
+    /// </summary>
     public static JsonSerializerOptions CreateLaxOptions()
     {
         var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
@@ -79,6 +97,9 @@ public static class JsonUtil
         return options;
     }
 
+    /// <summary>
+    /// Creates new camel-case options: tolerant reading, enums as strings, unknown members skipped.
+    /// </summary>
     public static JsonSerializerOptions CreateNewDefaultCamelCaseOptions(bool ignoreNulls = false)
     {
         var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
@@ -100,6 +121,9 @@ public static class JsonUtil
         return options;
     }
 
+    /// <summary>
+    /// Deserializes a JSON element with the shared options; returns null when it does not fit the type.
+    /// </summary>
     public static T? DeserializeFromJsonElement<T>(JsonElement value) where T : class
     {
         try
@@ -112,6 +136,9 @@ public static class JsonUtil
         }
     }
 
+    /// <summary>
+    /// Serializes the value with the shared camel-case options.
+    /// </summary>
     public static string Serialize<T>(T value, bool ignoreNulls = false)
     {
         if (ignoreNulls)
@@ -124,6 +151,9 @@ public static class JsonUtil
         }
     }
 
+    /// <summary>
+    /// Converts an object to a JSON element; null gives an undefined element.
+    /// </summary>
     public static JsonElement SerializeToJsonElement(object? obj)
     {
         if (obj == null)
@@ -136,6 +166,9 @@ public static class JsonUtil
         return document.RootElement;
     }
 
+    /// <summary>
+    /// Serializes the object with the shared camel-case options; null gives an empty string.
+    /// </summary>
     public static string ToJson(object? obj)
     {
         return obj == null ? string.Empty : JsonSerializer.Serialize(obj, DefaultCamelCaseOptions);

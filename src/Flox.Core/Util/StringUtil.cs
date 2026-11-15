@@ -4,6 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace Flox.Core.Util;
 
+/// <summary>
+/// Helpers for strings.
+/// </summary>
 public static partial class StringUtil
 {
     [GeneratedRegex(@"\{[^}]*\}")]
@@ -64,11 +67,17 @@ public static partial class StringUtil
         }
     }
 
+    /// <summary>
+    /// Converts an identifier to snake case.
+    /// </summary>
     public static string ToSnakeCase(this string value)
     {
         return JsonNamingPolicy.SnakeCaseLower.ConvertName(value);
     }
 
+    /// <summary>
+    /// Converts an identifier to lower camel case.
+    /// </summary>
     public static string ToLowerCamelCase(this string identifier)
     {
         return JsonNamingPolicy.CamelCase.ConvertName(identifier);

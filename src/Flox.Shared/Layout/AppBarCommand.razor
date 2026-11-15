@@ -5,6 +5,7 @@
               Style=@(!string.IsNullOrEmpty(IconColor) ? $"color: {IconColor}" : null)
               Disabled=@Disabled
               title=@Title
+              aria-label=@(ChildContent is null ? Title : null)
               aria-pressed=@(Pressed is null ? null : Pressed.Value ? "true" : "false")
               Click=@HandleClickAsync>
     <FloxIcon Icon=@Icon Filled=@(Pressed == true) Color=@(Pressed == true ? "var(--rz-primary)" : null)/>

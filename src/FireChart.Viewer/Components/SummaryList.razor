@@ -10,18 +10,21 @@
 
     @if (Sticky is not null && Rows.Count > 0 && (ShowSticky is null || ShowSticky(TopRow)))
     {
-        <div class="fx-summary-sticky absolute left-0 top-0 z-10 overflow-hidden" style="right: var(--fx-scrollbar, 0px); height: var(--summary-row-height)">
+        <div class="fx-summary-sticky absolute start-0 top-0 z-10 overflow-hidden" style="inset-inline-end: var(--fx-scrollbar, 0px); height: var(--summary-row-height)">
             @Sticky(TopRow)
         </div>
     }
 
     <div @ref=_scroller class="overflow-y-auto overscroll-contain">
         <div class="relative" style=@($"height: calc(var(--summary-row-height) * {Rows.Count})")>
-            <div style=@($"transform: translateY(calc(var(--summary-row-height) * {From}))")>
+            @* One list of the records: the rows out of the window are not in the page, so each says its place and the size of the list *@
+            <div role="list" style=@($"transform: translateY(calc(var(--summary-row-height) * {From}))")>
                 @for (var index = From; index < To; index++)
                 {
                     var row = Rows[index];
-                    <div class="overflow-hidden" style="height: var(--summary-row-height)" @key=row>
+                    var item = IsItem is null || IsItem(row);
+                    <div class="overflow-hidden" style="height: var(--summary-row-height)" role=@(item ? "listitem" : "none")
+                         aria-setsize=@(item ? (SetSize ?? Rows.Count) : null) aria-posinset=@(item ? index + 1 : null) @key=row>
                         @Row(row)
                     </div>
                 }
@@ -52,6 +55,30 @@
     [Parameter, EditorRequired]
     public RenderFragment<TRow> Row { get; set; } = null!;
 
+    /// <summary>
+    /// Whether a row is an item of the list (a record) and not a note or a command of it (nothing found, the next page); every row when not given.
+    /// The items come first: an item tells a reader its place (<c>aria-posinset</c>, its index plus one) and the size of the list.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// &lt;SummaryList TRow="ListRow" Rows=@rows IsItem=@(row =&gt; row.Kind == ListRowKind.Card)&gt;...&lt;/SummaryList&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public Func<TRow, bool>? IsItem { get; set; }
+
+    /// <summary>
+    /// The size of the list a reader is told (<c>aria-setsize</c>): the total of the server, or -1 while it is not known; the number of the rows when not
+    /// given.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// &lt;SummaryList TRow="ListRow" Rows=@rows SetSize=@(hasMore ? -1 : rows.Count)&gt;...&lt;/SummaryList&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public int? SetSize { get; set; }
+
     [Parameter]
     public RenderFragment<TRow>? Sticky { get; set; }
 
@@ -78,7 +105,7 @@
             return;
         }
 
-        _module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/FireChart.Viewer/Components/SummaryList.razor.js");
+        _module = await JS.ImportModuleAsync("./_content/FireChart.Viewer/Components/SummaryList.razor.js");
         // The page may have gone while the module was loading: its elements are gone too
         if (_disposed)
         {

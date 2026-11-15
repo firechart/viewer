@@ -50,13 +50,22 @@
                             </Items>
                         </RadzenSelectBar>
                     </RadzenFormField>
+                    <RadzenFormField Text="Style" Variant="Variant.Outlined">
+                        <RadzenSelectBar TValue="string" Value=@_style ValueChanged=@((string style) => SetStyleAsync(style)) Size="ButtonSize.Small" data-sandbox="style">
+                            <Items>
+                                <RadzenSelectBarItem Text="Vendor" Value="@("")"/>
+                                <RadzenSelectBarItem Text="Fluent" Value="@("fluent")"/>
+                                <RadzenSelectBarItem Text="Compact" Value="@("compact")"/>
+                            </Items>
+                        </RadzenSelectBar>
+                    </RadzenFormField>
                     <RadzenFormField Text="Language" Variant="Variant.Outlined">
                         <RadzenDropDown TValue="string" Data=@s_locales Value=@_locale ValueChanged=@((string locale) => SetLocaleAsync(locale)) data-sandbox="locale"/>
                     </RadzenFormField>
                     @if (Selected?.Patient is { } patient)
                     {
                         <RadzenButton ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Icon="person" Text="Patient summary"
-                                      Click=@(() => NavigateAsync(new ViewerRoute(ViewerPage.ClinicalSummary, "Patient", patient).Location)) data-sandbox="patient"/>
+                                      Click=@(() => NavigateAsync(new ViewerRoute(ViewerPage.Summary, "Patient", patient).Location)) data-sandbox="patient"/>
                     }
                 </RadzenStack>
 
@@ -73,7 +82,7 @@
                 @if (_errors.Count > 0)
                 {
                     <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Size="AlertSize.Small" AllowClose="false" data-sandbox="errors">
-                        <ul class="m-0 pl-4">
+                        <ul class="m-0 ps-4">
                             @foreach (var error in _errors)
                             {
                                 <li><code>@error.Param</code> (@error.Code): @error.Message</li>
@@ -160,6 +169,7 @@
     private string _editor = string.Empty;
     private JsonObject? _applied;
     private string _theme = "auto";
+    private string _style = string.Empty;
     private string _locale = "auto";
     private ElementReference _frameHost;
     private IJSObjectReference? _module;
@@ -182,7 +192,7 @@
         if (firstRender)
         {
             _self = DotNetObjectReference.Create(this);
-            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/sandbox.js");
+            _module = await JS.ImportModuleAsync("./js/sandbox.js");
             await _module.InvokeVoidAsync("attach", _frameHost, _self);
         }
     }
@@ -262,6 +272,7 @@
         var frameShown = _applied is not null;
         _applied = config;
         _theme = config["appearance"]?["theme"]?.GetValue<string>() ?? "auto";
+        _style = config["appearance"]?["style"]?.GetValue<string>() ?? string.Empty;
         _locale = config["locale"]?.GetValue<string>() ?? "auto";
         _snippets = CodeSnippets.Build(config);
         // A new frame says hello and gets the configuration by init
@@ -275,6 +286,13 @@
     {
         _theme = theme;
         return UpdateAsync(new JsonObject { ["appearance"] = new JsonObject { ["theme"] = theme } });
+    }
+
+    // A theme of the library (styles/themes); "" is the vendor look
+    private Task SetStyleAsync(string style)
+    {
+        _style = style;
+        return UpdateAsync(new JsonObject { ["appearance"] = new JsonObject { ["style"] = style.Length == 0 ? null : style } });
     }
 
     private Task SetLocaleAsync(string locale)

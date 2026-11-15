@@ -24,11 +24,11 @@ namespace FireChart.Viewer.Core.Forms;
 /// </remarks>
 /// <example>
 /// <code>
-/// using var resolver = new ViewerFormResolver&lt;SummaryFormKey, ClinicalSummaryFormDefinition&gt;(
+/// using var resolver = new ViewerFormResolver&lt;SummaryFormKey, SummaryFormDefinition&gt;(
 ///     [serverProvider, new VendorSummaryFormProvider()],
 ///     (key, cancellationToken) =&gt; Task.FromResult(VendorSummaryForms.Default),
 ///     logger);
-/// var form = await resolver.ResolveAsync(new SummaryFormKey("oncology"), cancellationToken);
+/// var form = await resolver.ResolveAsync(new SummaryFormKey("Encounter"), cancellationToken);
 /// </code>
 /// </example>
 public sealed class ViewerFormResolver<TKey, TDefinition> : IViewerFormResolver<TKey, TDefinition>, IDisposable

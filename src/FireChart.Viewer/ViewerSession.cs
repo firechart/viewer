@@ -25,14 +25,12 @@ public sealed class ViewerSession
     /// <param name="smartPopupRedirectUri">The return page of a sign-in in a popup (<c>_content/FireChart.Viewer/smart-callback.html</c>, absolute).</param>
     /// <param name="terminologyServer">The terminology server for the displays of bare codes (<see cref="TerminologyResolver.AddressOf"/>); none: the
     /// codes are shown as they are, nothing of a patient leaves for another server.</param>
-    /// <param name="clinicalSummaryForm">The code of the clinical summary form of the server; none is <c>default</c>.</param>
     /// <exception cref="ArgumentNullException"><paramref name="server"/> or <paramref name="location"/> is <see langword="null"/>.</exception>
-    public ViewerSession(IViewerServer server, IViewerLocationStore location, string? smartRedirectUri = null, string? terminologyServer = null, string? clinicalSummaryForm = null,
+    public ViewerSession(IViewerServer server, IViewerLocationStore location, string? smartRedirectUri = null, string? terminologyServer = null,
                          FireChart.Viewer.Smart.SmartFlow smartFlow = FireChart.Viewer.Smart.SmartFlow.Redirect, string smartPopupRedirectUri = "")
     {
         SmartFlow = smartFlow;
         SmartPopupRedirectUri = smartPopupRedirectUri;
-        ClinicalSummaryForm = string.IsNullOrWhiteSpace(clinicalSummaryForm) ? null : clinicalSummaryForm.Trim();
         TerminologyServer = TerminologyResolver.AddressOf(terminologyServer);
         ArgumentNullException.ThrowIfNull(server);
         ArgumentNullException.ThrowIfNull(location);
@@ -72,11 +70,6 @@ public sealed class ViewerSession
     public string? TerminologyServer { get; }
 
     /// <summary>
-    /// The code of the clinical summary form of the server, or <see langword="null"/> for <c>default</c>.
-    /// </summary>
-    public string? ClinicalSummaryForm { get; }
-
-    /// <summary>
     /// The pages show the star of a bookmark (when the host keeps bookmarks); <see langword="true"/> by default. A host whose own pages bookmark
     /// otherwise (the lists of the Conformance Browser of FireChart) turns it off.
     /// </summary>
@@ -107,5 +100,65 @@ public sealed class ViewerSession
     {
         ArgumentNullException.ThrowIfNull(route);
         Location.NavigateTo(route.Location, replace);
+    }
+
+    /// <summary>
+    /// Whether the sheet open now was opened by <see cref="OpenInSheet"/>, so closing it goes back in the history; a sheet that came with the address
+    /// (a link, a reload) does not.
+    /// </summary>
+    public bool SheetPushed { get; private set; }
+
+    /// <summary>
+    /// Shows a record in a sheet over the current page (the patient summary): a new entry of the history, so Back closes it.
+    /// </summary>
+    /// <param name="record">The page of the record.</param>
+    /// <example>
+    /// <code>
+    /// session.OpenInSheet(new ViewerRoute(ViewerPage.Resource, "Observation", "o1"));
+    /// </code>
+    /// </example>
+    public void OpenInSheet(ViewerRoute record)
+    {
+        ArgumentNullException.ThrowIfNull(record);
+        if (ViewerRoutes.Parse(Location.Location) is { } current)
+        {
+            SheetPushed = true;
+            Navigate(current.WithPeek(record));
+        }
+    }
+
+    /// <summary>
+    /// Closes the sheet. A sheet <see cref="OpenInSheet"/> opened is closed by going back in the history, which the host does when this returns
+    /// <see langword="true"/>; any other is closed here by replacing the address.
+    /// </summary>
+    /// <returns><see langword="true"/> when the host should go back in the history.</returns>
+    /// <example>
+    /// <code>
+    /// if (session.CloseSheet()) await js.InvokeVoidAsync("history.back");
+    /// </code>
+    /// </example>
+    public bool CloseSheet()
+    {
+        if (SheetPushed)
+        {
+            SheetPushed = false;
+            return true;
+        }
+
+        if (ViewerRoutes.Parse(Location.Location) is { Peek: not null } route)
+        {
+            Navigate(route.WithPeek(null), replace: true);
+        }
+
+        return false;
+    }
+
+    // Forgets that the sheet was opened here once the summary has none (Back closed it)
+    internal void OnLocationChanged()
+    {
+        if (ViewerRoutes.Parse(Location.Location) is { Page: ViewerPage.Summary, Peek: null })
+        {
+            SheetPushed = false;
+        }
     }
 }

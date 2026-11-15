@@ -2,14 +2,19 @@ using Microsoft.Extensions.Configuration;
 
 namespace Flox.Core.Util;
 
-// The address of the application server as the clients see it. The Flox:Bootstrap:BaseAddress setting sets it explicitly (MAUI and desktop have to,
-// a WASM client may to talk to another server); without it the address the client came from is used (WASM: the host that
-// served the page)
+/// <summary>
+/// The address of the application server as the clients see it. The Flox:Bootstrap:BaseAddress setting sets it explicitly (MAUI and desktop have to, a WASM client may to talk to another server); without it the address the client came from is used (WASM: the host that served the page).
+/// </summary>
 public static class ServerBaseAddress
 {
+    /// <summary>
+    /// Configuration key of the explicit address.
+    /// </summary>
     public const string ConfigurationKey = "Flox:Bootstrap:BaseAddress";
 
-    // Without the trailing slash, so callers append their own "/path"
+    /// <summary>
+    /// Returns the address of the server without the trailing slash, so callers append their own path.
+    /// </summary>
     public static string Resolve(IConfiguration configuration, string? fallback)
     {
         ArgumentNullException.ThrowIfNull(configuration);

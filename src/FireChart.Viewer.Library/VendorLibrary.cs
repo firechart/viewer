@@ -4,8 +4,9 @@ using Hl7.Fhir.Model;
 namespace FireChart.Viewer.Library;
 
 /// <summary>
-/// The layout of the vendor library: the static files of this project (<c>wwwroot</c>), served by every host as
-/// <c>_content/FireChart.Viewer.Library/...</c>, and read by a client one by one when they are needed.
+/// The layout of the vendor library: the static files of <c>public/library</c> (a package of the designer with its manifest
+/// <c>firechart.project.json</c>; no code project carries them), served by every host as <c>library/...</c>, and read by a client one by one when
+/// they are needed.
 /// </summary>
 /// <remarks>
 /// <list type="bullet">
@@ -19,20 +20,15 @@ namespace FireChart.Viewer.Library;
 /// <example>
 /// <code>
 /// var path = VendorLibrary.TemplatePathOf("Patient@tile");   // templates/resources/Patient@tile.liquid
-/// var url = VendorLibrary.UrlOf(path);                       // _content/FireChart.Viewer.Library/templates/resources/Patient@tile.liquid?v=1.2.0
+/// var url = VendorLibrary.UrlOf(path);                       // library/templates/resources/Patient@tile.liquid?v=1.2.0
 /// </code>
 /// </example>
 public static class VendorLibrary
 {
     /// <summary>
-    /// The folder of the static files of the project.
-    /// </summary>
-    public const string WebRoot = "wwwroot";
-
-    /// <summary>
     /// Where a host serves the static files of this library, relative to its base.
     /// </summary>
-    public const string ContentRoot = "_content/FireChart.Viewer.Library";
+    public const string ContentRoot = "library";
 
     /// <summary>
     /// The folder of the templates.

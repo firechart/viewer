@@ -2,10 +2,14 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Flox.Core.Authorization;
 
+/// <summary>
+/// Helpers for registering authorization policies.
+/// </summary>
 public static class AuthorizationOptionsExtensions
 {
-    // The user must be authenticated and hold at least one of the roles. Admin is not implied:
-    // include AppRoles.ADMINISTRATOR explicitly when a policy should also be open to administrators
+    /// <summary>
+    /// Adds a policy that needs a signed-in user holding at least one of the roles. Administrator is not implied: include it explicitly when the policy should be open to administrators.
+    /// </summary>
     public static AuthorizationOptions AddRolePolicy(this AuthorizationOptions options, string name, params string[] roles)
     {
         options.AddPolicy(name,

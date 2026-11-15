@@ -22,8 +22,8 @@ internal static class BannerFrame
         }
 
         var kind = type == Patient ? "fx-banner" : "fx-banner fx-banner-sub";
-        return $"<header class=\"{kind}\"><h2 class=\"fx-banner-title\">{title}</h2>" +
+        return $"<div class=\"{kind}\"><h2 class=\"fx-banner-title\">{title}</h2>" +
                $"<div class=\"fx-banner-facts\">{slots[FrameSlots.Facts].Trim()}</div>" +
-               $"<div class=\"fx-banner-flags\">{slots[FrameSlots.Flags].Trim()}</div></header>";
+               $"<div class=\"fx-banner-flags\">{slots[FrameSlots.Flags].Trim()}</div></div>";
     }
 }

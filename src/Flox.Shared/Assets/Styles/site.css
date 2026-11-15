@@ -189,6 +189,8 @@ html:root {
     --rz-checkbox-border-radius: calc(var(--radius-selector) * 0.75);
     --rz-icon-size: 1.25rem;
     --rz-icon-font-family: "Flox Symbols", "Flox Icon Fallback";
+    /* The font has the weight 400 only (app.css): an icon in bold text stays as drawn, not a synthesized bold */
+    --rz-icon-weight: 400;
     --rz-border-width: 1px;
     --rz-transition: 150ms var(--ease-in-out);
     --rz-header-min-height: 3rem;
@@ -247,7 +249,7 @@ html:root {
     --rz-input-background-color: var(--rz-base-background-color);
     --rz-input-hover-background-color: var(--rz-base-background-color);
     --rz-input-focus-background-color: var(--rz-base-background-color);
-    --rz-input-placeholder-color: var(--color-stone-400);
+    --rz-input-placeholder-color: var(--color-neutral-400);
 
     /* Form fields are Variant.Text everywhere, laid out as daisyUI's (components.css): the label above, the field, the hint below */
     --fw-field-label-gap: calc(var(--spacing) * 1.5);
@@ -286,7 +288,7 @@ html:root {
     --rz-panel-menu-item-3rd-level-active-background-color: var(--rz-panel-menu-item-active-background-color);
 
     /* Chips as daisyUI badges: the selector radius, text-xs, a quiet background */
-    --rz-chip-background-color: var(--color-stone-100);
+    --rz-chip-background-color: var(--color-neutral-100);
     --rz-chip-border-radius: var(--radius-selector);
     --rz-chip-font-size: var(--text-xs);
     --rz-chip-padding-block: calc(var(--spacing) * 1);
@@ -303,10 +305,17 @@ html:root {
 html:root[data-theme="dark"] {
     color-scheme: dark;
 
-    --rz-chip-background-color: var(--color-stone-800);
+    --rz-chip-background-color: var(--color-neutral-800);
 
-    --rz-input-placeholder-color: var(--color-stone-500);
+    --rz-input-placeholder-color: var(--color-neutral-500);
 
+}
+
+/* Forced colors (Windows High Contrast) drop the halo and force the border colors: there the focus of a field is a system outline */
+@media (forced-colors: active) {
+    html:root {
+        --rz-input-focus-outline: 2px solid Highlight;
+    }
 }
 
 /* Radzen 12.1.4 leaves the label of an empty form field (the placeholder position) in the text color; only the floated one is dimmed */

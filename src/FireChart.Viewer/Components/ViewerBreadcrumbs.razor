@@ -9,7 +9,7 @@
             <RadzenBreadCrumbItem>
                 @if (i == Items.Count - 1 || item.Href is null)
                 {
-                    <span>@item.Text</span>
+                    <span aria-current=@(i == Items.Count - 1 ? "page" : null)>@item.Text</span>
                 }
                 else
                 {
@@ -38,9 +38,8 @@
                 { Page: ViewerPage.ResourceList, ResourceType: { } type } => [server, new Crumb(type, null)],
                 { Page: ViewerPage.Resource, ResourceType: { } type, Id: { } id } =>
                     [server, new Crumb(type, Session.HrefOf(new ViewerRoute(ViewerPage.ResourceList, type))), new Crumb(id, null)],
-                { Page: ViewerPage.ClinicalSummary, Id: { } patient } =>
-                    [server, new Crumb(Strings.Caption_ClinicalSummary, Session.HrefOf(new ViewerRoute(ViewerPage.ClinicalSummary))), new Crumb(patient, null)],
-                { Page: ViewerPage.ClinicalSummary } => [server, new Crumb(Strings.Caption_ClinicalSummary, null)],
+                { Page: ViewerPage.Summary, ResourceType: { } type, Id: { } id } =>
+                    [server, new Crumb(type, Session.HrefOf(new ViewerRoute(ViewerPage.ResourceList, type))), new Crumb(id, null)],
                 { Page: ViewerPage.Bookmarks } => [server, new Crumb(FloxStrings.Caption_Bookmarks, null)],
                 _ => [server]
             };

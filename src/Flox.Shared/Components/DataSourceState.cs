@@ -1,22 +1,23 @@
 using System.Diagnostics;
-using Flox.Core.Replication;
 using Flox.Shared.Services;
 using Flox.Shared.Settings;
 
 namespace Flox.Shared.Components;
 
+/// <summary>
+/// State of a list over a data source: paging, search, filters, sorts, selection, optional bookmarks and deletion of rows.
+/// </summary>
 public abstract class DataSourceState<TKey, TEntity> : State,
                                                        IListState<TEntity>
 where TKey : notnull
 where TEntity : class
 {
     private GeneralAppSettings? _appSettings;
-    private readonly IReplicationService? _replication;
-    private Dictionary<string, ReplicationFailure> _failures = [];
     private readonly IAppSettingsProvider<GeneralAppSettings>? _appSettingsProvider;
     private CancellationTokenSource? _loadCts;
     private int _rangeLoads;
 
+    /// <inheritdoc />
     protected DataSourceState(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         DataSource = serviceProvider.GetRequiredService<IDataSource<TKey, TEntity>>();
@@ -24,49 +25,24 @@ where TEntity : class
         _appSettingsProvider = serviceProvider.GetService<IAppSettingsProvider<GeneralAppSettings>>();
         _appSettingsProvider?.SettingsChanged += OnAppSettingsChanged;
         Selection.Changed += (_, _) => NotifyChanged();
-        if (ReplicatedType.IsReplicated(typeof(TEntity)) && serviceProvider.GetService<IReplicationService>() is { } replication)
+        // Rows kept on the device (bookmarks, recent pages): another tab may change them
+        if (serviceProvider.GetService<IStorage<TKey, TEntity>>() is ILocalChangeNotifier local)
         {
-            _replication = replication;
-            _replication.StateChanged += OnReplicationChanged;
+            _local = local;
+            _local.ChangedElsewhere += OnChangedElsewhere;
         }
     }
 
-    // The rows of a replicated type that the server did not accept, by the id of the document
-    public string? FailureText(TEntity row)
-    {
-        var key = DataSource.GetKey(row);
-        var id = key is Guid guid ? guid.ToString("D") : key.ToString();
-        return id is not null && _failures.TryGetValue(id, out var failure) ? string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.Sync_NotSynced, ReplicationFailureText.Describe(failure)) : null;
-    }
+    private readonly ILocalChangeNotifier? _local;
+    private bool _loaded;
 
-    private async Task LoadFailuresAsync()
+    // Another tab changed the rows: a list that was shown reads them again
+    private void OnChangedElsewhere(object? sender, EventArgs e)
     {
-        if (_replication is null)
+        if (_loaded)
         {
-            return;
+            _ = RefreshAsync();
         }
-
-        try
-        {
-            var type = ReplicatedType.Of(typeof(TEntity)).Name;
-            _failures = (await _replication.GetFailuresAsync()).Where(row => string.Equals(row.Type, type, StringComparison.OrdinalIgnoreCase))
-                                                                .GroupBy(row => row.DocumentId, StringComparer.OrdinalIgnoreCase)
-                                                                .ToDictionary(row => row.Key, row => row.First(), StringComparer.OrdinalIgnoreCase);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogDebug(ex, "List of {Entity}: the refused changes could not be read", typeof(TEntity).Name);
-        }
-    }
-
-    // A sync reports (a change was refused, or sent after an edit): the marks follow
-    private void OnReplicationChanged(object? sender, EventArgs e)
-    {
-        _ = Task.Run(async () =>
-        {
-            await LoadFailuresAsync();
-            NotifyChanged();
-        });
     }
 
     // The settings changed (the page size): read again when the list is opened next
@@ -75,7 +51,9 @@ where TEntity : class
         _appSettings = null;
     }
 
-    // A list shows the bookmark of a row only when its state says so: it costs a request about every page
+    /// <summary>
+    /// Whether the list shows the bookmark of a row; off by default because it costs a request about every page.
+    /// </summary>
     protected virtual bool BookmarksEnabled
     {
         get
@@ -84,10 +62,14 @@ where TEntity : class
         }
     }
 
-    // The last load failed; the rows are the ones of the last good load of the same request (none after a start)
+    /// <summary>
+    /// The error of the last load, or null; the rows are then the ones of the last good load of the same request (none after a start).
+    /// </summary>
     public Exception? LoadError { get; private set; }
 
-    // Resolved on first use: a list without bookmarks does not need the service
+    /// <summary>
+    /// The bookmark service of the entity, resolved on first use.
+    /// </summary>
     public IUserBookmarkService<TKey, TEntity> BookmarkService
     {
         get
@@ -96,8 +78,14 @@ where TEntity : class
         }
     }
 
+    /// <summary>
+    /// The selection of rows of the list.
+    /// </summary>
     public SelectionModel<TKey, TEntity> Selection { get; }
 
+    /// <summary>
+    /// The full-text search string of the current request.
+    /// </summary>
     public string? FullTextSearchString
     {
         get
@@ -106,8 +94,14 @@ where TEntity : class
         }
     }
 
+    /// <summary>
+    /// The data source the list reads and writes.
+    /// </summary>
     public IDataSource<TKey, TEntity> DataSource { get; }
 
+    /// <summary>
+    /// The filters of the current request.
+    /// </summary>
     public FilterCollection Filters
     {
         get
@@ -116,6 +110,9 @@ where TEntity : class
         }
     }
 
+    /// <summary>
+    /// The sorts of the current request.
+    /// </summary>
     public SortCollection Sorts
     {
         get
@@ -124,18 +121,26 @@ where TEntity : class
         }
     }
 
+    /// <summary>
+    /// Bookmarks the row.
+    /// </summary>
     public async Task AddBookmarkAsync(TEntity value)
     {
         await BookmarkService.AddBookmarkAsync(value);
         NotifyChanged();
     }
 
+    /// <summary>
+    /// Deletes the row with the key through the data source.
+    /// </summary>
     public virtual async Task DeleteAsync(TKey key)
     {
         await DataSource.DeleteAsync(key);
     }
 
-    // Deletes the rows one by one and loads the list again, whatever came of it
+    /// <summary>
+    /// Deletes the rows one by one and loads the list again, whatever came of it.
+    /// </summary>
     public async Task DeleteRowsAsync(IReadOnlyCollection<TEntity> rows)
     {
         try
@@ -152,11 +157,17 @@ where TEntity : class
         }
     }
 
+    /// <summary>
+    /// Tells whether the row is bookmarked.
+    /// </summary>
     public bool IsBookmarked(TEntity value)
     {
         return BookmarkService.IsBookmarked(value);
     }
 
+    /// <summary>
+    /// Reads the page size from the settings of the application and applies it to the data source.
+    /// </summary>
     protected virtual async Task ApplyPageSizeAsync()
     {
         if (_appSettings == null)
@@ -174,19 +185,28 @@ where TEntity : class
         }
     }
 
-    // Called on a start after the request is reset: fields, sorts and the filters of the key
+    /// <summary>
+    /// Called on a start after the request is reset: sets fields, sorts and the filters of the key.
+    /// </summary>
     protected virtual void ConfigureRequest(object? key)
     {
     }
 
+    /// <summary>
+    /// Called before every load of the rows.
+    /// </summary>
     protected virtual async Task BeforeLoadDataAsync()
     {
     }
 
+    /// <summary>
+    /// Called after every successful load of the rows.
+    /// </summary>
     protected virtual async Task AfterLoadDataAsync()
     {
     }
 
+    /// <inheritdoc />
     protected override async Task OnStartAsync(object? key)
     {
         DataSource.Reset();
@@ -196,12 +216,14 @@ where TEntity : class
         await RefreshAsync();
     }
 
+    /// <inheritdoc />
     protected override async Task OnResumeAsync()
     {
         await ApplyPageSizeAsync();
         await RefreshAsync();
     }
 
+    /// <inheritdoc />
     public async Task SearchAsync(string? text)
     {
         if (string.Equals(FullTextSearchString, text, StringComparison.Ordinal))
@@ -215,6 +237,7 @@ where TEntity : class
         await RefreshAsync();
     }
 
+    /// <inheritdoc />
     public async Task GoToPageAsync(int page)
     {
         Logger.LogDebug("List of {Entity}: go to page {Page}", typeof(TEntity).Name, page);
@@ -222,7 +245,9 @@ where TEntity : class
         await RefreshAsync();
     }
 
-    // Loads the current request again; a newer load cancels the one still running
+    /// <summary>
+    /// Loads the current request again; a newer load cancels the one still running.
+    /// </summary>
     public async Task RefreshAsync()
     {
         var cts = new CancellationTokenSource();
@@ -255,8 +280,8 @@ where TEntity : class
                 await BookmarkService.LoadBookmarksAsync(DataSource.Items);
             }
 
-            await LoadFailuresAsync();
             await AfterLoadDataAsync();
+            _loaded = true;
         }
         catch (OperationCanceledException) when (cts.IsCancellationRequested)
         {
@@ -277,6 +302,9 @@ where TEntity : class
         }
     }
 
+    /// <summary>
+    /// Removes the bookmark of the row.
+    /// </summary>
     public async Task RemoveBookmarkAsync(TEntity value)
     {
         await BookmarkService.RemoveBookmarkAsync(value);
@@ -422,6 +450,7 @@ where TEntity : class
         return Selection.Targets(row);
     }
 
+    /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {
         if (disposing)
@@ -429,16 +458,17 @@ where TEntity : class
             _loadCts?.Cancel();
             _loadCts?.Dispose();
             _appSettingsProvider?.SettingsChanged -= OnAppSettingsChanged;
-            if (_replication is not null)
-            {
-                _replication.StateChanged -= OnReplicationChanged;
-            }
+            _local?.ChangedElsewhere -= OnChangedElsewhere;
         }
 
         base.Dispose(disposing);
     }
 }
 
+/// <summary>
+/// State of a list over a data source of entities with a <see cref="Guid"/> key.
+/// </summary>
+/// <param name="serviceProvider">The service provider of the state.</param>
 public class GuidDataSourceState<TEntity>
 (
     IServiceProvider serviceProvider

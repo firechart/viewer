@@ -9,6 +9,13 @@
         <WarningsNotAsErrors>NU1902;NU1903</WarningsNotAsErrors>
     </PropertyGroup>
 
+    <!-- XML docs of the libraries of public/src (CLAUDE.md: thorough in FireChart.Viewer*, brief in the others), checked in Release only, where a
+         public member without docs is a build error: ci.sh unit and the images build Release, Debug stays fast. Not the application
+         FireChart.Viewer.App, the tests or the tools -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release' and $(MSBuildProjectDirectory.StartsWith('$(MSBuildThisFileDirectory)src')) and '$(MSBuildProjectName)' != 'FireChart.Viewer.App'">
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
     <PropertyGroup>
         <AnalysisMode>AllEnabledByDefault</AnalysisMode>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>

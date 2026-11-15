@@ -76,7 +76,7 @@ public partial class TemplateTextsTests
                             .ToHashSet(StringComparer.Ordinal);
         keys.UnionWith(EngineTexts.Keys);
         var gaps = new List<string>();
-        foreach (var language in new[] { "de", "es", "fr", "ru", "zh" })
+        foreach (var language in new[] { "de", "es", "fr", "he", "ru", "zh" })
         {
             var texts = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(Path.Combine(folder, VendorLibrary.LocalesFolder, language, VendorLibrary.LocaleFile)))!;
             gaps.AddRange(keys.Where(key => !texts.ContainsKey(key) && !texts.ContainsKey(key + "_other")).Select(key => $"{language}: {key}"));
@@ -92,6 +92,9 @@ public partial class TemplateTextsTests
     [TestCase("ru", 111, "many")]
     [TestCase("ru", 101, "one")]
     [TestCase("fr", 1, "one")]
+    [TestCase("he", 1, "one")]
+    [TestCase("he", 2, "two")]
+    [TestCase("he", 3, "other")]
     [TestCase("en", 0, "other")]
     [TestCase("zh", 1, "other")]
     public void ThePluralCategory_IsTheOneOfCldr(string language, int count, string category)

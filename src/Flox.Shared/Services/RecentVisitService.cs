@@ -5,15 +5,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Flox.Shared.Services;
 
+/// <summary>Keeps the history of visited pages in the storage of the device, one row for a page.</summary>
 [FloxService(typeof(IRecentVisitService))]
 public sealed class RecentVisitService(NavigationManager navigation, IServiceProvider serviceProvider, ILogger<RecentVisitService> logger) : IRecentVisitService
 {
+    /// <summary>Type name under which pages are stored among the recent items.</summary>
     public const string PAGE_TYPE = "Page";
 
-    // A queue: the visits beyond it, the oldest, are deleted by the next visit
+    /// <summary>The most visits kept: a queue, in which the oldest are deleted by the next visit.</summary>
     public const int Capacity = 200;
 
-    // The path without the query: a list with other filters is the same page
+    /// <summary>The path of a URL without the query and the fragment: a list with other filters is the same page.</summary>
     public static string PathOf(string url)
     {
         var end = url.IndexOfAny(['?', '#']);
@@ -27,6 +29,7 @@ public sealed class RecentVisitService(NavigationManager navigation, IServicePro
         return new Guid(hash.AsSpan(0, 16));
     }
 
+    /// <inheritdoc />
     public async Task VisitAsync(string displayName, string? category, string? icon, CancellationToken cancellationToken = default)
     {
         try
@@ -77,6 +80,7 @@ public sealed class RecentVisitService(NavigationManager navigation, IServicePro
         }
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<UserRecent>> GetRecentAsync(int count, CancellationToken cancellationToken = default)
     {
         var list = serviceProvider.GetRequiredService<IGuidDataSource<UserRecent>>();

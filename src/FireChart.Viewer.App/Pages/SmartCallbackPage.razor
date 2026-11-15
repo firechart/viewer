@@ -2,7 +2,7 @@
 @inject ISmartAuthorizer Authorizer
 @inject NavigationManager NavigationManager
 
-@* The way back of a SMART sign-in in the frame (redirect): the code is exchanged for a token; the patient of the launch context opens the clinical summary,
+@* The way back of a SMART sign-in in the frame (redirect): the code is exchanged for a token; the patient of the launch context opens the patient summary,
    else the frame returns where the sign-in began *@
 <div class="p-4">
     @if (_failure is null)
@@ -30,7 +30,7 @@
         {
             var completion = await Authorizer.CompleteAsync(NavigationManager.Uri);
             var target = completion.PatientId is { Length: > 0 } patient
-                ? EmbedPage.Prefix + new ViewerRoute(ViewerPage.ClinicalSummary, "Patient", patient).Location
+                ? EmbedPage.Prefix + new ViewerRoute(ViewerPage.Summary, "Patient", patient).Location
                 : completion.ReturnUrl.TrimStart('/');
             NavigationManager.NavigateTo(target, replace: true);
         }

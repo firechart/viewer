@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Flox.Core.Settings;
 
-// Texts are resolved on access: the UI culture can change while the application runs
+/// <summary>Describes one editable setting of a settings class: its label, limits and control. Texts are resolved on access because the UI culture can change while the application runs.</summary>
 public sealed class SettingFieldDescriptor
 {
     private readonly DisplayAttribute? _display;
@@ -20,8 +20,10 @@ public sealed class SettingFieldDescriptor
         Control = ResolveControl();
     }
 
+    /// <summary>The control that edits the setting.</summary>
     public SettingControl Control { get; }
 
+    /// <summary>The description shown with the field.</summary>
     public string? Description
     {
         get
@@ -30,6 +32,7 @@ public sealed class SettingFieldDescriptor
         }
     }
 
+    /// <summary>The name of the group the field is shown in.</summary>
     public string? GroupName
     {
         get
@@ -38,6 +41,7 @@ public sealed class SettingFieldDescriptor
         }
     }
 
+    /// <summary>The label of the field; the property name when none is set.</summary>
     public string Label
     {
         get
@@ -46,6 +50,7 @@ public sealed class SettingFieldDescriptor
         }
     }
 
+    /// <summary>The largest allowed value, if the setting has a range.</summary>
     public decimal? Maximum
     {
         get
@@ -54,6 +59,7 @@ public sealed class SettingFieldDescriptor
         }
     }
 
+    /// <summary>The smallest allowed value, if the setting has a range.</summary>
     public decimal? Minimum
     {
         get
@@ -62,6 +68,7 @@ public sealed class SettingFieldDescriptor
         }
     }
 
+    /// <summary>The step of a slider; 0 is the default of the control.</summary>
     public int Step
     {
         get
@@ -70,6 +77,7 @@ public sealed class SettingFieldDescriptor
         }
     }
 
+    /// <summary>The name of the property.</summary>
     public string Name
     {
         get
@@ -78,6 +86,7 @@ public sealed class SettingFieldDescriptor
         }
     }
 
+    /// <summary>The place of the field among the others; smaller is first.</summary>
     public int Order
     {
         get
@@ -86,8 +95,10 @@ public sealed class SettingFieldDescriptor
         }
     }
 
+    /// <summary>The property of the settings class.</summary>
     public PropertyInfo Property { get; }
 
+    /// <summary>Whether the setting must have a value.</summary>
     public bool Required
     {
         get
@@ -96,6 +107,7 @@ public sealed class SettingFieldDescriptor
         }
     }
 
+    /// <summary>The type of the setting without <see cref="Nullable{T}"/>.</summary>
     public Type UnderlyingType
     {
         get
@@ -104,6 +116,8 @@ public sealed class SettingFieldDescriptor
         }
     }
 
+    /// <summary>Lists the values the user can choose from: those of the options source, or the members of an enum.</summary>
+    /// <returns>The options; empty when there are none.</returns>
     public IReadOnlyList<SettingOption> GetOptions()
     {
         if (_setting?.OptionsSource is { } sourceType)

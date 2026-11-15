@@ -1,0 +1,57 @@
+{
+  "default": "smart-open",
+  "environments": [
+    {
+      "id": "smart-open",
+      "name": "SMART Health IT R4 (open)",
+      "description": "Synthea patients, no sign-in.",
+      "patient": "13a00221-8417-4973-961e-e21b32ece95a",
+      "config": {
+        "server": {
+          "url": "https://r4.smarthealthit.org",
+          "name": "SMART Health IT R4",
+          "fhirRelease": "R4"
+        },
+        "terminology": {
+          "server": "https://tx.fhir.org/r4"
+        }
+      }
+    },
+    {
+      "id": "smart-launcher",
+      "name": "SMART Health IT Launcher (sign-in)",
+      "description": "A SMART sign-in in a popup: pick a patient at the launcher.",
+      "config": {
+        "server": {
+          "url": "https://launch.smarthealthit.org/v/r4/fhir",
+          "name": "SMART Launcher R4"
+        },
+        "smart": {
+          "clientId": "firechart-viewer",
+          "scopes": "launch/patient patient/*.rs openid fhirUser",
+          "extraParameters": "launch=e30",
+          "flow": "popup"
+        },
+        "terminology": {
+          "server": "https://tx.fhir.org/r4"
+        }
+      }
+    },
+    {
+      "id": "hapi-r4",
+      "name": "HAPI FHIR R4",
+      "description": "The public test server of HAPI: anyone writes there, data come and go.",
+      "patient": "nhanes-120300",
+      "config": {
+        "server": {
+          "url": "https://hapi.fhir.org/baseR4",
+          "name": "HAPI FHIR R4",
+          "fhirRelease": "R4"
+        },
+        "terminology": {
+          "server": "https://tx.fhir.org/r4"
+        }
+      }
+    }
+  ]
+}

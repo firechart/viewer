@@ -177,6 +177,24 @@
   <data name="Caption_FhirServerOAuth2ExtraParameters" xml:space="preserve">
     <value>Zusätzliche OAuth2-Parameter (Schlüssel=Wert&amp;Schlüssel=Wert)</value>
   </data>
+  <data name="Caption_FhirServerTimeout" xml:space="preserve">
+    <value>Zeitlimit, Sekunden</value>
+  </data>
+  <data name="Caption_SearchRefused" xml:space="preserve">
+    <value>Der Server hat die Suche abgelehnt</value>
+  </data>
+  <data name="Caption_SearchServerError" xml:space="preserve">
+    <value>Der Server konnte die Suche nicht ausführen</value>
+  </data>
+  <data name="Caption_SearchTimedOut" xml:space="preserve">
+    <value>Keine Antwort innerhalb von {0} Sekunden</value>
+  </data>
+  <data name="Caption_SearchUnreadable" xml:space="preserve">
+    <value>Die Antwort des Servers konnte nicht gelesen werden</value>
+  </data>
+  <data name="Caption_SectionFailed" xml:space="preserve">
+    <value>Eine Suche dieses Abschnitts ist fehlgeschlagen</value>
+  </data>
   <data name="Caption_FhirServerRelease" xml:space="preserve">
     <value>FHIR-Release (falls /metadata nicht verfügbar)</value>
   </data>
@@ -189,17 +207,20 @@
   <data name="Message_FhirServerAuthenticationNotSupported" xml:space="preserve">
     <value>Die Verbindung zu Servern mit dieser Authentifizierungsart wird noch nicht unterstützt.</value>
   </data>
-  <data name="Caption_ClinicalSummary" xml:space="preserve">
-    <value>Klinische Zusammenfassung</value>
-  </data>
-  <data name="Caption_ClinicalSummaryForm" xml:space="preserve">
-    <value>Formular der klinischen Zusammenfassung</value>
+  <data name="Caption_PatientSummary" xml:space="preserve">
+    <value>Patientenzusammenfassung</value>
   </data>
   <data name="Message_InvalidSearch" xml:space="preserve">
     <value>Die Suche in der Adresse ist ungültig.</value>
   </data>
   <data name="Placeholder_SearchAllFields" xml:space="preserve">
     <value>In allen Feldern suchen</value>
+  </data>
+  <data name="Caption_ShowAllFields" xml:space="preserve">
+    <value>Alle Felder anzeigen</value>
+  </data>
+  <data name="Caption_ShowFormFields" xml:space="preserve">
+    <value>Nur die Felder des Formulars</value>
   </data>
   <data name="Message_SearchFormGenerated" xml:space="preserve">
     <value>Dieses Formular wurde automatisch aus den Suchparametern der Ressource erzeugt und ist daher nicht sehr komfortabel. Der Server unterstützt möglicherweise nicht alle Parameter.</value>
@@ -476,5 +497,74 @@
   </data>
   <data name="Caption_TrendOpenLast" xml:space="preserve">
     <value>Letzten Eintrag öffnen</value>
+  </data>
+  <data name="Caption_TimesInDeviceZone" xml:space="preserve">
+    <value>Zeiten werden in der Zeitzone dieses Geräts angezeigt</value>
+  </data>
+  <data name="Message_SectionsFailed" xml:space="preserve">
+    <value>Abschnitte, die nicht geladen werden konnten: {0}</value>
+  </data>
+  <data name="Caption_TrendValues" xml:space="preserve">
+    <value>Werte</value>
+  </data>
+  <data name="Caption_TrendDate" xml:space="preserve">
+    <value>Datum</value>
+  </data>
+  <data name="Caption_TrendSummary" xml:space="preserve">
+    <value>{0} Werte, {1} – {2}</value>
+  </data>
+  <data name="Caption_OpenAsPage" xml:space="preserve">
+    <value>Als Seite öffnen</value>
+  </data>
+  <data name="Caption_EncounterSummary" xml:space="preserve">
+    <value>Zusammenfassung des Behandlungsfalls</value>
+  </data>
+  <data name="Caption_LoadAll" xml:space="preserve">
+    <value>Alle laden</value>
+  </data>
+  <data name="Caption_Print" xml:space="preserve">
+    <value>Drucken</value>
+  </data>
+  <data name="Message_PrintIncomplete" xml:space="preserve">
+    <value>Dieser Ausdruck ist möglicherweise unvollständig: Nicht alle Einträge der Seite sind geladen. Drucken Sie eine Übersicht mit ihrem Befehl „Drucken“, der zuerst alle Einträge lädt.</value>
+  </data>
+  <data name="Message_PrintRefused" xml:space="preserve">
+    <value>Nicht alle Einträge konnten geladen werden, daher wird die Seite nicht gedruckt. Laden Sie die fehlgeschlagenen Abschnitte erneut und drucken Sie dann noch einmal.</value>
+  </data>
+  <data name="Caption_Record" xml:space="preserve">
+    <value>Datensatz</value>
+  </data>
+  <data name="Caption_Summary" xml:space="preserve">
+    <value>Übersicht</value>
+  </data>
+  <data name="PackageBase_Download" xml:space="preserve">
+    <value>Herunterladen</value>
+  </data>
+  <data name="PackageBase_UpdateButton" xml:space="preserve">
+    <value>Aktualisieren</value>
+  </data>
+  <data name="PackageBase_Failed" xml:space="preserve">
+    <value>Der Download ist fehlgeschlagen: {0}</value>
+  </data>
+  <data name="PackageBase_NotOnDevice" xml:space="preserve">
+    <value>Dieses Paket ist nicht auf dem Gerät. Laden Sie es herunter ({0}; {1} auf dem Gerät), um es offline zu durchsuchen.</value>
+  </data>
+  <data name="PackageBase_Progress" xml:space="preserve">
+    <value>Wird heruntergeladen: {0} von {1}</value>
+  </data>
+  <data name="PackageBase_OnDevice" xml:space="preserve">
+    <value>Auf dem Gerät</value>
+  </data>
+  <data name="PackageBase_Delete" xml:space="preserve">
+    <value>Vom Gerät löschen</value>
+  </data>
+  <data name="PackageBase_UpdateAvailable" xml:space="preserve">
+    <value>Eine neuere Version des Pakets ist verfügbar ({0}).</value>
+  </data>
+  <data name="PackageBase_ListUnavailable" xml:space="preserve">
+    <value>Die Liste der FHIR-Pakete ist gerade nicht lesbar: Die Anwendung erreicht ihren Server nicht. Die Pakete auf dem Gerät funktionieren weiter.</value>
+  </data>
+  <data name="PackageBase_Occupied" xml:space="preserve">
+    <value>Pakete auf dem Gerät: {0}, belegt {1}</value>
   </data>
 </root>

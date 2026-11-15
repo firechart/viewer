@@ -1,6 +1,10 @@
+@implements IDisposable
+
 @* A circular indicator over its relative parent, shown after 150 ms so a quick load does not flash it. It sits in the middle of what the
    user can see: the parent may be much higher than the screen (a long list on a page that scrolls), so the indicator is sticky (the body of the layout scrolls under the header and has its own padding, which the offset
-   takes back), as high as the screen below the header, and never higher than the parent *@
+   takes back), as high as the screen below the header, and never higher than the parent. The spinner is hidden from screen readers; a load
+   that lasts 150 ms is told in a status line that is always there (a live region that appears is not read reliably) *@
+<span role="status" class="sr-only">@(_announced ? Strings.Caption_Loading : null)</span>
 @if (Visible)
 {
     <div class="absolute inset-0 z-10 @(Delayed ? "animate-progress-appear" : null) @(Dim ? "bg-canvas/60" : null) @(BlockInput ? null : "pointer-events-none")" aria-hidden="true">
@@ -11,6 +15,12 @@
 }
 
 @code {
+
+    private const int AnnounceDelayMilliseconds = 150;
+
+    private CancellationTokenSource? _announce;
+    private bool _announced;
+    private bool _wasVisible;
 
     [Parameter]
     public bool Visible { get; set; }
@@ -27,5 +37,52 @@
     // The content below does not get the mouse and touch while the indicator is shown
     [Parameter]
     public bool BlockInput { get; set; } = true;
+
+    protected override void OnParametersSet()
+    {
+        if (Visible == _wasVisible)
+        {
+            return;
+        }
+
+        _wasVisible = Visible;
+        CancelAnnouncement();
+        if (Visible)
+        {
+            _announce = new CancellationTokenSource();
+            _ = AnnounceAsync(_announce.Token);
+        }
+        else
+        {
+            _announced = false;
+        }
+    }
+
+    private async Task AnnounceAsync(CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(AnnounceDelayMilliseconds, token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        _announced = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void CancelAnnouncement()
+    {
+        _announce?.Cancel();
+        _announce?.Dispose();
+        _announce = null;
+    }
+
+    public void Dispose()
+    {
+        CancelAnnouncement();
+    }
 
 }

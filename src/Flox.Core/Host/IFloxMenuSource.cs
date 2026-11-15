@@ -2,9 +2,11 @@ using System.Security.Claims;
 
 namespace Flox.Core.Host;
 
-// A module exports exactly one menu (grouped under its own title in NavMenu); the module owns
-// its Items' order (see IFloxMenu.Items), the host only orders menus against each other.
+/// <summary>Supplies the menu of one module, grouped under its own title; the module owns the order of its items and the host only orders menus against each other.</summary>
 public interface IFloxMenuSource
 {
+    /// <summary>Builds the menu for a user.</summary>
+    /// <param name="user">The current user.</param>
+    /// <returns>The menu.</returns>
     IFloxMenu GetMenu(ClaimsPrincipal user);
 }

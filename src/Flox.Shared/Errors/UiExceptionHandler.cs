@@ -25,6 +25,7 @@ public sealed class UiExceptionHandler : IUiExceptionHandler
     private string? _lastKey;
     private long _lastTicks;
 
+    /// <summary>Creates the handler over the filters (run in their <see cref="IUiExceptionFilter.Order"/>), the notifier, the runtime and the logger.</summary>
     public UiExceptionHandler(IEnumerable<IUiExceptionFilter> filters, IUiNotifier notifier, IFloxRuntime runtime, IServiceProvider services, ILogger<UiExceptionHandler> logger)
     {
         _filters = [.. filters.OrderBy(filter => filter.Order)];
@@ -34,6 +35,7 @@ public sealed class UiExceptionHandler : IUiExceptionHandler
         _logger = logger;
     }
 
+    /// <inheritdoc />
     public async Task<UiExceptionContext> HandleAsync(Exception exception, string? operation = null, UiExceptionSource source = UiExceptionSource.Operation, string? userMessage = null)
     {
         var context = new UiExceptionContext(Unwrap(exception), source, operation, userMessage, _services);
@@ -62,6 +64,7 @@ public sealed class UiExceptionHandler : IUiExceptionHandler
         return context;
     }
 
+    /// <inheritdoc />
     public void Fire(Func<Task> action, string? operation = null)
     {
         _ = FireAsync(action, operation);

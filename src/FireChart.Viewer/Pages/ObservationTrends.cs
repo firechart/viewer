@@ -34,6 +34,9 @@ public static class ObservationTrends
     /// <summary>How many records of one measure the history asks for.</summary>
     public const int HistorySize = 100;
 
+    /// <summary>The order the history is asked in: newest first, so the size keeps the latest records. A server that refuses it gives its own order; the chart orders the points by their moment anyway.</summary>
+    public const string HistorySort = "-date";
+
     /// <summary>
     /// The measures of the records of a section, the one measured last first.
     /// </summary>

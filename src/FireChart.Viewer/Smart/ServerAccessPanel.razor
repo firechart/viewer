@@ -35,7 +35,7 @@ else if (Access == ServerAccess.NeedsCredentials)
     {
         if (completion.PatientId is { Length: > 0 } patient)
         {
-            Session.Navigate(new ViewerRoute(ViewerPage.ClinicalSummary, "Patient", patient));
+            Session.Navigate(new ViewerRoute(ViewerPage.Summary, "Patient", patient));
         }
         else
         {

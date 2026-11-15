@@ -3,103 +3,155 @@ using Microsoft.Extensions.Logging;
 
 namespace Flox.Core.Data;
 
+/// <summary>A data source of entities keyed by <see cref="Guid"/>.</summary>
 public interface IGuidDataSource<TEntity> : IDataSource<Guid, TEntity> // where TEntity : IGuidEntity
 {
 }
 
+/// <summary>
+/// The facade for UI and services over a storage: paging, filters, sorts and the entity operations, with the state of the last load.
+/// </summary>
 public interface IDataSource<TKey, TEntity> : IDataSourceEvents where TKey : notnull
 {
+    /// <summary>The zero-based number of the current page.</summary>
     int CurrentPage { get; }
+    /// <summary>The message of the last failed operation, or null when it succeeded.</summary>
     string? ErrorMessage { get; }
+    /// <summary>The names of the fields to load; empty means all of them.</summary>
     List<string> Fields { get; }
+    /// <summary>Free text to search for, if the storage supports it.</summary>
     string? FullTextSearchString { get; set; }
+    /// <summary>Tells whether a page follows the current one.</summary>
     bool HasNextPage { get; }
+    /// <summary>Tells whether a page precedes the current one.</summary>
     bool HasPreviousPage { get; }
+    /// <summary>The entities of the current page.</summary>
     List<TEntity> Items { get; }
+    /// <summary>The exception of the last failed operation, or null when it succeeded.</summary>
     Exception? LastException { get; }
+    /// <summary>How the pages are addressed: by number or by the links of the previous answer.</summary>
     PaginationMode Mode { get; set; }
+    /// <summary>The number of entities on a page.</summary>
     int PageSize { get; set; }
+    /// <summary>The request that the next load sends.</summary>
     PagedRequest<TEntity> Request { get; }
+    /// <summary>The answer to the last load.</summary>
     PagedResult<TEntity> Response { get; }
+    /// <summary>The storage that the source works over.</summary>
     IStorage<TKey, TEntity> Storage { get; }
+    /// <summary>The total number of entities that match the filters, as the last load returned it.</summary>
     long TotalItems { get; }
+    /// <summary>The number of pages that the total gives at the current page size.</summary>
     int TotalPages { get; }
 
+    /// <summary>Counts the entities that match the current filters.</summary>
     Task<long> CountAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>Deletes the entity and reloads the current page.</summary>
     Task DeleteAsync(TKey key, CancellationToken cancellationToken = default);
 
-    // The rows of the expression that the caller may delete; see IStorage.DeleteManyAsync for the limit
+    /// <summary>
+    /// Deletes the entities of the expression that the caller may delete, up to the limit; see <see cref="IStorage{TKey,
+    /// TEntity}.DeleteManyAsync"/> for the limit. Returns the number deleted.
+    /// </summary>
     Task<long> DeleteManyAsync(Expression<Func<TEntity, bool>> expression, int limit = Constants.MAX_BATCH_DELETE, bool refresh = true, CancellationToken cancellationToken = default);
 
+    /// <summary>Tells whether the entity exists for the caller.</summary>
     Task<bool> ExistsAsync(TKey key, CancellationToken cancellationToken = default);
 
+    /// <summary>Loads the first page.</summary>
     Task FirstPageAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>Returns the entity with the key, or null when there is none for the caller.</summary>
     Task<TEntity?> GetByIdAsync(TKey key, CancellationToken cancellationToken = default);
 
+    /// <summary>Returns the key of the entity.</summary>
     TKey GetKey(TEntity entity);
 
+    /// <summary>Loads the page with the given zero-based number, if it exists.</summary>
     Task GoToPageAsync(int page, CancellationToken cancellationToken = default);
 
+    /// <summary>Inserts the entity, optionally reloading the current page, and returns the stored one.</summary>
     Task<TEntity> InsertAsync(TEntity entity, bool refresh = true, CancellationToken cancellationToken = default);
 
+    /// <summary>Loads the last page.</summary>
     Task LastPageAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>Loads the current page with the current request.</summary>
     Task LoadAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>Loads the next page, if there is one.</summary>
     Task NextPageAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>Loads the previous page, if there is one.</summary>
     Task PreviousPageAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>Clears the request and the answer.</summary>
     IDataSource<TKey, TEntity> Reset();
 
+    /// <summary>Clears fields, filters, sorts and extra parameters, and keeps the paging.</summary>
     IDataSource<TKey, TEntity> ResetFiltersAndSorts();
 
+    /// <summary>Sets whether a load also returns the total.</summary>
     IDataSource<TKey, TEntity> SetCount(bool count);
 
+    /// <summary>Sets the names of the fields to load.</summary>
     IDataSource<TKey, TEntity> SetFields(List<string> fields);
 
+    /// <summary>Sets the fields to load from the members that the selector picks.</summary>
     IDataSource<TKey, TEntity> SetFields<TResult>(Expression<Func<TEntity, TResult>> selector);
 
+    /// <summary>Sets the zero-based page number of the next load.</summary>
     IDataSource<TKey, TEntity> SetPage(int page);
 
+    /// <summary>Sets the number of entities on a page.</summary>
     IDataSource<TKey, TEntity> SetPageSize(int pageSize);
 
+    /// <summary>Sets the number of entities to skip.</summary>
     IDataSource<TKey, TEntity> SetSkip(int skip);
 
-    // Administrators only, see IStorage.SetAccessAsync
+    /// <summary>Changes who may read and write the entity; administrators only, see <see cref="IStorage{TKey, TEntity}.SetAccessAsync"/>.</summary>
     Task<TEntity> SetAccessAsync(TKey key, AccessGrant readAccess, AccessGrant writeAccess, CancellationToken cancellationToken = default);
 
+    /// <summary>Replaces the entity under the key and reloads the current page.</summary>
     Task<TEntity> UpdateAsync(TKey key, TEntity entity, CancellationToken cancellationToken = default);
 
+    /// <summary>Inserts the entity, or replaces the stored one with the same key.</summary>
     Task<TEntity> UpsertAsync(TEntity entity, CancellationToken cancellationToken = default);
 
+    /// <summary>The filters of the request.</summary>
     FilterCollection<TEntity> Filters { get; }
 
+    /// <summary>The sorts of the request.</summary>
     SortCollection<TEntity> Sorts { get; }
 }
 
+/// <summary>The data source of a <see cref="IGuidEntity"/> over its storage.</summary>
 public sealed class GuidDataSource<TEntity> : DataSource<Guid, TEntity>, IGuidDataSource<TEntity> where TEntity : IGuidEntity
 {
+    /// <summary>Creates the source over the storage.</summary>
     public GuidDataSource(IGuidEntityStorage<TEntity> storage, ILogger<DataSource<Guid, TEntity>> logger) : base(storage, logger)
     {
     }
 }
 
+/// <summary>The default data source: a request, the last answer, paging and the busy state over an <see cref="IStorage{TKey, TEntity}"/>.</summary>
 public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey : notnull
 {
     private readonly ILogger<DataSource<TKey, TEntity>> _logger;
     private int _busyCount;
 
+    /// <summary>Creates the source over the storage.</summary>
     public DataSource(IStorage<TKey, TEntity> storage, ILogger<DataSource<TKey, TEntity>> logger)
     {
         Storage = storage ?? throw new ArgumentNullException(nameof(storage));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    /// <inheritdoc />
     public event EventHandler? BusyChanged;
 
+    /// <inheritdoc />
     public int CurrentPage
     {
         get
@@ -108,8 +160,10 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public string? ErrorMessage { get; private set; }
 
+    /// <inheritdoc />
     public List<string> Fields
     {
         get
@@ -118,6 +172,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public string? FullTextSearchString
     {
         get
@@ -131,6 +186,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public bool HasNextPage
     {
         get
@@ -144,6 +200,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public bool HasPreviousPage
     {
         get
@@ -157,6 +214,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public bool IsBusy
     {
         get
@@ -165,6 +223,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public List<TEntity> Items
     {
         get
@@ -173,10 +232,13 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public Exception? LastException { get; private set; }
 
+    /// <inheritdoc />
     public PaginationMode Mode { get; set; }
 
+    /// <inheritdoc />
     public int PageSize
     {
         get
@@ -190,12 +252,16 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public PagedRequest<TEntity> Request { get; private set; } = new PagedRequest<TEntity>();
 
+    /// <inheritdoc />
     public PagedResult<TEntity> Response { get; private set; } = new PagedResult<TEntity>();
 
+    /// <inheritdoc />
     public IStorage<TKey, TEntity> Storage { get; }
 
+    /// <inheritdoc />
     public long TotalItems
     {
         get
@@ -204,6 +270,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public int TotalPages
     {
         get
@@ -212,12 +279,13 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public virtual async Task<long> CountAsync(CancellationToken cancellationToken = default)
     {
-        var q = PagedRequestTranslator.BuildFilterExpression<TEntity>(Request.Filters);
-        return await Storage.CountAsync(q, cancellationToken);
+        return await Storage.CountAsync(Request.Filters, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task DeleteAsync(TKey key, CancellationToken cancellationToken = default)
     {
         await ExecuteAsync(async (cancellationToken) =>
@@ -228,6 +296,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
                            cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<long> DeleteManyAsync(Expression<Func<TEntity, bool>> expression, int limit = Constants.MAX_BATCH_DELETE, bool refresh = true, CancellationToken cancellationToken = default)
     {
         return await ExecuteAsync(async cancellationToken =>
@@ -244,11 +313,13 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
                                   cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<bool> ExistsAsync(TKey key, CancellationToken cancellationToken = default)
     {
         return await Storage.ExistsAsync(key, cancellationToken);
     }
 
+    /// <inheritdoc />
     public virtual async Task FirstPageAsync(CancellationToken cancellationToken = default)
     {
         await NavigateAsync(() =>
@@ -262,17 +333,19 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
                             cancellationToken);
     }
 
+    /// <inheritdoc />
     public virtual async Task<TEntity?> GetByIdAsync(TKey key, CancellationToken cancellationToken = default)
     {
         return await Storage.GetByIdAsync(key, cancellationToken);
     }
 
-    // An entity that is not an IEntity<TKey> (a third-party model) overrides it
+    /// <summary>Returns the key of the entity; an entity that is not an <see cref="IEntity{TKey}"/> (a third-party model) overrides it.</summary>
     public virtual TKey GetKey(TEntity entity)
     {
         return entity is IEntity<TKey> keyed ? keyed.Uid : throw new NotSupportedException($"{typeof(TEntity).Name} has no key: override GetKey");
     }
 
+    /// <inheritdoc />
     public async Task GoToPageAsync(int page, CancellationToken cancellationToken = default)
     {
         if (page >= 0 && page < TotalPages)
@@ -281,6 +354,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public async Task<TEntity> InsertAsync(TEntity entity, bool refresh = true, CancellationToken cancellationToken = default)
     {
         return await ExecuteAsync(async cancellationToken =>
@@ -297,6 +371,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
                                   cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task LastPageAsync(CancellationToken cancellationToken = default)
     {
         if (Mode == PaginationMode.PageBased)
@@ -312,6 +387,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public virtual async Task LoadAsync(CancellationToken cancellationToken = default)
     {
         try
@@ -338,6 +414,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public async Task NextPageAsync(CancellationToken cancellationToken = default)
     {
         if (HasNextPage)
@@ -354,6 +431,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public async Task PreviousPageAsync(CancellationToken cancellationToken = default)
     {
         if (HasPreviousPage)
@@ -370,6 +448,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public virtual IDataSource<TKey, TEntity> Reset()
     {
         Request.Reset();
@@ -379,7 +458,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         return this;
     }
 
-    // Keeps paging but resets filters
+    /// <inheritdoc />
     public virtual IDataSource<TKey, TEntity> ResetFiltersAndSorts()
     {
         Fields.Clear();
@@ -392,12 +471,14 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         return this;
     }
 
+    /// <inheritdoc />
     public IDataSource<TKey, TEntity> SetCount(bool count)
     {
         Request.ReturnTotal = count;
         return this;
     }
 
+    /// <inheritdoc />
     public IDataSource<TKey, TEntity> SetFields(List<string> fields)
     {
         Request.Fields.Clear();
@@ -405,6 +486,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         return this;
     }
 
+    /// <inheritdoc />
     public IDataSource<TKey, TEntity> SetFields<TResult>(Expression<Func<TEntity, TResult>> selector)
     {
         var fieldNames = ExtractFieldNamesFromSelector(selector);
@@ -413,24 +495,28 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         return this;
     }
 
+    /// <inheritdoc />
     public IDataSource<TKey, TEntity> SetPage(int page)
     {
         Request.Page = page;
         return this;
     }
 
+    /// <inheritdoc />
     public IDataSource<TKey, TEntity> SetPageSize(int pageSize)
     {
         Request.PageSize = pageSize;
         return this;
     }
 
+    /// <inheritdoc />
     public IDataSource<TKey, TEntity> SetSkip(int skip)
     {
         Request.Skip = skip;
         return this;
     }
 
+    /// <inheritdoc />
     public virtual async Task<TEntity> SetAccessAsync(TKey key, AccessGrant readAccess, AccessGrant writeAccess, CancellationToken cancellationToken = default)
     {
         return await ExecuteAsync(async ct =>
@@ -442,6 +528,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
                                   cancellationToken);
     }
 
+    /// <inheritdoc />
     public virtual async Task<TEntity> UpdateAsync(TKey key, TEntity entity, CancellationToken cancellationToken = default)
     {
         KeyUtil.EnsureSameKey(key, GetKey(entity));
@@ -456,6 +543,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
                                   cancellationToken);
     }
 
+    /// <inheritdoc />
     public virtual async Task<TEntity> UpsertAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         return await ExecuteAsync(async ct =>
@@ -468,7 +556,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
                                       }
 
                                       // An upsert replaces what is there: it takes the revision of what it replaces
-                                      if (entity is IReplicaState incoming && current is IReplicaState present)
+                                      if (entity is IEntity incoming && current is IEntity present)
                                       {
                                           incoming.Revision = present.Revision;
                                       }
@@ -478,6 +566,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
                                   cancellationToken);
     }
 
+    /// <inheritdoc />
     public FilterCollection<TEntity> Filters
     {
         get
@@ -486,6 +575,7 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
         }
     }
 
+    /// <inheritdoc />
     public SortCollection<TEntity> Sorts
     {
         get

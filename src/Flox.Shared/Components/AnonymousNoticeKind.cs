@@ -1,14 +1,22 @@
 namespace Flox.Shared.Components;
 
-// What a caller who is not signed in gets of the data on a page
+/// <summary>
+/// What a caller who is not signed in gets of the data on a page.
+/// </summary>
 public enum AnonymousNoticeKind
 {
-    // Sign in to use it
+    /// <summary>
+    /// Sign in is required to use the data.
+    /// </summary>
     Refuse,
 
-    // Changes are kept until the page is reloaded
+    /// <summary>
+    /// Changes are kept in memory until the page is reloaded.
+    /// </summary>
     Memory,
 
-    // The shared rows are read, own rows need the sign-in
+    /// <summary>
+    /// The shared rows can be read; own rows need a sign-in.
+    /// </summary>
     ReadShared
 }

@@ -4,6 +4,7 @@ using System.Reflection;
 
 namespace Flox.Core.Settings;
 
+/// <summary>Describes one settings class: its id, scope, title and editable fields.</summary>
 public sealed class SettingsSectionDescriptor
 {
     private readonly DisplayAttribute? _display;
@@ -21,6 +22,7 @@ public sealed class SettingsSectionDescriptor
                           .ToList();
     }
 
+    /// <summary>The description shown with the section.</summary>
     public string? Description
     {
         get
@@ -29,14 +31,19 @@ public sealed class SettingsSectionDescriptor
         }
     }
 
+    /// <summary>The editable fields in display order.</summary>
     public IReadOnlyList<SettingFieldDescriptor> Fields { get; }
 
+    /// <summary>The storage key of the settings.</summary>
     public string Id { get; }
 
+    /// <summary>The settings class.</summary>
     public Type ModelType { get; }
 
+    /// <summary>Who owns the settings.</summary>
     public SettingsScope Scope { get; }
 
+    /// <summary>The place of the section among the others; smaller is first.</summary>
     public int Order
     {
         get
@@ -45,6 +52,7 @@ public sealed class SettingsSectionDescriptor
         }
     }
 
+    /// <summary>The title of the section; the class name when none is set.</summary>
     public string Title
     {
         get
@@ -53,7 +61,9 @@ public sealed class SettingsSectionDescriptor
         }
     }
 
-    // Null when the type is not a settings class
+    /// <summary>Describes a settings class.</summary>
+    /// <param name="modelType">The class.</param>
+    /// <returns>The descriptor, or null when the class is not a settings class.</returns>
     public static SettingsSectionDescriptor? Create(Type modelType)
     {
         var attribute = modelType.GetCustomAttribute<FloxSettingsAttribute>();

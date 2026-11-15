@@ -8,6 +8,9 @@ using Radzen;
 
 namespace Flox.Shared.Components;
 
+/// <summary>
+/// The state of a page or a component, outside the component itself: it survives while the page is left and opened again, and notifies the page when it changes. Properties marked <c>[Inject]</c> are filled from the service provider.
+/// </summary>
 [FloxService]
 public abstract class State : IDisposable, IAsyncDisposable
 {
@@ -21,6 +24,9 @@ public abstract class State : IDisposable, IAsyncDisposable
     private object? _activationKey;
     private bool _activated;
 
+    /// <summary>
+    /// Creates the state and resolves the common services from the provider.
+    /// </summary>
     protected State(IServiceProvider serviceProvider)
     {
         ServiceProvider = serviceProvider;
@@ -36,30 +42,57 @@ public abstract class State : IDisposable, IAsyncDisposable
         UiErrors = serviceProvider.GetRequiredService<IUiExceptionHandler>();
     }
 
+    /// <summary>
+    /// Raised when something the page shows changed.
+    /// </summary>
     public event EventHandler? Changed;
 
     // The scroll position of the page: kept with the state, so a page that is left and opened again is where it was (see ScrollMemory)
+    /// <summary>
+    /// The scroll position of the page, kept with the state so that a page that is left and opened again is where it was.
+    /// </summary>
     [IgnoreDataMember]
     public ScrollMemory Scroll { get; } = new();
 
+    /// <summary>
+    /// The JavaScript runtime.
+    /// </summary>
     [IgnoreDataMember]
     protected IJSRuntime JSRuntime { get; }
 
+    /// <summary>
+    /// The logger of the state.
+    /// </summary>
     [IgnoreDataMember]
     protected ILogger<State> Logger { get; }
 
+    /// <summary>
+    /// The navigation history of the application.
+    /// </summary>
     [IgnoreDataMember]
     protected INavigationHistoryService NavigationHistoryService { get; }
 
+    /// <summary>
+    /// The service provider the state was created with.
+    /// </summary>
     [IgnoreDataMember]
     protected IServiceProvider ServiceProvider { get; }
 
+    /// <summary>
+    /// The authentication service of the application.
+    /// </summary>
     [IgnoreDataMember]
     public IAuthenticationService AuthenticationService { get; }
 
+    /// <summary>
+    /// The dialog service.
+    /// </summary>
     [IgnoreDataMember]
     public DialogService DialogService { get; }
 
+    /// <summary>
+    /// Whether there is an error to show: a message for the user or an exception.
+    /// </summary>
     [IgnoreDataMember]
     public bool Error
     {
@@ -69,6 +102,9 @@ public abstract class State : IDisposable, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// The exception to show instead of the page; setting it ends the busy state.
+    /// </summary>
     [IgnoreDataMember]
     public Exception? Exception
     {
@@ -92,9 +128,15 @@ public abstract class State : IDisposable, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// The navigation manager of the application.
+    /// </summary>
     [IgnoreDataMember]
     public NavigationManager NavigationManager { get; }
 
+    /// <summary>
+    /// Whether what the page shows does not exist; the page then shows a not-found message.
+    /// </summary>
     [IgnoreDataMember]
     public bool NotFound
     {
@@ -111,12 +153,21 @@ public abstract class State : IDisposable, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// The notification service that shows snack messages.
+    /// </summary>
     [IgnoreDataMember]
     public NotificationService Notifications { get; }
 
+    /// <summary>
+    /// The handler that shows exceptions to the user.
+    /// </summary>
     [IgnoreDataMember]
     public IUiExceptionHandler UiErrors { get; }
 
+    /// <summary>
+    /// The message for the user to show instead of the page.
+    /// </summary>
     [IgnoreDataMember]
     public string? UserError
     {
@@ -131,6 +182,9 @@ public abstract class State : IDisposable, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Whether the state is loading or working; the page shows a busy indicator.
+    /// </summary>
     [IgnoreDataMember]
     public virtual bool IsBusy
     {
@@ -148,7 +202,9 @@ public abstract class State : IDisposable, IAsyncDisposable
     /// <summary>
     /// Runs <paramref name="action"/> with <see cref="IsBusy"/> set and shows what it throws through <see cref="UiErrors"/>.
     /// </summary>
+    /// <param name="action">The work to run.</param>
     /// <param name="operation">Name for the log; the calling method by default.</param>
+    /// <param name="caller">The calling method, filled in by the compiler.</param>
     /// <returns><c>true</c> when it completed, <c>false</c> when it failed.</returns>
     protected async Task<bool> RunAsync(Func<Task> action, string? operation = null, [CallerMemberName] string? caller = null)
     {
@@ -169,6 +225,9 @@ public abstract class State : IDisposable, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Goes back in the navigation history when it is possible.
+    /// </summary>
     protected virtual void GoBack()
     {
         if (NavigationHistoryService.CanGoBack)
@@ -177,11 +236,17 @@ public abstract class State : IDisposable, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Opens the not-found page.
+    /// </summary>
     protected void NotifyNotFound()
     {
         NavigationManager.NotFound();
     }
 
+    /// <summary>
+    /// Raises <see cref="Changed"/>.
+    /// </summary>
     protected void NotifyChanged()
     {
         Changed?.Invoke(this, EventArgs.Empty);
@@ -213,7 +278,9 @@ public abstract class State : IDisposable, IAsyncDisposable
         return properties;
     }
 
-    // A page calls it with the key of what it shows (route values as a record). The same key again resumes, another key starts over
+    /// <summary>
+    /// Called by a page with the key of what it shows (route values as a record): the same key again resumes, another key starts over.
+    /// </summary>
     public async Task ActivateAsync(object? key)
     {
         if (_activated && Equals(_activationKey, key))
@@ -242,35 +309,50 @@ public abstract class State : IDisposable, IAsyncDisposable
         }
     }
 
-    // The state is being started for another key: clear what the page shows (the previous key's data). Runs before anything is awaited, so the next render has none of it
+    /// <summary>
+    /// Called when the state is started for another key: clears what the page shows of the previous key. Runs before anything is awaited, so the next render has none of it.
+    /// </summary>
     protected virtual void OnKeyChanged(object? newKey)
     {
     }
 
-    // True from the change of the key until OnStartAsync has finished: a page does not show the data of the previous key meanwhile
+    /// <summary>
+    /// True from the change of the key until <see cref="OnStartAsync"/> has finished: the page does not show the data of the previous key meanwhile.
+    /// </summary>
     [IgnoreDataMember]
     public bool Activating { get; private set; }
 
+    /// <summary>
+    /// Loads what the page shows for the key; called when the key is new.
+    /// </summary>
     protected virtual Task OnStartAsync(object? key)
     {
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Called when the page is shown again with the same key.
+    /// </summary>
     protected virtual Task OnResumeAsync()
     {
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Releases the resources of the state; a derived state overrides it.
+    /// </summary>
     protected virtual void Dispose(bool disposing)
     {
     }
 
+    /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
         await DisposeAsyncCore()
@@ -278,6 +360,9 @@ public abstract class State : IDisposable, IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Releases the asynchronous resources of the state; a derived state overrides it.
+    /// </summary>
     protected virtual ValueTask DisposeAsyncCore()
     {
         return ValueTask.CompletedTask;

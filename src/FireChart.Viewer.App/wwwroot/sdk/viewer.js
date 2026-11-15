@@ -4,9 +4,9 @@
 const PROTOCOL = "fxv";
 const EVENTS = ["ready", "navigate", "restarting", "updated", "error"];
 // The keys that change without a restart (live and reload); every other key needs one
-const LIVE = ["locale", "appearance", "terminology", "clinicalSummary"];
+const LIVE = ["locale", "appearance", "terminology"];
 // The languages of the texts of the Viewer (Locales of ViewerAppConfigLoader); another language of the host is "auto"
-const LOCALES = ["en", "de", "es", "ru", "zh-Hans"];
+const LOCALES = ["en", "de", "es", "he", "ru", "zh-Hans"];
 const INHERIT = "inherit";
 
 /** An error of the Viewer: a configuration it cannot use, an address that is not its own, a destroyed instance. */
@@ -67,7 +67,7 @@ export class Viewer {
         this.#urlParam = options.urlParam ?? null;
     }
 
-    /** The address of the Viewer (resources/Patient, summary/123); null before it is ready. */
+    /** The address of the Viewer (resources/Patient, summary/Patient/123); null before it is ready. */
     get location() {
         return this.#location;
     }
@@ -128,7 +128,7 @@ export class Viewer {
         this.#handlers.get(event)?.delete(handler);
     }
 
-    /** Changes the options that need no restart (locale, appearance, terminology, clinicalSummary). Resolves with { applied }. */
+    /** Changes the options that need no restart (locale, appearance, terminology). Resolves with { applied }. */
     async update(changes) {
         const result = await this.#request("update", { config: resolve(changes) });
         this.#config = merge(this.#config, changes);
@@ -165,12 +165,12 @@ export class Viewer {
         return Object.keys(changes).length > 0 ? this.update(changes) : Promise.resolve(null);
     }
 
-    /** Goes to an address of the Viewer (Patient/123, summary/123, resources/Observation?code=8867-4). */
+    /** Goes to an address of the Viewer (Patient/123, summary/Patient/123, resources/Observation?code=8867-4). */
     navigate(location, { replace = false } = {}) {
         return this.#request("navigate", { location, replace });
     }
 
-    /** Prints the page of the Viewer (the print dialog of the browser for the frame only). */
+    /** Prints the page of the Viewer (the frame only): a summary loads all its records first, see viewer.d.ts. */
     print() {
         return this.#request("print", {});
     }
@@ -292,7 +292,7 @@ export class Viewer {
         const url = new URL(window.location.href);
         if (url.searchParams.get(this.#urlParam) !== this.#location) {
             url.searchParams.set(this.#urlParam, this.#location);
-            // Slashes stay readable (?fhir=summary/123): a slash needs no escaping in a query
+            // Slashes stay readable (?fhir=summary/Patient/123): a slash needs no escaping in a query
             url.search = url.searchParams.toString().replace(/%2F/gi, "/");
             window.history.replaceState(window.history.state, "", url);
         }

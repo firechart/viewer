@@ -8,8 +8,8 @@ namespace FireChart.Viewer.Core.Forms;
 /// <remarks>
 /// <para>
 /// The vendor library holds one form per release and resource type as <c>search-forms/{release}/{type}.json</c> (<c>search-forms/R4/Patient.json</c>);
-/// a customer may override a form by a layer of their own. A form is self-contained: the options of a coded field are in the form itself
-/// (<see cref="SearchFormField.Options"/>), so it needs neither a database of packages nor a terminology server.
+/// a customer may override a form by a layer of their own. A form holds no codes: a coded field names its value set
+/// (<see cref="SearchFormField.ValueSetUrl"/>) and the Viewer asks the FHIR server of the search for its codes (<c>ValueSet/$expand</c>).
 /// </para>
 /// <para>
 /// It is read and written by <see cref="ViewerJson"/>: camelCase names, enumerations as camelCase strings, the keys of the texts as they are.
@@ -17,7 +17,7 @@ namespace FireChart.Viewer.Core.Forms;
 /// </remarks>
 /// <example>
 /// <code>
-/// var form = new SearchFormDefinition { Name = "default", AuthoredForVersion = "4.0.1" };
+/// var form = new SearchFormDefinition { Name = "default", FhirRelease = "R4" };
 /// form.Title.SetDefault("Find patients");
 /// form.Fields.Add(new SearchFormField { QueryName = "family", ParameterType = SearchParameterType.String, Order = 1 });
 /// File.WriteAllText("search-forms/R4/Patient.json", ViewerJson.Write(form));
@@ -27,9 +27,11 @@ namespace FireChart.Viewer.Core.Forms;
 public sealed class SearchFormDefinition
 {
     /// <summary>
-    /// The version of the format of the form this code writes.
+    /// The version of the format of the form this code writes. It goes up only with a change an older Viewer would read wrong (a property that changes
+    /// its meaning or goes away), never for a new optional property; <see cref="SearchFormReader.Upgrade"/> brings an older form up to it. 2 (2026-11-13):
+    /// <see cref="SearchFormField.Hidden"/> instead of <c>included</c>, <see cref="FhirRelease"/> instead of <c>authoredForVersion</c>.
     /// </summary>
-    public const int CurrentFormatVersion = 1;
+    public const int CurrentFormatVersion = 2;
 
     /// <summary>
     /// The version of the format of the form; <see cref="CurrentFormatVersion"/> for a new form.
@@ -43,9 +45,10 @@ public sealed class SearchFormDefinition
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// The version of the package (the FHIR core package of the release) the form was tuned for; informational.
+    /// The FHIR release the form was designed for (<c>STU3</c>, <c>R4</c>, <c>R4B</c>, <c>R5</c>): not a package, since a form of the core resources serves
+    /// every package built on them; informational.
     /// </summary>
-    public string? AuthoredForVersion { get; set; }
+    public string? FhirRelease { get; set; }
 
     /// <summary>
     /// Whether the form was made from the search parameters of the release and not tuned by a person yet.
@@ -105,6 +108,13 @@ public sealed class SearchFormGroup
     /// Whether the group is closed when the form opens.
     /// </summary>
     public bool CollapsedByDefault { get; set; }
+
+    /// <summary>
+    /// Whether the group and all its fields are left out of the form shown (the fields still send their values); optional, not written when
+    /// <see langword="false"/>.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool Hidden { get; set; }
 }
 
 /// <summary>
@@ -114,7 +124,7 @@ public sealed class SearchFormGroup
 /// <code>
 /// var gender = new SearchFormField { QueryName = "gender", ParameterType = SearchParameterType.Token, Control = SearchFieldControl.Select };
 /// gender.Label.SetDefault("Gender");
-/// gender.Options.Add(new SearchFormOption { Code = "female", System = "http://hl7.org/fhir/administrative-gender" });
+/// gender.ValueSetUrl = "http://hl7.org/fhir/ValueSet/administrative-gender";
 /// </code>
 /// </example>
 [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
@@ -138,9 +148,11 @@ public sealed class SearchFormField
     public SearchParameterType ParameterType { get; set; } = SearchParameterType.String;
 
     /// <summary>
-    /// Whether the field is shown when the form opens; a field that is not is offered under "more filters".
+    /// Whether the field is left out of the form shown. It still sends its value: the default value of a hidden field is a fixed filter. Optional, not
+    /// written when <see langword="false"/>.
     /// </summary>
-    public bool Included { get; set; } = true;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool Hidden { get; set; }
 
     /// <summary>
     /// The label of the field.
@@ -188,7 +200,8 @@ public sealed class SearchFormField
     public string? DefaultValue { get; set; }
 
     /// <summary>
-    /// The canonical URL of the value set the options were taken from; informational once <see cref="Options"/> are filled.
+    /// The canonical URL of the value set of a coded field (a select, a multi-select, an autocomplete): the Viewer offers the codes the FHIR server of
+    /// the search expands it to, and a text box when the server does not expand it.
     /// </summary>
     public string? ValueSetUrl { get; set; }
 
@@ -198,12 +211,7 @@ public sealed class SearchFormField
     public string? ValueSetVersion { get; set; }
 
     /// <summary>
-    /// The options of a coded field (a select, a multi-select, an autocomplete): the expanded value set, so the form needs no terminology server.
-    /// </summary>
-    public List<SearchFormOption> Options { get; } = [];
-
-    /// <summary>
-    /// Whether a code may be typed in when the options do not offer it.
+    /// Whether a code may be typed in when the value set does not offer it (the field suggests the codes instead of a list to choose from).
     /// </summary>
     public bool AllowFreeText { get; set; }
 
@@ -286,36 +294,6 @@ public sealed class SearchFormField
     /// Whether a later version of the package no longer has the parameter of the field.
     /// </summary>
     public bool NotInPackage { get; set; }
-}
-
-/// <summary>
-/// An option of a coded field: a code of the expanded value set and how it is shown.
-/// </summary>
-/// <example>
-/// <code>
-/// var option = new SearchFormOption { Code = "female", System = "http://hl7.org/fhir/administrative-gender" };
-/// option.Display.SetDefault("Female");
-/// option.Display["ru"] = "Женский";
-/// </code>
-/// </example>
-[JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-public sealed class SearchFormOption
-{
-    /// <summary>
-    /// The code sent to the server.
-    /// </summary>
-    [JsonRequired]
-    public string Code { get; set; } = string.Empty;
-
-    /// <summary>
-    /// The code system of the code, or <see langword="null"/> when the parameter takes the bare code; sent as <c>system|code</c> when set.
-    /// </summary>
-    public string? System { get; set; }
-
-    /// <summary>
-    /// How the code is shown.
-    /// </summary>
-    public LocalizedString Display { get; } = [];
 }
 
 /// <summary>

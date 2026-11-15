@@ -2,6 +2,9 @@ using Radzen;
 
 namespace Flox.Shared.Components;
 
+/// <summary>
+/// Extensions of the dialog service for message boxes.
+/// </summary>
 public static class DialogExtensions
 {
     /// <returns><c>true</c> for yes/OK, <c>false</c> for no, <c>null</c> for cancel or a dismissed dialog.</returns>
@@ -42,12 +45,16 @@ public static class DialogExtensions
     }
 }
 
-// Radzen closes a dialog through dynamic calls: the first one in a session starts the C# runtime binder,
-// which takes hundreds of milliseconds in the browser and froze the page on the "Yes" click
+/// <summary>
+/// Starts the C# runtime binder ahead of time: Radzen closes a dialog through dynamic calls, and the first one in a session takes hundreds of milliseconds in the browser and froze the page on the "Yes" click.
+/// </summary>
 public static class DynamicBinderWarmup
 {
     private static bool s_done;
 
+    /// <summary>
+    /// Warms up the dynamic binder once per session; later calls do nothing.
+    /// </summary>
     public static void Run()
     {
         if (s_done)

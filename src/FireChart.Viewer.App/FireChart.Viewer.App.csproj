@@ -8,6 +8,8 @@
     <IsPackable>false</IsPackable>
     <!-- The language follows the browser or the configuration, not only the subset of cultures the browser language picks -->
     <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+    <!-- The vendor library is the folder library/ of the application (public/library, Directory.Build.targets) -->
+    <FireChartLibrary>true</FireChartLibrary>
   </PropertyGroup>
 
   <!-- No AOT (measured 2026-11-09, README.md, Performance). Not RunAOTCompilation=false: a value other than the runtime pack's forces a native relink -->

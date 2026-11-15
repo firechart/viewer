@@ -1,0 +1,375 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://firechart.org/schemas/search-form.schema.json",
+  "title": "FireChart search form",
+  "type": "object",
+  "properties": {
+    "formatVersion": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "string"
+    },
+    "fhirRelease": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "isGenerated": {
+      "type": "boolean"
+    },
+    "title": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "description": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "groups": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "caption": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "order": {
+            "type": "integer"
+          },
+          "collapsedByDefault": {
+            "type": "boolean"
+          },
+          "hidden": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "fields": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "object",
+        "properties": {
+          "queryName": {
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "package",
+              "chained",
+              "custom"
+            ]
+          },
+          "parameterType": {
+            "enum": [
+              "string",
+              "token",
+              "date",
+              "number",
+              "quantity",
+              "reference",
+              "uri",
+              "composite",
+              "special"
+            ]
+          },
+          "hidden": {
+            "type": "boolean"
+          },
+          "label": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "hint": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "placeholder": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "control": {
+            "enum": [
+              "text",
+              "number",
+              "numberRange",
+              "boolean",
+              "date",
+              "dateRange",
+              "select",
+              "multiSelect",
+              "autocomplete",
+              "reference",
+              "quantity",
+              "identifier"
+            ]
+          },
+          "groupCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "order": {
+            "type": "integer"
+          },
+          "span": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "defaultValue": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "valueSetUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "valueSetVersion": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "allowFreeText": {
+            "type": "boolean"
+          },
+          "multipleOr": {
+            "type": "boolean"
+          },
+          "multipleAnd": {
+            "type": "boolean"
+          },
+          "comparators": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "defaultComparator": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "modifiers": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "defaultModifier": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "minLength": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "maxLength": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "min": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "max": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pattern": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "units": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "code"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "defaultUnit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lookup": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "targetTypes": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string"
+                }
+              },
+              "mode": {
+                "enum": [
+                  "dialog",
+                  "dropdown"
+                ]
+              },
+              "lookupParameter": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "displayTemplate": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "minChars": {
+                "type": "integer"
+              }
+            },
+            "additionalProperties": false
+          },
+          "source": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "parameterUrl": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "expression": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "base": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "notInPackage": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "queryName"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "additionalProperties": false
+}

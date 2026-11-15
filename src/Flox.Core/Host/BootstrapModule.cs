@@ -5,8 +5,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Flox.Core.Host;
 
+/// <summary>A unit of startup configuration of a host: registers services when the bootstrapper is configured and may run code once the host is built.</summary>
 public abstract class BootstrapModule
 {
+    /// <summary>The application configuration, read from <see cref="ConfigurationBuilder"/>.</summary>
     public IConfiguration Configuration
     {
         get
@@ -15,6 +17,7 @@ public abstract class BootstrapModule
         }
     }
 
+    /// <summary>The configuration builder of the host.</summary>
     public IConfigurationBuilder ConfigurationBuilder
     {
         get
@@ -23,6 +26,7 @@ public abstract class BootstrapModule
         }
     }
 
+    /// <summary>The logging builder of the host.</summary>
     public ILoggingBuilder LoggingBulder
     {
         get
@@ -31,6 +35,7 @@ public abstract class BootstrapModule
         }
     }
 
+    /// <summary>The service collection of the host.</summary>
     public IServiceCollection Services
     {
         get
@@ -39,6 +44,7 @@ public abstract class BootstrapModule
         }
     }
 
+    /// <summary>The runtime description of the host (platform, edition, environment).</summary>
     public IFloxRuntime Runtime
     {
         get
@@ -47,6 +53,7 @@ public abstract class BootstrapModule
         }
     }
 
+    /// <summary>The logger of the host.</summary>
     public ILogger Logger
     {
         get
@@ -55,9 +62,14 @@ public abstract class BootstrapModule
         }
     }
 
+    /// <summary>The bootstrapper that owns this module; set when the module is added.</summary>
     public IBootstrapper Bootstrapper { get; internal set; } = null!;
+    /// <summary>Registers the services of the module in <see cref="Services"/>.</summary>
     public abstract void ConfigureServices();
 
+    /// <summary>Runs after the host is built; does nothing by default.</summary>
+    /// <param name="serviceProvider">The service provider of the built host.</param>
+    /// <returns>A task that completes when the module has finished.</returns>
     public virtual Task RunAsync(IServiceProvider serviceProvider)
     {
         return Task.CompletedTask;

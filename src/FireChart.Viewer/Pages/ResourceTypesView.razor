@@ -1,7 +1,9 @@
-@* The resource types of the server, with the clinical summary first when the server has patients *@
+@* The resource types of the server, with the patient summary first when the server has patients *@
 @inherits StatefulWidget<ResourceTypesViewState>
 
 <BusyOverlay Busy=@State.IsBusy Concealed=@State.Activating>
+    @* The tokens of the colours of the types *@
+    <style>@State.Style</style>
     @if (State.Server is not null)
     {
         @if (State.Access == ServerAccess.NotSupported)
@@ -40,14 +42,6 @@
                                 </Leading>
                             </ListTile>
                         }
-                        else if (row.Item == ResourceTypesViewState.ClinicalSummaryEntry)
-                        {
-                            <ListTile Row=@row TitleText=@Strings.Caption_ClinicalSummary Chevron>
-                                <Leading>
-                                    <FloxIcon Icon="history" Title=@Strings.Caption_ClinicalSummary/>
-                                </Leading>
-                            </ListTile>
-                        }
                         else
                         {
                             <ListTile Row=@row TitleText=@row.Item Chevron>
@@ -77,7 +71,6 @@
         Session.Navigate(type switch
         {
             ResourceTypesViewState.BookmarksEntry => new ViewerRoute(ViewerPage.Bookmarks),
-            ResourceTypesViewState.ClinicalSummaryEntry => new ViewerRoute(ViewerPage.ClinicalSummary),
             _ => new ViewerRoute(ViewerPage.ResourceList, type)
         });
     }

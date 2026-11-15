@@ -3,6 +3,7 @@ using Flox.Core.Models;
 
 namespace Flox.Shared.Services;
 
+/// <summary>Keeps the bookmarks of entities of type <typeparamref name="TEntity"/> in the bookmark storage of the device.</summary>
 [FloxService(typeof(IUserBookmarkService<,>))]
 public sealed class UserBookmarkService<TKey, TEntity> : IUserBookmarkService<TKey, TEntity> where TKey : notnull where TEntity : class
 {
@@ -11,6 +12,7 @@ public sealed class UserBookmarkService<TKey, TEntity> : IUserBookmarkService<TK
     private readonly IServiceProvider _serviceProvider;
     private IDataSource<TKey, TEntity>? _keys;
 
+    /// <summary>Creates the service over the bookmark data source and the formatters that describe an entity.</summary>
     public UserBookmarkService(IGuidDataSource<UserBookmark> bookmarksDataSource, IEnumerable<IEntityFormatterService> formatters, IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
@@ -50,6 +52,7 @@ public sealed class UserBookmarkService<TKey, TEntity> : IUserBookmarkService<TK
         return Describe(value)?.EntityId ?? KeyToString(KeyOf(value));
     }
 
+    /// <inheritdoc />
     public async Task AddBookmarkAsync(TEntity value)
     {
         ArgumentNullException.ThrowIfNull(value);
@@ -87,11 +90,13 @@ public sealed class UserBookmarkService<TKey, TEntity> : IUserBookmarkService<TK
         _bookmarked.Add(entityId);
     }
 
+    /// <inheritdoc />
     public bool IsBookmarked(TEntity value)
     {
         return _bookmarked.Contains(IdentityOf(value));
     }
 
+    /// <inheritdoc />
     public async Task LoadBookmarksAsync(IReadOnlyCollection<TEntity> page)
     {
         _bookmarked.Clear();
@@ -115,6 +120,7 @@ public sealed class UserBookmarkService<TKey, TEntity> : IUserBookmarkService<TK
         }
     }
 
+    /// <inheritdoc />
     public async Task RemoveBookmarkAsync(TEntity value)
     {
         var typeName = value.GetType()

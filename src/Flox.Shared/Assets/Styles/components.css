@@ -101,7 +101,7 @@ html:root .rz-button.rz-button-lg {
 }
 
 /* A button with only an icon is a square (FloxIcon children are not Radzen's icon-only) */
-html:root .rz-button.rz-button:is(.rz-button-icon-only, :has(> .rz-button-box > svg:only-child)) {
+html:root .rz-button.rz-button:is(.rz-button-icon-only, :has(> .rz-button-box > .rzi:only-child)) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -174,7 +174,7 @@ html:root .rz-fieldset-legend {
     align-items: center;
     gap: 0.25rem;
     margin: 0;
-    padding: var(--fw-fieldset-legend-padding-block-start, calc(var(--spacing) * 3)) calc(var(--spacing) * 4) var(--fw-fieldset-legend-padding-block-end, 0);
+    padding: var(--fw-fieldset-legend-padding-block-start, calc(var(--spacing) * 3)) var(--fw-fieldset-legend-padding-inline, calc(var(--spacing) * 4)) var(--fw-fieldset-legend-padding-block-end, 0);
     font-weight: 600;
     letter-spacing: var(--tracking-tight);
     white-space: normal !important;
@@ -343,7 +343,7 @@ html:root .rz-switch.rz-switch-checked .rz-switch-circle:before {
 }
 
 /* The side menu: icons (FloxIcon, not Radzen's icon element) quieter than the text, the active item semibold */
-html:root .rz-panel-menu .rz-navigation-item-link > svg {
+html:root .rz-panel-menu .rz-navigation-item-link > .rzi {
     color: var(--rz-panel-menu-icon-color);
 }
 
@@ -351,7 +351,7 @@ html:root .rz-panel-menu .rz-navigation-item-wrapper-active .rz-navigation-item-
     font-weight: 600;
 }
 
-html:root .rz-panel-menu .rz-navigation-item-wrapper-active .rz-navigation-item-link > svg {
+html:root .rz-panel-menu .rz-navigation-item-wrapper-active .rz-navigation-item-link > .rzi {
     color: inherit;
 }
 
@@ -369,22 +369,68 @@ html:root .rz-tabview-nav li.rz-tabview-selected {
     box-shadow: 0 -2px 0 var(--rz-primary) inset;
 }
 
-/* Breadcrumbs (daisyUI): a thin chevron at 40% between the crumbs */
-html:root .rz-breadcrumb-item + .rz-breadcrumb-item::before {
-    content: "" / "";
-    box-sizing: content-box;
-    width: 0.375rem;
-    height: 0.375rem;
-    padding: 0;
-    margin-inline: 0.5rem 0.75rem;
-    border-block-start: 1px solid currentColor;
-    border-inline-end: 1px solid currentColor;
-    opacity: 0.4;
-    rotate: 45deg;
+/* Forced colors drop the inset shadow: the selected tab keeps its underline as a border */
+@media (forced-colors: active) {
+    html:root .rz-tabview-nav li.rz-tabview-selected {
+        border-block-end: 2px solid Highlight;
+    }
 }
 
-html:root [dir="rtl"] .rz-breadcrumb-item + .rz-breadcrumb-item::before {
-    rotate: -45deg;
+/* Breadcrumbs: a middle dot at 40% between the crumbs, the same in both directions of the text. Drawn, not a character: the build writes a character
+   of content as UTF-8, and a stylesheet read in another encoding (text/css comes without a charset) showed it as two others */
+html:root .rz-breadcrumb-item + .rz-breadcrumb-item::before {
+    content: "" / "";
+    display: inline-block;
+    box-sizing: content-box;
+    width: 0.25rem;
+    height: 0.25rem;
+    padding: 0;
+    margin-inline: 0.5rem;
+    border: 0;
+    border-radius: 50%;
+    background-color: currentColor;
+    vertical-align: middle;
+    opacity: 0.4;
+    rotate: none;
+}
+
+/* Breadcrumbs that do not fit scroll sideways (Breadcrumbs.razor) with a thin scrollbar; where scroll-driven animations exist, the edge that hides
+   crumbs also fades. Elsewhere the scrollbar alone shows that more crumbs exist */
+@property --fw-fade-start {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0px;
+}
+
+@property --fw-fade-end {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0px;
+}
+
+@keyframes fw-scroll-fade {
+    from { --fw-fade-start: 0px; --fw-fade-end: 1.5rem; }
+    10% { --fw-fade-start: 1.5rem; }
+    90% { --fw-fade-end: 1.5rem; }
+    to { --fw-fade-start: 1.5rem; --fw-fade-end: 0px; }
+}
+
+html:root .fw-breadcrumbs {
+    scrollbar-width: thin;
+    scrollbar-color: var(--rz-border-color) transparent;
+}
+
+@supports (animation-timeline: scroll()) {
+    html:root .fw-breadcrumbs {
+        --fw-fade-direction: to right;
+        mask-image: linear-gradient(var(--fw-fade-direction), transparent, #000 var(--fw-fade-start), #000 calc(100% - var(--fw-fade-end)), transparent);
+        animation: fw-scroll-fade linear both;
+        animation-timeline: scroll(self inline);
+    }
+
+    html:root .fw-breadcrumbs:dir(rtl) {
+        --fw-fade-direction: to left;
+    }
 }
 
 /* A form field is as wide as its content needs up to a readable line; a search box takes the whole width (--fw-field-max-width: none) */
@@ -395,4 +441,10 @@ html:root .rz-form-field.rz-variant-text {
 /* A slider with its value lines up with the form fields */
 .fw-slider {
     max-width: var(--fw-field-max-width, 40rem);
+}
+
+/* The title of a page (PageHeader): starts where the text of the rows of a ListSection does (the border of the fieldset and the padding of a tile) */
+html:root .page-header {
+    margin-block: calc(var(--spacing) * 4) calc(var(--spacing) * 3);
+    padding-inline: calc(1px + var(--spacing) * 3);
 }

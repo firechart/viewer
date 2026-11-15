@@ -1,3 +1,4 @@
+using Flox.Services;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using FireChart.Viewer.Appearance;
@@ -24,7 +25,7 @@ internal sealed class ViewerFrameChannel : IAsyncDisposable
     // None when the frame is not hosted by a parent that sends the configuration: it reads viewer.json
     public static async Task<ViewerFrameChannel?> OpenAsync(IJSRuntime js, Func<FrameRequest, Task> onMessage)
     {
-        var module = await js.InvokeAsync<IJSObjectReference>("import", "./js/viewer-frame.js");
+        var module = await js.ImportModuleAsync("./js/viewer-frame.js");
         if (!await module.InvokeAsync<bool>("isParentHosted"))
         {
             await module.DisposeAsync();
@@ -107,7 +108,7 @@ internal sealed record FrameRequest(string Type, string? Id, JsonObject Payload)
 // update: the options that change without a restart (plan 4.8, live and reload) merged into the current configuration by key; server and smart need a restart
 internal static class ViewerConfigPatch
 {
-    private static readonly HashSet<string> s_updatable = new(["locale", "appearance", "terminology", "clinicalSummary"], StringComparer.Ordinal);
+    private static readonly HashSet<string> s_updatable = new(["locale", "appearance", "terminology"], StringComparer.Ordinal);
 
     public static ViewerConfigPatchResult Apply(string current, JsonObject patch)
     {

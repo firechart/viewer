@@ -1,0 +1,57 @@
+@* The switch between a record and its summary: on the page of a record of a type that has a summary form (summary-forms/{Type}.json) and on the
+   summary. The address says which one shows (resources/Patient/1, summary/Patient/1), so Back, the bookmarks and the links keep it *@
+@inject ViewerSummaryForms SummaryForms
+
+@if (_hasSummary)
+{
+    <RadzenSelectBar TValue="bool" Value=@Summary Change=@((bool summary) => Switch(summary)) Size="ButtonSize.Small" class="fx-summary-switch print:hidden"
+                     data-viewer="summary-switch">
+        <Items>
+            <RadzenSelectBarItem Text=@Strings.Caption_Record Value="false" data-viewer="show-record"/>
+            <RadzenSelectBarItem Text=@Strings.Caption_Summary Value="true" data-viewer="show-summary"/>
+        </Items>
+    </RadzenSelectBar>
+}
+
+@code {
+
+    private bool _hasSummary;
+    private string? _checkedType;
+
+    /// <summary>The instance of the Viewer.</summary>
+    [CascadingParameter]
+    public ViewerSession Session { get; set; } = null!;
+
+    /// <summary>The type of the record.</summary>
+    [Parameter, EditorRequired]
+    public string ResourceType { get; set; } = string.Empty;
+
+    /// <summary>The id of the record.</summary>
+    [Parameter, EditorRequired]
+    public string ResourceId { get; set; } = string.Empty;
+
+    /// <summary>The summary shows (on the page of the summary); otherwise the record.</summary>
+    [Parameter]
+    public bool Summary { get; set; }
+
+    /// <inheritdoc/>
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_checkedType == ResourceType)
+        {
+            return;
+        }
+
+        _checkedType = ResourceType;
+        _hasSummary = Summary || await SummaryForms.HasFormAsync(ResourceType);
+    }
+
+    private void Switch(bool summary)
+    {
+        if (summary != Summary)
+        {
+            Session.Navigate(new ViewerRoute(summary ? ViewerPage.Summary : ViewerPage.Resource, ResourceType, ResourceId));
+        }
+    }
+
+}

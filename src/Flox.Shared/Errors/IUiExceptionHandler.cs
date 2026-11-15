@@ -9,7 +9,9 @@ public interface IUiExceptionHandler
     /// <summary>
     /// Handles <paramref name="exception"/>; never throws.
     /// </summary>
+    /// <param name="exception">The exception to handle.</param>
     /// <param name="operation">Name of the failed operation, for logs.</param>
+    /// <param name="source">Where in the UI the exception was caught.</param>
     /// <param name="userMessage">Text to show instead of the standard one.</param>
     Task<UiExceptionContext> HandleAsync(Exception exception, string? operation = null, UiExceptionSource source = UiExceptionSource.Operation, string? userMessage = null);
 
@@ -20,6 +22,7 @@ public interface IUiExceptionHandler
     void Fire(Func<Task> action, string? operation = null);
 }
 
+/// <summary>Convenience methods over <see cref="IUiExceptionHandler"/>.</summary>
 public static class UiExceptionHandlerExtensions
 {
     /// <summary>

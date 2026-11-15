@@ -21,5 +21,6 @@ public interface IUiExceptionFilter
         }
     }
 
+    /// <summary>Examines the exception of <paramref name="context"/> and, when it can deal with it, does so and sets <see cref="UiExceptionContext.Handled"/>.</summary>
     ValueTask HandleAsync(UiExceptionContext context);
 }

@@ -1,4 +1,4 @@
-// The list of the clinical summary: the rows have one height, so the window of the rows to draw follows from the scroll position alone.
+// The list of the patient summary: the rows have one height, so the window of the rows to draw follows from the scroll position alone.
 // The height is the CSS of the kit and changes with the width of the list (the probe is as tall as a row): the first row in view is kept when it changes.
 // The only scrolling element is the scroller; it is made as tall as the free part of the screen, so nothing around it scrolls (nested scrolling is bad on phones)
 

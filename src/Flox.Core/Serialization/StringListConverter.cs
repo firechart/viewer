@@ -3,8 +3,12 @@ using System.Text.Json.Serialization;
 
 namespace Flox.Core.Serialization;
 
+/// <summary>
+/// Reads a list of strings written either as one string (STU3) or as an array (R4 and later).
+/// </summary>
 public class StringListConverter : JsonConverter<List<string>>
 {
+    /// <inheritdoc />
     public override List<string> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.String)
@@ -35,6 +39,7 @@ public class StringListConverter : JsonConverter<List<string>>
         throw new JsonException($"Unexpected token type: {reader.TokenType}");
     }
 
+    /// <inheritdoc />
     public override void Write(Utf8JsonWriter writer, List<string> value, JsonSerializerOptions options)
     {
         writer.WriteStartArray();

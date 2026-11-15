@@ -194,7 +194,7 @@ configuration does nothing.
 **Open a patient from your application** (a button in your EMR, a row of your list):
 
 ```js
-await viewer.navigate(`summary/${patientId}`);          // the clinical summary
+await viewer.navigate(`summary/${patientId}`);          // the patient summary
 await viewer.navigate(`resources/Patient/${patientId}`);  // the resource
 await viewer.navigate("resources/Observation?code=8867-4&patient=" + patientId, { replace: true });
 ```
@@ -211,17 +211,19 @@ A language the Viewer has no texts for (`fr`) gives the language of the browser.
 **Links to a patient, reloads that keep the place:** `urlParam` keeps the address of the Viewer in the address of your page.
 
 ```js
-Viewer.create(config, { url: viewerUrl, urlParam: "fhir" });   // https://app.example.org/chart?fhir=summary/123
+Viewer.create(config, { url: viewerUrl, urlParam: "fhir" });   // https://app.example.org/chart?fhir=summary/Patient/123
 ```
 
 The SDK only replaces the parameter (`history.replaceState`): the moves inside the Viewer are in the history of the tab already, so Back works
 as usual. A router of your application that rewrites the query may drop the parameter: let it keep unknown parameters.
 
-**Print:** `await viewer.print()` opens the print dialog for the page of the Viewer only.
+**Print:** `await viewer.print()` prints the page of the Viewer only. A summary loads every record first and is not printed when some cannot be
+loaded; another page is printed as it is.
 
 **Your colours and shapes:**
 
 ```js
+viewer.update({ appearance: { style: "fluent" } }); // a theme of the library: styles/themes/fluent.css
 viewer.update({ appearance: { variables: { colorPrimary: "#0a7f5a", borderRadius: "6px" } } });
 viewer.update({ appearance: { rules: { ".Banner": { backgroundColor: "#f1f5f9" } } } });
 ```

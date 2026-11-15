@@ -56,7 +56,7 @@ public sealed class VendorTemplates : ITemplateSource, ITemplateTexts
     /// <exception cref="DirectoryNotFoundException">The folder has no templates.</exception>
     /// <example>
     /// <code>
-    /// var vendor = VendorTemplates.FromFolder(@"public\src\FireChart.Viewer.Library\wwwroot");
+    /// var vendor = VendorTemplates.FromFolder(@"public\library");
     /// </code>
     /// </example>
     public static VendorTemplates FromFolder(string webRoot)

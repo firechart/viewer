@@ -1,0 +1,24 @@
+[
+  {
+    "PackageId": "@sqlite.org/sqlite-wasm",
+    "PackageVersion": "3.54.1-build1",
+    "PackageProjectUrl": "https://github.com/sqlite/sqlite-wasm",
+    "Copyright": "The SQLite Wasm npm package contributors",
+    "Authors": "https://github.com/sqlite/sqlite-wasm/graphs/contributors",
+    "Description": "The npm package of SQLite Wasm (dist/index.mjs, dist/sqlite3.wasm), vendored unchanged in Flox.Sqlite (wwwroot/lib/sqlite-wasm)",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://www.apache.org/licenses/LICENSE-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "SQLite (WebAssembly)",
+    "PackageVersion": "3.54.1",
+    "PackageProjectUrl": "https://sqlite.org",
+    "Copyright": "Public domain: the authors disclaim copyright to the source code of SQLite",
+    "Authors": "D. Richard Hipp and the SQLite developers",
+    "Description": "SQLite and its WebAssembly build (sqlite3.wasm and its JavaScript), inside the sqlite-wasm package",
+    "License": "blessing",
+    "LicenseUrl": "https://sqlite.org/copyright.html",
+    "LicenseInformationOrigin": 0
+  }
+]

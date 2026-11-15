@@ -1,7 +1,8 @@
 @inject IFloxBrandingProvider Branding
 
 <SectionContent SectionName="appbar-title">
-    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.Div" class="rz-text-truncate rz-m-0">
+    @* The heading of the page (FocusOnNavigate moves the focus to it); the headings of a page start at h2 *@
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H1" class="rz-text-truncate rz-m-0">
         @if (ChildContent != null)
         {
             @ChildContent

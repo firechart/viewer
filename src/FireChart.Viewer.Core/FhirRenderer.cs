@@ -362,7 +362,7 @@ public sealed class FhirRenderer
     {
         var type = root.InstanceType ?? root.Name;
         var id = root.Children("id").FirstOrDefault()?.Value as string;
-        var plain = string.IsNullOrEmpty(id) ? TileModel.Plain(type, null) : TileModel.Plain(id, type);
+        var plain = NarrativeTile(root, type) ?? (string.IsNullOrEmpty(id) ? TileModel.Plain(type, null) : TileModel.Plain(id, type));
         if (await _library.FindAsync(FhirNode.ModeKey(type, TileModel.Mode)) is null)
         {
             return plain;
@@ -396,6 +396,27 @@ public sealed class FhirRenderer
         }
     }
 
+    // A type without a tile of its own (Basic, a rare type): the beginning of its narrative (Resource.text, decided by the owner 2026-11-10) as the title,
+    // the type below; none when the resource has no narrative or an empty one. Only this fallback of the engine reads the narrative, never a template
+    private const int NarrativeLength = 160;
+
+    private static TileModel? NarrativeTile(ITypedElement root, string type)
+    {
+        var text = root.Children("text").FirstOrDefault();
+        if (text is null || text.Children("status").FirstOrDefault()?.Value as string == "empty" || text.Children("div").FirstOrDefault()?.Value is not string div)
+        {
+            return null;
+        }
+
+        var plain = FxHtml.PlainText(div).Trim();
+        if (plain.Length == 0)
+        {
+            return null;
+        }
+
+        return TileModel.Plain(plain.Length > NarrativeLength ? plain[..NarrativeLength].TrimEnd() + "…" : plain, type);
+    }
+
     // Each slot sanitized on its own; no row when the template filled no title
     private static TileModel? TileOf(FrameSlots slots, TileOptions options)
     {
@@ -406,7 +427,7 @@ public sealed class FhirRenderer
         }
 
         return new TileModel(title, Slot(FrameSlots.Subtitle), Slot(FrameSlots.Trailing), Slot(FrameSlots.Status), Slot(FrameSlots.Patient), Slot(FrameSlots.Encounter),
-                             Slot(FrameSlots.Age), options);
+                             Slot(FrameSlots.Age), options, slots.Codes);
 
         string Slot(string name)
         {

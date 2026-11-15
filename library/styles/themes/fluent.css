@@ -1,0 +1,44 @@
+/* A demo theme in the manner of Fluent 2 (the design language of Microsoft): cool neutrals, the communication blue, small radii, the font of the
+   system (Segoe UI on Windows; the font is not shipped). Tokens only: the Viewer around the content follows them through fx.themed.css. Use it as a
+   start for a theme of your own: copy it to styles/themes/{name}.css of your appearance folder and set appearance.style to {name}. */
+
+:root {
+  --fx-font: "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+  --fx-font-mono: "Cascadia Mono", Consolas, ui-monospace, monospace;
+  --fx-color-background: #f5f5f5;
+  --fx-color-surface: #ffffff;
+  --fx-color-text: #242424;
+  --fx-color-muted: #616161;
+  --fx-color-border: #e0e0e0;
+  --fx-color-neutral: #707070;
+  --fx-color-accent: #0f6cbd;
+  --fx-color-on-accent: #ffffff;
+  --fx-color-link: #115ea3;
+  --fx-color-info: #0078d4;
+  --fx-color-success: #107c10;
+  --fx-color-warning: #f7630c;
+  --fx-color-on-warning: #242424;
+  --fx-color-danger: #c50f1f;
+  --fx-radius: 4px;
+  --fx-gap: 0.75rem;
+  --fx-gap-lg: 1.25rem;
+  --fx-size-title: 1.25rem;
+  --fx-size-body: 0.875rem;
+  --fx-size-small: 0.75rem;
+}
+
+:root[data-theme="dark"] {
+  --fx-color-background: #1f1f1f;
+  --fx-color-surface: #292929;
+  --fx-color-text: #ffffff;
+  --fx-color-muted: #d6d6d6;
+  --fx-color-border: #404040;
+  --fx-color-neutral: #858585;
+  --fx-color-accent: #2886de;
+  --fx-color-link: #479ef5;
+  --fx-color-info: #479ef5;
+  --fx-color-success: #54b054;
+  --fx-color-warning: #faa06b;
+  --fx-color-on-warning: #1f1f1f;
+  --fx-color-danger: #dc626d;
+}

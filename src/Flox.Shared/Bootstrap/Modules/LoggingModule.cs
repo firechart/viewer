@@ -7,16 +7,27 @@ using Serilog.Settings.Configuration;
 
 namespace Flox.Shared.Bootstrap.Modules;
 
+/// <summary>
+/// Configures Serilog logging: console in a regular host, browser console in WebAssembly, with levels that can be changed at run time.
+/// </summary>
 public class LoggingModule : BootstrapModule
 {
-    // The browser console has no time of its own per line; milliseconds make the startup timeline readable
+    /// <summary>
+    /// Output template of the browser console, with milliseconds in the timestamp.
+    /// </summary>
     public const string BrowserOutputTemplate = "[{Level:u3}] [{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{SourceContext:l}] {Message:lj}{NewLine}{Exception}";
 
+    /// <summary>
+    /// Output template of the console and the debug output.
+    /// </summary>
     public const string OutputTemplate = "[{Level:u3}] [{Timestamp:HH:mm:ss}] [{SourceContext:l}] {Message:lj}{NewLine}{Exception}";
 
-    // On Apple platforms the debugger and `simctl --console-pty` show stderr (NSLog) but not Console.Out
+    /// <summary>
+    /// Level from which the console writes to stderr; set on Apple platforms, where the debugger shows stderr only.
+    /// </summary>
     public static readonly LogEventLevel? StandardErrorFromLevel = OperatingSystem.IsIOS() || OperatingSystem.IsMacCatalyst() ? LogEventLevel.Verbose : null;
 
+    /// <inheritdoc />
     public override void ConfigureServices()
     {
         const string template = OutputTemplate;
@@ -60,6 +71,9 @@ public class LoggingModule : BootstrapModule
         LoggingBulder.AddSerilog(logger);
     }
 
+    /// <summary>
+    /// Hook for a derived module to add sinks or enrichers before the logger is created.
+    /// </summary>
     protected virtual void ConfigureLoggingConfiguration(ref LoggerConfiguration loggerConfiguration)
     {
     }

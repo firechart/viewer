@@ -60,6 +60,20 @@ public sealed record RelatedResource(string Json, string? FullUrl);
 public sealed record ResourcePage(IReadOnlyList<ResourceSummary> Items, long? Total, string? First, string? Previous, string? Next, string? Last, IReadOnlyList<RelatedResource>? Related = null);
 
 /// <summary>
+/// The first page of a search asked in an order (<see cref="IFhirServerReader.SearchSortedAsync"/>), and whether the server gave that order.
+/// </summary>
+/// <param name="Page">The page.</param>
+/// <param name="Sorted"><see langword="true"/> when the page came in the order asked; <see langword="false"/> when the server refused it (or no order
+/// was asked) and the records came in the order the server likes: the first page is then not the newest records, only some of them.</param>
+/// <example>
+/// <code>
+/// var result = await reader.SearchSortedAsync(server, "Observation", FhirSearchState.Parse("patient=p1&amp;_count=20"), "-date");
+/// var note = result.Sorted ? "newest first" : "in the order of the server";
+/// </code>
+/// </example>
+public sealed record SortedResourcePage(ResourcePage Page, bool Sorted);
+
+/// <summary>
 /// Reads the resources of a FHIR server; read-only. The answers are release-agnostic JSON: a <c>Bundle</c> has the same shape in every release.
 /// </summary>
 /// <remarks>
@@ -81,11 +95,36 @@ public interface IFhirServerReader
     /// <param name="resourceType">The type (<c>Patient</c>): letters only.</param>
     /// <param name="search">The search; none is every resource of the type.</param>
     /// <param name="needs">What is asked to come with the resources (<c>_include</c>, <c>_revinclude</c>). A server that refuses them with a client error is
-    /// asked again without them, and not with them again for that type.</param>
+    /// asked again without them; when that answers, it is not asked with them again for that type (when it fails too, the includes were not the reason
+    /// and the error of the second request is thrown).</param>
     /// <param name="cancellationToken">Cancels the request.</param>
     /// <returns>The page.</returns>
     /// <exception cref="ArgumentException"><paramref name="resourceType"/> is not a resource type.</exception>
     Task<ResourcePage> SearchAsync(IViewerServer server, string resourceType, FhirSearchState? search = null, FhirNeeds? needs = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// The first page of a search in an order that the server may not know (a server may sort by a subset of the search parameters, and Blaze refuses
+    /// the others with <c>400</c>). A refusal (a client error other than <c>401</c>, <c>403</c>, <c>404</c>) is answered by asking again, in this order:
+    /// without the order and with the needs, with the order and without the needs, without both. What had to be left out is remembered for the
+    /// server and the type (the order also by its value), so the next search asks for it no more: one request after the first.
+    /// </summary>
+    /// <param name="server">The server.</param>
+    /// <param name="resourceType">The type (<c>Observation</c>): letters only.</param>
+    /// <param name="search">The search without <c>_sort</c>.</param>
+    /// <param name="sort">The order (<c>-date</c>), the value of <c>_sort</c>; empty asks for none.</param>
+    /// <param name="needs">What is asked to come with the resources (<c>_include</c>, <c>_revinclude</c>).</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The page and whether it is in the order asked.</returns>
+    /// <exception cref="ArgumentException"><paramref name="resourceType"/> is not a resource type.</exception>
+    /// <exception cref="HttpRequestException">The last request failed: the error is not the order nor the needs.</exception>
+    /// <example>
+    /// <code>
+    /// var result = await reader.SearchSortedAsync(server, "Condition", FhirSearchState.Parse("patient=p1&amp;_count=20"), "-recorded-date",
+    ///     new FhirNeeds(["Condition:encounter"], []));
+    /// </code>
+    /// </example>
+    Task<SortedResourcePage> SearchSortedAsync(IViewerServer server, string resourceType, FhirSearchState search, string sort, FhirNeeds? needs = null,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Reads one resource.
@@ -142,13 +181,17 @@ public sealed partial class FhirServerReader(IHttpClientFactory httpClientFactor
     [GeneratedRegex("^[A-Za-z0-9.-]{1,64}$", RegexOptions.CultureInvariant)]
     private static partial Regex IdRegex();
 
-    // Servers (by address and type) that answered a search with includes by a client error: they are not asked again
+    // Servers (by address and type) that refused the includes, and (by address, type and order) that refused an order: not asked so again
     private readonly ConcurrentDictionary<string, byte> _withoutIncludes = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, byte> _withoutSort = new(StringComparer.Ordinal);
+
+    // One request of a sorted search: with the order or not, with the needs or not
+    private sealed record SearchStep(bool Sorted, bool Included);
 
     /// <inheritdoc/>
     public async Task<ResourcePage> SearchAsync(IViewerServer server, string resourceType, FhirSearchState? search = null, FhirNeeds? needs = null, CancellationToken cancellationToken = default)
     {
-        var url = $"{TypeUrl(server, resourceType)}?{(search ?? FhirSearchState.Empty).ToSearchQuery(server.PageSize)}{(server.SearchSummary ? "&_summary=true" : string.Empty)}";
+        var url = SearchUrl(server, resourceType, search);
         var key = $"{server.BaseUrl}|{resourceType}";
         if (needs is null || needs.IsEmpty || _withoutIncludes.ContainsKey(key))
         {
@@ -159,11 +202,63 @@ public sealed partial class FhirServerReader(IHttpClientFactory httpClientFactor
         {
             return await ReadPageAsync(server, url + NeedsQuery(needs), resourceType, cancellationToken);
         }
-        catch (HttpRequestException ex) when (ex.StatusCode is { } status && (int)status is >= 400 and < 500 && status is not (HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden or HttpStatusCode.NotFound))
+        catch (HttpRequestException ex) when (IsRefusal(ex))
         {
+            // Remembered only when it helps: a search refused for another reason (an order the server does not know) keeps its includes
+            var page = await ReadPageAsync(server, url, resourceType, cancellationToken);
             _withoutIncludes[key] = 0;
-            return await ReadPageAsync(server, url, resourceType, cancellationToken);
+            return page;
         }
+    }
+
+    /// <inheritdoc/>
+    public async Task<SortedResourcePage> SearchSortedAsync(IViewerServer server, string resourceType, FhirSearchState search, string sort, FhirNeeds? needs = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(search);
+        ArgumentNullException.ThrowIfNull(sort);
+        var url = SearchUrl(server, resourceType, search);
+        var key = $"{server.BaseUrl}|{resourceType}";
+        var sortKey = $"{key}|{sort.Trim()}";
+        var canSort = sort.Trim().Length > 0 && !_withoutSort.ContainsKey(sortKey);
+        var canInclude = needs is { IsEmpty: false } && !_withoutIncludes.ContainsKey(key);
+        List<SearchStep> ladder = [.. new SearchStep[] { new(canSort, canInclude), new(false, canInclude), new(canSort, false), new(false, false) }.Distinct()];
+
+        for (var i = 0; ; i++)
+        {
+            var step = ladder[i];
+            try
+            {
+                var page = await ReadPageAsync(server, url + (step.Sorted ? $"&_sort={Uri.EscapeDataString(sort.Trim())}" : string.Empty)
+                                                          + (step.Included ? NeedsQuery(needs!) : string.Empty), resourceType, cancellationToken);
+                if (canSort && !step.Sorted)
+                {
+                    _withoutSort[sortKey] = 0;
+                }
+
+                if (canInclude && !step.Included)
+                {
+                    _withoutIncludes[key] = 0;
+                }
+
+                return new SortedResourcePage(page, step.Sorted);
+            }
+            catch (HttpRequestException ex) when (i < ladder.Count - 1 && IsRefusal(ex))
+            {
+                // the next step leaves out more
+            }
+        }
+    }
+
+    // A client error that a search without the order or the needs may not get; not the credentials and not a type the server does not have
+    private static bool IsRefusal(HttpRequestException ex)
+    {
+        return ex.StatusCode is { } status && (int)status is >= 400 and < 500 && status is not (HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden or HttpStatusCode.NotFound);
+    }
+
+    private static string SearchUrl(IViewerServer server, string resourceType, FhirSearchState? search)
+    {
+        return $"{TypeUrl(server, resourceType)}?{(search ?? FhirSearchState.Empty).ToSearchQuery(server.PageSize)}{(server.SearchSummary ? "&_summary=true" : string.Empty)}";
     }
 
     private static string NeedsQuery(FhirNeeds needs)
@@ -186,7 +281,7 @@ public sealed partial class FhirServerReader(IHttpClientFactory httpClientFactor
             throw new ArgumentException("Not a resource id.", nameof(id));
         }
 
-        using var document = await FhirServerHttp.GetJsonAsync(httpClientFactory, $"{TypeUrl(server, resourceType)}/{id}", credentials.GetAuthorization(server), cancellationToken);
+        using var document = await FhirServerHttp.GetJsonAsync(httpClientFactory, $"{TypeUrl(server, resourceType)}/{id}", credentials.GetAuthorization(server), FhirServerHttp.TimeoutOf(server), cancellationToken);
         if (!document.RootElement.TryGetProperty("resourceType", out var type) || type.GetString() != resourceType)
         {
             throw new FloxException($"The server did not answer with a {resourceType}.");
@@ -228,7 +323,7 @@ public sealed partial class FhirServerReader(IHttpClientFactory httpClientFactor
 
     private async Task<ResourcePage> ReadPageAsync(IViewerServer server, string url, string resourceType, CancellationToken cancellationToken)
     {
-        using var document = await FhirServerHttp.GetJsonAsync(httpClientFactory, url, credentials.GetAuthorization(server), cancellationToken);
+        using var document = await FhirServerHttp.GetJsonAsync(httpClientFactory, url, credentials.GetAuthorization(server), FhirServerHttp.TimeoutOf(server), cancellationToken);
         return Parse(document.RootElement, resourceType);
     }
 

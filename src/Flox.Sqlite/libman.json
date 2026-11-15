@@ -1,0 +1,15 @@
+{
+  "version": "3.0",
+  "defaultProvider": "jsdelivr",
+  "libraries": [
+    {
+      "provider": "jsdelivr",
+      "library": "@sqlite.org/sqlite-wasm@3.54.1-build1",
+      "destination": "wwwroot/lib/sqlite-wasm",
+      "files": [
+        "dist/index.mjs",
+        "dist/sqlite3.wasm"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{%- comment -%} The value of an Observation o and the values of its components joined by " / " (decimals: the format of the section); the systolic pressure
+(LOINC 8480-6) comes first whatever the order of the record, so a blood pressure reads 120 mmHg / 80 mmHg {%- endcomment -%}
+{%- assign first = true -%}
+{%- if o.value -%}{% apply o.value mode: "text", decimals: decimals %}{%- assign first = false -%}{%- endif -%}
+{%- assign components = o.component | as_list -%}
+{%- for pass in (1..2) -%}
+  {%- for c in components -%}
+    {%- assign systolic = false -%}
+    {%- assign codings = c.code.coding | as_list -%}
+    {%- for cd in codings -%}{%- assign code = cd.code | append: "" -%}{%- if code == "8480-6" -%}{%- assign systolic = true -%}{%- endif -%}{%- endfor -%}
+    {%- if pass == 1 -%}{%- assign take = systolic -%}{%- elsif systolic -%}{%- assign take = false -%}{%- else -%}{%- assign take = true -%}{%- endif -%}
+    {%- if take and c.value -%}
+      {%- unless first %} / {% endunless -%}
+      {% apply c.value mode: "text", decimals: decimals %}
+      {%- assign first = false -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endfor -%}

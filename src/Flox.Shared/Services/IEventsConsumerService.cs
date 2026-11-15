@@ -10,6 +10,7 @@ public interface IEventsConsumerService
     /// </summary>
     event EventHandler<GenericEventArgs<EventMessage>>? OnMessage;
 
+    /// <summary>Whether the connection to the push channel is open.</summary>
     bool IsConnected { get; }
 
     /// <summary>

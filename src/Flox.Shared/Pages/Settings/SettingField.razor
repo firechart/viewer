@@ -6,21 +6,22 @@
 {
     case SettingControl.Switch:
         <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-md)">
-            <RadzenSwitch Name=@Field.Name Value=@((bool)GetValue()!) ValueChanged="@((bool value) => SetValue(value))"/>
+            <RadzenSwitch Name=@Field.Name Value=@((bool)GetValue()!) ValueChanged="@((bool value) => SetValue(value))" @attributes=@Aria()/>
             <RadzenLabel Text=@Field.Label Component=@Field.Name/>
         </RadzenStack>
         @Hint
         break;
 
     case SettingControl.Slider:
-        <div class="fw-label">@Field.Label</div>
-        <SliderWithDisplay T="int" Min=@((int)(Field.Minimum ?? 0)) Max=@((int)(Field.Maximum ?? 100)) Step=@(Math.Max(Field.Step, 1)) Value=@((int)GetValue()!) ValueChanged="@((int value) => SetValue(value))"/>
+        <div class="fw-label" aria-hidden="true">@Field.Label</div>
+        <SliderWithDisplay T="int" Min=@((int)(Field.Minimum ?? 0)) Max=@((int)(Field.Maximum ?? 100)) Step=@(Math.Max(Field.Step, 1)) Value=@((int)GetValue()!) ValueChanged="@((int value) => SetValue(value))" Label=@Field.Label/>
         @Hint
         break;
 
     case SettingControl.RadioList:
-        <div class="fw-label">@Field.Label</div>
-        <RadzenRadioButtonList TValue="object" Value=@GetValue() ValueChanged="@((object? value) => SetValue(value))" Data=@_options TextProperty="Text" ValueProperty="Value"/>
+        <div class="fw-label" id=@LabelId>@Field.Label</div>
+        <RadzenRadioButtonList TValue="object" Value=@GetValue() ValueChanged="@((object? value) => SetValue(value))" Data=@_options TextProperty="Text" ValueProperty="Value" AriaLabelledBy=@LabelId
+                               @attributes=@Aria()/>
         @Hint
         break;
 
@@ -30,23 +31,23 @@
                 @switch (Field.Control)
                 {
                     case SettingControl.Dropdown:
-                        <RadzenDropDown TValue="object" Name=@Field.Name Value=@GetValue() ValueChanged="@((object? value) => SetValue(value))" Data=@_options TextProperty="Text" ValueProperty="Value"/>
+                        <RadzenDropDown TValue="object" Name=@Field.Name Value=@GetValue() ValueChanged="@((object? value) => SetValue(value))" Data=@_options TextProperty="Text" ValueProperty="Value" @attributes=@Aria()/>
                         break;
 
                     case SettingControl.Number:
-                        <RadzenNumeric TValue="decimal" Name=@Field.Name Value=@Convert.ToDecimal(GetValue()) ValueChanged="@((decimal value) => SetValue(value))" Min=@Field.Minimum Max=@Field.Maximum/>
+                        <RadzenNumeric TValue="decimal" Name=@Field.Name Value=@Convert.ToDecimal(GetValue()) ValueChanged="@((decimal value) => SetValue(value))" Min=@Field.Minimum Max=@Field.Maximum @attributes=@Aria(invalidAttribute: false)/>
                         break;
 
                     case SettingControl.Password:
-                        <RadzenPassword Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" Immediate="true"/>
+                        <RadzenPassword Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" Immediate="true" @attributes=@Aria()/>
                         break;
 
                     case SettingControl.TextArea:
-                        <RadzenTextArea Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" Immediate="true" Rows="4"/>
+                        <RadzenTextArea Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" Immediate="true" Rows="4" @attributes=@Aria()/>
                         break;
 
                     default:
-                        <RadzenTextBox Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" Immediate="true"/>
+                        <RadzenTextBox Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" Immediate="true" @attributes=@Aria()/>
                         break;
                 }
             </ChildContent>
@@ -55,10 +56,12 @@
         break;
 }
 
-@foreach (var message in Context.GetValidationMessages(_identifier))
-{
-    <RadzenText TextStyle="TextStyle.Caption" class="rz-color-danger">@message</RadzenText>
-}
+<div id=@MessagesId>
+    @foreach (var message in Context.GetValidationMessages(_identifier))
+    {
+        <RadzenText TextStyle="TextStyle.Caption" class="rz-color-danger">@message</RadzenText>
+    }
+</div>
 
 @code {
 
@@ -77,6 +80,16 @@
 
     [Parameter][EditorRequired]
     public SettingFieldDescriptor Field { get; set; } = null!;
+
+    private string LabelId => $"{Field.Name}-label";
+
+    private string MessagesId => $"{Field.Name}-messages";
+
+    // aria-invalid and, while invalid, the messages in aria-describedby; RadzenNumeric writes its own aria-invalid
+    private Dictionary<string, object> Aria(bool invalidAttribute = true)
+    {
+        return FieldAria.For(Context, _identifier, MessagesId, invalidAttribute);
+    }
 
     private RenderFragment? Hint
     {

@@ -2,12 +2,24 @@ using FilterOperator = Flox.Core.Data.FilterOperator;
 
 namespace Flox.Shared.Components.Searching;
 
+/// <summary>
+/// Which end of a range a search value belongs to.
+/// </summary>
 public enum RangeBound
 {
+    /// <summary>
+    /// The lower bound of the range.
+    /// </summary>
     From,
+    /// <summary>
+    /// The upper bound of the range.
+    /// </summary>
     To
 }
 
+/// <summary>
+/// A search form generated from the searchable properties of an entity; it builds the filters of a search from the values entered.
+/// </summary>
 public partial class EntitySearchForm<TEntity>
 {
     private readonly Dictionary<string, object?> _values = new Dictionary<string, object?>();
@@ -20,15 +32,27 @@ public partial class EntitySearchForm<TEntity>
         }
     }
 
+    /// <summary>
+    /// CSS class added to the form.
+    /// </summary>
     [Parameter]
     public string? Class { get; set; }
 
+    /// <summary>
+    /// Raised after the form was reset.
+    /// </summary>
     [Parameter]
     public EventCallback OnReset { get; set; }
 
+    /// <summary>
+    /// Raised with the filters built from the entered values when the user searches.
+    /// </summary>
     [Parameter]
     public EventCallback<FilterCollection> OnSearch { get; set; }
 
+    /// <summary>
+    /// Whether the form shows its own search and reset buttons.
+    /// </summary>
     [Parameter]
     public bool ShowActions { get; set; } = true;
 
@@ -37,6 +61,9 @@ public partial class EntitySearchForm<TEntity>
         return $"{field.Field}:{bound}";
     }
 
+    /// <summary>
+    /// Builds the filters of the entered values.
+    /// </summary>
     public FilterCollection BuildFilters()
     {
         FilterCollection filters = new FilterCollection();
@@ -97,6 +124,9 @@ public partial class EntitySearchForm<TEntity>
         return filters;
     }
 
+    /// <summary>
+    /// Fills the form with the values of the filters.
+    /// </summary>
     public void LoadFilters(FilterCollection filters)
     {
         _values.Clear();
@@ -154,6 +184,9 @@ public partial class EntitySearchForm<TEntity>
         }
     }
 
+    /// <summary>
+    /// Clears all entered values.
+    /// </summary>
     public void Reset()
     {
         _values.Clear();

@@ -10,14 +10,12 @@ public class ViewerJsonTests
     [Test]
     public void ASearchForm_WrittenAndReadAgain_IsTheSameText_WithItsLettersKeysAndEnumerationsAsTheyAre()
     {
-        var form = new SearchFormDefinition { Name = "default", AuthoredForVersion = "4.0.1" };
+        var form = new SearchFormDefinition { Name = "default", FhirRelease = "R4" };
         form.Title.SetDefault("Find patients");
         form.Title["ru-RU"] = "Поиск пациентов";
         form.Groups.Add(new SearchFormGroup { Code = "dates", Order = 2, CollapsedByDefault = true });
-        var gender = new SearchFormField { QueryName = "gender", ParameterType = SearchParameterType.Token, Control = SearchFieldControl.MultiSelect, Included = false };
-        var female = new SearchFormOption { Code = "female", System = "http://hl7.org/fhir/administrative-gender" };
-        female.Display["ru"] = "Женский";
-        gender.Options.Add(female);
+        var gender = new SearchFormField { QueryName = "gender", ParameterType = SearchParameterType.Token, Control = SearchFieldControl.MultiSelect, Hidden = true };
+        gender.ValueSetUrl = "http://hl7.org/fhir/ValueSet/administrative-gender";
         gender.Lookup = new ReferenceLookup { MinChars = 3 };
         form.Fields.Add(gender);
 
@@ -27,7 +25,7 @@ public class ViewerJsonTests
         Assert.Multiple(() =>
         {
             Assert.That(again, Is.EqualTo(text));
-            Assert.That(text, Does.Contain("\"ru-RU\": \"Поиск пациентов\"").And.Contain("\"control\": \"multiSelect\"").And.Contain("\"included\": false"));
+            Assert.That(text, Does.Contain("\"ru-RU\": \"Поиск пациентов\"").And.Contain("\"control\": \"multiSelect\"").And.Contain("\"hidden\": true"));
             Assert.That(text, Does.Not.Contain("\r").And.Not.Contain("null"));
             Assert.That(text, Does.EndWith("}\n"));
         });
@@ -36,10 +34,10 @@ public class ViewerJsonTests
     [Test]
     public void AValueThatDiffersFromItsInitializer_IsNotLost()
     {
-        var form = new ClinicalSummaryFormDefinition { Code = "default", ShowStatus = false };
-        form.Sections.Add(new ClinicalSummaryFormSection { Code = "problems", Visible = false, HideIfUnsupported = false });
+        var form = new SummaryFormDefinition { Code = "default", ShowStatus = false };
+        form.Sections.Add(new SummaryFormSection { Code = "problems", Visible = false, HideIfUnsupported = false });
 
-        var read = ViewerJson.Read<ClinicalSummaryFormDefinition>(ViewerJson.Write(form));
+        var read = ViewerJson.Read<SummaryFormDefinition>(ViewerJson.Write(form));
 
         Assert.Multiple(() =>
         {
@@ -54,7 +52,7 @@ public class ViewerJsonTests
     [TestCase("""{ "showAge": true }""", "code")]
     public void AFileThatBreaksARule_IsRefused_WithThePlaceNamed(string json, string named)
     {
-        var error = Assert.Throws<JsonException>(() => ViewerJson.Read<ClinicalSummaryFormDefinition>(json));
+        var error = Assert.Throws<JsonException>(() => ViewerJson.Read<SummaryFormDefinition>(json));
 
         Assert.That(error!.Message, Does.Contain(named));
     }
@@ -62,7 +60,7 @@ public class ViewerJsonTests
     [Test]
     public void AFormOfVersion1_ReadsAsTiles_AndTheOptionsOfTheTilesAreReadByTheirClass()
     {
-        var form = ViewerJson.Read<ClinicalSummaryFormDefinition>("""
+        var form = ViewerJson.Read<SummaryFormDefinition>("""
             { "formatVersion": 1, "code": "old", "sections": [ { "code": "s", "searches": [ { "resourceType": "Condition" } ] } ] }
             """);
         var options = SummaryComponents.ReadTilesOptions(System.Text.Json.Nodes.JsonNode.Parse("""{ "showAge": true }""")!.AsObject());
@@ -73,6 +71,23 @@ public class ViewerJsonTests
             Assert.That(form.Sections[0].HideIfEmpty, Is.False);
             Assert.That(options.ShowAge, Is.True);
             Assert.That(() => SummaryComponents.ReadTilesOptions(System.Text.Json.Nodes.JsonNode.Parse("""{ "showAgee": true }""")!.AsObject()), Throws.InstanceOf<System.Text.Json.JsonException>());
+        });
+    }
+
+    [Test]
+    public void AFormOfVersion2_IsOfAPatient_AndItsPatientParamIsReadAsTheContextParam_NeverWritten()
+    {
+        var form = ViewerJson.Read<SummaryFormDefinition>("""
+            { "formatVersion": 2, "code": "old", "sections": [ { "code": "s", "searches": [ { "resourceType": "Coverage", "patientParam": "beneficiary" }, { "resourceType": "Condition" } ] } ] }
+            """);
+        var written = ViewerJson.Write(form);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(form.Context, Is.EqualTo(SummaryContexts.Patient));
+            Assert.That(form.Sections[0].Searches[0].ParamOf(form.Context), Is.EqualTo("beneficiary"));
+            Assert.That(form.Sections[0].Searches[1].ParamOf(SummaryContexts.Encounter), Is.EqualTo("encounter"), "none named: the one of the context");
+            Assert.That(written, Does.Contain("\"contextParam\": \"beneficiary\"").And.Not.Contain("patientParam"));
         });
     }
 }

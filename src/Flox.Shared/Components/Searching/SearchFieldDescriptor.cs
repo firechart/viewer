@@ -4,10 +4,19 @@ using FilterOperator = Flox.Core.Data.FilterOperator;
 
 namespace Flox.Shared.Components.Searching;
 
+/// <summary>
+/// Describes one searchable property of an entity: its label, the kind of input and the filter operator.
+/// </summary>
 public class SearchFieldDescriptor
 {
+    /// <summary>
+    /// The kind of input control for the field.
+    /// </summary>
     public SearchControlType ControlType { get; init; }
 
+    /// <summary>
+    /// The name of the field, that is of the property.
+    /// </summary>
     public string Field
     {
         get
@@ -16,16 +25,34 @@ public class SearchFieldDescriptor
         }
     }
 
+    /// <summary>
+    /// The label shown for the field.
+    /// </summary>
     public string Label { get; init; } = default!;
 
+    /// <summary>
+    /// The filter operator the field applies.
+    /// </summary>
     public FilterOperator Operator { get; init; }
 
+    /// <summary>
+    /// The values the user can choose from, if the field has a fixed set.
+    /// </summary>
     public string[]? Options { get; init; }
 
+    /// <summary>
+    /// The position of the field in the form.
+    /// </summary>
     public int Order { get; init; }
 
+    /// <summary>
+    /// The searchable property of the entity.
+    /// </summary>
     public PropertyInfo Property { get; init; } = default!;
 
+    /// <summary>
+    /// The type of the value, without <see cref="Nullable{T}"/>.
+    /// </summary>
     public Type UnderlyingType
     {
         get
@@ -34,6 +61,9 @@ public class SearchFieldDescriptor
         }
     }
 
+    /// <summary>
+    /// The type of the value, as declared.
+    /// </summary>
     public Type ValueType
     {
         get
@@ -43,6 +73,9 @@ public class SearchFieldDescriptor
     }
 }
 
+/// <summary>
+/// Finds the searchable fields of an entity type and caches them.
+/// </summary>
 public static class SearchFieldDescriptorCache
 {
     private static readonly ConcurrentDictionary<Type, List<SearchFieldDescriptor>> s_cache = new ConcurrentDictionary<Type, List<SearchFieldDescriptor>>();
@@ -106,11 +139,17 @@ public static class SearchFieldDescriptorCache
         return SearchControlType.Text;
     }
 
+    /// <summary>
+    /// Returns the searchable fields of the entity type, ordered for the form.
+    /// </summary>
     public static List<SearchFieldDescriptor> GetFields<TEntity>()
     {
         return GetFields(typeof(TEntity));
     }
 
+    /// <summary>
+    /// Returns the searchable fields of the type, ordered for the form.
+    /// </summary>
     public static List<SearchFieldDescriptor> GetFields(Type entityType)
     {
         return s_cache.GetOrAdd(entityType,

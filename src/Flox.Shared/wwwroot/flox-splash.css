@@ -1,0 +1,69 @@
+/* The splash of the start (Layout/Splash.razor, the static copy in the page of Lite): in the head of the host page, so the early splash is drawn
+   before Blazor starts */
+
+/* The black of the fire palette (fire.css), as the background_color of the manifests: the installed application starts on the same colour */
+html:not(:has([data-app-ready])):has(.flox-splash) {
+    background: #0b0b0b;
+}
+
+body:has(.flox-splash-live, [data-app-ready]) .flox-splash-early {
+    display: none;
+}
+
+.flox-splash {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: #0b0b0b;
+}
+
+.flox-splash-logo {
+    width: min(50vw, 320px);
+    height: 120px;
+    object-fit: contain;
+}
+
+.flox-splash-message {
+    min-height: 1.25em;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.55);
+    font: 0.875rem ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.flox-splash-progress {
+    width: min(50vw, 320px);
+    height: 4px;
+    overflow: hidden;
+    border-radius: 2px;
+}
+
+/* Reduced motion: a still bar across the track */
+.flox-splash-bar {
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #6a040f 0%, #9d0208 10%, #d00000 22%, #dc2f02 34%, #e85d04 44%, #f48c06 52%, #faa307 58%, #f48c06 64%, #e85d04 72%, #dc2f02 82%, #d00000 90%, #9d0208 96%, #6a040f 100%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .flox-splash-bar {
+        width: 40%;
+        background-size: 300% 100%;
+        animation: flox-splash-slide 1.5s infinite ease-in-out, flox-splash-flow 3s infinite linear;
+    }
+}
+
+@keyframes flox-splash-slide {
+    from { transform: translateX(-150%); }
+    to { transform: translateX(450%); }
+}
+
+@keyframes flox-splash-flow {
+    from { background-position: 0 0; }
+    to { background-position: 300% 0; }
+}

@@ -1,16 +1,17 @@
 using System.Security.Claims;
-using Flox.Core.Replication;
 
 namespace Flox.Shared.Host;
 
-// Menu Position convention: Flox.Shared's own platform menu (this class) is pinned to
-// int.MaxValue so it always renders last, after every app-specific menu - apps are free to pick
-// any Position to order themselves against each other.
-// Items within a menu are not position-sorted - a source lists them in the order it wants shown.
+/// <summary>
+/// The platform menu of Flox.Shared: the account, the settings, the bookmarks and the history, the administration for a signed-in user and the
+/// diagnostics in a debug build under development. Its position is <see cref="int.MaxValue"/>, so it always renders after the menus of the applications,
+/// which are free to pick any position to order themselves against each other. Items within a menu are listed in the order a source wants them shown.
+/// </summary>
+/// <param name="runtime">The runtime of the application.</param>
+/// <param name="oidc">The sign-in options; with sign-in disabled no sign-in entry is offered.</param>
 public sealed class SharedMenuSource
 (
     IFloxRuntime runtime,
-    IServiceProviderIsService services,
     FloxOidcOptions? oidc = null
 ) : IFloxMenuSource
 {
@@ -20,6 +21,7 @@ public sealed class SharedMenuSource
     private const bool DEBUG_BUILD = false;
 #endif
 
+    /// <inheritdoc />
     public IFloxMenu GetMenu(ClaimsPrincipal user)
     {
         var menu = new FloxMenu("Flox")
@@ -46,12 +48,6 @@ public sealed class SharedMenuSource
             // The administration is a page of the server: what the user may do there is decided by the server
             menu.Items.Add(SharedMenuItems.Admin);
             menu.Items.Add(SharedMenuItems.Tasks);
-
-            // Only where a local store replicates: it is a client that has IReplicationService
-            if (services.IsService(typeof(IReplicationService)))
-            {
-                menu.Items.Add(SharedMenuItems.Sync);
-            }
         }
 
         menu.Items.Add(SharedMenuItems.About);

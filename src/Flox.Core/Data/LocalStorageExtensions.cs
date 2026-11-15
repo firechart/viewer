@@ -2,8 +2,10 @@ using System.Text.Json;
 
 namespace Flox.Core.Data;
 
+/// <summary>Typed JSON access to an <see cref="ILocalStorage"/>.</summary>
 public static class LocalStorageExtensions
 {
+    /// <summary>Reads the value of the key as JSON of the given type; the default when it is missing or not valid JSON.</summary>
     public static async Task<object?> GetOrDefaultAsync(this ILocalStorage localStorage, string key, Type returnType, object? defaultValue)
     {
         if (string.IsNullOrEmpty(key))
@@ -30,6 +32,7 @@ public static class LocalStorageExtensions
         }
     }
 
+    /// <summary>Reads the value of the key as JSON of type <typeparamref name="T"/>; the default when it is missing or not valid JSON.</summary>
     public static async Task<T> GetOrDefaultAsync<T>(this ILocalStorage localStorage, string key, T defaultValue)
     {
         if (string.IsNullOrEmpty(key))
@@ -54,6 +57,7 @@ public static class LocalStorageExtensions
         }
     }
 
+    /// <summary>Stores the value of the key as JSON; a null or default value removes the key.</summary>
     public static async Task SetAsync<T>(this ILocalStorage localStorage, string key, T? value)
     {
         if (string.IsNullOrEmpty(key))

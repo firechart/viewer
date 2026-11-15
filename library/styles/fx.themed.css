@@ -1,0 +1,134 @@
+/* The base of a theme of the Viewer: added only when the Viewer has one (appearance.style or appearance.variables), never in an application that owns
+   its palette (FireChart). Two parts:
+   1. The vendor palette as plain values (the layer fx, :root:root): what a theme does not set keeps the look of the vendor, light and dark. Without a theme
+      the tokens are taken from the Radzen variables (fx.css); with one they cannot be, since the bridge below writes the Radzen variables from them.
+   2. The bridge: the Radzen variables, the shape of daisyUI and the font of Tailwind written from the tokens, on :root (Radzen declares the variables of
+      its components there, so a value lower in the page would not reach a button). It is outside the layers and outranks the palette of FloxWind
+      (html:root[data-theme]) and the Radzen themes.
+   A theme sets the tokens (--fx-*) only, never the Radzen variables; it gives the dark ones under :root[data-theme="dark"]. */
+
+@layer fx {
+  :root:root {
+    --fx-font: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --fx-color-background: oklch(97% 0.001 106.424);
+    --fx-color-surface: oklch(98.5% 0.001 106.423);
+    --fx-color-text: oklch(26.8% 0.007 34.298);
+    --fx-color-muted: oklch(48% 0.013 58.071);
+    --fx-color-border: oklch(92.3% 0.003 48.717);
+    --fx-color-neutral: oklch(55.3% 0.013 58.071);
+    --fx-color-accent: oklch(64.6% 0.222 41.116);
+    --fx-color-on-accent: #ffffff;
+    --fx-color-link: color-mix(in oklab, var(--fx-color-accent), var(--fx-color-text) 20%);
+    --fx-color-info: oklch(58.8% 0.158 241.966);
+    --fx-color-success: oklch(62.7% 0.194 149.214);
+    --fx-color-warning: oklch(76.9% 0.188 70.08);
+    --fx-color-on-warning: oklch(14.7% 0.004 49.25);
+    --fx-color-danger: oklch(57.7% 0.245 27.325);
+    --fx-radius: 6px;
+  }
+
+  :root:root[data-theme="dark"] {
+    --fx-color-background: oklch(14.7% 0.004 49.25);
+    --fx-color-surface: oklch(21.6% 0.006 56.043);
+    --fx-color-text: oklch(98.5% 0.001 106.423);
+    --fx-color-muted: oklch(70.9% 0.01 56.259);
+    --fx-color-border: oklch(26.8% 0.007 34.298);
+    --fx-color-info: oklch(68.5% 0.169 237.323);
+    --fx-color-success: oklch(72.3% 0.219 149.579);
+    --fx-color-warning: oklch(82.8% 0.189 84.429);
+    --fx-color-danger: oklch(63.7% 0.237 25.331);
+  }
+}
+
+:root:root:root {
+  --rz-body-background-color: var(--fx-color-background);
+  --rz-base-background-color: var(--fx-color-surface);
+  --rz-text-color: var(--fx-color-text);
+  --rz-text-title-color: var(--fx-color-text);
+  --rz-text-secondary-color: var(--fx-color-muted);
+  --rz-text-tertiary-color: color-mix(in oklab, var(--fx-color-muted) 70%, var(--fx-color-surface));
+  --rz-text-disabled-color: color-mix(in oklab, var(--fx-color-muted) 60%, var(--fx-color-surface));
+  --rz-border-color: var(--fx-color-border);
+  --rz-text-font-family: var(--fx-font);
+  --font-sans: var(--fx-font);
+  --rz-border-radius: var(--fx-radius);
+  --radius-field: var(--fx-radius);
+  --radius-box: calc(var(--fx-radius) * 2);
+
+  /* The neutral scale is absolute (50 is light in both modes, as in Radzen): from the mid grey to white and to black */
+  --rz-base-50: color-mix(in oklab, var(--fx-color-neutral) 5%, white);
+  --rz-base-100: color-mix(in oklab, var(--fx-color-neutral) 10%, white);
+  --rz-base-200: color-mix(in oklab, var(--fx-color-neutral) 20%, white);
+  --rz-base-300: color-mix(in oklab, var(--fx-color-neutral) 35%, white);
+  --rz-base-400: color-mix(in oklab, var(--fx-color-neutral) 65%, white);
+  --rz-base-500: var(--fx-color-neutral);
+  --rz-base-600: color-mix(in oklab, var(--fx-color-neutral), black 20%);
+  --rz-base-700: color-mix(in oklab, var(--fx-color-neutral), black 38%);
+  --rz-base-800: color-mix(in oklab, var(--fx-color-neutral), black 58%);
+  --rz-base-900: color-mix(in oklab, var(--fx-color-neutral), black 72%);
+  /* The base of the buttons and the fields follows the mode: a tint of the text over the surface */
+  --rz-base: color-mix(in oklab, var(--fx-color-text) 12%, var(--fx-color-surface));
+  --rz-base-light: color-mix(in oklab, var(--fx-color-text) 8%, var(--fx-color-surface));
+  --rz-base-lighter: color-mix(in oklab, var(--fx-color-text) 4%, var(--fx-color-surface));
+  --rz-base-dark: var(--fx-color-muted);
+  --rz-base-darker: var(--fx-color-text);
+  --rz-on-base: var(--fx-color-text);
+  --rz-on-base-light: var(--fx-color-text);
+  --rz-on-base-lighter: var(--fx-color-text);
+  --rz-on-base-dark: var(--fx-color-surface);
+  --rz-on-base-darker: var(--fx-color-surface);
+
+  --rz-primary: var(--fx-color-accent);
+  --rz-primary-light: color-mix(in oklab, var(--fx-color-accent), white 15%);
+  --rz-primary-dark: color-mix(in oklab, var(--fx-color-accent), black 15%);
+  --rz-primary-darker: color-mix(in oklab, var(--fx-color-accent), black 30%);
+  --rz-primary-lighter: color-mix(in oklab, var(--fx-color-accent) 12%, transparent);
+  --rz-on-primary: var(--fx-color-on-accent);
+  --rz-on-primary-light: var(--fx-color-on-accent);
+  --rz-on-primary-dark: var(--fx-color-on-accent);
+  --rz-on-primary-darker: var(--fx-color-on-accent);
+  --rz-on-primary-lighter: var(--fx-color-link);
+  --rz-link-color: var(--fx-color-link);
+  --rz-link-hover-color: color-mix(in oklab, var(--fx-color-link), var(--fx-color-text) 30%);
+
+  --rz-secondary: var(--fx-color-muted);
+  --rz-secondary-light: color-mix(in oklab, var(--fx-color-muted), white 15%);
+  --rz-secondary-dark: color-mix(in oklab, var(--fx-color-muted), black 15%);
+  --rz-secondary-darker: color-mix(in oklab, var(--fx-color-muted), black 30%);
+  --rz-secondary-lighter: color-mix(in oklab, var(--fx-color-muted) 12%, transparent);
+  --rz-on-secondary: var(--fx-color-surface);
+  --rz-on-secondary-lighter: var(--fx-color-text);
+
+  --rz-info: var(--fx-color-info);
+  --rz-info-light: color-mix(in oklab, var(--fx-color-info), white 15%);
+  --rz-info-dark: color-mix(in oklab, var(--fx-color-info), black 15%);
+  --rz-info-darker: color-mix(in oklab, var(--fx-color-info), black 30%);
+  --rz-info-lighter: color-mix(in oklab, var(--fx-color-info) 12%, transparent);
+  --rz-on-info: #ffffff;
+  --rz-on-info-lighter: color-mix(in oklab, var(--fx-color-info), var(--fx-color-text) 35%);
+
+  --rz-success: var(--fx-color-success);
+  --rz-success-light: color-mix(in oklab, var(--fx-color-success), white 15%);
+  --rz-success-dark: color-mix(in oklab, var(--fx-color-success), black 15%);
+  --rz-success-darker: color-mix(in oklab, var(--fx-color-success), black 30%);
+  --rz-success-lighter: color-mix(in oklab, var(--fx-color-success) 12%, transparent);
+  --rz-on-success: #ffffff;
+  --rz-on-success-lighter: color-mix(in oklab, var(--fx-color-success), var(--fx-color-text) 35%);
+
+  --rz-warning: var(--fx-color-warning);
+  --rz-warning-light: color-mix(in oklab, var(--fx-color-warning), white 15%);
+  --rz-warning-dark: color-mix(in oklab, var(--fx-color-warning), black 15%);
+  --rz-warning-darker: color-mix(in oklab, var(--fx-color-warning), black 30%);
+  --rz-warning-lighter: color-mix(in oklab, var(--fx-color-warning) 15%, transparent);
+  --rz-on-warning: var(--fx-color-on-warning);
+  --rz-on-warning-light: var(--fx-color-on-warning);
+  --rz-on-warning-lighter: color-mix(in oklab, var(--fx-color-warning), var(--fx-color-text) 45%);
+
+  --rz-danger: var(--fx-color-danger);
+  --rz-danger-light: color-mix(in oklab, var(--fx-color-danger), white 15%);
+  --rz-danger-dark: color-mix(in oklab, var(--fx-color-danger), black 15%);
+  --rz-danger-darker: color-mix(in oklab, var(--fx-color-danger), black 30%);
+  --rz-danger-lighter: color-mix(in oklab, var(--fx-color-danger) 12%, transparent);
+  --rz-on-danger: #ffffff;
+  --rz-on-danger-lighter: color-mix(in oklab, var(--fx-color-danger), var(--fx-color-text) 35%);
+}

@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Flox.Shared.Layout;
 
+/// <summary>
+/// The root component of a Flox application: the router over the assemblies of the shell.
+/// </summary>
 public partial class FloxApplication
 {
     [Inject]
@@ -19,6 +22,7 @@ public partial class FloxApplication
         }
     }
 
+    /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {
         var state = await Asp.GetAuthenticationStateAsync();

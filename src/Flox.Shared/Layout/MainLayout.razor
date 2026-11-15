@@ -6,7 +6,6 @@
 <RadzenComponents/>
 <ConnectivityMonitor/>
 <IdentityProviderMonitor/>
-<ReplicationHost/>
 
 <AppErrorBoundary @ref=@_bodyErrorBoundary>
     <ChildContent>
@@ -31,10 +30,15 @@
         }
         else
         {
+            @* The first stop of the keyboard: past the app bar and the menu to the page *@
+            <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-[1100] focus:rounded-field focus:bg-surface focus:px-3 focus:py-2 focus:text-ink focus:shadow-lg"
+               @onclick=@SkipToContentAsync @onclick:preventDefault>@Strings.Caption_SkipToContent</a>
             <RadzenLayout id="main-layout" @key=_cultureVersion>
                 <AppBar/>
                 <RadzenBody>
-                    <PageWidth>@Body</PageWidth>
+                    <main id="main" tabindex="-1" class="outline-none" @ref=_main>
+                        <PageWidth>@Body</PageWidth>
+                    </main>
                 </RadzenBody>
             </RadzenLayout>
 
@@ -55,6 +59,19 @@
 
 
 @code {
+
+    private ElementReference _main;
+
+    private async Task SkipToContentAsync()
+    {
+        try
+        {
+            await _main.FocusAsync();
+        }
+        catch (JSException)
+        {
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

@@ -219,42 +219,6 @@
   <data name="Caption_Installed" xml:space="preserve">
     <value>Instalado</value>
   </data>
-  <data name="Sync_Title" xml:space="preserve">
-    <value>Sincronización</value>
-  </data>
-  <data name="Sync_Now" xml:space="preserve">
-    <value>Sincronizar ahora</value>
-  </data>
-  <data name="Sync_StatusSynced" xml:space="preserve">
-    <value>Todo está sincronizado</value>
-  </data>
-  <data name="Sync_StatusSyncing" xml:space="preserve">
-    <value>Sincronizando…</value>
-  </data>
-  <data name="Sync_StatusPending" xml:space="preserve">
-    <value>Cambios pendientes de enviar: {0}</value>
-  </data>
-  <data name="Sync_StatusError" xml:space="preserve">
-    <value>La última sincronización falló</value>
-  </data>
-  <data name="Sync_LastSynced" xml:space="preserve">
-    <value>Última sincronización: {0}</value>
-  </data>
-  <data name="Sync_Never" xml:space="preserve">
-    <value>Aún no se ha sincronizado</value>
-  </data>
-  <data name="Sync_NotAvailable" xml:space="preserve">
-    <value>La sincronización no está disponible en esta aplicación</value>
-  </data>
-  <data name="Sync_Failures" xml:space="preserve">
-    <value>Cambios que el servidor no aceptó</value>
-  </data>
-  <data name="Sync_Retry" xml:space="preserve">
-    <value>Reintentar</value>
-  </data>
-  <data name="Sync_Technical" xml:space="preserve">
-    <value>Detalles técnicos</value>
-  </data>
   <data name="Caption_More" xml:space="preserve">
     <value>Más</value>
   </data>
@@ -441,27 +405,6 @@
   <data name="Caption_Password" xml:space="preserve">
     <value>Contraseña</value>
   </data>
-  <data name="Sync_Rejected" xml:space="preserve">
-    <value>El servidor no aceptó un cambio en {0}: {1}</value>
-  </data>
-  <data name="Sync_Reason_Invalid" xml:space="preserve">
-    <value>Los datos no son válidos</value>
-  </data>
-  <data name="Sync_Reason_Forbidden" xml:space="preserve">
-    <value>No tiene permiso para cambiar esto</value>
-  </data>
-  <data name="Sync_Reason_ReadOnly" xml:space="preserve">
-    <value>Estos datos no se pueden cambiar</value>
-  </data>
-  <data name="Sync_Reason_Conflict" xml:space="preserve">
-    <value>Se cambió en otro dispositivo</value>
-  </data>
-  <data name="Sync_Reason_Unknown" xml:space="preserve">
-    <value>El servidor rechazó el cambio</value>
-  </data>
-  <data name="Sync_NotSynced" xml:space="preserve">
-    <value>No sincronizado: {0}</value>
-  </data>
   <data name="Caption_SignIn" xml:space="preserve">
     <value>Iniciar sesión</value>
   </data>
@@ -560,5 +503,65 @@
   </data>
   <data name="Caption_History" xml:space="preserve">
     <value>Historial</value>
+  </data>
+  <data name="Caption_LicenseEdition" xml:space="preserve">
+    <value>Edición</value>
+  </data>
+  <data name="Caption_LicenseState" xml:space="preserve">
+    <value>Estado</value>
+  </data>
+  <data name="Caption_LicenseValidUntil" xml:space="preserve">
+    <value>Válida hasta</value>
+  </data>
+  <data name="Caption_LicenseFeatures" xml:space="preserve">
+    <value>Funciones</value>
+  </data>
+  <data name="Caption_LicensePerpetual" xml:space="preserve">
+    <value>Perpetua</value>
+  </data>
+  <data name="LicenseState_None" xml:space="preserve">
+    <value>Sin licencia: la edición gratuita</value>
+  </data>
+  <data name="LicenseState_Valid" xml:space="preserve">
+    <value>Válida</value>
+  </data>
+  <data name="LicenseState_Expiring" xml:space="preserve">
+    <value>Caduca pronto</value>
+  </data>
+  <data name="LicenseState_Grace" xml:space="preserve">
+    <value>Caducada, en el periodo de gracia</value>
+  </data>
+  <data name="LicenseState_Expired" xml:space="preserve">
+    <value>Caducada</value>
+  </data>
+  <data name="LicenseState_NotYetValid" xml:space="preserve">
+    <value>Aún no válida</value>
+  </data>
+  <data name="LicenseState_Invalid" xml:space="preserve">
+    <value>No válida</value>
+  </data>
+  <data name="Caption_Menu" xml:space="preserve">
+    <value>Menú</value>
+  </data>
+  <data name="Caption_Back" xml:space="preserve">
+    <value>Atrás</value>
+  </data>
+  <data name="Caption_Clear" xml:space="preserve">
+    <value>Borrar</value>
+  </data>
+  <data name="Caption_SkipToContent" xml:space="preserve">
+    <value>Saltar al contenido</value>
+  </data>
+  <data name="Caption_MainNavigation" xml:space="preserve">
+    <value>Navegación principal</value>
+  </data>
+  <data name="Caption_Loading" xml:space="preserve">
+    <value>Cargando…</value>
+  </data>
+  <data name="Caption_Select" xml:space="preserve">
+    <value>Seleccionar</value>
+  </data>
+  <data name="Caption_SelectItem" xml:space="preserve">
+    <value>Seleccionar {0}</value>
   </data>
 </root>

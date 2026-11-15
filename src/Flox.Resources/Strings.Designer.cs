@@ -141,6 +141,9 @@ namespace Flox.Resources {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to You are not signed in: you see the servers of the organization. Sign in to add your own..
+        /// </summary>
         public static string Notice_AnonymousReadShared {
             get {
                 return ResourceManager.GetString("Notice_AnonymousReadShared", resourceCulture);
@@ -192,114 +195,6 @@ namespace Flox.Resources {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to Synchronization.
-        /// </summary>
-        public static string Sync_Title {
-            get {
-                return ResourceManager.GetString("Sync_Title", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Synchronize now.
-        /// </summary>
-        public static string Sync_Now {
-            get {
-                return ResourceManager.GetString("Sync_Now", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Everything is synchronized.
-        /// </summary>
-        public static string Sync_StatusSynced {
-            get {
-                return ResourceManager.GetString("Sync_StatusSynced", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Synchronizing….
-        /// </summary>
-        public static string Sync_StatusSyncing {
-            get {
-                return ResourceManager.GetString("Sync_StatusSyncing", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Changes waiting to be sent: {0}.
-        /// </summary>
-        public static string Sync_StatusPending {
-            get {
-                return ResourceManager.GetString("Sync_StatusPending", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The last synchronization failed.
-        /// </summary>
-        public static string Sync_StatusError {
-            get {
-                return ResourceManager.GetString("Sync_StatusError", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Last synchronized: {0}.
-        /// </summary>
-        public static string Sync_LastSynced {
-            get {
-                return ResourceManager.GetString("Sync_LastSynced", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Not synchronized yet.
-        /// </summary>
-        public static string Sync_Never {
-            get {
-                return ResourceManager.GetString("Sync_Never", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Synchronization is not available in this application.
-        /// </summary>
-        public static string Sync_NotAvailable {
-            get {
-                return ResourceManager.GetString("Sync_NotAvailable", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Changes the server did not accept.
-        /// </summary>
-        public static string Sync_Failures {
-            get {
-                return ResourceManager.GetString("Sync_Failures", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Try again.
-        /// </summary>
-        public static string Sync_Retry {
-            get {
-                return ResourceManager.GetString("Sync_Retry", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Technical details.
-        /// </summary>
-        public static string Sync_Technical {
-            get {
-                return ResourceManager.GetString("Sync_Technical", resourceCulture);
-            }
-        }
-
         /// <summary>
         ///   Looks up a localized string similar to More.
         /// </summary>
@@ -522,6 +417,114 @@ namespace Flox.Resources {
         public static string Caption_Language {
             get {
                 return ResourceManager.GetString("Caption_Language", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edition.
+        /// </summary>
+        public static string Caption_LicenseEdition {
+            get {
+                return ResourceManager.GetString("Caption_LicenseEdition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to State.
+        /// </summary>
+        public static string Caption_LicenseState {
+            get {
+                return ResourceManager.GetString("Caption_LicenseState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Valid until.
+        /// </summary>
+        public static string Caption_LicenseValidUntil {
+            get {
+                return ResourceManager.GetString("Caption_LicenseValidUntil", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Features.
+        /// </summary>
+        public static string Caption_LicenseFeatures {
+            get {
+                return ResourceManager.GetString("Caption_LicenseFeatures", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Perpetual.
+        /// </summary>
+        public static string Caption_LicensePerpetual {
+            get {
+                return ResourceManager.GetString("Caption_LicensePerpetual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No license: the free edition.
+        /// </summary>
+        public static string LicenseState_None {
+            get {
+                return ResourceManager.GetString("LicenseState_None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Valid.
+        /// </summary>
+        public static string LicenseState_Valid {
+            get {
+                return ResourceManager.GetString("LicenseState_Valid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expires soon.
+        /// </summary>
+        public static string LicenseState_Expiring {
+            get {
+                return ResourceManager.GetString("LicenseState_Expiring", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expired, in the grace period.
+        /// </summary>
+        public static string LicenseState_Grace {
+            get {
+                return ResourceManager.GetString("LicenseState_Grace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expired.
+        /// </summary>
+        public static string LicenseState_Expired {
+            get {
+                return ResourceManager.GetString("LicenseState_Expired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not valid yet.
+        /// </summary>
+        public static string LicenseState_NotYetValid {
+            get {
+                return ResourceManager.GetString("LicenseState_NotYetValid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not valid.
+        /// </summary>
+        public static string LicenseState_Invalid {
+            get {
+                return ResourceManager.GetString("LicenseState_Invalid", resourceCulture);
             }
         }
         
@@ -1147,69 +1150,6 @@ namespace Flox.Resources {
 
 
         /// <summary>
-        ///   Looks up a localized string similar to The server did not accept a change to {0}: {1}.
-        /// </summary>
-        public static string Sync_Rejected {
-            get {
-                return ResourceManager.GetString("Sync_Rejected", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The data is not valid.
-        /// </summary>
-        public static string Sync_Reason_Invalid {
-            get {
-                return ResourceManager.GetString("Sync_Reason_Invalid", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to You are not allowed to change this.
-        /// </summary>
-        public static string Sync_Reason_Forbidden {
-            get {
-                return ResourceManager.GetString("Sync_Reason_Forbidden", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to This data cannot be changed.
-        /// </summary>
-        public static string Sync_Reason_ReadOnly {
-            get {
-                return ResourceManager.GetString("Sync_Reason_ReadOnly", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to It was changed on another device.
-        /// </summary>
-        public static string Sync_Reason_Conflict {
-            get {
-                return ResourceManager.GetString("Sync_Reason_Conflict", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The server refused the change.
-        /// </summary>
-        public static string Sync_Reason_Unknown {
-            get {
-                return ResourceManager.GetString("Sync_Reason_Unknown", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Not synchronized: {0}.
-        /// </summary>
-        public static string Sync_NotSynced {
-            get {
-                return ResourceManager.GetString("Sync_NotSynced", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to Sign in.
         /// </summary>
         public static string Caption_SignIn {
@@ -1452,6 +1392,78 @@ namespace Flox.Resources {
         public static string Caption_History {
             get {
                 return ResourceManager.GetString("Caption_History", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Menu.
+        /// </summary>
+        public static string Caption_Menu {
+            get {
+                return ResourceManager.GetString("Caption_Menu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Back.
+        /// </summary>
+        public static string Caption_Back {
+            get {
+                return ResourceManager.GetString("Caption_Back", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear.
+        /// </summary>
+        public static string Caption_Clear {
+            get {
+                return ResourceManager.GetString("Caption_Clear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skip to content.
+        /// </summary>
+        public static string Caption_SkipToContent {
+            get {
+                return ResourceManager.GetString("Caption_SkipToContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Main navigation.
+        /// </summary>
+        public static string Caption_MainNavigation {
+            get {
+                return ResourceManager.GetString("Caption_MainNavigation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading….
+        /// </summary>
+        public static string Caption_Loading {
+            get {
+                return ResourceManager.GetString("Caption_Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select.
+        /// </summary>
+        public static string Caption_Select {
+            get {
+                return ResourceManager.GetString("Caption_Select", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select {0}.
+        /// </summary>
+        public static string Caption_SelectItem {
+            get {
+                return ResourceManager.GetString("Caption_SelectItem", resourceCulture);
             }
         }
     }

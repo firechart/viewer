@@ -1,24 +1,31 @@
 let _sharing = false;
 
 async function copyToClipboard(text) {
-    if (navigator.clipboard && document.hasFocus()) {
+    if (navigator.clipboard) {
         try {
             await navigator.clipboard.writeText(text);
             return true;
         } catch {
-            // fall through to execCommand
+            // without the focus of the document or a user gesture (lost on the way through Blazor): the fallback below
         }
     }
-    // Legacy fallback: works without document focus or user gesture
+    // Legacy fallback: works without document focus or user gesture; the focus goes back where it was
+    const active = document.activeElement;
     const textarea = document.createElement('textarea');
     textarea.value = text;
+    textarea.setAttribute('readonly', '');
     textarea.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;';
     document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-    const ok = document.execCommand('copy');
-    document.body.removeChild(textarea);
-    return ok;
+    try {
+        textarea.focus();
+        textarea.select();
+        return document.execCommand('copy');
+    } finally {
+        document.body.removeChild(textarea);
+        if (active instanceof HTMLElement) {
+            active.focus({ preventScroll: true });
+        }
+    }
 }
 
 export async function share(title, text) {

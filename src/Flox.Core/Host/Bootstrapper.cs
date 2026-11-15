@@ -10,11 +10,18 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Flox.Core.Host;
 
+/// <summary>Default <see cref="IBootstrapper"/>: finds the assemblies that use Flox, registers their <c>[FloxService]</c> types and runs the added modules.</summary>
 public class Bootstrapper : IBootstrapper
 {
     private readonly List<BootstrapModule> _modules = [];
     private readonly List<Type> _modulesTypes = [];
 
+    /// <summary>Creates the bootstrapper and scans the loaded assemblies for services.</summary>
+    /// <param name="services">The service collection of the host.</param>
+    /// <param name="configuration">The configuration builder of the host.</param>
+    /// <param name="loggingBuilder">The logging builder of the host.</param>
+    /// <param name="baseAddress">The base address of the host, if it has one.</param>
+    /// <param name="environment">The environment name; the process environment variable is used when it is null.</param>
     public Bootstrapper(IServiceCollection services, IConfigurationBuilder configuration, ILoggingBuilder loggingBuilder, string? baseAddress = null, string? environment = null)
     {
         StartupTimeline.Mark("Bootstrapper: starts");
@@ -52,9 +59,12 @@ public class Bootstrapper : IBootstrapper
         ScanFloxAssemblies();
     }
 
+    /// <summary>The base address of the host, if it has one.</summary>
     public string? BaseAddress { get; }
+    /// <summary>The name of the hosting environment.</summary>
     public string Environment { get; }
 
+    /// <summary>The application configuration, read from <see cref="ConfigurationBuilder"/>.</summary>
     public IConfiguration Configuration
     {
         get
@@ -63,11 +73,12 @@ public class Bootstrapper : IBootstrapper
         }
     }
 
+    /// <summary>The configuration builder of the host.</summary>
     public IConfigurationBuilder ConfigurationBuilder { get; }
+    /// <summary>The assemblies that reference Flox.Core, directly or not.</summary>
     public IReadOnlyList<Assembly> FloxAssemblies { get; private set; } = [];
 
-    // Name prefixes of the assemblies that may hold [FloxService] types; in a browser only those are force-loaded
-    // (the reference graph has ~190 assemblies, and each load costs a debugger round trip)
+    /// <summary>Name prefixes of the assemblies that may hold <c>[FloxService]</c> types; in a browser only those are force-loaded, since each load costs a debugger round trip.</summary>
     protected virtual IReadOnlyList<string> FloxAssemblyNamePrefixes
     {
         get
@@ -76,24 +87,26 @@ public class Bootstrapper : IBootstrapper
         }
     }
 
+    /// <summary>The logging builder of the host.</summary>
     public ILoggingBuilder LoggingBulder { get; }
 
+    /// <summary>The current logger; the bootstrap logger until a module replaces it.</summary>
     public ILogger Logger { get; private set; }
 
+    /// <summary>Replaces the logger.</summary>
+    /// <param name="logger">The new logger.</param>
     public void SetLogger(ILogger logger)
     {
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    // Cheap logger available immediately in the constructor, before any BootstrapModule
-    // (including LoggingModule) has had a chance to configure the real one. Descendants
-    // override this to plug in whatever minimal sink makes sense for their host (console,
-    // browser console, etc.); LoggingModule replaces it later via SetLogger.
+    /// <summary>Creates a cheap logger that is available in the constructor, before any module has configured the real one; <see cref="SetLogger"/> replaces it later. Hosts override it to plug in a console or browser sink.</summary>
     protected virtual ILogger CreateBootstrapLogger()
     {
         return NullLogger.Instance;
     }
 
+    /// <summary>Loads the assemblies that may hold <c>[FloxService]</c> types, so the scan sees them: in a browser by walking the references of the entry assembly, elsewhere by loading the DLLs next to the executable.</summary>
     protected virtual void ForceLoadAssemblies()
     {
         // Downloading a .wasm file to the browser at startup does NOT add it to
@@ -181,6 +194,7 @@ public class Bootstrapper : IBootstrapper
         }
     }
 
+    /// <summary>The added modules in the order they run.</summary>
     public IReadOnlyList<BootstrapModule> Modules
     {
         get
@@ -189,6 +203,7 @@ public class Bootstrapper : IBootstrapper
         }
     }
 
+    /// <summary>The runtime description of the host, resolved from the service collection on first use.</summary>
     public IFloxRuntime Runtime
     {
         get
@@ -203,6 +218,7 @@ public class Bootstrapper : IBootstrapper
         }
     } = null;
 
+    /// <summary>The service collection of the host.</summary>
     public IServiceCollection Services { get; }
 
     // An assembly "is a Flox assembly" if it IS Flox.Core, or transitively references it -
@@ -301,6 +317,8 @@ public class Bootstrapper : IBootstrapper
         return result;
     }
 
+    /// <summary>Adds a module unless a module of the same type is already added.</summary>
+    /// <param name="module">The module to add.</param>
     public void AddModule(BootstrapModule module)
     {
         var moduleType = module.GetType();
@@ -312,6 +330,7 @@ public class Bootstrapper : IBootstrapper
         }
     }
 
+    /// <summary>Calls <see cref="BootstrapModule.ConfigureServices"/> of every module in order.</summary>
     public virtual void Configure()
     {
         foreach (var module in Modules)
@@ -323,6 +342,9 @@ public class Bootstrapper : IBootstrapper
         }
     }
 
+    /// <summary>Inserts a module into the list at the position of the module of the given type.</summary>
+    /// <param name="moduleType">The type of the module that marks the position.</param>
+    /// <param name="module">The module to insert.</param>
     public void InsertModuleAfter(Type moduleType, BootstrapModule module)
     {
         for (var i = 0; i < _modules.Count; i++)
@@ -336,6 +358,9 @@ public class Bootstrapper : IBootstrapper
         }
     }
 
+    /// <summary>Replaces the module of the given type, or adds the module when there is none.</summary>
+    /// <param name="moduleType">The type of the module to replace.</param>
+    /// <param name="module">The replacing module.</param>
     public void ReplaceModule(Type moduleType, BootstrapModule module)
     {
         for (var i = 0; i < _modules.Count; i++)
@@ -353,6 +378,8 @@ public class Bootstrapper : IBootstrapper
         _modules.Add(module);
     }
 
+    /// <summary>Starts <see cref="BootstrapModule.RunAsync(IServiceProvider)"/> of every module.</summary>
+    /// <param name="serviceProvider">The service provider of the built host.</param>
     public void Run(IServiceProvider serviceProvider)
     {
         foreach (var module in Modules)

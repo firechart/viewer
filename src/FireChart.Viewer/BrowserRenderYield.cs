@@ -1,3 +1,4 @@
+using Flox.Services;
 using FireChart.Viewer.Core;
 using Flox.Core.Host;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +29,7 @@ public sealed class BrowserRenderYield(IJSRuntime js) : IRenderYield
             return;
         }
 
-        _module ??= await js.InvokeAsync<IJSObjectReference>("import", "./_content/FireChart.Viewer/js/render-yield.js");
+        _module ??= await js.ImportModuleAsync("./_content/FireChart.Viewer/js/render-yield.js");
         await _module.InvokeVoidAsync("yieldToBrowser");
     }
 }

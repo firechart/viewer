@@ -1,16 +1,18 @@
 @using FireChart.Viewer.Pages
 @using FireChart.Viewer.Core
-@* The component observation-trends of a section of the clinical summary: the measures of the section, each the tile of its last record, and the chart of
+@* The component observation-trends of a section of the patient summary: the measures of the section, each the tile of its last record, and the chart of
    the history of the chosen one (a line per value: blood pressure has two). Wide: the list and the chart side by side, the chart sticks below the header
    of the section; narrow: the chart above the list *@
 
 <div class="fx-trends">
-    <div class="fx-trends-list">
+    @* A row chooses the measure of the chart: a toggle button that says whether it is the one shown *@
+    <div class="fx-trends-list" role="list">
         @foreach (var trend in Section.Trends)
         {
             var latest = trend.Records[0];
-            <div class=@(trend.Key == Section.SelectedTrend ? "fx-summary-section-row fx-trend-selected" : "fx-summary-section-row") @key=trend.Key>
-                <Tile Model=@TileOf(latest) Options=@ListOptions ResourceType=@latest.ResourceType OnClick=@(() => OnSelect.InvokeAsync(trend.Key))/>
+            var chosen = trend.Key == Section.SelectedTrend;
+            <div class=@(chosen ? "fx-summary-section-row fx-trend-selected" : "fx-summary-section-row") role="listitem" @key=trend.Key>
+                <Tile Model=@TileOf(latest) Options=@ListOptions ResourceType=@latest.ResourceType Pressed=@chosen OnClick=@(() => OnSelect.InvokeAsync(trend.Key))/>
             </div>
         }
     </div>
@@ -21,13 +23,13 @@
             var latest = selected.Records[0];
             var lines = ObservationTrends.SeriesOf(Section.TrendHistory.GetValueOrDefault(selected.Key) ?? selected.Records, TimeZoneInfo.Local);
             <div class="fx-trends-head">
-                <span class="fx-trends-title">@((MarkupString)TileOf(latest).Title)</span>
+                <span id=@TitleId class="fx-trends-title">@((MarkupString)TileOf(latest).Title)</span>
                 @if (Section.TrendLoading)
                 {
                     <CircularProgress Size="ProgressBarCircularSize.ExtraSmall"/>
                 }
                 <RadzenButton Icon="open_in_new" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" title=@Strings.Caption_TrendOpenLast
-                              Click=@(() => OnOpen.InvokeAsync(latest))/>
+                              aria-label=@Strings.Caption_TrendOpenLast Click=@(() => OnOpen.InvokeAsync(latest))/>
             </div>
             @if (lines.Count == 0)
             {
@@ -35,19 +37,49 @@
             }
             else
             {
-                <RadzenChart class="fx-trends-plot">
-                    @foreach (var line in lines)
-                    {
-                        <RadzenLineSeries TItem="TrendPoint" Data=@line.Points CategoryProperty="Moment" ValueProperty="Value" Title=@TitleOf(line)>
-                            <RadzenMarkers MarkerType="MarkerType.Circle"/>
-                        </RadzenLineSeries>
-                    }
-                    <RadzenCategoryAxis FormatString="{0:d}"/>
-                    <RadzenValueAxis FormatString=@ValueFormat>
-                        <RadzenGridLines Visible="true"/>
-                    </RadzenValueAxis>
-                    <RadzenLegend Visible=@(lines.Count > 1) Position="LegendPosition.Bottom"/>
-                </RadzenChart>
+                @* The chart is a picture: its caption says what it shows, its values are a table for a reader, a printout and forced colours *@
+                <figure class="fx-trends-figure" aria-labelledby=@($"{TitleId} {CaptionId}")>
+                    <RadzenChart class="fx-trends-plot">
+                        @foreach (var line in lines)
+                        {
+                            <RadzenLineSeries TItem="TrendPoint" Data=@line.Points CategoryProperty="Moment" ValueProperty="Value" Title=@TitleOf(line)>
+                                <RadzenMarkers MarkerType="MarkerType.Circle"/>
+                            </RadzenLineSeries>
+                        }
+                        <RadzenCategoryAxis FormatString="{0:d}"/>
+                        <RadzenValueAxis FormatString=@ValueFormat>
+                            <RadzenGridLines Visible="true"/>
+                        </RadzenValueAxis>
+                        <RadzenLegend Visible=@(lines.Count > 1) Position="LegendPosition.Bottom"/>
+                    </RadzenChart>
+                    <figcaption id=@CaptionId class="fx-trends-caption">@CaptionOf(lines)</figcaption>
+                </figure>
+                <details class="fx-trends-values">
+                    <summary>@Strings.Caption_TrendValues</summary>
+                    <table class="fx-table fx-table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">@Strings.Caption_TrendDate</th>
+                                @foreach (var line in lines)
+                                {
+                                    <th scope="col">@TitleOf(line)</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var moment in lines.SelectMany(line => line.Points).Select(point => point.Moment).Distinct().OrderDescending())
+                            {
+                                <tr>
+                                    <th scope="row">@moment.ToString("g", System.Globalization.CultureInfo.CurrentCulture)</th>
+                                    @foreach (var line in lines)
+                                    {
+                                        <td>@ValueAt(line, moment)</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </details>
             }
         }
     </div>
@@ -55,9 +87,9 @@
 
 @code {
 
-    /// <summary>The section: its measures (<see cref="ClinicalSummarySection.Trends"/>), the chosen one and its history.</summary>
+    /// <summary>The section: its measures (<see cref="SummarySection.Trends"/>), the chosen one and its history.</summary>
     [Parameter, EditorRequired]
-    public ClinicalSummarySection Section { get; set; } = null!;
+    public SummarySection Section { get; set; } = null!;
 
     /// <summary>Opens a record (the last one of the chosen measure).</summary>
     [Parameter]
@@ -68,17 +100,37 @@
     public EventCallback<string> OnSelect { get; set; }
 
     // The list of the measures shows the last values without the status: "final" on every row is noise, the value needs the room
-    private TileOptions ListOptions => new(Section.TileOptions.ShowAge, ShowStatus: false);
+    private TileOptions ListOptions => Section.TileOptions with { ShowStatus = false };
 
     private TrendGroup? Selected => Section.Trends.FirstOrDefault(trend => trend.Key == Section.SelectedTrend);
 
     private TileModel TileOf(ResourceSummary item)
     {
-        return Section.Tiles.GetValueOrDefault(ClinicalSummarySection.KeyOf(item)) ?? ResourceTiles.Plain(item);
+        return Section.Tiles.GetValueOrDefault(SummarySection.KeyOf(item)) ?? ResourceTiles.Plain(item);
     }
 
     // The format of the section on the axis and in the tooltips: at most that many places (0.##), the digits of the value without one
     private string ValueFormat => Section.Format?.Decimals is { } places ? "{0:0." + new string('#', places) + "}" : "{0}";
+
+    private string TitleId => Section.ElementId + "-trend-title";
+
+    private string CaptionId => Section.ElementId + "-trend-caption";
+
+    // The measure is the title above; the caption: how many values and the first and the last day
+    private static string CaptionOf(IReadOnlyList<TrendSeries> lines)
+    {
+        var moments = lines.SelectMany(line => line.Points).Select(point => point.Moment).Distinct().ToList();
+        var culture = System.Globalization.CultureInfo.CurrentCulture;
+        return string.Format(culture, Strings.Caption_TrendSummary, moments.Count, moments.Min().ToString("d", culture), moments.Max().ToString("d", culture));
+    }
+
+    // The value of a line at a moment in the format of the section, as on the axis; nothing when the line has none there
+    private string ValueAt(TrendSeries line, DateTime moment)
+    {
+        return line.Points.FirstOrDefault(point => point.Moment == moment) is { } point
+            ? string.Format(System.Globalization.CultureInfo.CurrentCulture, ValueFormat, point.Value)
+            : string.Empty;
+    }
 
     private static string TitleOf(TrendSeries line)
     {

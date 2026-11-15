@@ -3,7 +3,7 @@ using Flox.Core.Data;
 
 namespace FireChart.Viewer.Tests.Viewer;
 
-// The last search of a list is kept per server and type in the documents of the device (IndexedDB); a cleared search (empty) is not the same as none;
+// The last search of a list is kept per server and type in the documents of the device (SQLite); a cleared search (empty) is not the same as none;
 // a search kept by an older version in localStorage is moved over
 public class ListSearchMemoryTests
 {

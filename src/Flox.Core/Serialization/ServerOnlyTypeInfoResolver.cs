@@ -10,6 +10,7 @@ namespace Flox.Core.Serialization;
 /// </summary>
 public sealed class ServerOnlyTypeInfoResolver : DefaultJsonTypeInfoResolver
 {
+    /// <inheritdoc />
     public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
     {
         var typeInfo = base.GetTypeInfo(type, options);

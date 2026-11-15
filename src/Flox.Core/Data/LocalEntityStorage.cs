@@ -8,10 +8,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Flox.Core.Data;
 
-// An IStorage of the documents kept on the device (ILocalDocumentStore): all of them are loaded once into memory and queried there, every change is
-// written through. Made for thousands of rows, not for millions. The device has one user (one account of the operating system is one user of the
-// application): no owners, no rights of rows, no permissions; a sign-in changes nothing. Changes of another tab are seen after a reload
-public class LocalEntityStorage<TKey, TEntity> : IStorage<TKey, TEntity>, IDisposable where TKey : notnull where TEntity : class, IEntity<TKey>
+/// <summary>
+/// An <see cref="IStorage{TKey, TEntity}"/> of the documents kept on the device (<see cref="ILocalDocumentStore"/>): all of them are loaded
+/// once into memory and queried there, every change is written through. Made for thousands of rows, not for millions. The device has one user
+/// (one account of the operating system is one user of the application), so there are no owners, no rights of rows and no permissions. Changes
+/// of another tab are seen after a reload.
+/// </summary>
+public class LocalEntityStorage<TKey, TEntity> : IStorage<TKey, TEntity>, ILocalChangeNotifier, IDisposable where TKey : notnull where TEntity : class, IEntity<TKey>
 {
     private static readonly JsonSerializerOptions s_json = new(JsonSerializerDefaults.Web)
     {
@@ -30,49 +33,62 @@ public class LocalEntityStorage<TKey, TEntity> : IStorage<TKey, TEntity>, IDispo
     private readonly IValidator<TEntity>? _validator;
     private Dictionary<TKey, TEntity>? _rows;
 
+    /// <summary>Creates the storage over the document store.</summary>
     public LocalEntityStorage(ILocalDocumentStore store, ILogger<LocalEntityStorage<TKey, TEntity>> logger, IValidator<TEntity>? validator = null, string? collection = null)
     {
         _store = store ?? throw new ArgumentNullException(nameof(store));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _validator = validator;
         Collection = string.IsNullOrWhiteSpace(collection) ? typeof(TEntity).Name : collection;
+        _store.ChangedElsewhere += OnChangedElsewhere;
     }
 
+    /// <summary>Raised when another tab wrote the collection: the rows in memory are read again at the next call.</summary>
+    public event EventHandler? ChangedElsewhere;
+
+    /// <summary>The name of the collection in the document store; the name of the entity class unless given.</summary>
     public string Collection { get; }
 
+    /// <inheritdoc />
     public async Task<long> CountAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default)
     {
         var match = predicate?.Compile();
         return await ReadAsync(rows => match is null ? rows.Count : rows.Values.LongCount(match), cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<bool> ExistsAsync(TKey key, CancellationToken cancellationToken = default)
     {
         return await ReadAsync(rows => rows.ContainsKey(key), cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<TEntity?> GetByIdAsync(TKey key, CancellationToken cancellationToken = default)
     {
         return await ReadAsync(rows => rows.TryGetValue(key, out var row) ? Clone(row) : null, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<PagedResult<TEntity>> FindAsync(PagedRequest<TEntity> request, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
         return await ReadAsync(rows => Find(rows.Values, request), cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<EntityCapability<TKey>>> GetCapabilitiesAsync(IReadOnlyCollection<TKey> keys, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(keys);
         return await ReadAsync(rows => (IReadOnlyList<EntityCapability<TKey>>)[.. keys.Distinct().Select(key => rows.ContainsKey(key) ? new EntityCapability<TKey>(key, true, true, true) : new EntityCapability<TKey>(key, false, false, false))], cancellationToken);
     }
 
+    /// <summary>Not supported: the documents of one user have no access to change.</summary>
     public Task<TEntity> SetAccessAsync(TKey key, AccessGrant readAccess, AccessGrant writeAccess, CancellationToken cancellationToken = default)
     {
         throw new NotSupportedException($"{GetType().Name} keeps the documents of one user: they have no access to change.");
     }
 
+    /// <inheritdoc />
     public async Task<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
@@ -102,7 +118,9 @@ public class LocalEntityStorage<TKey, TEntity> : IStorage<TKey, TEntity>, IDispo
         }
     }
 
-    // The revision of the update must be the stored one, as on the server: a copy that was read before another change is refused
+    /// <summary>
+    /// Replaces the entity; its revision must be the stored one, as on the server: a copy that was read before another change is refused.
+    /// </summary>
     public async Task<TEntity> UpdateAsync(TKey key, TEntity value, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(value);
@@ -134,6 +152,7 @@ public class LocalEntityStorage<TKey, TEntity> : IStorage<TKey, TEntity>, IDispo
         }
     }
 
+    /// <inheritdoc />
     public async Task DeleteAsync(TKey key, CancellationToken cancellationToken = default)
     {
         await _gate.WaitAsync(cancellationToken);
@@ -154,6 +173,7 @@ public class LocalEntityStorage<TKey, TEntity> : IStorage<TKey, TEntity>, IDispo
         }
     }
 
+    /// <inheritdoc />
     public async Task<long> DeleteManyAsync(Expression<Func<TEntity, bool>> expression, int limit = Constants.MAX_BATCH_DELETE, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(expression);
@@ -185,16 +205,19 @@ public class LocalEntityStorage<TKey, TEntity> : IStorage<TKey, TEntity>, IDispo
         }
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>Releases the subscription to the document store and the lock when disposing.</summary>
     protected virtual void Dispose(bool disposing)
     {
         if (disposing)
         {
+            _store.ChangedElsewhere -= OnChangedElsewhere;
             _gate.Dispose();
         }
     }
@@ -260,6 +283,17 @@ public class LocalEntityStorage<TKey, TEntity> : IStorage<TKey, TEntity>, IDispo
         }
 
         return Expression.Lambda<Func<TEntity, object?>>(Expression.Convert(key, typeof(object)), row).Compile();
+    }
+
+    private void OnChangedElsewhere(object? sender, LocalDocumentsChangedEventArgs e)
+    {
+        if (!e.Concerns(Collection))
+        {
+            return;
+        }
+
+        _rows = null;
+        ChangedElsewhere?.Invoke(this, EventArgs.Empty);
     }
 
     private async Task<TResult> ReadAsync<TResult>(Func<Dictionary<TKey, TEntity>, TResult> read, CancellationToken cancellationToken)
@@ -408,6 +442,11 @@ public class LocalEntityStorage<TKey, TEntity> : IStorage<TKey, TEntity>, IDispo
     }
 }
 
+/// <summary>A local storage of <see cref="IGuidEntity"/> documents.</summary>
+/// <param name="store">The document store of the device.</param>
+/// <param name="logger">The logger.</param>
+/// <param name="validator">Validates an entity before it is written, if given.</param>
+/// <param name="collection">The name of the collection; the name of the entity class when empty.</param>
 public class LocalGuidEntityStorage<TEntity>
 (
     ILocalDocumentStore store,
@@ -416,6 +455,11 @@ public class LocalGuidEntityStorage<TEntity>
     string? collection = null
 ) : LocalEntityStorage<Guid, TEntity>(store, logger, validator, collection), IGuidEntityStorage<TEntity> where TEntity : class, IGuidEntity;
 
+/// <summary>A local storage of <see cref="IStringEntity"/> documents.</summary>
+/// <param name="store">The document store of the device.</param>
+/// <param name="logger">The logger.</param>
+/// <param name="validator">Validates an entity before it is written, if given.</param>
+/// <param name="collection">The name of the collection; the name of the entity class when empty.</param>
 public class LocalStringEntityStorage<TEntity>
 (
     ILocalDocumentStore store,

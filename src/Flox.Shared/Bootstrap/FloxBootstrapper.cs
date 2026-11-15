@@ -9,12 +9,17 @@ using Serilog.Extensions.Logging;
 
 namespace Flox.Shared.Bootstrap;
 
+/// <summary>
+/// Base bootstrapper of Flox client hosts: registers branding, the platform menu, validated Oidc and telemetry options and the standard modules.
+/// </summary>
 public abstract class FloxBootstrapper : Bootstrapper
 {
-    // Mutable App property: a specialized app's own bootstrapper overrides branding by assigning
-    // Branding.App in its own constructor, after base(...) runs - see FloxBrandingProvider.
+    /// <summary>
+    /// Branding provider of the host; an application bootstrapper assigns its own application branding to it.
+    /// </summary>
     protected FloxBrandingProvider Branding { get; }
 
+    /// <inheritdoc />
     protected FloxBootstrapper(IServiceCollection services, IConfigurationBuilder configuration, ILoggingBuilder loggingBuilder, string? baseAddress = null, string? environment = null) : base(services, configuration, loggingBuilder, baseAddress, environment)
     {
         Branding = new FloxBrandingProvider(FloxPlatformBranding.Default);
@@ -56,6 +61,7 @@ public abstract class FloxBootstrapper : Bootstrapper
         AddModule(new ThemingModule());
     }
 
+    /// <inheritdoc />
     protected override Microsoft.Extensions.Logging.ILogger CreateBootstrapLogger()
     {
         var isBrowser = OperatingSystem.IsBrowser();

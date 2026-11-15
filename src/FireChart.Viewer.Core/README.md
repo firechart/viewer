@@ -61,16 +61,36 @@ var row = await renderer.RenderTileAsync(observationJson, pool: pool);
 
 ## Forms
 
-`SearchFormDefinition` and `ClinicalSummaryFormDefinition` are the search forms and the clinical summary forms; `ViewerJson` reads and writes their
+`SearchFormDefinition` and `SummaryFormDefinition` are the search forms and the summary forms; `ViewerJson` reads and writes their
 files. `ViewerFormResolver` chooses the form of a key (`SearchFormKey("r4", "Patient")`, `SummaryFormKey("default")`) among providers (your server,
 your configuration, the vendor providers of `FireChart.Viewer.Library`): a designed form wins over a generated one, then the provider of the lower
 `Order`; a provider that fails is skipped; without any form the fallback you give makes one.
 
 ```csharp
-using var resolver = new ViewerFormResolver<SummaryFormKey, ClinicalSummaryFormDefinition>(
+using var resolver = new ViewerFormResolver<SummaryFormKey, SummaryFormDefinition>(
     [myServerProvider, new VendorSummaryFormProvider()],
     (key, cancellationToken) => Task.FromResult(VendorSummaryForms.Default));
 var form = await resolver.ResolveAsync(new SummaryFormKey("default"), cancellationToken);
+```
+
+`FhirMetadata` is what the Firely SDK does not carry of a release and the search forms need: the value set each element of a resource or datatype is
+bound to (with its strength), and of the search parameters their comparators, modifiers, chains and targets. It is C# generated from the core packages
+(`Fhir/Metadata/*.g.cs`, STU3, R4, R4B, R5; generated, not to be edited), built when a release is first asked for.
+
+```csharp
+var r4 = FhirMetadata.Of("R4")!;
+var status = r4.BindingOf("Observation.status");          // observation-status, Required
+var date = r4.SearchParameterOf("Observation", "date");   // the comparators eq, gt, ge...
+```
+
+The codes of a field bound to a value set come from the FHIR server of the search: `IValueSetExpander` asks it for `ValueSet/$expand` (no
+terminology server). A value set it gives whole (up to 500 codes) is filtered on the device; a larger one is searched on the server with the text
+typed (`filter`), and filtered here again, since a server may ignore the filter. A server that does not expand the value set (no `$expand`, an
+unknown code system, a token that may not read value sets) leaves the field a text box, and is not asked again for it.
+
+```csharp
+var expansion = await expander.ExpandAsync(server, "http://hl7.org/fhir/ValueSet/observation-status", null, null);
+var finals = expansion?.Matching("fin");   // Final (final)
 ```
 
 ## HTML is not trusted

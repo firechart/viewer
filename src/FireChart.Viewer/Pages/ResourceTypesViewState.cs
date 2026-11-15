@@ -15,9 +15,6 @@ namespace FireChart.Viewer.Pages;
 /// </example>
 public class ResourceTypesViewState : State
 {
-    /// <summary>A row of the list that is not a type: the clinical summary of a patient (before Patient, when the server has it).</summary>
-    public const string ClinicalSummaryEntry = "#summary";
-
     /// <summary>The entry of the bookmarks in <see cref="Visible"/>, first, when the host keeps bookmarks.</summary>
     public const string BookmarksEntry = "#bookmarks";
 
@@ -26,6 +23,7 @@ public class ResourceTypesViewState : State
 
     private readonly IServerCredentialStore _credentials;
     private readonly IServerResourceTypeProvider _provider;
+    private readonly IResourceTiles _tiles;
     private ViewerSession? _session;
     private IReadOnlyList<string> _types = [];
 
@@ -37,6 +35,7 @@ public class ResourceTypesViewState : State
     {
         _credentials = serviceProvider.GetRequiredService<IServerCredentialStore>();
         _provider = serviceProvider.GetRequiredService<IServerResourceTypeProvider>();
+        _tiles = serviceProvider.GetRequiredService<IResourceTiles>();
     }
 
     /// <summary>The server, once the state is activated.</summary>
@@ -45,10 +44,13 @@ public class ResourceTypesViewState : State
     /// <summary>The release the server declares (<c>R4</c>); empty until it is read.</summary>
     public string Release { get; private set; } = string.Empty;
 
+    /// <summary>The style of the templates: the colours of the types (<see cref="Components.ResourceTypeColors"/>) are its tokens; empty until it is read.</summary>
+    public string Style { get; private set; } = string.Empty;
+
     /// <summary>The last connection did not give the types.</summary>
     public bool Failed { get; private set; }
 
-    /// <summary>The types after the filter, with <see cref="ClinicalSummaryEntry"/> first when it fits; a new list on every change.</summary>
+    /// <summary>The types after the filter, with <see cref="BookmarksEntry"/> first when it fits; a new list on every change.</summary>
     public IReadOnlyList<string> Visible { get; private set; } = [];
 
     /// <summary>The text the types are filtered by.</summary>
@@ -102,6 +104,11 @@ public class ResourceTypesViewState : State
             _types = [];
             Filter = null;
             Apply();
+            if (Style.Length == 0)
+            {
+                Style = await _tiles.StyleAsync();
+            }
+
             await ServiceProvider.GetRequiredService<ISmartAuthorizer>().RestoreAsync(session.Server);
 
             if (Access != ServerAccess.Ready)
@@ -147,9 +154,7 @@ public class ResourceTypesViewState : State
         IReadOnlyList<string> types = string.IsNullOrWhiteSpace(Filter)
             ? _types
             : [.. _types.Where(row => row.Contains(Filter.Trim(), StringComparison.OrdinalIgnoreCase))];
-        var summary = _types.Contains("Patient") && (string.IsNullOrWhiteSpace(Filter) || Strings.Caption_ClinicalSummary.Contains(Filter.Trim(), StringComparison.OrdinalIgnoreCase));
         var bookmarks = ViewerBookmarks.AreAvailable(ServiceProvider) && (string.IsNullOrWhiteSpace(Filter) || FloxStrings.Caption_Bookmarks.Contains(Filter.Trim(), StringComparison.OrdinalIgnoreCase));
-        string[] entry = [.. bookmarks ? [BookmarksEntry] : Array.Empty<string>(), .. summary ? [ClinicalSummaryEntry] : Array.Empty<string>()];
-        Visible = [.. entry, .. types];
+        Visible = [.. bookmarks ? [BookmarksEntry] : Array.Empty<string>(), .. types];
     }
 }

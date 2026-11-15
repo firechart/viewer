@@ -21,8 +21,6 @@
 
 	<ItemGroup>
 		<!-- Exclude non-minified JS and CSS from lib — only ship .min.js and .min.css -->
-		<Compile Remove="wwwroot\fonts\**" />
-		<Content Remove="wwwroot\fonts\**" />
 		<Content Remove="wwwroot\lib\**\*.js" />
 		<Content Remove="wwwroot\lib\**\*.css" />
 		<Content Include="wwwroot\lib\**\*.min.js" />
@@ -30,17 +28,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Remove="wwwroot\fonts\**" />
-	  <None Remove="wwwroot\fonts\**" />
-	</ItemGroup>
-
-	<ItemGroup>
+	  <!-- The licenses of the icon font for the lists of the applications (licenses.py), not a file of the application -->
+	  <Content Update="other-licenses.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
 	  <Content Remove="Components\RepositoryDataList.razor" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="Licenses\other-licenses.json" />
-    <EmbeddedResource Include="Licenses\licenses.json" />
 	</ItemGroup>
 
   <ItemGroup>
@@ -70,6 +60,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Flox.Core\Flox.Core.csproj" />
+	  <ProjectReference Include="..\Flox.Sqlite\Flox.Sqlite.csproj" />
 	  <ProjectReference Include="..\Flox.Resources\Flox.Resources.csproj" />
 	</ItemGroup>
 

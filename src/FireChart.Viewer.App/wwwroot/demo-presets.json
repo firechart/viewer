@@ -13,7 +13,7 @@
   {
     "id": "smart-launcher",
     "name": "SMART Health IT Launcher (sign-in)",
-    "description": "A real SMART sign-in in a popup: pick a patient at the launcher, the clinical summary opens.",
+    "description": "A real SMART sign-in in a popup: pick a patient at the launcher, the patient summary opens.",
     "config": {
       "server": { "url": "https://launch.smarthealthit.org/v/r4/fhir", "name": "SMART Launcher R4" },
       "smart": { "clientId": "firechart-viewer", "scopes": "launch/patient patient/*.rs openid fhirUser", "extraParameters": "launch=e30", "flow": "popup" },

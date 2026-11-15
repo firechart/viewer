@@ -4,8 +4,14 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace Flox.Shared.Components;
 
+/// <summary>
+/// Collects the values of the state of a page and builds the URL of the current page with them as a query string.
+/// </summary>
 public class UrlStateBuilder : Dictionary<string, List<object>>
 {
+    /// <summary>
+    /// Creates a builder for the current page of the navigation manager.
+    /// </summary>
     public UrlStateBuilder(NavigationManager navigationManager) : base(StringComparer.OrdinalIgnoreCase)
     {
         _navigationManager = navigationManager;
@@ -35,6 +41,9 @@ public class UrlStateBuilder : Dictionary<string, List<object>>
         }
     }
 
+    /// <summary>
+    /// Adds the value of the property the expression reads, under the name of the property; null is skipped.
+    /// </summary>
     public UrlStateBuilder Add(Expression<Func<object?>> expr)
     {
         var name = expr.Body switch
@@ -53,6 +62,9 @@ public class UrlStateBuilder : Dictionary<string, List<object>>
         return this;
     }
 
+    /// <summary>
+    /// Adds the value the expression reads under the given parameter name; null is skipped.
+    /// </summary>
     public UrlStateBuilder Add(string parameterName, Expression<Func<object?>> expr)
     {
         var name = expr.Body switch
@@ -71,12 +83,18 @@ public class UrlStateBuilder : Dictionary<string, List<object>>
         return this;
     }
 
+    /// <summary>
+    /// Adds the value under the given parameter name; null is skipped.
+    /// </summary>
     public UrlStateBuilder Add(string parameterName, object? value)
     {
         InternalAdd(parameterName, value);
         return this;
     }
 
+    /// <summary>
+    /// Builds the URL of the current page with the added values as a query string; empty strings and false are left out.
+    /// </summary>
     public string ToUrl()
     {
         var uri = new Uri(_navigationManager.Uri).GetLeftPart(UriPartial.Path);
@@ -110,6 +128,9 @@ public class UrlStateBuilder : Dictionary<string, List<object>>
         return uri;
     }
 
+    /// <summary>
+    /// Navigates to the URL built by <see cref="ToUrl"/>.
+    /// </summary>
     public void Navigate()
     {
         var url = ToUrl();

@@ -68,7 +68,7 @@
     {
         if (firstRender && Session.SmartFlow == SmartFlow.Popup)
         {
-            _popup = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/FireChart.Viewer/js/smart-popup.js");
+            _popup = await JS.ImportModuleAsync("./_content/FireChart.Viewer/js/smart-popup.js");
         }
     }
 

@@ -1,6 +1,7 @@
 @* Wraps the working part of a page: while busy a circular indicator covers it (see BusyIndicator) and the content stays where it is; while Concealed (the page
-   is started for another key) the content is not drawn at all, so the data of the previous key is not on screen *@
-<div class="relative @(Busy ? "min-h-24" : null) @Class" aria-busy=@(Busy ? "true" : null)>
+   is started for another key) the content is not drawn at all, so the data of the previous key is not on screen; then the box is half the screen high,
+   so the indicator is near the middle of the page, not under its top *@
+<div class="relative @(Busy ? Concealed ? "min-h-[50dvh]" : "min-h-24" : null) @Class" aria-busy=@(Busy ? "true" : null)>
     @if (!Concealed)
     {
         @ChildContent

@@ -1,6 +1,6 @@
 @implements IDisposable
 
-<RadzenFormField Variant="Radzen.Variant.Text" AllowFloatingLabel="false" class="rz-w-100 [--rz-form-field-margin-block:0] [--fw-field-max-width:none]">
+<RadzenFormField Variant="Radzen.Variant.Text" AllowFloatingLabel="false" class="rz-w-100 [--rz-form-field-margin-block:0] [--fw-field-max-width:none]" role="search">
     <Start>
         <FloxIcon Icon="search" Size="1.25rem" Color="var(--rz-text-secondary-color)"/>
     </Start>
@@ -10,12 +10,15 @@
                        Placeholder=@Placeholder
                        AutoFocus=@AutoFocus
                        ValueChanged=@OnInput
-                       @onkeydown=@OnKeyDown/>
+                       aria-label=@Placeholder
+                       enterkeyhint="search"
+                       @onkeydown=@KeyDownAsync/>
     </ChildContent>
     <End>
         @if (!string.IsNullOrEmpty(_value))
         {
-            <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Size="Radzen.ButtonSize.Small" Click=@ClearAsync>
+            <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Size="Radzen.ButtonSize.Small" Click=@ClearAsync
+                          aria-label=@Strings.Caption_Clear title=@Strings.Caption_Clear>
                 <FloxIcon Icon="close" Size="1rem"/>
             </RadzenButton>
         }
@@ -43,6 +46,12 @@
 
     [Parameter]
     public int DebounceInterval { get; set; } = 500;
+
+    // The Enter that confirms a candidate of an input method (Chinese, Japanese, Korean) is not the Enter of the box: it never reaches OnKeyDown
+    private Task KeyDownAsync(KeyboardEventArgs args)
+    {
+        return args.Key == "Enter" && args.IsComposing ? Task.CompletedTask : OnKeyDown.InvokeAsync(args);
+    }
 
     protected override void OnParametersSet()
     {

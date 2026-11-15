@@ -1,5 +1,3 @@
-@import url('lib/cookieconsent/dist/cookieconsent.min.css');
-
 /**********************************************************
 FONTS
 
@@ -9,14 +7,15 @@ back). The faces therefore live here and not in Radzen's theme or in site.css, w
 media rules; Radzen's own "Material Symbols" face is replaced by "Flox Symbols" in the theme variables.
 **********************************************************/
 
-/* Same file Radzen ships; font-display: block keeps a not yet applied icon invisible */
+/* Radzen's Material Symbols with the weight fixed at 400 and the axis FILL kept (filled icons): 0.4 MB instead of 1.07 MB, every icon stays
+   (fonts/FloxSymbols.woff2, written by .claude/skills/package-upgrade/icon_font.py); font-display: block keeps a not yet applied icon invisible */
 @font-face {
     font-family: "Flox Symbols";
     font-style: normal;
-    font-weight: 100 700;
+    font-weight: 400;
     font-display: block;
-    src: url("../Radzen.Blazor/fonts/MaterialSymbolsOutlined.woff2") format("woff2 supports variations"),
-         url("../Radzen.Blazor/fonts/MaterialSymbolsOutlined.woff2") format("woff2-variations");
+    src: url("fonts/FloxSymbols.woff2") format("woff2 supports variations"),
+         url("fonts/FloxSymbols.woff2") format("woff2-variations");
 }
 
 /* Zero-size fallback after the icon font: a ligature name that shows up anyway stays invisible */
@@ -40,6 +39,13 @@ GENERIC STYLES
 
 body, html, #app {
     font-family: var(--rz-text-font-family, ui-sans-serif, system-ui, sans-serif);
+}
+
+/* An installed app: no pull-to-refresh, it reloads the whole Blazor app */
+@media (display-mode: standalone) {
+    html, body {
+        overscroll-behavior-y: none;
+    }
 }
 
 .dialog-blurry-bg {

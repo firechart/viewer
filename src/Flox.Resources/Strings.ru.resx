@@ -219,42 +219,6 @@
   <data name="Caption_Installed" xml:space="preserve">
     <value>Установлен</value>
   </data>
-  <data name="Sync_Title" xml:space="preserve">
-    <value>Синхронизация</value>
-  </data>
-  <data name="Sync_Now" xml:space="preserve">
-    <value>Синхронизировать</value>
-  </data>
-  <data name="Sync_StatusSynced" xml:space="preserve">
-    <value>Всё синхронизировано</value>
-  </data>
-  <data name="Sync_StatusSyncing" xml:space="preserve">
-    <value>Синхронизация…</value>
-  </data>
-  <data name="Sync_StatusPending" xml:space="preserve">
-    <value>Ожидают отправки изменений: {0}</value>
-  </data>
-  <data name="Sync_StatusError" xml:space="preserve">
-    <value>Последняя синхронизация не удалась</value>
-  </data>
-  <data name="Sync_LastSynced" xml:space="preserve">
-    <value>Последняя синхронизация: {0}</value>
-  </data>
-  <data name="Sync_Never" xml:space="preserve">
-    <value>Ещё не синхронизировалось</value>
-  </data>
-  <data name="Sync_NotAvailable" xml:space="preserve">
-    <value>Синхронизация в этом приложении недоступна</value>
-  </data>
-  <data name="Sync_Failures" xml:space="preserve">
-    <value>Изменения, которые сервер не принял</value>
-  </data>
-  <data name="Sync_Retry" xml:space="preserve">
-    <value>Повторить</value>
-  </data>
-  <data name="Sync_Technical" xml:space="preserve">
-    <value>Технические детали</value>
-  </data>
   <data name="Caption_More" xml:space="preserve">
     <value>Ещё</value>
   </data>
@@ -462,27 +426,6 @@
   <data name="Caption_Password" xml:space="preserve">
     <value>Пароль</value>
   </data>
-  <data name="Sync_Rejected" xml:space="preserve">
-    <value>Сервер не принял изменение {0}: {1}</value>
-  </data>
-  <data name="Sync_Reason_Invalid" xml:space="preserve">
-    <value>Данные недопустимы</value>
-  </data>
-  <data name="Sync_Reason_Forbidden" xml:space="preserve">
-    <value>У вас нет прав это изменять</value>
-  </data>
-  <data name="Sync_Reason_ReadOnly" xml:space="preserve">
-    <value>Эти данные нельзя изменять</value>
-  </data>
-  <data name="Sync_Reason_Conflict" xml:space="preserve">
-    <value>Изменено на другом устройстве</value>
-  </data>
-  <data name="Sync_Reason_Unknown" xml:space="preserve">
-    <value>Сервер отклонил изменение</value>
-  </data>
-  <data name="Sync_NotSynced" xml:space="preserve">
-    <value>Не синхронизировано: {0}</value>
-  </data>
   <data name="Caption_SignIn" xml:space="preserve">
     <value>Войти</value>
   </data>
@@ -560,5 +503,65 @@
   </data>
   <data name="Caption_History" xml:space="preserve">
     <value>История</value>
+  </data>
+  <data name="Caption_LicenseEdition" xml:space="preserve">
+    <value>Редакция</value>
+  </data>
+  <data name="Caption_LicenseState" xml:space="preserve">
+    <value>Состояние</value>
+  </data>
+  <data name="Caption_LicenseValidUntil" xml:space="preserve">
+    <value>Действует до</value>
+  </data>
+  <data name="Caption_LicenseFeatures" xml:space="preserve">
+    <value>Функции</value>
+  </data>
+  <data name="Caption_LicensePerpetual" xml:space="preserve">
+    <value>Бессрочно</value>
+  </data>
+  <data name="LicenseState_None" xml:space="preserve">
+    <value>Нет лицензии: бесплатная редакция</value>
+  </data>
+  <data name="LicenseState_Valid" xml:space="preserve">
+    <value>Действует</value>
+  </data>
+  <data name="LicenseState_Expiring" xml:space="preserve">
+    <value>Скоро истекает</value>
+  </data>
+  <data name="LicenseState_Grace" xml:space="preserve">
+    <value>Истекла, льготный период</value>
+  </data>
+  <data name="LicenseState_Expired" xml:space="preserve">
+    <value>Истекла</value>
+  </data>
+  <data name="LicenseState_NotYetValid" xml:space="preserve">
+    <value>Ещё не действует</value>
+  </data>
+  <data name="LicenseState_Invalid" xml:space="preserve">
+    <value>Недействительна</value>
+  </data>
+  <data name="Caption_Menu" xml:space="preserve">
+    <value>Меню</value>
+  </data>
+  <data name="Caption_Back" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="Caption_Clear" xml:space="preserve">
+    <value>Очистить</value>
+  </data>
+  <data name="Caption_SkipToContent" xml:space="preserve">
+    <value>Перейти к содержимому</value>
+  </data>
+  <data name="Caption_MainNavigation" xml:space="preserve">
+    <value>Главное меню</value>
+  </data>
+  <data name="Caption_Loading" xml:space="preserve">
+    <value>Загрузка…</value>
+  </data>
+  <data name="Caption_Select" xml:space="preserve">
+    <value>Выбрать</value>
+  </data>
+  <data name="Caption_SelectItem" xml:space="preserve">
+    <value>Выбрать: {0}</value>
   </data>
 </root>

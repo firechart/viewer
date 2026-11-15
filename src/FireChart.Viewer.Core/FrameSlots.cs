@@ -18,8 +18,12 @@ internal sealed class FrameSlots
     public const string At = "at";
     public const string Facts = "facts";
     public const string Flags = "flags";
+    public const string CodesArgument = "codes";
 
     public Dictionary<string, string> Html { get; } = new(StringComparer.Ordinal);
+
+    // The codings of the main code of a tile ({% slot_data codes: self.code %}): the frame shows the one of the systems of the options before the title
+    public List<TileCode> Codes { get; } = [];
 
     public bool IsEmpty => Html.Count == 0;
 

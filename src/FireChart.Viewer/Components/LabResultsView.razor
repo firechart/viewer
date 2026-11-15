@@ -1,20 +1,21 @@
 @using FireChart.Viewer.Pages
 @using FireChart.Viewer.Core
-@* The component lab-results of a section of the clinical summary: a group per report (its tile as the header, then its results in the order of the report)
+@* The component lab-results of a section of the patient summary: a group per report (its tile as the header, then its results in the order of the report)
    or per day; a table in a wide section (the cells of the partial lab-row), the tiles of the results in a narrow one (the container query of the stack) *@
 
 @foreach (var group in Section.LabGroups)
 {
+    var head = HeadIdOf(group);
     <div class="fx-lab-group" @key=group.Key>
         @if (group.Report is { } report)
         {
-            <div class="fx-summary-section-row fx-lab-head">
-                <Tile Model=@TileOf(report) ResourceType=@report.ResourceType OnClick=@(() => OnOpen.InvokeAsync(report))/>
+            <div id=@head class="fx-summary-section-row fx-lab-head">
+                <Tile Model=@TileOf(report) ResourceType=@report.ResourceType Href=@HrefOf?.Invoke(report) OnClick=@(() => OnOpen.InvokeAsync(report))/>
             </div>
         }
         else
         {
-            <div class="fx-lab-day">@DayOf(group)</div>
+            <div id=@head class="fx-lab-day">@DayOf(group)</div>
         }
 
         @if (group.Rows.Count > 0)
@@ -22,7 +23,7 @@
             var range = Has(group, "range");
             var flag = Has(group, "flag");
             <div class="fx-lab-wide">
-                <table class="fx-table fx-table-sm fx-lab-table">
+                <table class="fx-table fx-table-sm fx-lab-table" aria-labelledby=@head>
                     <colgroup>
                         <col class="fx-lab-col-test"/>
                         <col class="fx-lab-col-value"/>
@@ -33,16 +34,27 @@
                         <tr>
                             <th>@Strings.Caption_LabTest</th>
                             <th>@Strings.Caption_LabResult</th>
-                            <th>@(range ? Strings.Caption_LabReferenceRange : string.Empty)</th>
-                            <th>@(flag ? Strings.Caption_LabFlag : string.Empty)</th>
+                            @* An empty column keeps its place and its name, which only a reader hears *@
+                            <th><span class=@(range ? null : "fx-visually-hidden")>@Strings.Caption_LabReferenceRange</span></th>
+                            <th><span class=@(flag ? null : "fx-visually-hidden")>@Strings.Caption_LabFlag</span></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var row in group.Rows)
                         {
-                            var cells = Section.Cells.GetValueOrDefault(ClinicalSummarySection.KeyOf(row)) ?? Empty;
+                            var cells = Section.Cells.GetValueOrDefault(SummarySection.KeyOf(row)) ?? Empty;
+                            var test = cells.GetValueOrDefault("test") is { } html ? (MarkupString)html : (MarkupString?)null;
+                            var href = HrefOf?.Invoke(row);
+                            @* The row is a shortcut of the mouse; the link of the first cell is what the keyboard reaches and a new tab opens *@
                             <tr @key=row @onclick=@(() => OnOpen.InvokeAsync(row)) title=@TileOf(row).Text>
-                                <td class="fx-lab-test">@((MarkupString)(cells.GetValueOrDefault("test") ?? row.Id))</td>
+                                <td class="fx-lab-test">@if (href is not null)
+                                    {
+                                        <RecordLink Href=@href OnClick=@(() => OnOpen.InvokeAsync(row)) StopPropagation>@TestOf(test, row)</RecordLink>
+                                    }
+                                    else
+                                    {
+                                        @TestOf(test, row)
+                                    }</td>
                                 <td class="fx-lab-value">@((MarkupString)(cells.GetValueOrDefault("value") ?? string.Empty))</td>
                                 <td class="fx-lab-range">@((MarkupString)(cells.GetValueOrDefault("range") ?? string.Empty))</td>
                                 <td class="fx-lab-flag">@((MarkupString)(cells.GetValueOrDefault("flag") ?? string.Empty))</td>
@@ -51,11 +63,11 @@
                     </tbody>
                 </table>
             </div>
-            <div class="fx-lab-narrow">
+            <div class="fx-lab-narrow" role="list" aria-labelledby=@head>
                 @foreach (var row in group.Rows)
                 {
-                    <div class="fx-summary-section-row" @key=row>
-                        <Tile Model=@TileOf(row) ResourceType=@row.ResourceType OnClick=@(() => OnOpen.InvokeAsync(row))/>
+                    <div class="fx-summary-section-row" role="listitem" @key=row>
+                        <Tile Model=@TileOf(row) ResourceType=@row.ResourceType Href=@HrefOf?.Invoke(row) OnClick=@(() => OnOpen.InvokeAsync(row))/>
                     </div>
                 }
             </div>
@@ -67,23 +79,47 @@
 
     private static readonly IReadOnlyDictionary<string, string> Empty = new Dictionary<string, string>();
 
-    /// <summary>The section: its groups (<see cref="ClinicalSummarySection.LabGroups"/>), the cells and the tiles of its results.</summary>
+    /// <summary>The section: its groups (<see cref="SummarySection.LabGroups"/>), the cells and the tiles of its results.</summary>
     [Parameter, EditorRequired]
-    public ClinicalSummarySection Section { get; set; } = null!;
+    public SummarySection Section { get; set; } = null!;
 
     /// <summary>Opens a record (a report or a result).</summary>
     [Parameter]
     public EventCallback<ResourceSummary> OnOpen { get; set; }
 
+    /// <summary>
+    /// The address of the place <see cref="OnOpen"/> opens a record in (<see cref="SummaryViewState.HrefOf"/>): a report and a result are then links,
+    /// reached by the keyboard and opened in a new tab. <see langword="null"/>, or a <see langword="null"/> address: no link.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// &lt;LabResultsView Section=@section OnOpen=@(item =&gt; State.OpenAsync(section, item)) HrefOf=@(item =&gt; State.HrefOf(section, item))/&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public Func<ResourceSummary, string?>? HrefOf { get; set; }
+
+    // The id of the head of a group (its report or its day): the name of its table and of its list
+    private string HeadIdOf(LabGroup group)
+    {
+        return Section.ElementId + "-lab-" + string.Concat(group.Key.Select(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '_' ? c : '-'));
+    }
+
+    // The name of the test, else the id: the id comes from the server unchecked, so it is text, never markup
+    private static RenderFragment TestOf(MarkupString? test, ResourceSummary row)
+    {
+        return test is { } html ? builder => builder.AddContent(0, html) : builder => builder.AddContent(0, row.Id);
+    }
+
     // Whether any row of the group has the cell: an empty column keeps its place (the groups stay aligned) without a header
     private bool Has(LabGroup group, string cell)
     {
-        return group.Rows.Any(row => Section.Cells.GetValueOrDefault(ClinicalSummarySection.KeyOf(row)) is { } cells && cells.TryGetValue(cell, out var html) && html.Length > 0);
+        return group.Rows.Any(row => Section.Cells.GetValueOrDefault(SummarySection.KeyOf(row)) is { } cells && cells.TryGetValue(cell, out var html) && html.Length > 0);
     }
 
     private TileModel TileOf(ResourceSummary item)
     {
-        return Section.Tiles.GetValueOrDefault(ClinicalSummarySection.KeyOf(item)) ?? ResourceTiles.Plain(item);
+        return Section.Tiles.GetValueOrDefault(SummarySection.KeyOf(item)) ?? ResourceTiles.Plain(item);
     }
 
     // The day in the format of the culture (as fhir_date writes a date); results without a moment have none

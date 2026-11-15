@@ -2,15 +2,18 @@ using Flox.Core.Settings;
 
 namespace Flox.Shared.Pages.Settings;
 
+/// <summary>State of the settings page: one section for every group of user settings, edited together.</summary>
 public class SettingsPageState : State
 {
     private readonly ISettingsCatalog _catalog;
 
+    /// <summary>Creates the state over the catalog of settings.</summary>
     public SettingsPageState(IServiceProvider serviceProvider, ISettingsCatalog catalog) : base(serviceProvider)
     {
         _catalog = catalog;
     }
 
+    /// <summary>Whether any section has unsaved edits.</summary>
     public bool IsModified
     {
         get
@@ -19,8 +22,10 @@ public class SettingsPageState : State
         }
     }
 
+    /// <summary>The sections shown, one for every group of settings the user may edit.</summary>
     public IReadOnlyList<SettingsSectionState> Sections { get; private set; } = [];
 
+    /// <summary>Throws away unsaved edits by reading every section again.</summary>
     public async Task DiscardAsync()
     {
         foreach (var section in Sections)
@@ -31,7 +36,7 @@ public class SettingsPageState : State
         NotifyChanged();
     }
 
-    // Every section back to its defaults, unsaved edits included
+    /// <summary>After confirmation brings every section back to its defaults, unsaved edits included.</summary>
     public async Task ResetAsync()
     {
         if (await this.ConfirmAsync(Strings.Message_ConfirmResetSettings) != true)
@@ -50,6 +55,7 @@ public class SettingsPageState : State
         NotifyChanged();
     }
 
+    /// <summary>Validates and saves the sections that have edits.</summary>
     public async Task SaveAsync()
     {
         var modified = Sections.Where(section => section.IsModified)
@@ -76,6 +82,7 @@ public class SettingsPageState : State
         NotifyChanged();
     }
 
+    /// <inheritdoc />
     protected override async Task OnStartAsync(object? key)
     {
         await RunAsync(async () =>
@@ -101,7 +108,7 @@ public class SettingsPageState : State
         });
     }
 
-    // Values changed elsewhere (another tab, a sync) are picked up; the edits in progress are kept
+    /// <summary>Picks up values changed elsewhere (another tab); the edits in progress are kept.</summary>
     protected override async Task OnResumeAsync()
     {
         foreach (var section in Sections.Where(section => !section.IsModified))

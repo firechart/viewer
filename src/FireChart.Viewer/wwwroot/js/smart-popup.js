@@ -39,7 +39,8 @@ export function wait(timeoutMs) {
             resolve(result);
         };
         const onMessage = event => {
-            if (event.origin !== location.origin || !event.data || event.data.type !== MessageType || typeof event.data.url !== "string") {
+            // Only the popup this document opened, from this origin: another window of the origin cannot answer for it
+            if (event.origin !== location.origin || event.source !== popup || !event.data || event.data.type !== MessageType || typeof event.data.url !== "string") {
                 return;
             }
 

@@ -12,6 +12,8 @@ export interface ViewerConfig {
         fhirRelease?: "STU3" | "R4" | "R4B" | "R5" | "R6";
         /** The size of a page of a list; default 50. */
         pageSize?: number;
+        /** How long one request to the server may take, in seconds (5 to 600); default 60. */
+        timeoutSeconds?: number;
     };
     /** The SMART client, when the server needs a sign-in (a public client with PKCE: no secret). */
     smart?: {
@@ -25,20 +27,20 @@ export interface ViewerConfig {
         /** More parameters of the authorization request, as a query (launch=e30). */
         extraParameters?: string;
     };
-    /** auto (the language of the browser), inherit (lang of the page, followed live; SDK only) or en, de, es, ru, zh-Hans, with a region (ru-RU). */
+    /** auto (the language of the browser), inherit (lang of the page, followed live; SDK only) or en, de, es, he, ru, zh-Hans, with a region (ru-RU). */
     locale?: string;
     terminology?: {
         /** The terminology server for the displays of bare codes. */
         server?: string;
     };
-    clinicalSummary?: {
-        /** The code of the form of the clinical summary; default "default". */
-        form?: string;
-    };
     appearance?: {
         /** inherit (SDK only): the theme of the page (data-theme, data-bs-theme, the class dark, color-scheme), followed live. */
         theme?: "light" | "dark" | "auto" | "inherit";
-        /** The public variables (colorPrimary, fontFamily, borderRadius, ...). */
+        /** A theme of the library, styles/themes/{style}.css: "fluent", "compact", or one of the appearance folder of the installation. */
+        style?: string;
+        /** Fonts to load (@font-face) for the style or fontFamily: https only. */
+        fonts?: { family: string; src: string; weight?: string; style?: "normal" | "italic" }[];
+        /** The public variables over the style (colorPrimary, fontFamily, borderRadius, ...). */
         variables?: Record<string, string>;
         /** Properties of public selectors (.Banner, .Tile, .Badge--status, ...). */
         rules?: Record<string, Record<string, string>>;
@@ -46,7 +48,7 @@ export interface ViewerConfig {
 }
 
 /** The options that change without a restart. */
-export type ViewerUpdate = Pick<ViewerConfig, "locale" | "terminology" | "clinicalSummary" | "appearance">;
+export type ViewerUpdate = Pick<ViewerConfig, "locale" | "terminology" | "appearance">;
 
 export interface ViewerOptions {
     /** Where FireChart.Viewer.App is served (https://viewer.example.org/); its host.json must allow the origin of this page. */
@@ -55,7 +57,7 @@ export interface ViewerOptions {
     height?: "fill" | "auto";
     /** The title of the frame, for screen readers; default "FHIR Viewer". */
     title?: string;
-    /** A parameter of the address of the page that keeps the address of the Viewer (?fhir=summary/123): a link or a reload opens the Viewer there. */
+    /** A parameter of the address of the page that keeps the address of the Viewer (?fhir=summary/Patient/123): a link or a reload opens the Viewer there. */
     urlParam?: string;
 }
 
@@ -102,7 +104,8 @@ export declare class Viewer {
     /** A restart when server or smart differ, else an update of the live keys that differ, else nothing (null): for the props of a component. */
     configure(config: ViewerConfig): Promise<{ applied: string[] } | { location: string | null; server: string } | null>;
     navigate(location: string, options?: { replace?: boolean }): Promise<{ location: string }>;
-    /** The print dialog of the browser for the page of the Viewer. */
+    /** Prints the page of the Viewer: a summary loads all its records first and is not printed when some cannot be loaded; another page opens the
+     * print dialog of the browser as it is (a list prints the rows in view, with a note that the printout is incomplete). */
     print(): Promise<Record<string, never>>;
     destroy(): void;
 }

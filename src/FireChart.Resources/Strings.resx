@@ -177,6 +177,24 @@
   <data name="Caption_FhirServerOAuth2ExtraParameters" xml:space="preserve">
     <value>OAuth2 extra parameters (key=value&amp;key=value)</value>
   </data>
+  <data name="Caption_FhirServerTimeout" xml:space="preserve">
+    <value>Timeout, seconds</value>
+  </data>
+  <data name="Caption_SearchRefused" xml:space="preserve">
+    <value>The server refused the search</value>
+  </data>
+  <data name="Caption_SearchServerError" xml:space="preserve">
+    <value>The server could not run the search</value>
+  </data>
+  <data name="Caption_SearchTimedOut" xml:space="preserve">
+    <value>No answer within {0} seconds</value>
+  </data>
+  <data name="Caption_SearchUnreadable" xml:space="preserve">
+    <value>The answer of the server could not be read</value>
+  </data>
+  <data name="Caption_SectionFailed" xml:space="preserve">
+    <value>A search of this section failed</value>
+  </data>
   <data name="Caption_FhirServerRelease" xml:space="preserve">
     <value>FHIR release (if /metadata is unavailable)</value>
   </data>
@@ -189,17 +207,20 @@
   <data name="Message_FhirServerAuthenticationNotSupported" xml:space="preserve">
     <value>Connecting to servers with this authentication type is not supported yet.</value>
   </data>
-  <data name="Caption_ClinicalSummary" xml:space="preserve">
-    <value>Clinical Summary</value>
-  </data>
-  <data name="Caption_ClinicalSummaryForm" xml:space="preserve">
-    <value>Clinical summary form</value>
+  <data name="Caption_PatientSummary" xml:space="preserve">
+    <value>Patient Summary</value>
   </data>
   <data name="Message_InvalidSearch" xml:space="preserve">
     <value>The search in the address is not valid.</value>
   </data>
   <data name="Placeholder_SearchAllFields" xml:space="preserve">
     <value>Search all fields</value>
+  </data>
+  <data name="Caption_ShowAllFields" xml:space="preserve">
+    <value>Show all fields</value>
+  </data>
+  <data name="Caption_ShowFormFields" xml:space="preserve">
+    <value>Only the fields of the form</value>
   </data>
   <data name="Message_SearchFormGenerated" xml:space="preserve">
     <value>This form was generated automatically from the search parameters of the resource, so it is not very convenient. The server may not support some of the parameters.</value>
@@ -476,5 +497,74 @@
   </data>
   <data name="Caption_TrendOpenLast" xml:space="preserve">
     <value>Open the last record</value>
+  </data>
+  <data name="Caption_TimesInDeviceZone" xml:space="preserve">
+    <value>Times are shown in the time zone of this device</value>
+  </data>
+  <data name="Message_SectionsFailed" xml:space="preserve">
+    <value>Sections that could not be loaded: {0}</value>
+  </data>
+  <data name="Caption_TrendValues" xml:space="preserve">
+    <value>Values</value>
+  </data>
+  <data name="Caption_TrendDate" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Caption_TrendSummary" xml:space="preserve">
+    <value>{0} values, {1} – {2}</value>
+  </data>
+  <data name="Caption_OpenAsPage" xml:space="preserve">
+    <value>Open as a page</value>
+  </data>
+  <data name="Caption_EncounterSummary" xml:space="preserve">
+    <value>Encounter Summary</value>
+  </data>
+  <data name="Caption_LoadAll" xml:space="preserve">
+    <value>Load all</value>
+  </data>
+  <data name="Caption_Print" xml:space="preserve">
+    <value>Print</value>
+  </data>
+  <data name="Message_PrintIncomplete" xml:space="preserve">
+    <value>This printout may be incomplete: not every record of the page is loaded. Print a summary with its command Print, which loads every record first.</value>
+  </data>
+  <data name="Message_PrintRefused" xml:space="preserve">
+    <value>Not every record could be loaded, so the page is not printed. Retry the sections that failed, then print again.</value>
+  </data>
+  <data name="Caption_Record" xml:space="preserve">
+    <value>Record</value>
+  </data>
+  <data name="Caption_Summary" xml:space="preserve">
+    <value>Summary</value>
+  </data>
+  <data name="PackageBase_Download" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="PackageBase_UpdateButton" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="PackageBase_Failed" xml:space="preserve">
+    <value>The download failed: {0}</value>
+  </data>
+  <data name="PackageBase_NotOnDevice" xml:space="preserve">
+    <value>This package is not on the device. Download it ({0}; {1} on the device) to browse it offline.</value>
+  </data>
+  <data name="PackageBase_Progress" xml:space="preserve">
+    <value>Downloading: {0} of {1}</value>
+  </data>
+  <data name="PackageBase_OnDevice" xml:space="preserve">
+    <value>On the device</value>
+  </data>
+  <data name="PackageBase_Delete" xml:space="preserve">
+    <value>Delete from the device</value>
+  </data>
+  <data name="PackageBase_UpdateAvailable" xml:space="preserve">
+    <value>A newer version of the package is available ({0}).</value>
+  </data>
+  <data name="PackageBase_ListUnavailable" xml:space="preserve">
+    <value>The list of the FHIR packages cannot be read now: the application cannot reach its server. The packages on the device keep working.</value>
+  </data>
+  <data name="PackageBase_Occupied" xml:space="preserve">
+    <value>Packages on the device: {0}, taking {1}</value>
   </data>
 </root>

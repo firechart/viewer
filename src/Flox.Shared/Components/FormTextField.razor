@@ -1,0 +1,152 @@
+@using System.Linq.Expressions
+@implements IDisposable
+
+@* A text field of a form with its validation: the label (a mark when required), the box and the messages below it. The messages are in the
+   box's aria-describedby and aria-invalid is set while the field is invalid; the field is validated when it is left, then on every key while it
+   stays invalid (no "invalid" after the first letter). In a FormFieldFocus the first invalid field takes the focus after a failed submit *@
+<RadzenFormField Text=@Text TextTemplate=@(Required && !ReadOnly ? RequiredLabel : null) Variant="Radzen.Variant.Text" class="rz-w-100">
+    <ChildContent>
+        <RadzenTextBox @ref=_box
+                       ReadOnly=@ReadOnly
+                       Value=@Value
+                       ValueChanged=@ValueChanged
+                       ValueExpression=@ValueExpression
+                       Immediate=@Invalid
+                       Name=@Name
+                       @attributes=@InputAttributes()/>
+    </ChildContent>
+    <Helper>
+        <div id=@MessagesId>
+            <ValidationMessage For=@ValueExpression/>
+        </div>
+    </Helper>
+</RadzenFormField>
+
+@code {
+
+    private RadzenTextBox? _box;
+    private FieldIdentifier _field;
+    private EditContext? _subscribed;
+    private FormFieldFocus? _registeredIn;
+
+    [CascadingParameter]
+    private EditContext? EditContext { get; set; }
+
+    [CascadingParameter]
+    private FormFieldFocus? Focus { get; set; }
+
+    /// <summary>
+    /// The label of the field.
+    /// </summary>
+    [Parameter]
+    public string? Text { get; set; }
+
+    /// <summary>
+    /// The value of the field.
+    /// </summary>
+    [Parameter]
+    public string? Value { get; set; }
+
+    /// <summary>
+    /// Called when the value changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    /// <summary>
+    /// The field of the model the value is bound to (set by <c>@bind-Value</c>).
+    /// </summary>
+    [Parameter]
+    [EditorRequired]
+    public Expression<Func<string>> ValueExpression { get; set; } = null!;
+
+    /// <summary>
+    /// The name of the input, also its id.
+    /// </summary>
+    [Parameter]
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// Whether the field is shown only.
+    /// </summary>
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    /// <summary>
+    /// Whether a value is required: the label carries a mark and the input <c>aria-required</c>.
+    /// </summary>
+    [Parameter]
+    public bool Required { get; set; }
+
+    /// <summary>
+    /// What the field holds: the keyboard of a phone and whether the browser corrects the text.
+    /// </summary>
+    [Parameter]
+    public FormTextKind Kind { get; set; } = FormTextKind.Text;
+
+    private string MessagesId => $"{Name ?? _field.FieldName}-messages";
+
+    private bool Invalid => FieldAria.IsInvalid(EditContext, _field);
+
+    private RenderFragment RequiredLabel => @<text>@Text<span aria-hidden="true" class="rz-color-danger"> *</span></text>;
+
+    protected override void OnParametersSet()
+    {
+        _field = FieldIdentifier.Create(ValueExpression);
+
+        if (!ReferenceEquals(_subscribed, EditContext))
+        {
+            _subscribed?.OnValidationStateChanged -= OnValidationStateChanged;
+            _subscribed = EditContext;
+            _subscribed?.OnValidationStateChanged += OnValidationStateChanged;
+        }
+
+        if (!ReferenceEquals(_registeredIn, Focus))
+        {
+            _registeredIn?.Remove(this);
+            _registeredIn = Focus;
+            _registeredIn?.Add(this, _field, FocusAsync);
+        }
+    }
+
+    private Dictionary<string, object> InputAttributes()
+    {
+        var attributes = FieldAria.For(EditContext, _field, MessagesId);
+        if (Required && !ReadOnly)
+        {
+            attributes["aria-required"] = "true";
+        }
+
+        if (Kind != FormTextKind.Text)
+        {
+            if (Kind == FormTextKind.Url)
+            {
+                attributes["inputmode"] = "url";
+            }
+
+            attributes["autocapitalize"] = "none";
+            attributes["autocorrect"] = "off";
+            attributes["spellcheck"] = "false";
+            attributes["autocomplete"] = "off";
+        }
+
+        return attributes;
+    }
+
+    private ValueTask FocusAsync()
+    {
+        return _box is null ? ValueTask.CompletedTask : _box.Element.FocusAsync();
+    }
+
+    private void OnValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        _subscribed?.OnValidationStateChanged -= OnValidationStateChanged;
+        _registeredIn?.Remove(this);
+    }
+
+}

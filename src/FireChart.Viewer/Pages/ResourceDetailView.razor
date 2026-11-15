@@ -28,7 +28,8 @@
         else if (State.View is not null)
         {
             <style>@State.View.Style</style>
-            <SectionContent SectionName=@FhirViewer.PageCommandsSection>
+            <SectionContent SectionName=@(InSheet ? RecordSheet.CommandsSection : FhirViewer.PageCommandsSection)>
+                <SummarySwitch ResourceType=@ResourceType ResourceId=@ResourceId/>
                 <BookmarkStar Route=@(new ViewerRoute(ViewerPage.Resource, ResourceType, ResourceId)) Title=@State.TextAsync Category=@ResourceType/>
             </SectionContent>
             <div>
@@ -36,10 +37,10 @@
                 <Tabs>
                     <RadzenTabsItem Text=@FloxStrings.Caption_View>
                         @* The HTML of the template has passed the white list of FxHtml *@
-                        <div class="fx-root">@((MarkupString)State.View.Html)<p class="fx-muted" title="Times are shown in the time zone of this device">@DisplayZone.Text()</p></div>
+                        <div class="fx-root">@((MarkupString)State.View.Html)<p class="fx-muted" title=@Strings.Caption_TimesInDeviceZone><span class="fx-visually-hidden">@Strings.Caption_TimesInDeviceZone: </span>@DisplayZone.Text()</p></div>
                     </RadzenTabsItem>
                     <RadzenTabsItem Text=@FloxStrings.Caption_Source>
-                        <CodeEditor Value=@State.Json ReadOnly="true" WordWrap="true" Height="calc(100dvh - 15rem)"/>
+                        <CodeEditor Value=@State.Json ReadOnly="true" WordWrap="true" Height=@(InSheet ? "60dvh" : "calc(100dvh - 15rem)")/>
                     </RadzenTabsItem>
                 </Tabs>
             </RadzenTabs>
@@ -47,7 +48,7 @@
         }
         else if (State.Json is not null)
         {
-            <CodeEditor Value=@State.Json ReadOnly="true" WordWrap="true" Height="calc(100dvh - 11rem)"/>
+            <CodeEditor Value=@State.Json ReadOnly="true" WordWrap="true" Height=@(InSheet ? "60dvh" : "calc(100dvh - 11rem)")/>
         }
     }
 </BusyOverlay>
@@ -65,6 +66,10 @@
     /// <summary>The id of the resource.</summary>
     [Parameter, EditorRequired]
     public string ResourceId { get; set; } = string.Empty;
+
+    /// <summary>Shown in a sheet (<see cref="RecordSheet"/>): its commands go to the header of the sheet, not to the toolbar of the page.</summary>
+    [Parameter]
+    public bool InSheet { get; set; }
 
 
     protected override object? ActivationKey => new ResourceDetailKey(Session, ResourceType, ResourceId);

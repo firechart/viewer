@@ -14,8 +14,8 @@ internal static partial class FhirFilters
     {
         // One value, a list or nothing, as a list: a loop does not care how the element is declared in the release
         filters.AddFilter("as_list", (input, _, _) => ValueTask.FromResult<FluidValue>(input is ArrayValue ? input : input.IsNil() ? new ArrayValue([]) : new ArrayValue([input])));
-        filters.AddFilter("age", (input, _, _) => ValueTask.FromResult(Age(input, DateOnly.FromDateTime(clock.GetLocalNow().DateTime))));
-        filters.AddFilter("age_at", (input, arguments, _) => ValueTask.FromResult(AgeAt(input, arguments.At(0))));
+        filters.AddFilter("age", (input, _, _) => ValueTask.FromResult(Age(input, DateOnly.FromDateTime(clock.GetLocalNow().DateTime), texts)));
+        filters.AddFilter("age_at", (input, arguments, _) => ValueTask.FromResult(AgeAt(input, arguments.At(0), texts)));
         filters.AddFilter("fhir_date", (input, _, _) => ValueTask.FromResult<FluidValue>(input.IsNil() ? input : new StringValue(Date(input.ToStringValue(), clock.LocalTimeZone))));
         // fhir_number: decimals rounds to that many places when a field asks for it (nil: the digits of the record)
         filters.AddFilter("fhir_number", (input, arguments, _) => ValueTask.FromResult<FluidValue>(input.IsNil() ? input : new StringValue(Number(input.ToStringValue(), null, Places(arguments.At(0))))));
@@ -27,8 +27,9 @@ internal static partial class FhirFilters
         filters.AddFilter("fhir_href", (input, _, _) => ValueTask.FromResult(Href(input)));
     }
 
-    // "49 y", "7 mo", "12 d" from a date as FHIR writes it (a year, a month, a day; a time is ignored)
-    public static FluidValue Age(FluidValue input, DateOnly today)
+    // "49 y", "7 mo", "12 d" from a date as FHIR writes it (a year, a month, a day; a time is ignored), in the language of the application (the engine
+    // texts of the locales; none: English)
+    public static FluidValue Age(FluidValue input, DateOnly today, IReadOnlyList<ITemplateTexts>? texts = null)
     {
         if (input.IsNil() || BirthDate().Match(input.ToStringValue()) is not { Success: true } match)
         {
@@ -52,19 +53,19 @@ internal static partial class FhirFilters
         var years = today.Year - born.Year - (today < born.AddYears(today.Year - born.Year) ? 1 : 0);
         if (years > 0)
         {
-            return new StringValue($"{years} y");
+            return new StringValue(Counted(texts, EngineTexts.Years, years));
         }
 
         var months = (today.Year - born.Year) * 12 + today.Month - born.Month - (today.Day < born.Day ? 1 : 0);
-        return new StringValue(months > 0 ? $"{months} mo" : $"{today.DayNumber - born.DayNumber} d");
+        return new StringValue(months > 0 ? Counted(texts, EngineTexts.Months, months) : Counted(texts, EngineTexts.Days, today.DayNumber - born.DayNumber));
     }
 
     // The age at the moment of an event ("34 y"): a date, a dateTime or a Period (its start); the zone of the event does not matter, only its date
-    private static FluidValue AgeAt(FluidValue birth, FluidValue when)
+    private static FluidValue AgeAt(FluidValue birth, FluidValue when, IReadOnlyList<ITemplateTexts> texts)
     {
         var text = when is FhirNodeValue { Node: { } node } && node.Children("start") is [{ } start, ..] ? start.ValueText() : when.IsNil() ? null : when.ToStringValue();
         return text is not null && EventDate().Match(text) is { Success: true } match && DateOnly.TryParseExact(match.Groups[1].Value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var day)
-            ? Age(birth, day)
+            ? Age(birth, day, texts)
             : NilValue.Instance;
     }
 
@@ -179,6 +180,11 @@ internal static partial class FhirFilters
         }
 
         return DayOnly().IsMatch(text) ? new StringValue(text) : NilValue.Instance;
+    }
+
+    private static string Counted(IReadOnlyList<ITemplateTexts>? texts, string key, int count)
+    {
+        return TemplateText.Translate(texts ?? [], key, new Dictionary<string, FluidValue> { ["count"] = NumberValue.Create(count) });
     }
 
     // true and false as words of the language of the application (the engine texts Yes and No of the locales)

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using FireChart.Viewer.Library;
 
 namespace FireChart.Viewer.Appearance;
 
@@ -37,21 +38,25 @@ public enum ViewerTheme
 public sealed record ViewerFont(string Family, string Src, string Weight = "400", string Style = "normal");
 
 /// <summary>
-/// How the Viewer looks: from the safest to the riskiest, the theme, the public variables, the rules of public selectors, the fonts and a free
-/// stylesheet. Every part sets the tokens of the document the Viewer is drawn on (FloxWind, the Radzen variables, the <c>fx-*</c> kit); in a Flox
-/// application the host usually sets none and the Viewer inherits its styles.
+/// How the Viewer looks: from the safest to the riskiest, the light or dark theme, a style (a theme file of the library: the tokens <c>--fx-*</c>), the
+/// public variables, the rules of public selectors, the fonts and a free stylesheet. A style or a variable makes the Viewer its own: the tokens drive the
+/// content and, through <c>styles/fx.themed.css</c>, the Radzen components and the utilities around it, on the whole document. In a Flox application the
+/// host sets none and the Viewer inherits its palette.
 /// </summary>
 /// <remarks>
-/// The variables (<see cref="Variables"/>): <c>colorPrimary</c>, <c>colorBackground</c>, <c>colorSurface</c>, <c>colorText</c>,
-/// <c>colorTextSecondary</c>, <c>colorBorder</c>, <c>colorDanger</c>, <c>colorWarning</c>, <c>colorSuccess</c>, <c>colorInfo</c>, <c>fontFamily</c>,
-/// <c>borderRadius</c>. The selectors of the rules (<see cref="Rules"/>): <c>.Banner</c>, <c>.Tile</c>, <c>.Badge</c>, <c>.Card</c>, <c>.Table</c>.
-/// A value that cannot be used is left out with a <see cref="ViewerConfigError"/> (<see cref="AppearanceCss.Compose"/>).
+/// The style (<see cref="Style"/>) is the name of a file <c>styles/themes/{name}.css</c> of the library: the vendor ships <c>fluent</c> and
+/// <c>compact</c>, an installation adds its own in its appearance folder. The variables (<see cref="Variables"/>) set single tokens over it:
+/// <c>colorPrimary</c>, <c>colorBackground</c>, <c>colorSurface</c>, <c>colorText</c>, <c>colorTextSecondary</c>, <c>colorBorder</c>,
+/// <c>colorDanger</c>, <c>colorWarning</c>, <c>colorSuccess</c>, <c>colorInfo</c>, <c>fontFamily</c>, <c>borderRadius</c>. The selectors of the rules
+/// (<see cref="Rules"/>): <c>.Banner</c>, <c>.Tile</c>, <c>.Badge</c>, <c>.Card</c>, <c>.Table</c>. A value that cannot be used is left out with a
+/// <see cref="ViewerConfigError"/> (<see cref="AppearanceCss.Compose"/>).
 /// </remarks>
 /// <example>
 /// <code>
 /// var appearance = new ViewerAppearance
 /// {
 ///     Theme = ViewerTheme.Light,
+///     Style = "fluent",
 ///     Variables = { ["colorPrimary"] = "#0f766e", ["borderRadius"] = "4px" },
 ///     Rules = { [".Banner"] = new Dictionary&lt;string, string&gt; { ["backgroundColor"] = "#f0fdfa" } }
 /// };
@@ -62,13 +67,16 @@ public sealed class ViewerAppearance
     /// <summary>The theme; <see cref="ViewerTheme.Inherit"/> by default.</summary>
     public ViewerTheme Theme { get; init; } = ViewerTheme.Inherit;
 
-    /// <summary>The public variables by their camelCase names.</summary>
+    /// <summary>The name of a theme file of the library, <c>styles/themes/{name}.css</c> (<c>fluent</c>, <c>compact</c>); none: the vendor look.</summary>
+    public string? Style { get; init; }
+
+    /// <summary>The public variables by their camelCase names: single tokens over the style.</summary>
     public Dictionary<string, string> Variables { get; init; } = new(StringComparer.Ordinal);
 
     /// <summary>The rules: a public selector (<c>.Tile</c>, <c>.Tile:hover</c>) and its properties by camelCase names.</summary>
     public Dictionary<string, Dictionary<string, string>> Rules { get; init; } = new(StringComparer.Ordinal);
 
-    /// <summary>The fonts to load.</summary>
+    /// <summary>The fonts to load; a style or <c>fontFamily</c> names them.</summary>
     public List<ViewerFont> Fonts { get; init; } = [];
 
     /// <summary>Free CSS on the internal classes, the last layer: at the risk of the one who writes it (it may break with a new version).</summary>
@@ -91,16 +99,18 @@ public sealed record ViewerConfigError(string Code, string Param, string Message
 public sealed record AppearanceStylesheet(string Css, IReadOnlyList<ViewerConfigError> Errors);
 
 /// <summary>
-/// Turns a <see cref="ViewerAppearance"/> into a stylesheet over the tokens of the document.
+/// Turns a <see cref="ViewerAppearance"/> into a stylesheet over the tokens of the kit (<c>--fx-*</c>).
 /// </summary>
 /// <remarks>
-/// The variables are written on <c>:root:root:root</c>, which outranks the palette of FloxWind (<c>html:root</c>, <c>html:root[data-theme]</c>) and
-/// the stock Radzen theme whatever the order of the stylesheets. A colour gives its variants (light, dark, the soft tint) by <c>color-mix</c>. The
-/// rules are in <c>@layer viewer-custom</c>; the free stylesheet comes last, outside the layers.
+/// The order: the fonts; the base of a theme (<see cref="FxThemeSheets.Base"/>: the vendor palette as values and the bridge from the tokens to the
+/// Radzen variables) when the appearance has a style or variables; the style in the layer <c>fx-custom</c>; the variables as tokens on
+/// <c>:root:root:root</c>, outside the layers, so they win over the style; the rules in <c>fx-custom</c>; the free stylesheet last, outside the layers.
+/// The order of the layers <c>fx, fx-custom</c> is declared first, so the vendor style of a page (<see cref="FxStyleSheets.Compose"/>) keeps it.
 /// </remarks>
 /// <example>
 /// <code>
-/// var sheet = AppearanceCss.Compose(appearance);
+/// var theme = AppearanceCss.IsThemed(appearance) ? await FxStyle.LoadThemeAsync(assets, appearance.Style) : null;
+/// var sheet = AppearanceCss.Compose(appearance, theme);
 /// foreach (var error in sheet.Errors)
 /// {
 ///     logger.LogWarning("{Param}: {Message}", error.Param, error.Message);
@@ -111,21 +121,21 @@ public static partial class AppearanceCss
 {
     private const string Root = ":root:root:root";
 
-    private static readonly Dictionary<string, string[]> s_status = new(StringComparer.Ordinal)
+    // The public variables and the tokens they set
+    private static readonly Dictionary<string, string> s_tokens = new(StringComparer.Ordinal)
     {
-        ["colorDanger"] = ["danger"],
-        ["colorWarning"] = ["warning"],
-        ["colorSuccess"] = ["success"],
-        ["colorInfo"] = ["info"]
-    };
-
-    private static readonly Dictionary<string, string[]> s_plain = new(StringComparer.Ordinal)
-    {
-        ["colorBackground"] = ["--rz-body-background-color"],
-        ["colorSurface"] = ["--rz-base-background-color"],
-        ["colorText"] = ["--rz-text-color", "--rz-text-title-color"],
-        ["colorTextSecondary"] = ["--rz-text-secondary-color"],
-        ["colorBorder"] = ["--rz-border-color"]
+        ["colorPrimary"] = "--fx-color-accent",
+        ["colorBackground"] = "--fx-color-background",
+        ["colorSurface"] = "--fx-color-surface",
+        ["colorText"] = "--fx-color-text",
+        ["colorTextSecondary"] = "--fx-color-muted",
+        ["colorBorder"] = "--fx-color-border",
+        ["colorDanger"] = "--fx-color-danger",
+        ["colorWarning"] = "--fx-color-warning",
+        ["colorSuccess"] = "--fx-color-success",
+        ["colorInfo"] = "--fx-color-info",
+        ["fontFamily"] = "--fx-font",
+        ["borderRadius"] = "--fx-radius"
     };
 
     // The public selectors and the classes they stand for
@@ -157,11 +167,34 @@ public static partial class AppearanceCss
     private static partial Regex FontUrlPattern();
 
     /// <summary>
+    /// Whether the appearance makes the Viewer its own (a style or a variable), so the base of a theme is needed: read it with
+    /// <see cref="FxStyle.LoadThemeAsync"/> and pass it to <see cref="Compose"/>.
+    /// </summary>
+    /// <param name="appearance">The appearance; <see langword="null"/> is none.</param>
+    /// <returns><see langword="true"/> when the tokens drive the Viewer.</returns>
+    /// <example>
+    /// <code>
+    /// FxThemeSheets? theme = AppearanceCss.IsThemed(appearance) ? await FxStyle.LoadThemeAsync(assets, appearance!.Style) : null;
+    /// </code>
+    /// </example>
+    public static bool IsThemed(ViewerAppearance? appearance)
+    {
+        return appearance is not null && (!string.IsNullOrWhiteSpace(appearance.Style) || appearance.Variables.Count > 0);
+    }
+
+    /// <summary>
     /// Makes the stylesheet of an appearance.
     /// </summary>
     /// <param name="appearance">The appearance; <see langword="null"/> is none.</param>
+    /// <param name="theme">The base of a theme and the file of the style (<see cref="FxStyle.LoadThemeAsync"/>); needed when
+    /// <see cref="IsThemed"/>, else the variables reach the content only and the style is left out.</param>
     /// <returns>The CSS and what was left out.</returns>
-    public static AppearanceStylesheet Compose(ViewerAppearance? appearance)
+    /// <example>
+    /// <code>
+    /// var sheet = AppearanceCss.Compose(new ViewerAppearance { Variables = { ["colorPrimary"] = "#0f6cbd" } }, theme);
+    /// </code>
+    /// </example>
+    public static AppearanceStylesheet Compose(ViewerAppearance? appearance, FxThemeSheets? theme = null)
     {
         var errors = new List<ViewerConfigError>();
         if (appearance is null)
@@ -174,6 +207,13 @@ public static partial class AppearanceCss
         {
             AppendFont(css, font, errors);
         }
+
+        if (theme is not null && IsThemed(appearance))
+        {
+            css.Append(theme.Base.Trim()).Append('\n');
+        }
+
+        AppendStyle(css, appearance.Style, theme, errors);
 
         var declarations = new StringBuilder();
         foreach (var (name, raw) in appearance.Variables)
@@ -194,7 +234,7 @@ public static partial class AppearanceCss
 
         if (rules.Length > 0)
         {
-            css.Append("@layer viewer-custom {\n").Append(rules).Append("}\n");
+            css.Append(CultureInfo.InvariantCulture, $"@layer {FxStyle.CustomLayer} {{\n").Append(rules).Append("}\n");
         }
 
         if (!string.IsNullOrWhiteSpace(appearance.AdvancedStylesheet))
@@ -210,7 +250,7 @@ public static partial class AppearanceCss
             }
         }
 
-        return new AppearanceStylesheet(css.ToString(), errors);
+        return new AppearanceStylesheet(css.Length == 0 ? string.Empty : $"@layer {FxStyle.VendorLayer}, {FxStyle.CustomLayer};\n{css}", errors);
     }
 
     /// <summary>
@@ -230,74 +270,60 @@ public static partial class AppearanceCss
         };
     }
 
+    // The file of the style passes the checks of a customer style: nothing from outside, no notices of the page styled away, no end of the style element
+    private static void AppendStyle(StringBuilder css, string? style, FxThemeSheets? theme, List<ViewerConfigError> errors)
+    {
+        if (string.IsNullOrWhiteSpace(style))
+        {
+            return;
+        }
+
+        if (!FxStyle.IsThemeName(style))
+        {
+            errors.Add(new ViewerConfigError("invalid_value", "appearance.style", $"'{style}' is not the name of a style: lowercase letters, digits and hyphens."));
+            return;
+        }
+
+        if (theme is null)
+        {
+            return;
+        }
+
+        if (theme.Theme is null)
+        {
+            errors.Add(new ViewerConfigError("invalid_value", "appearance.style", $"There is no style '{style}': the library has no {FxStyle.ThemePathOf(style)}."));
+            return;
+        }
+
+        var problem = theme.Theme.Contains("</", StringComparison.Ordinal) ? "The style may not contain '</'." : StyleChecks.Check(theme.Theme);
+        if (problem is not null)
+        {
+            errors.Add(new ViewerConfigError("invalid_value", "appearance.style", $"The style '{style}' is left out: {problem}"));
+            return;
+        }
+
+        css.Append(CultureInfo.InvariantCulture, $"@layer {FxStyle.CustomLayer} {{\n").Append(theme.Theme.Trim()).Append("\n}\n");
+    }
+
     private static void AppendVariable(StringBuilder css, string name, string raw, List<ViewerConfigError> errors)
     {
         var param = $"appearance.variables.{name}";
+        if (!s_tokens.TryGetValue(name, out var token))
+        {
+            errors.Add(new ViewerConfigError("unknown_option", param, $"'{name}' is not a variable of the appearance."));
+            return;
+        }
+
         var value = raw?.Trim() ?? string.Empty;
-        if (name == "fontFamily")
+        var valid = name == "fontFamily" ? FontPattern().IsMatch(value) : ValuePattern().IsMatch(value) && !value.Contains("url", StringComparison.OrdinalIgnoreCase);
+        if (!valid)
         {
-            if (!FontPattern().IsMatch(value))
-            {
-                errors.Add(new ViewerConfigError("invalid_value", param, "A font family is names separated by commas."));
-                return;
-            }
-
-            Declare(css, "--rz-text-font-family", value);
-            Declare(css, "--font-sans", value);
+            errors.Add(new ViewerConfigError("invalid_value", param,
+                                             name == "fontFamily" ? "A font family is names separated by commas." : "The value is not a CSS colour or length."));
             return;
         }
 
-        if (!ValuePattern().IsMatch(value) || value.Contains("url", StringComparison.OrdinalIgnoreCase))
-        {
-            errors.Add(new ViewerConfigError("invalid_value", param, "The value is not a CSS colour or length."));
-            return;
-        }
-
-        if (name == "borderRadius")
-        {
-            Declare(css, "--rz-border-radius", value);
-            Declare(css, "--fx-radius", value);
-            Declare(css, "--radius-field", value);
-            Declare(css, "--radius-box", $"calc({value} * 2)");
-            return;
-        }
-
-        if (name == "colorPrimary")
-        {
-            DeclareColor(css, "primary", value);
-            Declare(css, "--rz-link-color", $"color-mix(in oklab, {value}, black 15%)");
-            Declare(css, "--rz-link-hover-color", $"color-mix(in oklab, {value}, black 30%)");
-            return;
-        }
-
-        if (s_status.TryGetValue(name, out var status))
-        {
-            DeclareColor(css, status[0], value);
-            return;
-        }
-
-        if (s_plain.TryGetValue(name, out var targets))
-        {
-            foreach (var target in targets)
-            {
-                Declare(css, target, value);
-            }
-
-            return;
-        }
-
-        errors.Add(new ViewerConfigError("unknown_option", param, $"'{name}' is not a variable of the appearance."));
-    }
-
-    // A colour and the variants Radzen uses: light and dark by mixing, the soft tint by transparency
-    private static void DeclareColor(StringBuilder css, string role, string value)
-    {
-        Declare(css, $"--rz-{role}", value);
-        Declare(css, $"--rz-{role}-light", $"color-mix(in oklab, {value}, white 15%)");
-        Declare(css, $"--rz-{role}-dark", $"color-mix(in oklab, {value}, black 15%)");
-        Declare(css, $"--rz-{role}-darker", $"color-mix(in oklab, {value}, black 30%)");
-        Declare(css, $"--rz-{role}-lighter", $"color-mix(in oklab, {value} 12%, transparent)");
-        Declare(css, $"--rz-on-{role}-lighter", $"color-mix(in oklab, {value}, black 30%)");
+        Declare(css, token, value);
     }
 
     private static void AppendRule(StringBuilder css, string selector, Dictionary<string, string> properties, List<ViewerConfigError> errors)

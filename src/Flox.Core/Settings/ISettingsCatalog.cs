@@ -4,12 +4,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Flox.Core.Settings;
 
-// The settings classes ([FloxSettings]) of every Flox assembly the application has loaded
+/// <summary>The settings classes (<c>[FloxSettings]</c>) of every Flox assembly the application has loaded.</summary>
 public interface ISettingsCatalog
 {
+    /// <summary>The sections in display order.</summary>
     IReadOnlyList<SettingsSectionDescriptor> Sections { get; }
 }
 
+/// <summary>The default <see cref="ISettingsCatalog"/>: finds the settings classes in the Flox assemblies of the host on first use.</summary>
+/// <param name="bootstrapper">The bootstrapper that knows the Flox assemblies.</param>
 [FloxService(typeof(ISettingsCatalog), ServiceLifetime.Singleton)]
 public sealed class SettingsCatalog
 (
@@ -18,6 +21,7 @@ public sealed class SettingsCatalog
 {
     private readonly Lazy<IReadOnlyList<SettingsSectionDescriptor>> _sections = new Lazy<IReadOnlyList<SettingsSectionDescriptor>>(() => Scan(bootstrapper.FloxAssemblies));
 
+    /// <inheritdoc />
     public IReadOnlyList<SettingsSectionDescriptor> Sections
     {
         get

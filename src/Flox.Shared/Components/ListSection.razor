@@ -1,5 +1,5 @@
-@* A group of rows framed as daisyUI's fieldset: the caption is the legend on top, the rows on the surface *@
-<RadzenFieldset Text=@Caption HeaderTemplate=@Commands class="[--rz-fieldset-padding:0] [--fw-fieldset-background:var(--rz-base-background-color)] [--fw-fieldset-legend-padding-block-end:calc(var(--spacing)*2)] [--fw-fieldset-bare-padding-block-start:0]">
+@* A group of rows framed as daisyUI's fieldset: the caption is the legend on top, the rows on the surface; the caption starts where the text of the rows does *@
+<RadzenFieldset Text=@Caption HeaderTemplate=@Commands class="[--rz-fieldset-padding:0] [--fw-fieldset-background:var(--rz-base-background-color)] [--fw-fieldset-legend-padding-block-end:calc(var(--spacing)*2)] [--fw-fieldset-legend-padding-inline:calc(var(--spacing)*3)] [--fw-fieldset-bare-padding-block-start:0]">
     @if (Definitions)
     {
         <dl class=@($"{GetClass()} m-0")>
@@ -8,8 +8,10 @@
     }
     else
     {
-        <div class=@GetClass()>
-            @ChildContent
+        <div class=@GetClass() role=@(List ? "list" : null)>
+            <CascadingValue Name=@ListTile.ListCascade Value=@List>
+                @ChildContent
+            </CascadingValue>
         </div>
     }
 </RadzenFieldset>
@@ -42,6 +44,10 @@
     /// </summary>
     [Parameter]
     public bool Dividers { get; set; } = true;
+
+    // The rows are ListTiles and nothing else: the container is a list and every tile an item of it, so a screen reader tells how many rows there are
+    [Parameter]
+    public bool List { get; set; }
 
     // The rows are PropertyTiles: the list is a definition list (<dl>), read by a screen reader as pairs of a term and its value
     [Parameter]

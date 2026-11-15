@@ -77,9 +77,15 @@ function onMessage(event) {
         sendHeight();
     }
 
-    // Printing needs no .NET: the print dialog of the browser for this document
+    // Printing: the command Print of the page when it has one (a summary loads every record first and refuses an incomplete page), else the print
+    // dialog of the browser for this document
     if (message.type === "print") {
-        window.print();
+        const command = document.querySelector('[data-viewer="print"]');
+        if (command) {
+            command.click();
+        } else {
+            window.print();
+        }
         if (typeof message.id === "string") {
             post("result", message.id, JSON.stringify({ ok: true, value: {} }));
         }

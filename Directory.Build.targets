@@ -18,4 +18,66 @@
         <PackageVersion Condition="'$(MinVerVersion)' != ''">$(MinVerVersion)</PackageVersion>
     </PropertyGroup>
 
+    <!--
+      The vendor library (public/library, a package of the designer: templates, locales, forms, styles, samples) is static content of the
+      application that sets FireChartLibrary, served at library/ in development and published as the folder wwwroot/library. No code project
+      carries it. Its manifest gets the version of the release (the one in git is 0.0.0-dev); the environments of the designer stay out.
+      The assets are defined with their own content root, as the SDK does with its own (a linked Content item would be looked for in wwwroot)
+    -->
+    <PropertyGroup>
+        <FireChartLibrarySource>$(MSBuildThisFileDirectory)library\</FireChartLibrarySource>
+        <FireChartLibraryStamped>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/$(BaseIntermediateOutputPath)library/'))</FireChartLibraryStamped>
+        <!-- FireChartLibraryCopy: the files are copied into obj first. A static web asset is known by the path of its file, so two applications of
+             one host (Pro and Lite of the server) cannot both declare the files of public/library -->
+        <FireChartLibraryRoot Condition="'$(FireChartLibraryCopy)' != 'true'">$(FireChartLibrarySource)</FireChartLibraryRoot>
+        <FireChartLibraryRoot Condition="'$(FireChartLibraryCopy)' == 'true'">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/$(BaseIntermediateOutputPath)library-copy/'))</FireChartLibraryRoot>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(FireChartLibrary)' == 'true'">
+        <_FireChartLibrarySourceFile Include="$(FireChartLibrarySource)**\*"
+                                     Exclude="$(FireChartLibrarySource)firechart.project.json;$(FireChartLibrarySource)firechart.environments*.json;$(FireChartLibrarySource).gitignore"
+                                     RelativePath="library/%(RecursiveDir)%(Filename)%(Extension)" />
+        <!-- The transform keeps RelativePath, not RecursiveDir -->
+        <_FireChartLibraryFile Include="@(_FireChartLibrarySourceFile->'$(FireChartLibraryRoot)%(RecursiveDir)%(Filename)%(Extension)')" />
+        <_FireChartLibraryManifest Include="$(FireChartLibraryStamped)firechart.project.json" RelativePath="library/firechart.project.json" />
+    </ItemGroup>
+
+    <Target Name="StampFireChartLibrary" Condition="'$(FireChartLibrary)' == 'true'"
+            Inputs="$(FireChartLibrarySource)firechart.project.json;$(MSBuildProjectFullPath)" Outputs="$(FireChartLibraryStamped)firechart.project.json.$(Version).stamp">
+        <PropertyGroup>
+            <_FireChartLibraryText>$([System.IO.File]::ReadAllText('$(FireChartLibrarySource)firechart.project.json').Replace('"0.0.0-dev"', '"$(Version)"'))</_FireChartLibraryText>
+        </PropertyGroup>
+        <WriteLinesToFile File="$(FireChartLibraryStamped)firechart.project.json" Lines="$(_FireChartLibraryText)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+        <Touch Files="$(FireChartLibraryStamped)firechart.project.json.$(Version).stamp" AlwaysCreate="true" />
+        <ItemGroup>
+            <FileWrites Include="$(FireChartLibraryStamped)firechart.project.json;$(FireChartLibraryStamped)firechart.project.json.$(Version).stamp" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="CopyFireChartLibrary" Condition="'$(FireChartLibrary)' == 'true' And '$(FireChartLibraryCopy)' == 'true'">
+        <Copy SourceFiles="@(_FireChartLibrarySourceFile)" DestinationFiles="@(_FireChartLibrarySourceFile->'$(FireChartLibraryRoot)%(RecursiveDir)%(Filename)%(Extension)')"
+              SkipUnchangedFiles="true" />
+        <ItemGroup>
+            <FileWrites Include="$(FireChartLibraryRoot)**\*" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="DefineFireChartLibraryAssets" Condition="'$(FireChartLibrary)' == 'true'" AfterTargets="ResolveProjectStaticWebAssets"
+            DependsOnTargets="StampFireChartLibrary;CopyFireChartLibrary">
+        <DefineStaticWebAssets CandidateAssets="@(_FireChartLibraryFile)" RelativePathPattern="**" SourceType="Discovered" SourceId="$(PackageId)"
+                               ContentRoot="$(FireChartLibraryRoot)" BasePath="$(StaticWebAssetBasePath)" AssetMergeSource="$(StaticWebAssetMergeTarget)">
+            <Output TaskParameter="Assets" ItemName="_FireChartLibraryAsset" />
+        </DefineStaticWebAssets>
+        <DefineStaticWebAssets CandidateAssets="@(_FireChartLibraryManifest)" RelativePathPattern="**" SourceType="Discovered" SourceId="$(PackageId)"
+                               ContentRoot="$(FireChartLibraryStamped)" BasePath="$(StaticWebAssetBasePath)" AssetMergeSource="$(StaticWebAssetMergeTarget)">
+            <Output TaskParameter="Assets" ItemName="_FireChartLibraryAsset" />
+        </DefineStaticWebAssets>
+        <DefineStaticWebAssetEndpoints CandidateAssets="@(_FireChartLibraryAsset)" ContentTypeMappings="@(StaticWebAssetContentTypeMapping)">
+            <Output TaskParameter="Endpoints" ItemName="StaticWebAssetEndpoint" />
+        </DefineStaticWebAssetEndpoints>
+        <ItemGroup>
+            <StaticWebAsset Include="@(_FireChartLibraryAsset)" />
+        </ItemGroup>
+    </Target>
+
 </Project>

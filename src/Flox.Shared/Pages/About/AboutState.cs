@@ -1,7 +1,9 @@
 namespace Flox.Shared.Pages.About;
 
+/// <summary>State of the About page: the identity of the application that runs.</summary>
 public class AboutState : State
 {
+    /// <summary>Creates the state over the branding provider.</summary>
     public AboutState(IServiceProvider serviceProvider, IFloxBrandingProvider branding) : base(serviceProvider)
     {
         _branding = branding;
@@ -9,15 +11,13 @@ public class AboutState : State
 
     private readonly IFloxBrandingProvider _branding;
 
-    public FloxBranding? AppBranding { get; private set; }
-    public FloxBranding? PlatformBranding { get; private set; }
+    /// <summary>The application that runs (the platform's own identity when the application registered none).</summary>
+    public FloxBranding? Branding { get; private set; }
 
+    /// <inheritdoc />
     protected override Task OnStartAsync(object? key)
     {
-        AppBranding = _branding.App;
-        // Only a separate "About platform" tab if the app actually registered its own branding -
-        // otherwise it'd be the exact same tab twice.
-        PlatformBranding = ReferenceEquals(_branding.App, _branding.Platform) ? null : _branding.Platform;
+        Branding = _branding.App;
         IsBusy = false;
         return Task.CompletedTask;
     }

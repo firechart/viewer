@@ -14,11 +14,18 @@
   </Folder>
   <Folder Name="/Flox/">
     <Project Path="src/Flox.Core/Flox.Core.csproj" />
+    <Project Path="src/Flox.Licensing/Flox.Licensing.csproj" />
     <Project Path="src/Flox.Resources/Flox.Resources.csproj" />
     <Project Path="src/Flox.Shared/Flox.Shared.csproj" />
+    <Project Path="src/Flox.Sqlite/Flox.Sqlite.csproj" />
+    <Project Path="src/Flox.Sqlite.Files/Flox.Sqlite.Files.csproj" />
+  </Folder>
+  <Folder Name="/Tools/">
+    <Project Path="tools/FireChart.FhirMetadata/FireChart.FhirMetadata.csproj" />
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="test/FireChart.Viewer.Tests/FireChart.Viewer.Tests.csproj" />
     <Project Path="test/Flox.Tests/Flox.Tests.csproj" />
+    <Project Path="test/Flox.Sqlite.BrowserTests/Flox.Sqlite.BrowserTests.csproj" />
   </Folder>
 </Solution>

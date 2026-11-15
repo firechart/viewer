@@ -31,16 +31,15 @@
                     </RadzenFieldset>
                 }
             }
-            @if (_more.Count > 0)
-            {
-                <RadzenFieldset Text=@FloxStrings.Caption_MoreFilters AllowCollapse="true" Collapsed=@(!_more.Any(HasValue))>
-                    @FieldGrid(_more)
-                </RadzenFieldset>
-            }
         </RadzenStack>
     </div>
     <div class="form-footer">
         <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.End" Gap="var(--gap-sm)">
+            @if (HasHidden)
+            {
+                <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Text=@(_showAll ? Strings.Caption_ShowFormFields : Strings.Caption_ShowAllFields)
+                              Click=@ToggleAll class="form-show-all"/>
+            }
             <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Text=@FloxStrings.Caption_Reset Click=@Reset class="form-reset"/>
             <RadzenButton Variant="Radzen.Variant.Outlined" ButtonStyle="Radzen.ButtonStyle.Base" Text=@FloxStrings.Caption_Cancel Click=@_cancel/>
             <RadzenButton Variant="Radzen.Variant.Filled" ButtonStyle="Radzen.ButtonStyle.Primary" Text=@FloxStrings.Caption_Ok Click=@Apply/>
@@ -60,7 +59,6 @@
     private readonly Dictionary<string, SearchFieldValue> _values = new Dictionary<string, SearchFieldValue>(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _errors = new Dictionary<string, string>(StringComparer.Ordinal);
     private readonly List<Section> _sections = [];
-    private readonly List<SearchFormField> _more = [];
     private SearchFormField? _fullText;
     private string _culture = CultureInfo.CurrentUICulture.Name;
     private SearchFormDefinition? _loadedForm;
@@ -73,6 +71,10 @@
     /// <summary>The values the form opens with, by query name; none: the defaults of the fields.</summary>
     [Parameter]
     public IReadOnlyDictionary<string, SearchFieldValue>? Values { get; set; }
+
+    /// <summary>The FHIR server the search goes to: it expands the value sets of the coded fields; none: the option source of the host only.</summary>
+    [Parameter]
+    public IViewerServer? Server { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -96,12 +98,15 @@
     private void BuildLayout()
     {
         _sections.Clear();
-        _more.Clear();
 
+        // A hidden group hides its fields and a hidden field is not shown, unless all the fields are asked for; a field with a value always shows, so
+        // nothing that narrows the list is out of sight (the default value of a hidden field is a filter of every search)
+        var hiddenGroups = Definition.Groups.Where(g => g.Hidden).Select(g => g.Code).ToHashSet(StringComparer.Ordinal);
+        bool Shown(SearchFormField field) => _showAll || HasValue(field) || (!field.Hidden && !(field.GroupCode is { } code && hiddenGroups.Contains(code)));
         var groups = Definition.Groups
                           .OrderBy(g => g.Order)
                           .ToList();
-        var known = groups.Select(g => g.Code)
+        var known = Definition.Groups.Select(g => g.Code)
                            .ToHashSet(StringComparer.Ordinal);
         _fullText = Definition.Fields.FirstOrDefault(f => f.QueryName == FullTextParameter) ?? Definition.Fields.FirstOrDefault(f => f.QueryName == NarrativeParameter);
         var ordered = Definition.Fields
@@ -109,7 +114,7 @@
                            .OrderBy(f => f.Order)
                            .ToList();
 
-        var loose = ordered.Where(f => f.Included && (f.GroupCode == null || !known.Contains(f.GroupCode)))
+        var loose = ordered.Where(f => Shown(f) && (f.GroupCode == null || !known.Contains(f.GroupCode)))
                             .ToList();
         if (loose.Count > 0)
         {
@@ -118,7 +123,7 @@
 
         foreach (var group in groups)
         {
-            var fields = ordered.Where(f => f.Included && f.GroupCode == group.Code)
+            var fields = ordered.Where(f => Shown(f) && f.GroupCode == group.Code)
                                  .ToList();
             if (fields.Count > 0)
             {
@@ -126,11 +131,20 @@
                 _sections.Add(new Section(group.Caption.Resolve(_culture), collapsed, fields));
             }
         }
-
-        _more.AddRange(ordered.Where(f => !f.Included));
     }
 
     private bool HasValue(SearchFormField field) => SearchFormEvaluator.HasValue(field, _values[field.QueryName]);
+
+    // The fields the author hid are shown too
+    private bool _showAll;
+
+    private bool HasHidden => Definition.Fields.Any(f => f.Hidden) || Definition.Groups.Any(g => g.Hidden);
+
+    private void ToggleAll()
+    {
+        _showAll = !_showAll;
+        BuildLayout();
+    }
 
     // The full-text search of FHIR: the whole resource, else its narrative
     private const string FullTextParameter = "_content";
@@ -152,6 +166,7 @@
                     <SearchFieldEditor Field=@field
                                        Value=@_values[field.QueryName]
                                        Culture=@_culture
+                                       Server=@Server
                                        Error=@_errors.GetValueOrDefault(field.QueryName)/>
                 </RadzenColumn>
             }

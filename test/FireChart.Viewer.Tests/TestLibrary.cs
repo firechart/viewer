@@ -14,9 +14,9 @@ internal static class TestLibrary
     // The static files of the library read from the folder, as a client reads them from its host
     public static FolderAssets Assets => new(WebRoot());
 
-    // The vendor summary form "default", a new instance at every call
-    public static FireChart.Viewer.Core.Forms.ClinicalSummaryFormDefinition SummaryDefault =>
-        FireChart.Viewer.Core.ViewerJson.Read<FireChart.Viewer.Core.Forms.ClinicalSummaryFormDefinition>(VendorSummaryForms.ReadFolder(WebRoot())["default"]);
+    // The vendor summary form of a patient, a new instance at every call
+    public static FireChart.Viewer.Core.Forms.SummaryFormDefinition SummaryDefault =>
+        FireChart.Viewer.Core.ViewerJson.Read<FireChart.Viewer.Core.Forms.SummaryFormDefinition>(VendorSummaryForms.ReadFolder(WebRoot())["Patient"]);
 
     public static string WebRoot()
     {
@@ -26,7 +26,7 @@ internal static class TestLibrary
             directory = directory.Parent;
         }
 
-        return Path.Combine(directory!.FullName, "src", "FireChart.Viewer.Library", VendorLibrary.WebRoot);
+        return Path.Combine(directory!.FullName, "library");
     }
 }
 

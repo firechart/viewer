@@ -10,8 +10,10 @@ namespace Flox.Shared.Errors;
 /// </summary>
 public interface IUiNotifier
 {
+    /// <summary>Shows an error message that stays until the user dismisses it.</summary>
     void Error(string message);
 
+    /// <summary>Shows a warning message that disappears by itself.</summary>
     void Warning(string message);
 }
 
@@ -32,6 +34,7 @@ public sealed class NotificationUiNotifier : IUiNotifier, IDisposable
     private readonly NavigationManager _navigation;
     private readonly List<NotificationMessage> _errors = [];
 
+    /// <summary>Creates the notifier over the Radzen notification service and the navigation manager used to close errors when the page changes.</summary>
     public NotificationUiNotifier(NotificationService notifications, NavigationManager navigation)
     {
         _notifications = notifications;
@@ -39,16 +42,19 @@ public sealed class NotificationUiNotifier : IUiNotifier, IDisposable
         _navigation.LocationChanged += OnLocationChanged;
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         _navigation.LocationChanged -= OnLocationChanged;
     }
 
+    /// <inheritdoc />
     public void Error(string message)
     {
         Show(message, NotificationSeverity.Error, UntilClosedMs);
     }
 
+    /// <inheritdoc />
     public void Warning(string message)
     {
         Show(message, NotificationSeverity.Warning, WarningDurationMs);

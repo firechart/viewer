@@ -1,63 +1,94 @@
 namespace Flox.Core.Services;
 
+/// <summary>The kinds of host the code runs in.</summary>
 [Flags]
 public enum FloxPlatform
 {
+    /// <summary>The browser, through WebAssembly.</summary>
     Wasm = 1,
 
+    /// <summary>A MAUI application.</summary>
     Maui = 2,
 
+    /// <summary>The ASP.NET Core server.</summary>
     Server = 4,
 
+    /// <summary>A console tool.</summary>
     Console = 8,
 
+    /// <summary>A test host.</summary>
     Test = 16,
 
+    /// <summary>Every platform.</summary>
     All = Wasm | Maui | Server | Console | Test
 }
 
+/// <summary>The deployment environments.</summary>
 [Flags]
 public enum FloxEnvironment
 {
+    /// <summary>Development.</summary>
     Development = 1,
+    /// <summary>Test.</summary>
     Test = 2,
+    /// <summary>Production.</summary>
     Production = 4,
+    /// <summary>Staging.</summary>
     Staging = 8,
+    /// <summary>Every environment.</summary>
     All = Development | Test | Production | Staging
 }
 
+/// <summary>The editions of the product.</summary>
 [Flags]
 public enum FloxEdition
 {
+    /// <summary>The offline edition.</summary>
     Lite = 0,
+    /// <summary>The edition that runs on the server of the vendor.</summary>
     Pro = 1,
+    /// <summary>The edition that runs on the server of the customer.</summary>
     Enterprise = 2
 }
 
+/// <summary>Describes the host the code runs in.</summary>
 public interface IFloxRuntime
 {
+    /// <summary>The kind of host.</summary>
     FloxPlatform Platform { get; }
+    /// <summary>The edition of the product.</summary>
     FloxEdition Edition { get; set; }
 
+    /// <summary>Whether the environment is development.</summary>
     bool IsDevelopment { get; }
 
+    /// <summary>Whether the environment is production.</summary>
     bool IsProduction { get; }
 
+    /// <summary>Whether the environment is staging.</summary>
     bool IsStaging { get; }
 
+    /// <summary>Whether the environment is test.</summary>
     bool IsTest { get; }
+    /// <summary>The name of the hosting environment.</summary>
     string EnvironmentName { get; }
+    /// <summary>The base address of the host.</summary>
     string BaseAddress { get; }
 
+    /// <summary>Whether the application works without a connection.</summary>
     bool Offline { get; set; }
 }
 
+/// <summary>Base class of the runtime descriptions of the hosts.</summary>
 public abstract class FloxRuntime : IFloxRuntime
 {
+    /// <summary>The kind of host.</summary>
     public abstract FloxPlatform Platform { get; }
 
+    /// <summary>The edition of the product.</summary>
     public virtual FloxEdition Edition { get; set; }
 
+    /// <summary>The folder of the running executable; null when there is none.</summary>
     public virtual string? StartupPath
     {
         get
@@ -77,6 +108,7 @@ public abstract class FloxRuntime : IFloxRuntime
         }
     }
 
+    /// <summary>Whether the environment is development: the name is empty, <c>development</c> or <c>demo</c>.</summary>
     public bool IsDevelopment
     {
         get
@@ -85,6 +117,7 @@ public abstract class FloxRuntime : IFloxRuntime
         }
     }
 
+    /// <summary>Whether the environment is production.</summary>
     public bool IsProduction
     {
         get
@@ -93,6 +126,7 @@ public abstract class FloxRuntime : IFloxRuntime
         }
     }
 
+    /// <summary>Whether the environment is staging.</summary>
     public bool IsStaging
     {
         get
@@ -101,6 +135,7 @@ public abstract class FloxRuntime : IFloxRuntime
         }
     }
 
+    /// <summary>Whether the environment is test.</summary>
     public bool IsTest
     {
         get
@@ -109,7 +144,10 @@ public abstract class FloxRuntime : IFloxRuntime
         }
     }
 
+    /// <summary>The name of the hosting environment.</summary>
     public abstract string EnvironmentName { get; }
+    /// <summary>Whether the application works without a connection.</summary>
     public bool Offline { get; set; }
+    /// <summary>The base address of the host.</summary>
     public string BaseAddress { get; set; } = default!;
 }

@@ -1,0 +1,23 @@
+/*
+ * The fire palette (black - red - dark orange - orange - white): the colors of the roles of palette.css (the clients and the site) and of
+ * the theme of the administration of the server, which imports this file; utilities bg-fire-*, text-fire-*. White text needs ember or darker (4.7:1 and up), orange and
+ * amber carry black text (8:1 and up).
+ */
+@theme {
+    --color-fire-black: #0b0b0b;
+    --color-fire-maroon: #6a040f;
+    --color-fire-crimson: #9d0208;
+    --color-fire-red: #d00000;
+    --color-fire-ember: #dc2f02;
+    --color-fire-flame: #e85d04;
+    --color-fire-orange: #f48c06;
+    --color-fire-amber: #faa307;
+    --color-fire-gold: #ffba08;
+    --color-fire-ink: #c02a02;
+    /* Danger: the deep red, apart from the orange-red accent; the lighter one on a dark page */
+    --color-fire-danger: #c1121f;
+    --color-fire-danger-dark: #a4161a;
+    --color-fire-danger-light: #e5383b;
+    --color-fire-danger-night: #ff5a5f;
+    --color-fire-danger-night-light: #ff8589;
+}

@@ -4,24 +4,28 @@ using Flox.Core.Services;
 
 namespace Flox.Core.Authorization;
 
-// Providers put roles in different places: Orchard uses "role", Entra "roles", Okta "groups",
-// Cognito "cognito:groups", Auth0 a URL-named claim, some nest them (realm_access.roles). Which places to read is configuration (FloxOidcOptions.RoleClaims);
-// this maps them all to ClaimTypes.Role, the only role claim type the application uses.
-//
-// A path is either the exact name of a claim, or a dotted walk into a claim holding a JSON object.
-// Claim and property names may themselves contain dots, so every split is tried. Roles are only
-// taken from the configured paths (put your own client in the path, never "all clients"), so a
-// role of another application cannot grant rights here. Idempotent, never throws on bad input.
+/// <summary>
+/// Maps the roles of a token to ClaimTypes.Role, the only role claim type the application uses. Providers put roles in different places (Orchard "role", Entra "roles", Okta "groups", nested objects such as realm_access.roles); which places to read is configuration (FloxOidcOptions.RoleClaims). A path is the exact name of a claim or a dotted walk into a claim holding a JSON object. Roles are taken only from the configured paths, so a role of another application cannot grant rights here. Idempotent, never throws on bad input.
+/// </summary>
 public static class RoleClaimsMapper
 {
     private const string ClientIdPlaceholder = "{clientId}";
 
+    /// <summary>
+    /// Maps the roles found at the configured paths of the identity.
+    /// </summary>
     public static void Apply(ClaimsIdentity identity, FloxOidcOptions oidc)
     {
         ArgumentNullException.ThrowIfNull(oidc);
         Apply(identity, oidc.EffectiveRoleClaims, oidc.ClientId);
     }
 
+    /// <summary>
+    /// Maps the roles found at the given paths of the identity.
+    /// </summary>
+    /// <param name="identity">The identity to read claims from and add role claims to.</param>
+    /// <param name="paths">Claim names or dotted paths that hold roles.</param>
+    /// <param name="clientId">Value for the {clientId} placeholder in a path.</param>
     public static void Apply(ClaimsIdentity identity, IEnumerable<string> paths, string? clientId)
     {
         ArgumentNullException.ThrowIfNull(identity);
@@ -43,9 +47,9 @@ public static class RoleClaimsMapper
         }
     }
 
-    // For clients that only see the ID token while providers put roles into the access token: copies
-    // the claims the configured paths start from out of the access token payload, then maps them.
-    // The payload is read without validation (the server validates the token); it only feeds UI hints
+    /// <summary>
+    /// For clients that see only the ID token while the provider puts roles into the access token: copies the claims the configured paths start from out of the access token payload, then maps them. The payload is read without validation (the server validates the token); it only feeds UI hints.
+    /// </summary>
     public static void ApplyAccessToken(ClaimsIdentity identity, string? accessToken, FloxOidcOptions oidc)
     {
         ArgumentNullException.ThrowIfNull(identity);

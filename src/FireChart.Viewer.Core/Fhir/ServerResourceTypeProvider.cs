@@ -111,7 +111,7 @@ public sealed class ServerResourceTypeProvider(IHttpClientFactory httpClientFact
 
     private async Task<ServerResourceTypes> ReadMetadataAsync(IViewerServer server, CancellationToken cancellationToken)
     {
-        using var document = await FhirServerHttp.GetJsonAsync(httpClientFactory, server.BaseUrl.TrimEnd('/') + "/metadata?_summary=true", credentials.GetAuthorization(server), cancellationToken);
+        using var document = await FhirServerHttp.GetJsonAsync(httpClientFactory, server.BaseUrl.TrimEnd('/') + "/metadata?_summary=true", credentials.GetAuthorization(server), FhirServerHttp.TimeoutOf(server), cancellationToken);
         return Parse(document.RootElement);
     }
 

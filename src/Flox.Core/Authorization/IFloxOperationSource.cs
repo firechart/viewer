@@ -1,10 +1,13 @@
 namespace Flox.Core.Authorization;
 
-// Operations a module exposes to the permission matrix, e.g. "FhirPackage.Index"; register with
-// [FloxService(ServiceType = typeof(IFloxOperationSource), Lifetime = ServiceLifetime.Singleton, Multiple = true)]
+/// <summary>
+/// Operations a module exposes to the permission matrix, for example "FhirPackage.Index". Register with [FloxService(ServiceType = typeof(IFloxOperationSource), Lifetime = ServiceLifetime.Singleton, Multiple = true)].
+/// </summary>
 public interface IFloxOperationSource
 {
-    // The group of the operations on the page of the roles
+    /// <summary>
+    /// The group of the operations on the page of the roles.
+    /// </summary>
     string Category
     {
         get
@@ -13,5 +16,8 @@ public interface IFloxOperationSource
         }
     }
 
+    /// <summary>
+    /// Returns the names of the operations.
+    /// </summary>
     IReadOnlyList<string> GetOperations();
 }

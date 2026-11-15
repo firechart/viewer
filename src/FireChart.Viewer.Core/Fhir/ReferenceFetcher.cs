@@ -28,16 +28,17 @@ public sealed record FetchedReferences(IReadOnlyList<RelatedResource> Found, IRe
 
 /// <summary>
 /// Fetches the patients and the encounters a page refers to but did not get with its records (no <c>_include</c>, a block not loaded yet, a server without
-/// referential integrity).
+/// referential integrity); the page of one record asks for the resources of every type it refers to (<c>anyType</c>), so its fields name them.
 /// </summary>
 /// <remarks>
 /// One search by <c>_id</c> per type; what it does not return is read by its id, and only an answer <c>404</c> or <c>410</c> makes it missing: an error, a
-/// refusal or a search that hides it (the rights of SMART) proves nothing. Only <c>Patient</c> and <c>Encounter</c> are fetched. The answers are kept for the
-/// scope (the session of a page).
+/// refusal or a search that hides it (the rights of SMART) proves nothing. Only <c>Patient</c> and <c>Encounter</c> are fetched, unless <c>anyType</c> asks for
+/// every type (at most <see cref="ReferenceFetcher.MaxAnyType"/> of them). The answers are kept for the scope (the session of a page).
 /// </remarks>
 /// <example>
 /// <code>
-/// var fetched = await fetcher.FetchAsync(server, rendering.MissingReferences, cancellationToken);
+/// var fetched = await fetcher.FetchAsync(server, rendering.MissingReferences, cancellationToken: cancellationToken);
+/// var reasons = await fetcher.FetchAsync(server, ["Condition/c1"], anyType: true);
 /// </code>
 /// </example>
 public interface IReferenceFetcher
@@ -46,10 +47,11 @@ public interface IReferenceFetcher
     /// Fetches the resources of references.
     /// </summary>
     /// <param name="server">The server.</param>
-    /// <param name="keys">The references as <c>Type/id</c>; other types than <c>Patient</c> and <c>Encounter</c> are ignored.</param>
+    /// <param name="keys">The references as <c>Type/id</c>; other types than <c>Patient</c> and <c>Encounter</c> are ignored unless <paramref name="anyType"/>.</param>
+    /// <param name="anyType">Fetch the references of every type (the page of one record), at most <see cref="ReferenceFetcher.MaxAnyType"/> of them.</param>
     /// <param name="cancellationToken">Cancels the requests.</param>
     /// <returns>What was found and what the server says is missing; an error of the server leaves a key in neither.</returns>
-    Task<FetchedReferences> FetchAsync(IViewerServer server, IReadOnlyCollection<string> keys, CancellationToken cancellationToken = default);
+    Task<FetchedReferences> FetchAsync(IViewerServer server, IReadOnlyCollection<string> keys, bool anyType = false, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -70,15 +72,20 @@ public sealed class ReferenceFetcher(IFhirServerReader reader, ILogger<Reference
 
     private const int Chunk = 20;
 
+    /// <summary>
+    /// How many references of any type one call fetches at most: a record with hundreds of them (a Composition) keeps the rest as the references say.
+    /// </summary>
+    public const int MaxAnyType = 50;
+
     // server|Type/id: the JSON, or null when the server says it does not exist
     private readonly ConcurrentDictionary<string, string?> _known = new(StringComparer.Ordinal);
 
     /// <inheritdoc/>
-    public async Task<FetchedReferences> FetchAsync(IViewerServer server, IReadOnlyCollection<string> keys, CancellationToken cancellationToken = default)
+    public async Task<FetchedReferences> FetchAsync(IViewerServer server, IReadOnlyCollection<string> keys, bool anyType = false, CancellationToken cancellationToken = default)
     {
         var found = new List<RelatedResource>();
         var missing = new List<string>();
-        var asked = keys.Where(key => s_types.Contains(TypeOf(key))).Distinct(StringComparer.Ordinal).ToList();
+        var asked = keys.Where(key => anyType || s_types.Contains(TypeOf(key))).Distinct(StringComparer.Ordinal).Take(anyType ? MaxAnyType : int.MaxValue).ToList();
         foreach (var key in asked.Where(key => _known.ContainsKey(Known(server, key))).ToList())
         {
             Add(key, _known[Known(server, key)], found, missing);

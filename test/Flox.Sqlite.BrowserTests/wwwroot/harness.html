@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Flox.Sqlite harness</title>
+</head>
+<body>
+<!-- One tab of the tests: flox-sqlite.js as BrowserSqliteEngine imports it, and the helpers the tests call through Playwright -->
+<script type="module">
+    import * as sqlite from './flox-sqlite.js';
+
+    const params = values => values ? JSON.stringify(values) : null;
+    const rows = text => JSON.parse(text).rows;
+
+    window.harness = {
+        sqlite,
+        init: pool => sqlite.init(pool, 16),
+        open: (name, readOnly = false) => sqlite.open(name, readOnly),
+        close: handle => sqlite.close(handle),
+        execute: (handle, sql, values) => sqlite.execute(handle, sql, params(values)),
+        query: async (handle, sql, values) => rows(await sqlite.query(handle, sql, params(values))),
+        remove: name => sqlite.remove(name),
+        list: () => sqlite.list(),
+
+        // count statements one by one, upserts keyed by (tab, n); the time of each in ms
+        async writeOneByOne(handle, tab, count, from = 0) {
+            const times = [];
+            for (let n = from; n < from + count; n++) {
+                const started = performance.now();
+                await sqlite.execute(handle, 'INSERT OR REPLACE INTO rows (tab, n, payload) VALUES ($t, $n, $p)', params({ $t: tab, $n: n, $p: 'x'.repeat(200) }));
+                times.push(performance.now() - started);
+            }
+            return times;
+        },
+
+        // count rows in batches of size, each batch one transaction
+        async writeBatches(handle, tab, count, size) {
+            const times = [];
+            for (let n = 0; n < count; n += size) {
+                const statements = [];
+                for (let i = n; i < Math.min(n + size, count); i++) {
+                    statements.push({ sql: 'INSERT OR REPLACE INTO rows (tab, n, payload) VALUES ($t, $n, $p)', parameters: { $t: tab, $n: i, $p: 'y'.repeat(200) } });
+                }
+                const started = performance.now();
+                await sqlite.batch(handle, JSON.stringify(statements));
+                times.push(performance.now() - started);
+            }
+            return times;
+        },
+
+        // Counts the rows again and again while until() is false; every count must not be smaller than the one before
+        async countWhile(handle, until) {
+            const counts = [];
+            while (!window[until]) {
+                counts.push((await window.harness.query(handle, 'SELECT count(*) FROM rows'))[0][0]);
+            }
+            return counts;
+        }
+    };
+    window.harnessReady = true;
+</script>
+</body>
+</html>

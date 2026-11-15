@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 
 namespace Flox.Shared.Services;
 
+/// <summary>Message handler of the application HTTP clients: attaches the bearer token of the signed-in user, adds the query parameters pushed with <see cref="Push"/> and, when the server refuses the token, renews it once and sends the request again.</summary>
 [FloxService(ServiceLifetime.Transient)]
 public sealed class AppHttpClientMessageHandler
 (
@@ -21,6 +22,7 @@ public sealed class AppHttpClientMessageHandler
         return new Scope();
     }
 
+    /// <inheritdoc />
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var accessToken = await authenticationService.GetAccessTokenAsync();

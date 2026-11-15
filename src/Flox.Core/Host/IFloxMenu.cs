@@ -1,14 +1,14 @@
 namespace Flox.Core.Host;
 
+/// <summary>A menu of one module, shown under its own title in the navigation.</summary>
 public interface IFloxMenu
 {
+    /// <summary>The title of the menu.</summary>
     string? Text { get; set; }
 
-    // Already in the order the module wants them rendered - the host never reorders Items.
+    /// <summary>The items in the order the module wants them shown; the host never reorders them.</summary>
     FloxMenuItemList Items { get; }
 
-    // Orders this menu against every other module's menu (see SharedMenuSource - the platform
-    // menu is pinned to int.MaxValue so it always renders last). Items within the menu are not
-    // position-sorted - only menus are.
+    /// <summary>Orders this menu against the menus of other modules; smaller is first. Items within a menu are not sorted by it.</summary>
     int Position { get; set; }
 }

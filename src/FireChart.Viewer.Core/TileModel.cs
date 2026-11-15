@@ -12,9 +12,11 @@ namespace FireChart.Viewer.Core;
 /// is sanitized on its own (<see cref="FxHtml.SanitizeTile"/>: the inline elements and blocks of the kit, no links: the whole row is the link).
 /// </para>
 /// <para>
-/// The frame, not the template, lays the row out: the title; the second line of the subtitle, the age at the record (<see cref="TileOptions.ShowAge"/>),
+/// The frame, not the template, lays the row out: the title, after the code of the record in the first of the systems of the options that it has
+/// (<c>{% slot_data codes: self.code %}</c>, <see cref="TileOptions.CodeSystems"/>); the second line of the subtitle, the age at the record (<see cref="TileOptions.ShowAge"/>),
 /// the patient and the encounter (each only when the page does not show it above, <see cref="TileContext.Shown"/>); at the end the trailing part and the
-/// status (<see cref="TileOptions.ShowStatus"/>). <see cref="Html"/> is that row, one daisyUI list row (<c>&lt;li class="fx-list-row"&gt;</c>);
+/// status (<see cref="TileOptions.ShowStatus"/>). <see cref="Html"/> is that row, one daisyUI list row (<c>&lt;div class="fx-list-row"&gt;</c>: a block, so the
+/// row can sit in a link or a button; the list is the container of the rows, <c>role="list"</c> where it is one);
 /// <see cref="WithOptions"/> lays the same slots out with other options without rendering the template again.
 /// </para>
 /// </remarks>
@@ -43,6 +45,7 @@ public sealed class TileModel
     /// <param name="encounter">The HTML that names the encounter of the record on the second line, or empty.</param>
     /// <param name="age">The HTML of the age of the patient at the moment of the record, or empty.</param>
     /// <param name="options">The options the row is laid out with.</param>
+    /// <param name="codes">The codings of the main code of the record (<see cref="TileOptions.CodeSystems"/> chooses the one shown), or <see langword="null"/>.</param>
     /// <exception cref="ArgumentException"><paramref name="title"/> is empty.</exception>
     /// <example>
     /// <code>
@@ -50,7 +53,7 @@ public sealed class TileModel
     /// </code>
     /// </example>
     public TileModel(string title, string subtitle = "", string trailing = "", string status = "", string patient = "", string encounter = "", string age = "",
-                     TileOptions? options = null)
+                     TileOptions? options = null, IReadOnlyList<TileCode>? codes = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         Title = title;
@@ -61,6 +64,7 @@ public sealed class TileModel
         Encounter = encounter;
         Age = age;
         Options = options ?? TileOptions.Default;
+        Codes = codes ?? [];
         Html = Compose();
         Text = FxHtml.PlainText(Html);
     }
@@ -89,7 +93,10 @@ public sealed class TileModel
     /// <summary>The options the row is laid out with.</summary>
     public TileOptions Options { get; }
 
-    /// <summary>The row laid out of the slots: one <c>&lt;li class="fx-list-row"&gt;</c>.</summary>
+    /// <summary>The codings of the main code of the record; the options choose the one shown before the title.</summary>
+    public IReadOnlyList<TileCode> Codes { get; }
+
+    /// <summary>The row laid out of the slots: one <c>&lt;div class="fx-list-row"&gt;</c>.</summary>
     public string Html { get; }
 
     /// <summary>The same row without markup: a tooltip, a search.</summary>
@@ -108,7 +115,7 @@ public sealed class TileModel
     public TileModel WithOptions(TileOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-        return options == Options ? this : new TileModel(Title, Subtitle, Trailing, Status, Patient, Encounter, Age, options);
+        return options == Options ? this : new TileModel(Title, Subtitle, Trailing, Status, Patient, Encounter, Age, options, Codes);
     }
 
     /// <summary>
@@ -143,15 +150,30 @@ public sealed class TileModel
         return new TileModel(Encode(title), $"<span class=\"fx-tile-error\">{Encode("Template error: " + error)}</span>");
     }
 
-    // The second line: the own facts with the age, then the patient and the encounter, joined by " · "; the end: the trailing part and the status
+    // The title after the code of the first system of the options the record has; the second line: the own facts with the age, then the patient and the
+    // encounter, joined by " · "; the end: the trailing part and the status
     private string Compose()
     {
+        var title = CodeOf() is { } code ? $"<span class=\"fx-tile-code\">{Encode(code)}</span> {Title}" : Title;
         var own = Join(" ", Subtitle, Options.ShowAge ? Age : string.Empty);
         var line = Join(" · ", own, Patient, Encounter);
         var end = Trailing + (Options.ShowStatus ? Status : string.Empty);
         var subtitle = line.Length == 0 ? string.Empty : $"<div class=\"fx-tile-subtitle\">{line}</div>";
         var ending = string.IsNullOrWhiteSpace(end) ? string.Empty : $"<div class=\"fx-tile-end\">{end}</div>";
-        return $"<li class=\"fx-list-row\"><div class=\"fx-list-col-grow fx-tile\"><div class=\"fx-tile-main\"><div class=\"fx-tile-title\">{Title}</div>{subtitle}</div>{ending}</div></li>";
+        return $"<div class=\"fx-list-row\"><div class=\"fx-list-col-grow fx-tile\"><div class=\"fx-tile-main\"><div class=\"fx-tile-title\">{title}</div>{subtitle}</div>{ending}</div></div>";
+    }
+
+    private string? CodeOf()
+    {
+        foreach (var system in Options.CodeSystems ?? [])
+        {
+            if (Codes.FirstOrDefault(code => string.Equals(code.System, system, StringComparison.Ordinal)) is { } found)
+            {
+                return found.Code;
+            }
+        }
+
+        return null;
     }
 
     private static string Join(string separator, params ReadOnlySpan<string> parts)

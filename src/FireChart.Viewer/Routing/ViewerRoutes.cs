@@ -16,8 +16,11 @@ public enum ViewerPage
     /// <summary>One resource (<c>resources/Patient/123</c>).</summary>
     Resource,
 
-    /// <summary>The clinical summary, of a patient or the choice of one (<c>summary</c>, <c>summary/123</c>).</summary>
-    ClinicalSummary,
+    /// <summary>
+    /// The summary of a record and of what refers to it: of a patient (<c>summary/Patient/123</c>; the older <c>summary/123</c> too), or the choice of a
+    /// patient (<c>summary</c>). The <see cref="ViewerRoute.ResourceType"/> of the route is the type of the record the summary grows from.
+    /// </summary>
+    Summary,
 
     /// <summary>The bookmarks of the Viewer on this device (<c>bookmarks</c>), of every server.</summary>
     Bookmarks
@@ -51,10 +54,34 @@ public sealed record ViewerRoute(ViewerPage Page, string? ResourceType = null, s
                 ViewerPage.Bookmarks => ViewerRoutes.Bookmarks,
                 ViewerPage.ResourceList => $"{ViewerRoutes.Resources}/{Uri.EscapeDataString(ResourceType ?? string.Empty)}",
                 ViewerPage.Resource => $"{ViewerRoutes.Resources}/{Uri.EscapeDataString(ResourceType ?? string.Empty)}/{Uri.EscapeDataString(Id ?? string.Empty)}",
-                _ => Id is null ? ViewerRoutes.Summary : $"{ViewerRoutes.Summary}/{Uri.EscapeDataString(Id)}"
+                _ => Id is null ? ViewerRoutes.Summary : $"{ViewerRoutes.Summary}/{Uri.EscapeDataString(ResourceType ?? ViewerRoutes.PatientContext)}/{Uri.EscapeDataString(Id)}"
             };
             return string.IsNullOrEmpty(Query) ? path : $"{path}?{Query}";
         }
+    }
+
+    /// <summary>
+    /// The record shown in a sheet over the patient summary (<c>summary/Patient/123?peek=Observation/o1</c>), as the route of its page;
+    /// <see langword="null"/> for no sheet, a value that is not a record, or another page.
+    /// </summary>
+    public ViewerRoute? Peek => Page == ViewerPage.Summary && Id is not null ? ViewerRoutes.PeekOf(Query) : null;
+
+    /// <summary>
+    /// The same page with a record in a sheet over it, or without the sheet.
+    /// </summary>
+    /// <param name="record">The page of the record (<see cref="ViewerPage.Resource"/>); <see langword="null"/> closes the sheet.</param>
+    /// <returns>The route; the rest of its query is kept.</returns>
+    /// <example>
+    /// <code>
+    /// var sheet = summary.WithPeek(new ViewerRoute(ViewerPage.Resource, "Observation", "o1")); // summary/Patient/123?peek=Observation/o1
+    /// var closed = sheet.WithPeek(null);                                                      // summary/Patient/123
+    /// </code>
+    /// </example>
+    public ViewerRoute WithPeek(ViewerRoute? record)
+    {
+        var rest = Query.Split('&', StringSplitOptions.RemoveEmptyEntries).Where(part => !part.StartsWith(ViewerRoutes.PeekParameter + "=", StringComparison.Ordinal));
+        string[] peek = record is { ResourceType: { } type, Id: { } id } ? [$"{ViewerRoutes.PeekParameter}={Uri.EscapeDataString(type)}/{Uri.EscapeDataString(id)}"] : [];
+        return this with { Query = string.Join('&', rest.Concat(peek)) };
     }
 }
 
@@ -79,11 +106,17 @@ public static partial class ViewerRoutes
     /// <summary>The first segment of the pages of the resources: <c>resources</c>.</summary>
     public const string Resources = "resources";
 
-    /// <summary>The first segment of the clinical summary: <c>summary</c>.</summary>
+    /// <summary>The first segment of a summary: <c>summary</c>.</summary>
     public const string Summary = "summary";
+
+    /// <summary>The type of the record of the patient summary: <c>Patient</c> (<c>summary/Patient/123</c>).</summary>
+    public const string PatientContext = "Patient";
 
     /// <summary>The page of the bookmarks: <c>bookmarks</c>.</summary>
     public const string Bookmarks = "bookmarks";
+
+    /// <summary>The parameter of the query of the patient summary that holds the record of the sheet over it (<c>peek=Observation/o1</c>).</summary>
+    public const string PeekParameter = "peek";
 
     [GeneratedRegex("^[A-Za-z]{1,64}$", RegexOptions.CultureInvariant)]
     private static partial Regex ResourceTypePattern();
@@ -113,11 +146,21 @@ public static partial class ViewerRoutes
             [] or [Resources] => new ViewerRoute(ViewerPage.ResourceTypes, Query: query),
             [Resources, var type] when ResourceTypePattern().IsMatch(type) => new ViewerRoute(ViewerPage.ResourceList, type, Query: query),
             [Resources, var type, var id] when ResourceTypePattern().IsMatch(type) && IdPattern().IsMatch(id) => new ViewerRoute(ViewerPage.Resource, type, id, query),
-            [Summary] => new ViewerRoute(ViewerPage.ClinicalSummary, Query: query),
+            // The list of the patients that led to the patient summary is the list of the patients now
+            [Summary] => new ViewerRoute(ViewerPage.ResourceList, PatientContext, Query: query),
             [Bookmarks] => new ViewerRoute(ViewerPage.Bookmarks),
-            [Summary, var patient] when IdPattern().IsMatch(patient) => new ViewerRoute(ViewerPage.ClinicalSummary, "Patient", patient, query),
+            [Summary, var type, var id] when ResourceTypePattern().IsMatch(type) && IdPattern().IsMatch(id) => new ViewerRoute(ViewerPage.Summary, type, id, query),
+            [Summary, var patient] when IdPattern().IsMatch(patient) => new ViewerRoute(ViewerPage.Summary, PatientContext, patient, query),
             _ => null
         };
+    }
+
+    // The page of the record of peek=Type/id in a query; null when there is none or it is not a record
+    internal static ViewerRoute? PeekOf(string query)
+    {
+        var value = query.Split('&').FirstOrDefault(part => part.StartsWith(PeekParameter + "=", StringComparison.Ordinal))?[(PeekParameter.Length + 1)..];
+        string[] parts = value is null ? [] : Uri.UnescapeDataString(value).Split('/');
+        return parts is [var type, var id] && ResourceTypePattern().IsMatch(type) && IdPattern().IsMatch(id) ? new ViewerRoute(ViewerPage.Resource, type, id) : null;
     }
 
     /// <summary>

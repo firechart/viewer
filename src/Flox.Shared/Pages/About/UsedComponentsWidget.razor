@@ -1,0 +1,107 @@
+@using System.Text.Json
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@* The third-party components of the application that runs: its own list beside its page (wwwroot/licenses.json, made by the skill
+   package-upgrade), read when the page opens, not shipped in an assembly *@
+
+<ListSection Caption=@Strings.Caption_UsedComponents>
+    @if (_licenses == null)
+    {
+        <RadzenProgressBar Mode="Radzen.ProgressBarMode.Indeterminate" ShowValue="false" class="rz-m-4"/>
+    }
+    else if (_licenses.Count == 0)
+    {
+        <RadzenText TextStyle="TextStyle.Body2" class="rz-p-4">No license information available.</RadzenText>
+    }
+    else
+    {
+        @foreach (var entry in _licenses)
+        {
+            <ListTile TitleText="@entry.PackageId"
+                      OnClick="() => OpenPackageUrl(entry.PackageProjectUrl)"
+            >
+                <Subtitle>
+                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)">
+                        <RadzenBadge Variant="Radzen.Variant.Outlined" BadgeStyle="Radzen.BadgeStyle.Info" Text=@entry.License/>
+                        <RadzenBadge Variant="Radzen.Variant.Outlined" BadgeStyle="Radzen.BadgeStyle.Success" Text=@entry.PackageVersion/>
+                    </RadzenStack>
+                </Subtitle>
+                <Trailing>
+                    @if (!string.IsNullOrEmpty(entry.PackageProjectUrl))
+                    {
+                        <FloxIcon Icon="open_in_new" Size="1.25rem" Color="var(--rz-text-secondary-color)"/>
+                    }
+                </Trailing>
+            </ListTile>
+        }
+    }
+</ListSection>
+
+@code {
+
+    // Relative to the base of the page: the application's own wwwroot (WebAssembly, the webview of MAUI)
+    private const string LICENSES_URL = "licenses.json";
+
+    private IJSObjectReference? _module;
+    private IReadOnlyList<LicenseEntry>? _licenses;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _licenses = await LoadAsync();
+        StateHasChanged();
+    }
+
+    private async Task<IReadOnlyList<LicenseEntry>> LoadAsync()
+    {
+        try
+        {
+            _module = await JS.ImportModuleAsync("./_content/Flox.Shared/Pages/About/UsedComponentsWidget.razor.js");
+            var json = await _module.InvokeAsync<string?>("loadText", LICENSES_URL);
+            if (string.IsNullOrEmpty(json))
+            {
+                return [];
+            }
+
+            var rows = JsonSerializer.Deserialize<List<LicenseEntry>>(json) ?? [];
+            return [.. rows.OrderBy(row => row.PackageId, StringComparer.OrdinalIgnoreCase)];
+        }
+        catch (Exception ex) when (ex is JSException or JsonException)
+        {
+            return [];
+        }
+    }
+
+    private Task OpenPackageUrl(string? url)
+    {
+        if (string.IsNullOrEmpty(url))
+        {
+            return Task.CompletedTask;
+        }
+
+        return JS.InvokeVoidAsync("window.open", url, "_blank")
+                  .AsTask();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module == null)
+        {
+            return;
+        }
+
+        try
+        {
+            await _module.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+
+}

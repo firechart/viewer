@@ -155,6 +155,9 @@
     private IJSObjectReference? _module;
     private IJSObjectReference? _gestures;
     private DotNetObjectReference<DataList<TItem>>? _self;
+    private bool _attaching;
+    private bool _attachFailed;
+    private bool _disposed;
     private Virtualize<TItem>? _virtualize;
     private RadzenPager? _pager;
     private (long Total, int PageSize, int Page)? _pagerSynced;
@@ -321,12 +324,44 @@
     {
         await base.OnAfterRenderAsync(firstRender);
         await SyncPagerAsync();
-        if (_gestures is null && _state is not null)
+        if (_gestures is null && _state is not null && !_attaching && !_attachFailed && !_disposed)
         {
-            _module ??= await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Flox.Shared/Components/DataList.razor.js");
-            _self ??= DotNetObjectReference.Create(this);
-            _gestures = await _module.InvokeAsync<IJSObjectReference>("attach", _root, _scroller, _self, new { pull = PullToRefresh && EffectiveLayout == ListLayout.Fill });
+            _attaching = true;
+            try
+            {
+                await AttachGesturesAsync();
+            }
+            catch
+            {
+                _attachFailed = true;
+                throw;
+            }
+            finally
+            {
+                _attaching = false;
+            }
         }
+    }
+
+    // Once, whatever renders come meanwhile; the list may be gone (disposed) after any await
+    private async Task AttachGesturesAsync()
+    {
+        _module ??= await JS.ImportModuleAsync("./_content/Flox.Shared/Components/DataList.razor.js");
+        if (_disposed)
+        {
+            return;
+        }
+
+        _self ??= DotNetObjectReference.Create(this);
+        var gestures = await _module.InvokeAsync<IJSObjectReference>("attach", _root, _scroller, _self, new { pull = PullToRefresh && EffectiveLayout == ListLayout.Fill });
+        if (_disposed)
+        {
+            await gestures.InvokeVoidAsync("dispose");
+            await gestures.DisposeAsync();
+            return;
+        }
+
+        _gestures = gestures;
     }
 
     [JSInvokable]
@@ -563,6 +598,7 @@
 
     public async ValueTask DisposeAsync()
     {
+        _disposed = true;
         if (_subscribed is not null)
         {
             _subscribed.Changed -= OnStateChanged;

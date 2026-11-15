@@ -1,4 +1,4 @@
-@* The resources of a type as tiles, with the search of the address; also the list of the patients that leads to the clinical summary *@
+@* The resources of a type as tiles, with the search of the address; also the list of the patients that leads to the patient summary *@
 @inherits StatefulWidget<ResourceListViewState>
 
 <BusyOverlay Busy=@State.IsBusy Concealed=@State.Activating>
@@ -63,8 +63,10 @@
                 </RadzenStack>
 
                 <div class="fx-root fx-summary">
+                    @* A list draws only the rows in view: its printout is never the whole list *@
+                    <p class="fx-print-incomplete" role="note">@Strings.Message_PrintIncomplete</p>
                     <div class="fx-summary-list">
-                        <SummaryList TRow="ListRow" Rows=@State.Rows Memory=@Scroll>
+                        <SummaryList TRow="ListRow" Rows=@State.Rows Memory=@Scroll IsItem=@(row => row.Kind == ListRowKind.Card) SetSize=@SetSize>
                             <Row Context="row">@RowOf(row)</Row>
                         </SummaryList>
                     </div>
@@ -80,7 +82,7 @@
     [CascadingParameter]
     public ViewerSession Session { get; set; } = null!;
 
-    /// <summary>The type of the list (<c>Patient</c> for the list of the clinical summary).</summary>
+    /// <summary>The type of the list.</summary>
     [Parameter, EditorRequired]
     public string ResourceType { get; set; } = string.Empty;
 
@@ -88,23 +90,18 @@
     [Parameter]
     public string Query { get; set; } = string.Empty;
 
-    /// <summary>The list of the patients that leads to the clinical summary of the one that is chosen.</summary>
-    [Parameter]
-    public bool ClinicalSummary { get; set; }
-
     // The list with its search: a bookmark of it is a saved search
-    private ViewerRoute SearchRoute => ClinicalSummary ? new ViewerRoute(ViewerPage.ClinicalSummary, Query: Query) : new ViewerRoute(ViewerPage.ResourceList, ResourceType, Query: Query);
+    private ViewerRoute SearchRoute => new(ViewerPage.ResourceList, ResourceType, Query: Query);
 
     private Task<string?> SearchTitleAsync()
     {
         var filters = string.Join("; ", State.ActiveFilters.Select(filter => $"{filter.Caption}: {filter.Text}"));
-        var list = ClinicalSummary ? Strings.Caption_ClinicalSummary : ResourceType;
-        return Task.FromResult<string?>(filters.Length == 0 ? list : $"{list} ({filters})");
+        return Task.FromResult<string?>(filters.Length == 0 ? ResourceType : $"{ResourceType} ({filters})");
     }
 
 
     // The search of the list is in the address: a change of it (the form, the back button, a link) loads the list again
-    protected override object? ActivationKey => new ResourceListKey(Session, ResourceType, Query, ClinicalSummary);
+    protected override object? ActivationKey => new ResourceListKey(Session, ResourceType, Query);
 
     // The filter button is there when the type has a search form
     private EventCallback FilterCallback => State.CanFilter ? EventCallback.Factory.Create(this, State.OpenFilterAsync) : default;
@@ -113,7 +110,7 @@
     {
         return row.Kind switch
         {
-            ListRowKind.Card => @<Tile Model=@(row.Tile!) ResourceType=@row.Item!.ResourceType OnClick=@(() => Open(row.Item!))/>,
+            ListRowKind.Card => @<Tile Model=@(row.Tile!) ResourceType=@row.Item!.ResourceType Href=@HrefOf(row.Item!) OnClick=@(() => Open(row.Item!))/>,
             ListRowKind.Empty => @<div class="fx-summary-note">@FloxStrings.List_NoData</div>,
             _ => @<div class="fx-summary-note">
                      <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_More
@@ -124,9 +121,19 @@
 
     private void Open(ResourceSummary row)
     {
-        Session.Navigate(ClinicalSummary
-                             ? new ViewerRoute(ViewerPage.ClinicalSummary, "Patient", row.Id)
-                             : new ViewerRoute(ViewerPage.Resource, row.ResourceType, row.Id));
+        Session.Navigate(new ViewerRoute(ViewerPage.Resource, row.ResourceType, row.Id));
     }
+
+    // The address Open goes to: the row is a link to it
+    private string? HrefOf(ResourceSummary row)
+    {
+        var route = new ViewerRoute(ViewerPage.Resource, row.ResourceType, row.Id);
+        return ViewerRoutes.IsSafe(route.Location) ? Session.HrefOf(route) : null;
+    }
+
+    // The size of the list a reader is told: the total of the server when it is known, unknown while there are more pages, else the rows
+    private int SetSize => State.Page?.Total is { } total ? (int)Math.Min(total, int.MaxValue)
+        : State.Rows.Any(row => row.Kind == ListRowKind.More) ? -1
+        : State.Rows.Count(row => row.Kind == ListRowKind.Card);
 
 }

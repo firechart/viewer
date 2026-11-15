@@ -1,0 +1,78 @@
+@* A link to the place of a record in the Viewer that a plain click opens in the page (a sheet, the page of the record) through OnClick; Ctrl, Cmd or Shift
+   with the click, the middle button and the menu of the link open the address in another tab or window *@
+@inject IJSRuntime JS
+
+<a class=@Class href=@Href title=@Title @onclick=@OnLinkClick @onclick:preventDefault @onclick:stopPropagation=@StopPropagation>@ChildContent</a>
+
+@code {
+
+    /// <summary>The address of the place (<see cref="ViewerSession.HrefOf"/>); required.</summary>
+    /// <example>
+    /// <code>
+    /// &lt;RecordLink Href=@Session.HrefOf(new ViewerRoute(ViewerPage.Resource, "Observation", "o1")) OnClick=@Open&gt;Potassium&lt;/RecordLink&gt;
+    /// </code>
+    /// </example>
+    [Parameter, EditorRequired]
+    public string Href { get; set; } = string.Empty;
+
+    /// <summary>What a plain click does: goes to the same place in the page, the way the Viewer opens it (a sheet, a page).</summary>
+    /// <example>
+    /// <code>
+    /// &lt;RecordLink Href=@href OnClick=@(() =&gt; State.OpenAsync(section, item))&gt;...&lt;/RecordLink&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    /// <summary>The classes of the link.</summary>
+    /// <example>
+    /// <code>
+    /// &lt;RecordLink Class="fx-summary-row" Href=@href&gt;...&lt;/RecordLink&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>The tooltip of the link: the full text of a row that may be cut; never its only name.</summary>
+    /// <example>
+    /// <code>
+    /// &lt;RecordLink Href=@href Title=@tile.Text&gt;...&lt;/RecordLink&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// Whether the click stops at the link, so a click handler of an element around it (the row of a table) does not run too; <see langword="false"/> by
+    /// default.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// &lt;tr @onclick=@Open&gt;&lt;td&gt;&lt;RecordLink Href=@href OnClick=@Open StopPropagation&gt;Potassium&lt;/RecordLink&gt;&lt;/td&gt;&lt;/tr&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public bool StopPropagation { get; set; }
+
+    /// <summary>The content of the link.</summary>
+    /// <example>
+    /// <code>
+    /// &lt;RecordLink Href=@href&gt;&lt;span&gt;Potassium&lt;/span&gt;&lt;/RecordLink&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    // The browser does not follow the link (the click stays in the page); with a modifier the user asked for another tab or window, which it opens
+    private async Task OnLinkClick(MouseEventArgs e)
+    {
+        if (e.CtrlKey || e.MetaKey || e.ShiftKey)
+        {
+            await JS.InvokeVoidAsync("open", Href, "_blank", "noopener");
+            return;
+        }
+
+        await OnClick.InvokeAsync();
+    }
+
+}

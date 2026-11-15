@@ -1,12 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Description>The vendor library of FireChart Viewer: Liquid templates for FHIR resources and datatypes, their translations, the fx-* style kit built on daisyUI, and synthetic samples. Use it as the last layer of FireChart.Viewer.Core.</Description>
+    <Description>The readers of the vendor library of FireChart Viewer: where a template, a locale, a search form, a summary form, the fx-* style kit and the samples are, and how a client and a server read them. The files themselves are not here: they are the package public/library, published by an application as its folder library/.</Description>
     <PackageTags>fhir;hl7;liquid;templates;daisyui;healthcare;viewer</PackageTags>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
@@ -25,6 +24,7 @@
   <ItemGroup>
     <PackageReference Include="Hl7.Fhir.R4" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
 
 </Project>

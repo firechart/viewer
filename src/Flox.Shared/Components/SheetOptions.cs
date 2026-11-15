@@ -7,9 +7,18 @@ namespace Flox.Shared.Components;
 /// </summary>
 public static class SheetOptions
 {
+    /// <summary>
+    /// The default height of a modal sheet and of a bottom sheet.
+    /// </summary>
     public const string DefaultHeight = "calc(100dvh - 6rem)";
+    /// <summary>
+    /// The default width of a modal sheet.
+    /// </summary>
     public const string DefaultModalWidth = "680px";
 
+    /// <summary>
+    /// Options of a centered modal dialog that takes the whole screen on phones.
+    /// </summary>
     public static DialogOptions Modal(string width = DefaultModalWidth, bool showClose = true)
     {
         return new DialogOptions
@@ -23,8 +32,9 @@ public static class SheetOptions
         };
     }
 
-    // An ordinary dialog: the title above, the content in the middle (the body scrolls when it does not fit) and the commands below. It
-    // is as wide as asked and as high as its content, never larger than the screen, so it suits a phone and a desktop alike
+    /// <summary>
+    /// Options of an ordinary dialog: the title above, the content in the middle (the body scrolls when it does not fit) and the commands below. It is as wide as asked and as high as its content, never larger than the screen.
+    /// </summary>
     public static DialogOptions Content(string width = "560px")
     {
         return new DialogOptions
@@ -36,6 +46,9 @@ public static class SheetOptions
         };
     }
 
+    /// <summary>
+    /// Options of a side dialog docked to the bottom edge, which the user can resize.
+    /// </summary>
     public static SideDialogOptions Bottom(string height = DefaultHeight, bool showTitle = true, bool showClose = true)
     {
         return new SideDialogOptions

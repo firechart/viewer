@@ -14,35 +14,63 @@ namespace Flox.Shared.Components;
 /// </summary>
 public class StatelessWidget : ComponentBase, IHandleEvent /* optimizes repaints */
 {
+    /// <summary>
+    /// The JavaScript runtime.
+    /// </summary>
     [Inject]
     protected IJSRuntime JS { get; set; } = null!;
 
+    /// <summary>
+    /// The navigation manager of the application.
+    /// </summary>
     [Inject]
     public NavigationManager NavigationManager { get; set; } = null!;
 
+    /// <summary>
+    /// The dialog service.
+    /// </summary>
     [Inject]
     public DialogService DialogService { get; set; } = null!;
 
+    /// <summary>
+    /// The notification service that shows snack messages.
+    /// </summary>
     [Inject]
     public NotificationService Notifications { get; set; } = null!;
 
+    /// <summary>
+    /// The factory of HTTP clients.
+    /// </summary>
     [Inject]
     protected IHttpClientFactory HttpClientFactory { get; set; } = default!;
 
+    /// <summary>
+    /// The authentication service of the application.
+    /// </summary>
     [Inject]
     public IAuthenticationService AuthenticationService { get; set; } = default!;
 
+    /// <summary>
+    /// The handler that shows exceptions to the user.
+    /// </summary>
     [Inject]
     public IUiExceptionHandler UiErrors { get; set; } = default!;
 
+    /// <summary>
+    /// The logger of the widget.
+    /// </summary>
     [Inject]
     protected ILogger<StatelessWidget> Logger { get; set; } = default!;
 
+    /// <summary>
+    /// The breadcrumbs of the page; built by <see cref="InitBreadcrumbs"/> when the parent passes none.
+    /// </summary>
     [Parameter]
 #pragma warning disable CA2227
     public FloxMenuItemList Breadcrumbs { get; set; } = [];
 #pragma warning restore CA2227
 
+    /// <inheritdoc />
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -52,7 +80,9 @@ public class StatelessWidget : ComponentBase, IHandleEvent /* optimizes repaints
         }
     }
 
-    // A page reused for other route values (a link to another item) makes its crumbs again
+    /// <summary>
+    /// Makes the breadcrumbs again: a page reused for other route values (a link to another item) needs new crumbs.
+    /// </summary>
     protected void RebuildBreadcrumbs()
     {
         Breadcrumbs.Clear();

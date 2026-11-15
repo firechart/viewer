@@ -24,7 +24,6 @@ From the folder of `FireChart.Viewer.slnx`: `dotnet run --project src/FireChart.
   "smart": { "clientId": "viewer", "scopes": "launch/patient patient/*.rs openid fhirUser", "flow": "redirect" },
   "locale": "auto",
   "terminology": { "server": "https://tx.fhir.org/r4" },
-  "clinicalSummary": { "form": "default" },
   "appearance": { "theme": "auto", "variables": { "colorPrimary": "#0a7f5a" } }
 }
 ```
@@ -50,6 +49,21 @@ docker run -d --name fhir-viewer -p 8080:8080 \
 `viewer.json` is the configuration (read at every load of the page), `host.json` the origins that may drive the frame (below); without them
 the image has the files of the sources: the open SMART Health IT server, `'self'` only. `/` is the sandbox, `/embed` the frame.
 
+**Your own templates, forms and style.** The vendor library is the folder `/usr/share/nginx/html/library` of the image (the package
+`public/library` with its manifest `firechart.project.json`, which says its version). A project of the FireChart FHIR Designer mounted at
+`/usr/share/nginx/appearance` goes over it: a file the project has wins, the others stay the vendor's and follow the updates of the image.
+The project holds only the files it changes (in the same folders: `templates/resources/Patient@tile.liquid`, `summary-forms/Patient.json`,
+`styles/...`) and its own `firechart.project.json`.
+
+```bash
+docker run -d --name fhir-viewer -p 8080:8080 \
+  -v "$PWD/my-appearance:/usr/share/nginx/appearance:ro" \
+  firechart-viewer:local
+```
+
+Every file is revalidated (`no-cache`), so a changed file shows at the next load of the page without a restart. Nothing checks the project in the
+container: check it in the designer (FireChart: Check Project) before you mount it.
+
 **HTTPS** comes from the reverse proxy in front of the container (nginx, Caddy, Traefik, an ingress): SMART and the browser need it. So do
 the headers the image does not send: CSP `frame-ancestors` (who may frame the Viewer; without it any page may), `Cache-Control`. The image sends
 one itself: `/sdk/` has `Access-Control-Allow-Origin: *` and `Cache-Control: no-cache`, as pages of other origins import the SDK. A CDN in front
@@ -69,8 +83,8 @@ uses the same messages. The frame is opened as `embed?host=parent`, says `hello`
 |---|---|---|---|
 | `init` | `{ config }` | `hello` | (loaded, waits for `init`; again after the way back of a SMART redirect) |
 | `restart` | `{ config }` | `ready` | `{ location, server }` |
-| `update` | `{ config }`: `locale`, `appearance`, `terminology`, `clinicalSummary` only | `updated` | `{ applied }` |
-| `navigate` | `{ location, replace? }` (`summary/123`) | `navigate` | `{ location, source: "user" \| "host" }` |
+| `update` | `{ config }`: `locale`, `appearance`, `terminology` only | `updated` | `{ applied }` |
+| `navigate` | `{ location, replace? }` (`summary/Patient/123`) | `navigate` | `{ location, source: "user" \| "host" }` |
 | | | `restarting`, `resize` | `resize`: `{ height }` of the content |
 | | | `error` | `{ type, code, param, message }` |
 | | | `result` | `{ ok, value }` or `{ ok: false, error, errors }`, for a request with an `id` |
@@ -94,7 +108,7 @@ stops the build with an error). Measured on 2026-11-09 (.NET 10, nginx on the sa
 | A publish | about 2 minutes | about 24 minutes |
 
 - **The time goes to the FHIR server.** Without AOT the runtime starts and draws the first page in about 1 s (from the cache as from the network
-  of the machine). The list of Observations then waits 3.1 s for the server and needs 0.3 s after its last answer; the Clinical Summary waits
+  of the machine). The list of Observations then waits 3.1 s for the server and needs 0.3 s after its last answer; the Patient Summary waits
   3.5 s and needs 2.2 s after it (that part is worth profiling, not compiling; see below).
 - **AOT costs on every first visit**: 13 MB more to download, 1–2 s more on a link of 50–100 Mbit/s, which is more than it could win.
 - **It defeats the lazy loading** of the SDKs of the other FHIR releases (STU3, R4B, R5, R6): their code is compiled into `dotnet.native.wasm`,
@@ -105,7 +119,7 @@ stops the build with an error). Measured on 2026-11-09 (.NET 10, nginx on the sa
 on the desktop and 16–70 ms in the browser, and three quarters of it was the garbage collector. Fixed: a row is parsed by AngleSharp once
 (the sanitized HTML and its text in one walk, the parser kept per thread), a single value no longer asks the FHIR model again whether it is
 a collection, and a resource is read from its JSON once (the pool of a page, its rows and the blocks of a summary share it). A row now costs
-0.85 ms on the desktop; in the browser the main thread of the Clinical Summary is busy about a third less (2.4 s instead of 2.9 s with
+0.85 ms on the desktop; in the browser the main thread of the Patient Summary is busy about a third less (2.4 s instead of 2.9 s with
 the 1 s of the start), the list of Observations 17 % less. What remains: Fluid itself and AngleSharp's document per fragment.
 
 ## License

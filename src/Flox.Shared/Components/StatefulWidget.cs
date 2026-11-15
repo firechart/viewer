@@ -1,15 +1,22 @@
 namespace Flox.Shared.Components;
 
+/// <summary>
+/// A component that shows a <typeparamref name="TState"/>: it takes the state from the service provider, keeps itself rendered when the state changes and activates the state with the key of what it shows.
+/// </summary>
 public abstract partial class StatefulWidget<TState> : StatelessWidget, IDisposable where TState : State
 {
     private bool _activated;
     private object? _activatedKey;
 
-    // The state is resolved in SetParametersAsync, not injected: a failure of its constructor (a missing service)
-    // in the injection happens while the parent renders, where no error boundary reaches it
+    /// <summary>
+    /// The service provider the state is resolved from.
+    /// </summary>
     [Inject]
     protected IServiceProvider StateServices { get; set; } = null!;
 
+    /// <summary>
+    /// The state the widget shows.
+    /// </summary>
     public TState State
     {
         get;
@@ -25,6 +32,7 @@ public abstract partial class StatefulWidget<TState> : StatelessWidget, IDisposa
         }
     } = null!;
 
+    /// <inheritdoc />
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         // Async on purpose: a failure here becomes a faulted task, which the error boundary handles
@@ -32,10 +40,14 @@ public abstract partial class StatefulWidget<TState> : StatelessWidget, IDisposa
         await base.SetParametersAsync(parameters);
     }
 
-    // The scroll position of the state: give it to a scrolling component (a list), which keeps it while the user scrolls and restores it when the page returns
+    /// <summary>
+    /// The scroll position of the state: given to a scrolling component, which keeps it while the user scrolls and restores it when the page returns.
+    /// </summary>
     protected ScrollMemory Scroll => State.Scroll;
 
-    // What this widget shows, as a value with equality (a record of the route values); null when there is nothing to tell
+    /// <summary>
+    /// What this widget shows, as a value with equality (a record of the route values); null when there is nothing to tell.
+    /// </summary>
     protected virtual object? ActivationKey
     {
         get
@@ -44,7 +56,7 @@ public abstract partial class StatefulWidget<TState> : StatelessWidget, IDisposa
         }
     }
 
-    // The parameters are set on every render of the parent: the state is activated only when the key is another one
+    /// <inheritdoc />
     protected override async Task OnParametersSetAsync()
     {
         var key = ActivationKey;
@@ -67,9 +79,14 @@ public abstract partial class StatefulWidget<TState> : StatelessWidget, IDisposa
         }
     }
 
-    // True from the start of the activation to the end of OnActivatedAsync (the crumbs of the page are made there): the page shows a skeleton of them, not the old ones
+    /// <summary>
+    /// True from the start of the activation to the end of <see cref="OnActivatedAsync"/> (the crumbs of the page are made there): the page shows a skeleton of them, not the old ones.
+    /// </summary>
     protected bool Starting { get; private set; }
 
+    /// <summary>
+    /// Called after the state was activated for the key; the page builds its breadcrumbs here.
+    /// </summary>
     protected virtual Task OnActivatedAsync()
     {
         return Task.CompletedTask;
@@ -80,12 +97,16 @@ public abstract partial class StatefulWidget<TState> : StatelessWidget, IDisposa
         UiErrors.Fire(() => InvokeAsync(StateHasChanged), nameof(State_OnChanged));
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Releases the resources of the widget; a derived widget overrides it.
+    /// </summary>
     protected virtual void Dispose(bool disposing)
     {
         if (disposing)

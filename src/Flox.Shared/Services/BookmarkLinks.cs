@@ -8,20 +8,24 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Flox.Shared.Services;
 
-// Builds the address of a bookmark in this host from what it holds (its source and location), so a bookmark outlives a change of the routes or a
-// server registered again. Several: the one that handles the bookmark answers; none: the address it was made with
+/// <summary>
+/// Builds the address of a bookmark in this host from what it holds (its source and location), so a bookmark outlives a change of the routes or a
+/// server registered again. When several resolvers exist, the one that handles the bookmark answers; with none, the address the bookmark was made with is used.
+/// </summary>
 public interface IBookmarkLinkResolver
 {
+    /// <summary>Tells whether this resolver builds the address of the bookmark.</summary>
     bool Handles(UserBookmark bookmark);
 
-    // Null: the source of the bookmark is not here (a server that is not registered)
+    /// <summary>Returns the address of the bookmark in this host, or <c>null</c> when its source is not here (a server that is not registered).</summary>
     Task<string?> HrefOfAsync(UserBookmark bookmark, CancellationToken cancellationToken = default);
 }
 
+/// <summary>Finds the address of a bookmark in this host and opens it.</summary>
 [FloxService(typeof(BookmarkLinks), ServiceLifetime.Scoped)]
 public sealed class BookmarkLinks(IEnumerable<IBookmarkLinkResolver> resolvers)
 {
-    // Null: the bookmark cannot be opened here (its source is missing); the address it was made with would lead elsewhere
+    /// <summary>Returns the address of the bookmark, or <c>null</c> when it cannot be opened here because its source is missing; the address it was made with would lead elsewhere.</summary>
     public async Task<string?> HrefOfAsync(UserBookmark bookmark, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(bookmark);
@@ -33,7 +37,7 @@ public sealed class BookmarkLinks(IEnumerable<IBookmarkLinkResolver> resolvers)
         return string.IsNullOrEmpty(bookmark.SourceAddress) ? bookmark.Url : null;
     }
 
-    // Opens the bookmark, or tells the user that its source is not here
+    /// <summary>Opens the bookmark, or tells the user that its source is not here.</summary>
     public async Task OpenAsync(UserBookmark bookmark, NavigationManager navigation, NotificationService notifications, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(navigation);

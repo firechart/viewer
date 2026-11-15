@@ -158,7 +158,7 @@ public sealed class ResourceTiles(ITemplateRenderers renderers, IReleaseModels m
         var missed = await RenderAllAsync(items, renderer, model, pool, context, result);
         if (renderer is not null && server is not null && references is not null && pool.Misses.Count > 0)
         {
-            var fetched = await references.FetchAsync(server, [.. pool.Misses], cancellationToken);
+            var fetched = await references.FetchAsync(server, [.. pool.Misses], cancellationToken: cancellationToken);
             if (fetched.Found.Count > 0 || fetched.Missing.Count > 0)
             {
                 pool.AddAll(fetched.Found.Select(resource => new PoolEntry(resource.Json, resource.FullUrl)), model);

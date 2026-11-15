@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <Description>Renders FHIR resources to HTML with Liquid (Fluid) templates on the client: layered templates, translations of their texts, a safety net for what the templates do not show, an HTML sanitizer. Part of FireChart Viewer.</Description>
     <PackageTags>fhir;hl7;liquid;fluid;rendering;healthcare;viewer</PackageTags>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

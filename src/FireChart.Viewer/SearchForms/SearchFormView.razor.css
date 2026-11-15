@@ -11,7 +11,7 @@
     min-height: 0;
     overflow-y: auto;
     /* The fields keep away from the scrollbar */
-    padding-right: 1rem;
+    padding-inline-end: 1rem;
     padding-bottom: 0.5rem;
 }
 
@@ -22,5 +22,5 @@
 
 /* Reset stands at the left, Cancel and OK at the right */
 .form-footer ::deep .form-reset {
-    margin-right: auto;
+    margin-inline-end: auto;
 }

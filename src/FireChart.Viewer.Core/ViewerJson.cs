@@ -1,5 +1,7 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Schema;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using FireChart.Viewer.Core.Forms;
@@ -38,7 +40,7 @@ public static class ViewerJson
     /// <summary>
     /// Reads a file of the Viewer.
     /// </summary>
-    /// <typeparam name="T">The model: <see cref="SearchFormDefinition"/> or <see cref="ClinicalSummaryFormDefinition"/>.</typeparam>
+    /// <typeparam name="T">The model: <see cref="SearchFormDefinition"/> or <see cref="SummaryFormDefinition"/>.</typeparam>
     /// <param name="json">The text of the file.</param>
     /// <returns>The model.</returns>
     /// <exception cref="JsonException">The text is not JSON, or breaks a rule of reading (an unknown property, a forbidden <see langword="null"/>, a missing
@@ -51,12 +53,43 @@ public static class ViewerJson
     /// <summary>
     /// Writes a file of the Viewer in the canonical form.
     /// </summary>
-    /// <typeparam name="T">The model: <see cref="SearchFormDefinition"/> or <see cref="ClinicalSummaryFormDefinition"/>.</typeparam>
+    /// <typeparam name="T">The model: <see cref="SearchFormDefinition"/> or <see cref="SummaryFormDefinition"/>.</typeparam>
     /// <param name="value">The model.</param>
     /// <returns>The text of the file, with a final line end.</returns>
     public static string Write<T>(T value)
     {
         return JsonSerializer.Serialize(value, Options) + "\n";
+    }
+
+    /// <summary>
+    /// The JSON Schema of a file of the Viewer, made from the model: the strict rules of authoring (no other property, the values of the enumerations,
+    /// the required properties), for the editors and the checks; the run time reads laxly (<see cref="Forms.SearchFormReader"/>).
+    /// </summary>
+    /// <typeparam name="T">The model: <see cref="SearchFormDefinition"/> or <see cref="SummaryFormDefinition"/>.</typeparam>
+    /// <param name="id">The <c>$id</c> of the schema.</param>
+    /// <param name="title">Its title.</param>
+    /// <returns>The schema (draft 2020-12), with a final line end.</returns>
+    /// <example>
+    /// <code>
+    /// File.WriteAllText("schemas/search-form.schema.json", ViewerJson.SchemaOf&lt;SearchFormDefinition&gt;("https://firechart.org/schemas/search-form.schema.json", "Search form"));
+    /// </code>
+    /// </example>
+    public static string SchemaOf<T>(string id, string title)
+    {
+        var schema = JsonSchemaExporter.GetJsonSchemaAsNode(Options, typeof(T), new JsonSchemaExporterOptions { TreatNullObliviousAsNonNullable = true });
+        var root = new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["$id"] = id,
+            ["title"] = title
+        };
+        foreach (var (name, value) in schema.AsObject().ToList())
+        {
+            schema.AsObject().Remove(name);
+            root[name] = value;
+        }
+
+        return root.ToJsonString(Options) + "\n";
     }
 
     private static JsonSerializerOptions Create()
@@ -83,6 +116,6 @@ public static class ViewerJson
     RespectNullableAnnotations = true,
     RespectRequiredConstructorParameters = true)]
 [JsonSerializable(typeof(SearchFormDefinition))]
-[JsonSerializable(typeof(ClinicalSummaryFormDefinition))]
+[JsonSerializable(typeof(SummaryFormDefinition))]
 [JsonSerializable(typeof(TilesOptions))]
 internal sealed partial class ViewerJsonContext : JsonSerializerContext;

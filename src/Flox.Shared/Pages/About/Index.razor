@@ -1,28 +1,21 @@
 @attribute [Route("/about")]
 
 @inherits StatefulWidget<AboutState>
+@inject IEnumerable<IAboutSection> Sections
 
 <AppBarTitle>@Strings.About</AppBarTitle>
 
+@* One page for the application that runs: its header and license, the sections of the modules (the license of the server), the third-party
+   components it carries (its own licenses.json) *@
 <BusyOverlay Busy=@State.IsBusy Concealed=@State.Activating>
-
-<RadzenTabs class="rz-mt-2">
-    <Tabs>
-        @if (State.AppBranding != null)
-        {
-            <RadzenTabsItem Text=@Strings.Caption_AboutThisApp>
-                <ModuleInfoWidget Branding=@State.AppBranding/>
-            </RadzenTabsItem>
-        }
-
-        @if (State.PlatformBranding != null)
-        {
-            <RadzenTabsItem Text=@Strings.Caption_AboutPlatform>
-                <ModuleInfoWidget Branding=@State.PlatformBranding/>
-            </RadzenTabsItem>
-        }
-    </Tabs>
-</RadzenTabs>
+    @if (State.Branding != null)
+    {
+        <ModuleInfoWidget Branding=@State.Branding>
+            @foreach (var section in Sections)
+            {
+                <DynamicComponent Type=@section.Component/>
+            }
+            <UsedComponentsWidget/>
+        </ModuleInfoWidget>
+    }
 </BusyOverlay>
-
-

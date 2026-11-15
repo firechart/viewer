@@ -6,7 +6,7 @@ using Resource = Hl7.Fhir.Model.Resource;
 
 namespace FireChart.Viewer.Tests.Rendering;
 
-// The check of the template library (src/FireChart.Viewer.Library/wwwroot), the static files a client reads one by one
+// The check of the vendor library (public/library, a package of the designer), the static files a client reads one by one
 public partial class TemplatePackageTests
 {
     private static readonly string s_package = FindPackage();
@@ -19,13 +19,13 @@ public partial class TemplatePackageTests
             directory = directory.Parent;
         }
 
-        return Path.Combine(directory?.FullName ?? throw new InvalidOperationException("The solution folder is not found"), "src", "FireChart.Viewer.Library");
+        return Path.Combine(directory?.FullName ?? throw new InvalidOperationException("The solution folder is not found"), "library");
     }
 
     private static Dictionary<string, string> Files()
     {
         var result = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (var path in Directory.EnumerateFiles(Path.Combine(s_package, VendorLibrary.WebRoot, VendorLibrary.TemplatesFolder), "*.liquid", System.IO.SearchOption.AllDirectories))
+        foreach (var path in Directory.EnumerateFiles(Path.Combine(s_package, VendorLibrary.TemplatesFolder), "*.liquid", System.IO.SearchOption.AllDirectories))
         {
             var key = Path.GetFileNameWithoutExtension(path);
             Assert.That(result.ContainsKey(key), Is.False, $"The key {key} is in two files");
@@ -54,7 +54,7 @@ public partial class TemplatePackageTests
     [Test]
     public async System.Threading.Tasks.Task EverySample_RendersThroughTheLibrary()
     {
-        var samples = Directory.EnumerateFiles(Path.Combine(s_package, VendorLibrary.WebRoot, TemplateSamples.Folder), "*.json").ToList();
+        var samples = Directory.EnumerateFiles(Path.Combine(s_package, TemplateSamples.Folder), "*.json").ToList();
         var problems = new List<string>();
         var renderer = new FhirRenderer([new MemoryTemplateSource(Files())], problems.Add);
 
@@ -69,10 +69,26 @@ public partial class TemplatePackageTests
         Assert.That(problems, Is.Empty);
     }
 
+    // The designer opens the library as a project, and the build of an application writes the version of the release into its manifest
+    [Test]
+    public void TheLibrary_IsAProjectOfTheDesigner_WithOnlyTheFoldersOfTheViewer()
+    {
+        using var manifest = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(s_package, "firechart.project.json")));
+        var folders = Directory.EnumerateDirectories(s_package).Select(Path.GetFileName).Order(StringComparer.Ordinal).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(manifest.RootElement.GetProperty("name").GetString(), Is.EqualTo("firechart-vendor"));
+            Assert.That(manifest.RootElement.GetProperty("version").GetString(), Is.EqualTo("0.0.0-dev"), "the placeholder the build replaces");
+            Assert.That(manifest.RootElement.GetProperty("engine").GetInt32(), Is.EqualTo(1));
+            Assert.That(folders, Is.EqualTo(new[] { "locales", "samples", "schemas", "search-forms", "styles", "summary-forms", "templates" }), "the AssetFolders and VendorFolders of the designer (project.ts)");
+        });
+    }
+
     [Test]
     public void EveryTemplate_IsWhereAClientLooksForIt()
     {
-        var root = Path.Combine(s_package, VendorLibrary.WebRoot);
+        var root = s_package;
         var misplaced = Directory.EnumerateFiles(Path.Combine(root, VendorLibrary.TemplatesFolder), "*.liquid", System.IO.SearchOption.AllDirectories)
                                  .Select(file => Path.GetRelativePath(root, file).Replace('\\', '/'))
                                  .Where(path => VendorLibrary.TemplatePathOf(Path.GetFileNameWithoutExtension(path)) != path)
@@ -94,7 +110,7 @@ public partial class TemplatePackageTests
         Assert.Multiple(() =>
         {
             Assert.That(onDemand.Html, Is.EqualTo(whole.Html));
-            Assert.That(assets.Read, Does.Contain("_content/FireChart.Viewer.Library/templates/resources/StructureDefinition@tile.liquid").And.Contain("_content/FireChart.Viewer.Library/templates/partials/status-badge.liquid"));
+            Assert.That(assets.Read, Does.Contain("library/templates/resources/StructureDefinition@tile.liquid").And.Contain("library/templates/partials/status-badge.liquid"));
             Assert.That(assets.Read.Count(path => path.Contains("/templates/", StringComparison.Ordinal)), Is.LessThan(20), "only what the row needs");
         });
     }

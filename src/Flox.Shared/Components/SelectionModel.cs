@@ -1,20 +1,34 @@
 namespace Flox.Shared.Components;
 
+/// <summary>
+/// The selected rows of a list, kept by key so that the selection survives a reload, and the row the user acted on last.
+/// </summary>
 public sealed class SelectionModel<TKey, TEntity> where TKey : notnull where TEntity : class
 {
     private readonly Func<TEntity, TKey> _keyOf;
     private readonly Dictionary<TKey, TEntity> _selected = [];
 
+    /// <summary>
+    /// Creates a selection that identifies rows by the key the function returns.
+    /// </summary>
     public SelectionModel(Func<TEntity, TKey> keyOf)
     {
         _keyOf = keyOf;
     }
 
+    /// <summary>
+    /// Raised when the selection or the current row changed.
+    /// </summary>
     public event EventHandler? Changed;
 
-    // The row the user acted on last (a tap, the context menu); not the same as the selected rows
+    /// <summary>
+    /// The row the user acted on last (a tap, the context menu); not the same as the selected rows.
+    /// </summary>
     public TEntity? Current { get; private set; }
 
+    /// <summary>
+    /// The number of selected rows.
+    /// </summary>
     public int Count
     {
         get
@@ -23,6 +37,9 @@ public sealed class SelectionModel<TKey, TEntity> where TKey : notnull where TEn
         }
     }
 
+    /// <summary>
+    /// Whether any row is selected.
+    /// </summary>
     public bool Any
     {
         get
@@ -31,6 +48,9 @@ public sealed class SelectionModel<TKey, TEntity> where TKey : notnull where TEn
         }
     }
 
+    /// <summary>
+    /// The selected rows.
+    /// </summary>
     public IReadOnlyCollection<TEntity> Items
     {
         get
@@ -39,11 +59,17 @@ public sealed class SelectionModel<TKey, TEntity> where TKey : notnull where TEn
         }
     }
 
+    /// <summary>
+    /// Tells whether the row is selected.
+    /// </summary>
     public bool IsSelected(TEntity item)
     {
         return _selected.ContainsKey(_keyOf(item));
     }
 
+    /// <summary>
+    /// Makes the row the current one.
+    /// </summary>
     public void SetCurrent(TEntity? item)
     {
         if (!ReferenceEquals(Current, item))
@@ -53,6 +79,9 @@ public sealed class SelectionModel<TKey, TEntity> where TKey : notnull where TEn
         }
     }
 
+    /// <summary>
+    /// Selects the row.
+    /// </summary>
     public void Select(TEntity item)
     {
         if (_selected.TryGetValue(_keyOf(item), out var existing) && ReferenceEquals(existing, item))
@@ -64,6 +93,9 @@ public sealed class SelectionModel<TKey, TEntity> where TKey : notnull where TEn
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <summary>
+    /// Deselects the row.
+    /// </summary>
     public void Deselect(TEntity item)
     {
         if (_selected.Remove(_keyOf(item)))
@@ -72,6 +104,9 @@ public sealed class SelectionModel<TKey, TEntity> where TKey : notnull where TEn
         }
     }
 
+    /// <summary>
+    /// Selects the row if it is not selected, otherwise deselects it.
+    /// </summary>
     public void Toggle(TEntity item)
     {
         if (IsSelected(item))
@@ -84,7 +119,9 @@ public sealed class SelectionModel<TKey, TEntity> where TKey : notnull where TEn
         }
     }
 
-    // Replaces the selected rows with the freshly loaded ones of the same key, so a command acts on current data
+    /// <summary>
+    /// Replaces the selected rows with the freshly loaded ones of the same key, so a command acts on current data.
+    /// </summary>
     public void Refresh(IEnumerable<TEntity> loaded)
     {
         var changed = false;
@@ -109,12 +146,17 @@ public sealed class SelectionModel<TKey, TEntity> where TKey : notnull where TEn
         }
     }
 
-    // What a command invoked on a row acts on: the whole selection when the row belongs to it, otherwise the row alone
+    /// <summary>
+    /// The rows a command invoked on a row acts on: the whole selection when the row belongs to it, otherwise the row alone.
+    /// </summary>
     public IReadOnlyList<TEntity> Targets(TEntity row)
     {
         return IsSelected(row) ? [.. _selected.Values] : [row];
     }
 
+    /// <summary>
+    /// Deselects all rows and clears the current row.
+    /// </summary>
     public void Clear()
     {
         if (_selected.Count == 0 && Current == null)

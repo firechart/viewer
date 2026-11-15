@@ -115,18 +115,21 @@ public class ViewerFormResolverTests
     }
 
     [Test]
-    public async Task TheVendorSummaryProvider_HasTheDefaultForm_AndNoOtherCode()
+    public async Task ATypeHasASummary_WhenTheLibraryHasTheFormOfItsName()
     {
-        using var resolver = new ViewerFormResolver<SummaryFormKey, ClinicalSummaryFormDefinition>([new VendorSummaryFormProvider(TestLibrary.Assets)], (_, _) => Task.FromResult(TestLibrary.SummaryDefault));
+        using var forms = new ViewerSummaryForms([], TestLibrary.Assets, Microsoft.Extensions.Logging.Abstractions.NullLogger<ViewerSummaryForms>.Instance);
 
-        var found = await resolver.ResolveAsync(new SummaryFormKey(ClinicalSummaryFormDefinition.DefaultCode), CancellationToken.None);
-        var missing = await resolver.ResolveAsync(new SummaryFormKey("no-such-form"), CancellationToken.None);
+        var patient = await forms.FindAsync("Patient");
+        var encounter = await forms.FindAsync("Encounter");
+        var observation = await forms.FindAsync("Observation");
+        var lowerCase = await forms.FindAsync("patient");
 
         Assert.Multiple(() =>
         {
-            Assert.That(found.Source, Is.EqualTo(FormSource.Vendor));
-            Assert.That(missing.Source, Is.EqualTo(FormSource.Fallback));
-            Assert.That(missing.Definition.Code, Is.EqualTo(ClinicalSummaryFormDefinition.DefaultCode));
+            Assert.That(patient?.Context, Is.EqualTo("Patient"));
+            Assert.That(encounter?.Context, Is.EqualTo("Encounter"));
+            Assert.That(observation, Is.Null, "no form: no summary");
+            Assert.That(lowerCase, Is.Null, "a file is named by its type");
         });
     }
 }

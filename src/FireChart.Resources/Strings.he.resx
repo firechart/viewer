@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Caption_FhirServers" xml:space="preserve">
+    <value>שרתי FHIR</value>
+  </data>
+  <data name="Caption_Resources" xml:space="preserve">
+    <value>משאבים</value>
+  </data>
+  <data name="Caption_AllPackages" xml:space="preserve">
+    <value>כל החבילות</value>
+  </data>
+  <data name="Caption_FhirPackage" xml:space="preserve">
+    <value>חבילת FHIR</value>
+  </data>
+  <data name="Caption_CodeSystems" xml:space="preserve">
+    <value>מערכות קודים</value>
+  </data>
+  <data name="Caption_AllFhirServers" xml:space="preserve">
+    <value>כל שרתי FHIR</value>
+  </data>
+  <data name="Caption_FhirCorePackages" xml:space="preserve">
+    <value>חבילות הליבה של FHIR</value>
+  </data>
+  <data name="Caption_FhirSettings" xml:space="preserve">
+    <value>הגדרות FHIR</value>
+  </data>
+  <data name="Caption_DefaultFhirVersion" xml:space="preserve">
+    <value>גרסת FHIR ברירת מחדל</value>
+  </data>
+  <data name="Caption_FhirServer" xml:space="preserve">
+    <value>שרת FHIR</value>
+  </data>
+  <data name="Caption_FhirRelease" xml:space="preserve">
+    <value>גרסת FHIR</value>
+  </data>
+  <data name="Caption_FhirServerName" xml:space="preserve">
+    <value>שם</value>
+  </data>
+  <data name="Caption_FhirServerBaseUrl" xml:space="preserve">
+    <value>כתובת בסיס</value>
+  </data>
+  <data name="Caption_FhirServerAuthentication" xml:space="preserve">
+    <value>אימות</value>
+  </data>
+  <data name="Caption_FhirServerNoAuthentication" xml:space="preserve">
+    <value>ללא אימות</value>
+  </data>
+  <data name="Caption_FhirServerCredentialsAsked" xml:space="preserve">
+    <value>פרטי ההתחברות אינם נשמרים עם השרת: הם נדרשים בעת ההתחברות.</value>
+  </data>
+  <data name="Caption_FhirServerToken" xml:space="preserve">
+    <value>אסימון API</value>
+  </data>
+  <data name="Caption_FhirServerAuthority" xml:space="preserve">
+    <value>רשות (מנפיק OIDC, אופציונלי)</value>
+  </data>
+  <data name="Caption_FhirServerOAuth2Scope" xml:space="preserve">
+    <value>היקף OAuth2</value>
+  </data>
+  <data name="Caption_FhirServerOAuth2ExtraParameters" xml:space="preserve">
+    <value>פרמטרים נוספים של OAuth2 (key=value&amp;key=value)</value>
+  </data>
+  <data name="Caption_FhirServerTimeout" xml:space="preserve">
+    <value>זמן קצוב, בשניות</value>
+  </data>
+  <data name="Caption_SearchRefused" xml:space="preserve">
+    <value>השרת דחה את החיפוש</value>
+  </data>
+  <data name="Caption_SearchServerError" xml:space="preserve">
+    <value>השרת לא הצליח לבצע את החיפוש</value>
+  </data>
+  <data name="Caption_SearchTimedOut" xml:space="preserve">
+    <value>לא התקבלה תשובה בתוך {0} שניות</value>
+  </data>
+  <data name="Caption_SearchUnreadable" xml:space="preserve">
+    <value>לא ניתן לקרוא את תשובת השרת</value>
+  </data>
+  <data name="Caption_SectionFailed" xml:space="preserve">
+    <value>חיפוש של מקטע זה נכשל</value>
+  </data>
+  <data name="Caption_FhirServerRelease" xml:space="preserve">
+    <value>גרסת FHIR (אם /metadata אינו זמין)</value>
+  </data>
+  <data name="Caption_FhirServerTerminologyUrl" xml:space="preserve">
+    <value>כתובת שרת טרמינולוגיה (אופציונלי)</value>
+  </data>
+  <data name="Message_FhirServerUnavailable" xml:space="preserve">
+    <value>השרת לא השיב. ייתכן שאינו זמין, או שאינו מתיר בקשות מדפדפן (CORS).</value>
+  </data>
+  <data name="Message_FhirServerAuthenticationNotSupported" xml:space="preserve">
+    <value>התחברות לשרתים עם סוג אימות זה אינה נתמכת עדיין.</value>
+  </data>
+  <data name="Caption_PatientSummary" xml:space="preserve">
+    <value>סיכום מטופל</value>
+  </data>
+  <data name="Message_InvalidSearch" xml:space="preserve">
+    <value>החיפוש בכתובת אינו תקין.</value>
+  </data>
+  <data name="Placeholder_SearchAllFields" xml:space="preserve">
+    <value>חיפוש בכל השדות</value>
+  </data>
+  <data name="Caption_ShowAllFields" xml:space="preserve">
+    <value>הצג את כל השדות</value>
+  </data>
+  <data name="Caption_ShowFormFields" xml:space="preserve">
+    <value>רק שדות הטופס</value>
+  </data>
+  <data name="Message_SearchFormGenerated" xml:space="preserve">
+    <value>טופס זה נוצר אוטומטית מפרמטרי החיפוש של המשאב, ולכן אינו נוח במיוחד. ייתכן שהשרת אינו תומך בחלק מהפרמטרים.</value>
+  </data>
+  <data name="Message_CredentialsRejected" xml:space="preserve">
+    <value>השרת לא קיבל את פרטי ההתחברות האלה.</value>
+  </data>
+  <data name="Caption_FhirServerOAuth2ClientId" xml:space="preserve">
+    <value>מזהה לקוח OAuth2</value>
+  </data>
+  <data name="Caption_FhirServerLiteEdition" xml:space="preserve">
+    <value>מהדורה זו תומכת רק בשרתי FHIR ציבוריים שאינם דורשים אימות.</value>
+  </data>
+  <data name="Caption_FhirServerPublic" xml:space="preserve">
+    <value>שרתים ציבוריים</value>
+  </data>
+  <data name="Message_FhirServerSignInAsked" xml:space="preserve">
+    <value>שרת זה מבקש שתתחבר. תועבר לדף ההתחברות שלו ותחזור לכאן.</value>
+  </data>
+  <data name="Message_SmartDiscoveryFailed" xml:space="preserve">
+    <value>השרת אינו מציין היכן להתחבר (אין תצורת SMART).</value>
+  </data>
+  <data name="Message_SmartPkceNotSupported" xml:space="preserve">
+    <value>שרת ההתחברות אינו תומך ב-PKCE עם S256, הנדרש.</value>
+  </data>
+  <data name="Message_SmartStateMismatch" xml:space="preserve">
+    <value>תשובת שרת ההתחברות אינה תואמת את הבקשה. התחל את ההתחברות מחדש.</value>
+  </data>
+  <data name="Message_SmartAuthorizationDenied" xml:space="preserve">
+    <value>ההתחברות בוטלה או שהשרת לא אישר אותה.</value>
+  </data>
+  <data name="Message_SmartTokenExchangeFailed" xml:space="preserve">
+    <value>השרת לא סיפק אסימון גישה.</value>
+  </data>
+  <data name="Message_SmartUnknownIss" xml:space="preserve">
+    <value>שרת זה אינו ברשימת השרתים שהארגון מתיר להפעיל מבחוץ.</value>
+  </data>
+  <data name="Message_SmartClientNotConfigured" xml:space="preserve">
+    <value>מזהה הלקוח או ההיקף לא הוגדרו עבור שרת זה.</value>
+  </data>
+  <data name="Caption_Packages" xml:space="preserve">
+    <value>חבילות</value>
+  </data>
+  <data name="Caption_Publisher" xml:space="preserve">
+    <value>מפרסם</value>
+  </data>
+  <data name="Caption_Kind" xml:space="preserve">
+    <value>סוג</value>
+  </data>
+  <data name="Conformance_ResourceProperties" xml:space="preserve">
+    <value>מאפייני המשאב</value>
+  </data>
+  <data name="Conformance_Content" xml:space="preserve">
+    <value>תוכן</value>
+  </data>
+  <data name="Conformance_Concepts" xml:space="preserve">
+    <value>מושגים</value>
+  </data>
+  <data name="Conformance_Derivation" xml:space="preserve">
+    <value>גזירה</value>
+  </data>
+  <data name="Conformance_Abstract" xml:space="preserve">
+    <value>מופשט</value>
+  </data>
+  <data name="Conformance_BaseDefinition" xml:space="preserve">
+    <value>הגדרת בסיס</value>
+  </data>
+  <data name="Conformance_ElementTypes" xml:space="preserve">
+    <value>סוגי רכיבים</value>
+  </data>
+  <data name="Conformance_Profiles" xml:space="preserve">
+    <value>פרופילים</value>
+  </data>
+  <data name="Conformance_Bindings" xml:space="preserve">
+    <value>קשירות לקבוצות ערכים</value>
+  </data>
+  <data name="Conformance_References" xml:space="preserve">
+    <value>הפניות</value>
+  </data>
+  <data name="Conformance_PackageProperties" xml:space="preserve">
+    <value>מאפייני החבילה</value>
+  </data>
+  <data name="Conformance_Canonical" xml:space="preserve">
+    <value>כתובת קנונית</value>
+  </data>
+  <data name="Conformance_ArtifactCount" xml:space="preserve">
+    <value>רכיבים</value>
+  </data>
+  <data name="Conformance_Dependencies" xml:space="preserve">
+    <value>תלויות</value>
+  </data>
+  <data name="Conformance_NotIndexed" xml:space="preserve">
+    <value>לא אונדקס</value>
+  </data>
+  <data name="Conformance_PackageContent" xml:space="preserve">
+    <value>תוכן החבילה</value>
+  </data>
+  <data name="Conformance_PackageNotFound" xml:space="preserve">
+    <value>החבילה לא נמצאה (או לא נטענה).</value>
+  </data>
+  <data name="Conformance_ArtifactNotFound" xml:space="preserve">
+    <value>הרכיב לא נמצא.</value>
+  </data>
+  <data name="Conformance_OutgoingReferences" xml:space="preserve">
+    <value>הפניות יוצאות ({0})</value>
+  </data>
+  <data name="Conformance_IncomingReferences" xml:space="preserve">
+    <value>הפניות נכנסות ({0})</value>
+  </data>
+  <data name="Conformance_Flags" xml:space="preserve">
+    <value>סימונים</value>
+  </data>
+  <data name="Conformance_Cardinality" xml:space="preserve">
+    <value>קרדינליות</value>
+  </data>
+  <data name="Conformance_FlagSummary" xml:space="preserve">
+    <value>נכלל בסיכומים</value>
+  </data>
+  <data name="Conformance_FlagModifier" xml:space="preserve">
+    <value>רכיב משנה</value>
+  </data>
+  <data name="Conformance_FlagConstraints" xml:space="preserve">
+    <value>יש לו אילוצים משלו</value>
+  </data>
+  <data name="Conformance_FindByCanonical" xml:space="preserve">
+    <value>חיפוש לפי כתובת קנונית</value>
+  </data>
+  <data name="Conformance_CanonicalNotFound" xml:space="preserve">
+    <value>אין בחבילות המאונדקסות רכיב עם כתובת קנונית זו.</value>
+  </data>
+  <data name="Conformance_CanonicalFound" xml:space="preserve">
+    <value>נמצא: {0}</value>
+  </data>
+  <data name="Caption_AllBookmarks" xml:space="preserve">
+    <value>כל הסימניות</value>
+  </data>
+  <data name="Caption_RecentPages" xml:space="preserve">
+    <value>ביקורים אחרונים</value>
+  </data>
+  <data name="Caption_AddFhirServer" xml:space="preserve">
+    <value>הוספת שרת</value>
+  </data>
+  <data name="Caption_Documentation" xml:space="preserve">
+    <value>תיעוד</value>
+  </data>
+  <data name="Home_DocumentationDescription" xml:space="preserve">
+    <value>כיצד לעיין בחבילות FHIR ובשרתי FHIR</value>
+  </data>
+  <data name="Message_NoBookmarks" xml:space="preserve">
+    <value>אין סימניות</value>
+  </data>
+  <data name="Message_NoRecentPages" xml:space="preserve">
+    <value>אין דפים שבוקרו לאחרונה</value>
+  </data>
+  <data name="Message_NoFhirServers" xml:space="preserve">
+    <value>אין שרתי FHIR</value>
+  </data>
+  <data name="Message_NoCorePackages" xml:space="preserve">
+    <value>לא אונדקסו חבילות ליבה של FHIR</value>
+  </data>
+  <data name="Conformance_Overview" xml:space="preserve">
+    <value>סקירה</value>
+  </data>
+  <data name="Conformance_Structure" xml:space="preserve">
+    <value>מבנה</value>
+  </data>
+  <data name="Conformance_Snapshot" xml:space="preserve">
+    <value>תמונת מצב</value>
+  </data>
+  <data name="Conformance_Differential" xml:space="preserve">
+    <value>הפרשים</value>
+  </data>
+  <data name="Conformance_FindElement" xml:space="preserve">
+    <value>חיפוש רכיב</value>
+  </data>
+  <data name="Conformance_OnlyThisBranch" xml:space="preserve">
+    <value>רק ענף זה</value>
+  </data>
+  <data name="Conformance_ShowWholeTree" xml:space="preserve">
+    <value>הצגת העץ כולו</value>
+  </data>
+  <data name="Conformance_NoDifferential" xml:space="preserve">
+    <value>לרכיב זה אין הפרשים.</value>
+  </data>
+  <data name="Conformance_NoElementsFound" xml:space="preserve">
+    <value>אין רכיב תואם.</value>
+  </data>
+  <data name="Conformance_NotInDifferential" xml:space="preserve">
+    <value>לא שונה על ידי הפרופיל</value>
+  </data>
+  <data name="Conformance_Description" xml:space="preserve">
+    <value>תיאור</value>
+  </data>
+  <data name="Conformance_Definition" xml:space="preserve">
+    <value>הגדרה</value>
+  </data>
+  <data name="Conformance_Comment" xml:space="preserve">
+    <value>הערה</value>
+  </data>
+  <data name="Conformance_Requirements" xml:space="preserve">
+    <value>דרישות</value>
+  </data>
+  <data name="Conformance_Binding" xml:space="preserve">
+    <value>קשירה</value>
+  </data>
+  <data name="Conformance_Constraints" xml:space="preserve">
+    <value>אילוצים</value>
+  </data>
+  <data name="Conformance_FlagMustSupport" xml:space="preserve">
+    <value>חובת תמיכה: מערכות חייבות לדעת לטפל בו</value>
+  </data>
+  <data name="Conformance_StatusTrialUse" xml:space="preserve">
+    <value>שימוש ניסיוני</value>
+  </data>
+  <data name="Conformance_StatusNormative" xml:space="preserve">
+    <value>נורמטיבי</value>
+  </data>
+  <data name="Conformance_StatusDraft" xml:space="preserve">
+    <value>טיוטה</value>
+  </data>
+  <data name="Conformance_StatusDeprecated" xml:space="preserve">
+    <value>הוצא משימוש</value>
+  </data>
+  <data name="Message_ViewerClientOnly" xml:space="preserve">
+    <value>FireChart Viewer פועל רק בדפדפן (Blazor WebAssembly) או באפליקציה (Blazor Hybrid), לא בשרת.</value>
+  </data>
+  <data name="Message_ViewerUnknownAddress" xml:space="preserve">
+    <value>לצופה אין דף בכתובת זו.</value>
+  </data>
+  <data name="Message_SmartPopupWaiting" xml:space="preserve">
+    <value>השלם את ההתחברות בחלון שנפתח.</value>
+  </data>
+  <data name="Message_SmartPopupBlocked" xml:space="preserve">
+    <value>הדפדפן לא פתח את חלון ההתחברות (חוסם חלונות קופצים או הגדרות הדף המטמיע את הצופה). פתח אותו שוב או התחבר כאן.</value>
+  </data>
+  <data name="Message_SmartPopupClosed" xml:space="preserve">
+    <value>חלון ההתחברות נסגר לפני שההתחברות הושלמה, או שהקשר אליו אבד. פתח אותו שוב או התחבר כאן.</value>
+  </data>
+  <data name="Caption_SmartOpenSignInWindow" xml:space="preserve">
+    <value>פתיחת חלון ההתחברות</value>
+  </data>
+  <data name="Caption_SmartSignInHere" xml:space="preserve">
+    <value>התחברות כאן</value>
+  </data>
+  <data name="Message_BookmarkOnOtherServer" xml:space="preserve">
+    <value>בשרת {0}: פתח אותה משם.</value>
+  </data>
+  <data name="Caption_AllHistory" xml:space="preserve">
+    <value>כל ההיסטוריה</value>
+  </data>
+  <data name="Caption_FhirPackages" xml:space="preserve">
+    <value>חבילות FHIR</value>
+  </data>
+  <data name="Notice_PackageIndexing" xml:space="preserve">
+    <value>אינדוקס חבילת FHIR הוא פעולה כבדה: היא רצה בשרת, ורק מנהלים ומפתחים יכולים להוסיף ולאנדקס חבילות.</value>
+  </data>
+  <data name="Caption_OpenPackageManager" xml:space="preserve">
+    <value>פתיחת מנהל חבילות FHIR</value>
+  </data>
+  <data name="Caption_LabTest" xml:space="preserve">
+    <value>בדיקה</value>
+  </data>
+  <data name="Caption_LabResult" xml:space="preserve">
+    <value>תוצאה</value>
+  </data>
+  <data name="Caption_LabReferenceRange" xml:space="preserve">
+    <value>טווח תקין</value>
+  </data>
+  <data name="Caption_LabFlag" xml:space="preserve">
+    <value>סימון</value>
+  </data>
+  <data name="Caption_TrendNoValues" xml:space="preserve">
+    <value>אין ערכים להצגה</value>
+  </data>
+  <data name="Caption_TrendOpenLast" xml:space="preserve">
+    <value>פתיחת הרשומה האחרונה</value>
+  </data>
+  <data name="Caption_TimesInDeviceZone" xml:space="preserve">
+    <value>השעות מוצגות באזור הזמן של מכשיר זה</value>
+  </data>
+  <data name="Message_SectionsFailed" xml:space="preserve">
+    <value>מקטעים שלא ניתן היה לטעון: {0}</value>
+  </data>
+  <data name="Caption_TrendValues" xml:space="preserve">
+    <value>ערכים</value>
+  </data>
+  <data name="Caption_TrendDate" xml:space="preserve">
+    <value>תאריך</value>
+  </data>
+  <data name="Caption_TrendSummary" xml:space="preserve">
+    <value>{0} ערכים, {1} – {2}</value>
+  </data>
+  <data name="Caption_OpenAsPage" xml:space="preserve">
+    <value>פתיחה כדף</value>
+  </data>
+  <data name="Caption_EncounterSummary" xml:space="preserve">
+    <value>סיכום מפגש</value>
+  </data>
+  <data name="Caption_LoadAll" xml:space="preserve">
+    <value>טען הכול</value>
+  </data>
+  <data name="Caption_Print" xml:space="preserve">
+    <value>הדפסה</value>
+  </data>
+  <data name="Message_PrintIncomplete" xml:space="preserve">
+    <value>ייתכן שהתדפיס אינו שלם: לא כל הרשומות של הדף נטענו. הדפיסו סיכום בפקודה „הדפסה” שלו, שטוענת קודם את כל הרשומות.</value>
+  </data>
+  <data name="Message_PrintRefused" xml:space="preserve">
+    <value>לא ניתן היה לטעון את כל הרשומות, ולכן הדף לא יודפס. נסו שוב את המקטעים שנכשלו ואז הדפיסו שוב.</value>
+  </data>
+  <data name="Caption_Record" xml:space="preserve">
+    <value>רשומה</value>
+  </data>
+  <data name="Caption_Summary" xml:space="preserve">
+    <value>סיכום</value>
+  </data>
+  <data name="PackageBase_Download" xml:space="preserve">
+    <value>הורדה</value>
+  </data>
+  <data name="PackageBase_UpdateButton" xml:space="preserve">
+    <value>עדכון</value>
+  </data>
+  <data name="PackageBase_Failed" xml:space="preserve">
+    <value>ההורדה נכשלה: {0}</value>
+  </data>
+  <data name="PackageBase_NotOnDevice" xml:space="preserve">
+    <value>חבילה זו אינה במכשיר. הורידו אותה ({0}; ‏{1} במכשיר) כדי לעיין בה ללא רשת.</value>
+  </data>
+  <data name="PackageBase_Progress" xml:space="preserve">
+    <value>מוריד: {0} מתוך {1}</value>
+  </data>
+  <data name="PackageBase_OnDevice" xml:space="preserve">
+    <value>במכשיר</value>
+  </data>
+  <data name="PackageBase_Delete" xml:space="preserve">
+    <value>מחיקה מהמכשיר</value>
+  </data>
+  <data name="PackageBase_UpdateAvailable" xml:space="preserve">
+    <value>גרסה חדשה יותר של החבילה זמינה ({0}).</value>
+  </data>
+  <data name="PackageBase_ListUnavailable" xml:space="preserve">
+    <value>לא ניתן לקרוא כעת את רשימת חבילות FHIR: היישום אינו מגיע לשרת שלו. החבילות שבמכשיר ממשיכות לפעול.</value>
+  </data>
+  <data name="PackageBase_Occupied" xml:space="preserve">
+    <value>חבילות במכשיר: {0}, תופסות {1}</value>
+  </data>
+</root>

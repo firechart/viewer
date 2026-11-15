@@ -3,8 +3,10 @@ namespace Flox.Shared.Pages.BackgroundTask;
 using Core.Models;
 using Services;
 
+/// <summary>State of the list of background tasks: keeps it current from the push channel and offers the actions on the whole list.</summary>
 public class BackgroundTasksState : GuidDataSourceState<BackgroundTask>
 {
+    /// <summary>Creates the state and starts listening to the push channel.</summary>
     public BackgroundTasksState(IServiceProvider serviceProvider, IEventsConsumerService eventsConsumerService, IHttpClientFactory httpClientFactory) : base(serviceProvider)
     {
         EventsConsumerService = eventsConsumerService;
@@ -12,9 +14,12 @@ public class BackgroundTasksState : GuidDataSourceState<BackgroundTask>
         HttpClientFactory = httpClientFactory;
     }
 
+    /// <summary>The client of the push channel that reports changes of tasks.</summary>
     public IEventsConsumerService EventsConsumerService { get; }
+    /// <summary>The factory of HTTP clients used to call the task endpoints.</summary>
     public IHttpClientFactory HttpClientFactory { get; }
 
+    /// <inheritdoc />
     protected override void ConfigureRequest(object? key)
     {
         DataSource.SetFields(row => new
@@ -28,6 +33,7 @@ public class BackgroundTasksState : GuidDataSourceState<BackgroundTask>
         DataSource.Sorts.SetValue(row => row.StartedAt!, false);
     }
 
+    /// <summary>Starts a simple demo task on the server and reloads the list.</summary>
     public async Task AddSimpleAsync()
     {
         try
@@ -46,6 +52,7 @@ public class BackgroundTasksState : GuidDataSourceState<BackgroundTask>
         }
     }
 
+    /// <summary>After confirmation asks the server to clean up tasks and delete the completed ones, then reloads the list.</summary>
     public async Task CleanupAsync()
     {
         if (true == await this.ConfirmAsync(Strings.Caption_ConfirmPurgeTasks))
@@ -100,6 +107,7 @@ public class BackgroundTasksState : GuidDataSourceState<BackgroundTask>
         }
     }
 
+    /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);

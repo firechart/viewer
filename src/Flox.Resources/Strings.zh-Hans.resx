@@ -219,42 +219,6 @@
   <data name="Caption_Installed" xml:space="preserve">
     <value>已安装</value>
   </data>
-  <data name="Sync_Title" xml:space="preserve">
-    <value>同步</value>
-  </data>
-  <data name="Sync_Now" xml:space="preserve">
-    <value>立即同步</value>
-  </data>
-  <data name="Sync_StatusSynced" xml:space="preserve">
-    <value>所有内容均已同步</value>
-  </data>
-  <data name="Sync_StatusSyncing" xml:space="preserve">
-    <value>正在同步…</value>
-  </data>
-  <data name="Sync_StatusPending" xml:space="preserve">
-    <value>待发送的更改：{0}</value>
-  </data>
-  <data name="Sync_StatusError" xml:space="preserve">
-    <value>上次同步失败</value>
-  </data>
-  <data name="Sync_LastSynced" xml:space="preserve">
-    <value>上次同步：{0}</value>
-  </data>
-  <data name="Sync_Never" xml:space="preserve">
-    <value>尚未同步</value>
-  </data>
-  <data name="Sync_NotAvailable" xml:space="preserve">
-    <value>此应用不支持同步</value>
-  </data>
-  <data name="Sync_Failures" xml:space="preserve">
-    <value>服务器未接受的更改</value>
-  </data>
-  <data name="Sync_Retry" xml:space="preserve">
-    <value>重试</value>
-  </data>
-  <data name="Sync_Technical" xml:space="preserve">
-    <value>技术细节</value>
-  </data>
   <data name="Caption_More" xml:space="preserve">
     <value>更多</value>
   </data>
@@ -441,27 +405,6 @@
   <data name="Caption_Password" xml:space="preserve">
     <value>密码</value>
   </data>
-  <data name="Sync_Rejected" xml:space="preserve">
-    <value>服务器未接受对 {0} 的更改：{1}</value>
-  </data>
-  <data name="Sync_Reason_Invalid" xml:space="preserve">
-    <value>数据无效</value>
-  </data>
-  <data name="Sync_Reason_Forbidden" xml:space="preserve">
-    <value>您无权更改此内容</value>
-  </data>
-  <data name="Sync_Reason_ReadOnly" xml:space="preserve">
-    <value>此数据无法更改</value>
-  </data>
-  <data name="Sync_Reason_Conflict" xml:space="preserve">
-    <value>已在其他设备上更改</value>
-  </data>
-  <data name="Sync_Reason_Unknown" xml:space="preserve">
-    <value>服务器拒绝了更改</value>
-  </data>
-  <data name="Sync_NotSynced" xml:space="preserve">
-    <value>未同步：{0}</value>
-  </data>
   <data name="Caption_SignIn" xml:space="preserve">
     <value>登录</value>
   </data>
@@ -560,5 +503,65 @@
   </data>
   <data name="Caption_History" xml:space="preserve">
     <value>历史记录</value>
+  </data>
+  <data name="Caption_LicenseEdition" xml:space="preserve">
+    <value>版本</value>
+  </data>
+  <data name="Caption_LicenseState" xml:space="preserve">
+    <value>状态</value>
+  </data>
+  <data name="Caption_LicenseValidUntil" xml:space="preserve">
+    <value>有效期至</value>
+  </data>
+  <data name="Caption_LicenseFeatures" xml:space="preserve">
+    <value>功能</value>
+  </data>
+  <data name="Caption_LicensePerpetual" xml:space="preserve">
+    <value>永久</value>
+  </data>
+  <data name="LicenseState_None" xml:space="preserve">
+    <value>无许可证：免费版</value>
+  </data>
+  <data name="LicenseState_Valid" xml:space="preserve">
+    <value>有效</value>
+  </data>
+  <data name="LicenseState_Expiring" xml:space="preserve">
+    <value>即将到期</value>
+  </data>
+  <data name="LicenseState_Grace" xml:space="preserve">
+    <value>已过期，处于宽限期</value>
+  </data>
+  <data name="LicenseState_Expired" xml:space="preserve">
+    <value>已过期</value>
+  </data>
+  <data name="LicenseState_NotYetValid" xml:space="preserve">
+    <value>尚未生效</value>
+  </data>
+  <data name="LicenseState_Invalid" xml:space="preserve">
+    <value>无效</value>
+  </data>
+  <data name="Caption_Menu" xml:space="preserve">
+    <value>菜单</value>
+  </data>
+  <data name="Caption_Back" xml:space="preserve">
+    <value>返回</value>
+  </data>
+  <data name="Caption_Clear" xml:space="preserve">
+    <value>清除</value>
+  </data>
+  <data name="Caption_SkipToContent" xml:space="preserve">
+    <value>跳到内容</value>
+  </data>
+  <data name="Caption_MainNavigation" xml:space="preserve">
+    <value>主导航</value>
+  </data>
+  <data name="Caption_Loading" xml:space="preserve">
+    <value>正在加载…</value>
+  </data>
+  <data name="Caption_Select" xml:space="preserve">
+    <value>选择</value>
+  </data>
+  <data name="Caption_SelectItem" xml:space="preserve">
+    <value>选择 {0}</value>
   </data>
 </root>

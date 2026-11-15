@@ -8,7 +8,7 @@ public enum FormSource
     /// <summary>The server of the host application (the forms of the organization over its own packages).</summary>
     Server,
 
-    /// <summary>The configuration of the Viewer (<c>searchForms</c>, <c>clinicalSummary.form</c>).</summary>
+    /// <summary>The configuration of the Viewer (<c>searchForms</c>).</summary>
     Config,
 
     /// <summary>The vendor library embedded in <c>FireChart.Viewer.Library</c>.</summary>
@@ -54,15 +54,15 @@ public static class FormProviderOrder
 public sealed record SearchFormKey(string Release, string ResourceType, string? Profile = null);
 
 /// <summary>
-/// The key of a clinical summary form: the code of the form chosen for a FHIR server.
+/// The key of a summary form: the type of the record the summary grows from.
 /// </summary>
-/// <param name="Code">The <see cref="ClinicalSummaryFormDefinition.Code"/> (<c>default</c>).</param>
+/// <param name="ResourceType">The type (<c>Patient</c>, <c>Encounter</c>): the name of the file <c>summary-forms/{Type}.json</c>.</param>
 /// <example>
 /// <code>
-/// var key = new SummaryFormKey(server.ClinicalSummaryFormCode ?? ClinicalSummaryFormDefinition.DefaultCode);
+/// var key = new SummaryFormKey(route.ResourceType);
 /// </code>
 /// </example>
-public sealed record SummaryFormKey(string Code);
+public sealed record SummaryFormKey(string ResourceType);
 
 /// <summary>
 /// A form a provider has for a key.
@@ -100,7 +100,7 @@ public sealed record ResolvedForm<T>(T Definition, FormSource Source, bool IsGen
 /// A source of forms by key: the server of the host application, the configuration of the Viewer, the vendor library.
 /// </summary>
 /// <typeparam name="TKey">The key: <see cref="SearchFormKey"/> or <see cref="SummaryFormKey"/>.</typeparam>
-/// <typeparam name="TDefinition">The form: <see cref="SearchFormDefinition"/> or <see cref="ClinicalSummaryFormDefinition"/>.</typeparam>
+/// <typeparam name="TDefinition">The form: <see cref="SearchFormDefinition"/> or <see cref="SummaryFormDefinition"/>.</typeparam>
 /// <remarks>
 /// A provider that cannot answer (no connection, <c>401</c>, a timeout) may throw: the resolver logs a warning and asks the next one, so a Viewer with a
 /// server is never worse than one without. <see cref="OperationCanceledException"/> of the caller's token is not swallowed.
@@ -153,8 +153,8 @@ public interface IViewerFormProvider<in TKey, TDefinition>
 /// <typeparam name="TDefinition">The form.</typeparam>
 /// <example>
 /// <code>
-/// IViewerFormResolver&lt;SummaryFormKey, ClinicalSummaryFormDefinition&gt; resolver = ...;
-/// var summary = await resolver.ResolveAsync(new SummaryFormKey("default"), cancellationToken);
+/// IViewerFormResolver&lt;SummaryFormKey, SummaryFormDefinition&gt; resolver = ...;
+/// var summary = await resolver.ResolveAsync(new SummaryFormKey("Patient"), cancellationToken);
 /// </code>
 /// </example>
 public interface IViewerFormResolver<in TKey, TDefinition>

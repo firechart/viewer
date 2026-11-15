@@ -1,0 +1,23 @@
+@* The title of a page with its commands on the right; the title starts where the text of the rows and the captions of the sections do *@
+<RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.SpaceBetween"
+             Gap="var(--gap-sm)" class="page-header">
+    <RadzenText TextStyle="Radzen.Blazor.TextStyle.H5" TagName="TagName.H2" class="rz-m-0 min-w-0">@ChildContent</RadzenText>
+    @if (Commands != null)
+    {
+        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-sm)" class="shrink-0">
+            @Commands
+        </RadzenStack>
+    }
+</RadzenStack>
+
+@code {
+
+    /// <summary>The title of the page.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>The commands of the page, shown on the right of the title; none when not set.</summary>
+    [Parameter]
+    public RenderFragment? Commands { get; set; }
+
+}

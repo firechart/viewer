@@ -24,6 +24,7 @@ public enum UiExceptionSource
 /// </summary>
 public sealed class UiExceptionContext
 {
+    /// <summary>Creates the context of one caught exception.</summary>
     public UiExceptionContext(Exception exception, UiExceptionSource source, string? operation, string? userMessage, IServiceProvider services)
     {
         Exception = exception;
@@ -36,6 +37,7 @@ public sealed class UiExceptionContext
     /// <summary>The exception, with wrapper exceptions (<see cref="AggregateException"/>) already removed.</summary>
     public Exception Exception { get; }
 
+    /// <summary>Where in the UI the exception was caught.</summary>
     public UiExceptionSource Source { get; }
 
     /// <summary>Name of the operation that failed (a method or component name), for logs.</summary>
@@ -48,6 +50,7 @@ public sealed class UiExceptionContext
     public string CorrelationId { get; } = Guid.NewGuid()
                                                .ToString("N")[..8];
 
+    /// <summary>The services of the application, for filters that need more than their own dependencies.</summary>
     public IServiceProvider Services { get; }
 
     /// <summary>

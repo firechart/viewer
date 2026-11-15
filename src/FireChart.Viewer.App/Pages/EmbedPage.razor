@@ -28,7 +28,6 @@ else
                     SmartRedirectUri=@NavigationManager.ToAbsoluteUri(SmartCallbackPage.Route).ToString()
                     SmartFlow=@_setup.SmartFlow
                     TerminologyServer=@_setup.TerminologyServer
-                    ClinicalSummaryForm=@_setup.ClinicalSummaryForm
                     Appearance=@_setup.Appearance
                     OnConfigError=@ReportAsync/>
     </div>
@@ -55,7 +54,7 @@ else
         _channel = await ViewerFrameChannel.OpenAsync(JS, OnParentMessageAsync);
         if (_channel is null)
         {
-            Apply(await ConfigLoader.LoadAsync());
+            await ApplyAsync(await ConfigLoader.LoadAsync());
         }
     }
 
@@ -107,7 +106,7 @@ else
 
         var text = config.ToJsonString();
         var setup = ViewerAppConfigLoader.Parse(text);
-        Apply(setup);
+        await ApplyAsync(setup);
         if (setup.Server is null)
         {
             _configText = null;
@@ -158,7 +157,7 @@ else
         }
 
         _configText = result.Text;
-        Apply(setup);
+        await ApplyAsync(setup);
         var applied = new JsonObject { ["applied"] = new JsonArray([.. result.Applied.Select(a => (JsonNode)JsonValue.Create(a))]) };
         await _channel!.PostAsync("updated", applied);
         await _channel.SucceedAsync(request, applied.DeepClone().AsObject());
@@ -180,7 +179,7 @@ else
         await _channel!.SucceedAsync(request, new JsonObject { ["location"] = location });
     }
 
-    private void Apply(ViewerAppSetup setup)
+    private async Task ApplyAsync(ViewerAppSetup setup)
     {
         _setup = setup;
         _culture = setup.Culture ?? s_browserCulture;
@@ -188,6 +187,7 @@ else
         CultureInfo.DefaultThreadCurrentUICulture = _culture;
         CultureInfo.CurrentCulture = _culture;
         CultureInfo.CurrentUICulture = _culture;
+        await Flox.Shared.Layout.DocumentDirection.ApplyAsync(JS, _culture);
     }
 
     private static string StartLocation => new ViewerRoute(ViewerPage.ResourceTypes).Location;

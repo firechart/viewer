@@ -60,7 +60,7 @@
     {
         if (firstRender)
         {
-            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Flox.Shared/Components/CodeEditor.razor.js");
+            _module = await JS.ImportModuleAsync("./_content/Flox.Shared/Components/CodeEditor.razor.js");
             await _module.InvokeVoidAsync("init", _id, LanguageName(Language), Value ?? string.Empty, ReadOnly, WordWrap, AutoHeight);
             Remember();
             return;

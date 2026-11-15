@@ -1,0 +1,676 @@
+[
+  {
+    "PackageId": "@sqlite.org/sqlite-wasm",
+    "PackageVersion": "3.54.1-build1",
+    "PackageProjectUrl": "https://github.com/sqlite/sqlite-wasm",
+    "Copyright": "The SQLite Wasm npm package contributors",
+    "Authors": "https://github.com/sqlite/sqlite-wasm/graphs/contributors",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://www.apache.org/licenses/LICENSE-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "AngleSharp",
+    "PackageVersion": "1.10.3",
+    "PackageProjectUrl": "https://anglesharp.github.io/",
+    "Copyright": "Copyright 2013-2026, AngleSharp.",
+    "Authors": "AngleSharp",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Duende.IdentityModel",
+    "PackageVersion": "8.1.0",
+    "PackageProjectUrl": "https://github.com/duendesoftware/foss",
+    "Copyright": "Duende Software",
+    "Authors": "Duende Software",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Duende.IdentityModel.OidcClient",
+    "PackageVersion": "7.1.1",
+    "PackageProjectUrl": "https://github.com/duendesoftware/foss",
+    "Copyright": "Duende Software",
+    "Authors": "Duende Software",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Fhir.Metrics",
+    "PackageVersion": "1.4.0",
+    "PackageProjectUrl": "https://github.com/FirelyTeam/Fhir.Metrics",
+    "Copyright": "Copyright 2013-2023 Firely.  Contains materials (C) HL7 International",
+    "Authors": "Firely (info@fire.ly) and contributors",
+    "License": "BSD-3-Clause",
+    "LicenseUrl": "https://licenses.nuget.org/BSD-3-Clause",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "FluentValidation",
+    "PackageVersion": "12.2.0",
+    "PackageProjectUrl": "https://fluentvalidation.net/",
+    "Copyright": "Copyright (c) Jeremy Skinner, .NET Foundation, and contributors 2008-2025",
+    "Authors": "Jeremy Skinner",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "FluentValidation.DependencyInjectionExtensions",
+    "PackageVersion": "12.2.0",
+    "PackageProjectUrl": "https://fluentvalidation.net/",
+    "Copyright": "Copyright (c) Jeremy Skinner, .NET Foundation, and contributors 2008-2025",
+    "Authors": "Jeremy Skinner",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Fluid.Core",
+    "PackageVersion": "2.41.1",
+    "PackageProjectUrl": "https://github.com/sebastienros/fluid",
+    "Copyright": "Sebastien Ros",
+    "Authors": "Sebastien Ros",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Hl7.Fhir.Base",
+    "PackageVersion": "6.8.0",
+    "PackageProjectUrl": "https://github.com/FirelyTeam/firely-net-sdk",
+    "Copyright": "Copyright 2013-2024 Firely.  Contains materials (C) HL7 International",
+    "Authors": "Firely (info@fire.ly) and contributors",
+    "License": "BSD-3-Clause",
+    "LicenseUrl": "https://licenses.nuget.org/BSD-3-Clause",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Hl7.Fhir.Conformance",
+    "PackageVersion": "6.8.0",
+    "PackageProjectUrl": "https://github.com/FirelyTeam/firely-net-sdk",
+    "Copyright": "Copyright 2013-2024 Firely.  Contains materials (C) HL7 International",
+    "Authors": "Firely (info@fire.ly) and contributors",
+    "License": "BSD-3-Clause",
+    "LicenseUrl": "https://licenses.nuget.org/BSD-3-Clause",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Hl7.Fhir.R4",
+    "PackageVersion": "6.8.0",
+    "PackageProjectUrl": "https://github.com/FirelyTeam/firely-net-sdk",
+    "Copyright": "Copyright 2013-2024 Firely.  Contains materials (C) HL7 International",
+    "Authors": "Firely (info@fire.ly) and contributors",
+    "License": "BSD-3-Clause",
+    "LicenseUrl": "https://licenses.nuget.org/BSD-3-Clause",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Hl7.Fhir.R4B",
+    "PackageVersion": "6.8.0",
+    "PackageProjectUrl": "https://github.com/FirelyTeam/firely-net-sdk",
+    "Copyright": "Copyright 2013-2024 Firely.  Contains materials (C) HL7 International",
+    "Authors": "Firely (info@fire.ly) and contributors",
+    "License": "BSD-3-Clause",
+    "LicenseUrl": "https://licenses.nuget.org/BSD-3-Clause",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Hl7.Fhir.R5",
+    "PackageVersion": "6.8.0",
+    "PackageProjectUrl": "https://github.com/FirelyTeam/firely-net-sdk",
+    "Copyright": "Copyright 2013-2024 Firely.  Contains materials (C) HL7 International",
+    "Authors": "Firely (info@fire.ly) and contributors",
+    "License": "BSD-3-Clause",
+    "LicenseUrl": "https://licenses.nuget.org/BSD-3-Clause",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Hl7.Fhir.R6",
+    "PackageVersion": "6.8.0",
+    "PackageProjectUrl": "https://github.com/FirelyTeam/firely-net-sdk",
+    "Copyright": "Copyright 2013-2024 Firely.  Contains materials (C) HL7 International",
+    "Authors": "Firely (info@fire.ly) and contributors",
+    "License": "BSD-3-Clause",
+    "LicenseUrl": "https://licenses.nuget.org/BSD-3-Clause",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Hl7.Fhir.STU3",
+    "PackageVersion": "6.8.0",
+    "PackageProjectUrl": "https://github.com/FirelyTeam/firely-net-sdk",
+    "Copyright": "Copyright 2013-2024 Firely.  Contains materials (C) HL7 International",
+    "Authors": "Firely (info@fire.ly) and contributors",
+    "License": "BSD-3-Clause",
+    "LicenseUrl": "https://licenses.nuget.org/BSD-3-Clause",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Material Symbols (Flox Symbols)",
+    "PackageVersion": "Radzen.Blazor 13.1.0",
+    "PackageProjectUrl": "https://github.com/google/material-design-icons",
+    "Copyright": "Copyright 2022 Google LLC",
+    "Authors": "Google",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://www.apache.org/licenses/LICENSE-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.AspNetCore.Authorization",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://asp.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.AspNetCore.Components",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://asp.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.AspNetCore.Components.Analyzers",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://asp.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.AspNetCore.Components.Authorization",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://asp.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.AspNetCore.Components.Forms",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://asp.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.AspNetCore.Components.Web",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://asp.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.AspNetCore.Components.WebAssembly",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://asp.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.AspNetCore.Metadata",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://asp.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.AspNetCore.WebUtilities",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://asp.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.AI",
+    "PackageVersion": "10.11.0",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.AI.Abstractions",
+    "PackageVersion": "10.11.0",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Caching.Abstractions",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Caching.Memory",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Configuration",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Configuration.Abstractions",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Configuration.Binder",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Configuration.EnvironmentVariables",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Configuration.FileExtensions",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Configuration.Json",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.DependencyInjection",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.DependencyInjection.Abstractions",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.DependencyModel",
+    "PackageVersion": "10.0.0",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Diagnostics",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Diagnostics.Abstractions",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.FileProviders.Abstractions",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.FileProviders.Physical",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.FileSystemGlobbing",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Hosting.Abstractions",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Http",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Logging",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Logging.Abstractions",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Options",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Options.ConfigurationExtensions",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Primitives",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Extensions.Validation",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://asp.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.JSInterop",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://asp.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.JSInterop.WebAssembly",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://asp.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Microsoft.Net.Http.Headers",
+    "PackageVersion": "10.0.15",
+    "PackageProjectUrl": "https://asp.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Newtonsoft.Json",
+    "PackageVersion": "13.0.4",
+    "PackageProjectUrl": "https://www.newtonsoft.com/json",
+    "Copyright": "Copyright © James Newton-King 2008",
+    "Authors": "James Newton-King",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Parlot",
+    "PackageVersion": "1.5.9",
+    "PackageProjectUrl": "https://github.com/sebastienros/parlot",
+    "Copyright": "Sebastien Ros",
+    "Authors": "Sebastien Ros",
+    "License": "BSD-3-Clause",
+    "LicenseUrl": "https://licenses.nuget.org/BSD-3-Clause",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Radzen.Blazor",
+    "PackageVersion": "13.1.0",
+    "PackageProjectUrl": "https://www.radzen.com/",
+    "Copyright": "Radzen Ltd.",
+    "Authors": "Radzen Ltd.",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Serilog",
+    "PackageVersion": "4.3.0",
+    "PackageProjectUrl": "https://serilog.net/",
+    "Copyright": "Copyright © Serilog Contributors",
+    "Authors": "Serilog Contributors",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Serilog.Extensions.Logging",
+    "PackageVersion": "10.0.0",
+    "PackageProjectUrl": "https://github.com/serilog/serilog-extensions-logging",
+    "Authors": "Microsoft,Serilog Contributors",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Serilog.Settings.Configuration",
+    "PackageVersion": "10.0.1",
+    "PackageProjectUrl": "https://github.com/serilog/serilog-settings-configuration",
+    "Authors": "Serilog Contributors",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Serilog.Sinks.BrowserConsole",
+    "PackageVersion": "8.0.0",
+    "PackageProjectUrl": "https://github.com/serilog/serilog-sinks-browserconsole",
+    "Authors": "Serilog Contributors",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Serilog.Sinks.Console",
+    "PackageVersion": "6.1.1",
+    "PackageProjectUrl": "https://github.com/serilog/serilog-sinks-console",
+    "Authors": "Serilog Contributors",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "Serilog.Sinks.Debug",
+    "PackageVersion": "3.0.0",
+    "PackageProjectUrl": "https://github.com/serilog/serilog-sinks-debug",
+    "Authors": "Serilog Contributors",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "SQLite (WebAssembly)",
+    "PackageVersion": "3.54.1",
+    "PackageProjectUrl": "https://sqlite.org",
+    "Copyright": "Public domain: the authors disclaim copyright to the source code of SQLite",
+    "Authors": "D. Richard Hipp and the SQLite developers",
+    "License": "blessing",
+    "LicenseUrl": "https://sqlite.org/copyright.html",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "System.ComponentModel.Annotations",
+    "PackageVersion": "5.0.0",
+    "PackageProjectUrl": "https://github.com/dotnet/runtime",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "System.Linq.Dynamic.Core",
+    "PackageVersion": "1.7.4",
+    "PackageProjectUrl": "https://dynamic-linq.net/",
+    "Copyright": "Copyright © ZZZ Projects",
+    "Authors": "ZZZ Projects,Stef Heyenrath,Microsoft,Scott Guthrie,King Wilder,Nathan Arnott",
+    "License": "Apache-2.0",
+    "LicenseUrl": "https://licenses.nuget.org/Apache-2.0",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "System.Numerics.Tensors",
+    "PackageVersion": "10.0.13",
+    "PackageProjectUrl": "https://dot.net/",
+    "Copyright": "© Microsoft Corporation. All rights reserved.",
+    "Authors": "Microsoft",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  },
+  {
+    "PackageId": "TimeZoneConverter",
+    "PackageVersion": "7.2.0",
+    "PackageProjectUrl": "https://github.com/mattjohnsonpint/TimeZoneConverter",
+    "Authors": "Matt Johnson-Pint",
+    "License": "MIT",
+    "LicenseUrl": "https://licenses.nuget.org/MIT",
+    "LicenseInformationOrigin": 0
+  }
+]

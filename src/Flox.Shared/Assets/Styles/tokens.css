@@ -49,6 +49,8 @@
     }
 }
 
+@import "./fire.css";
+
 /* Semantic colors for utilities; the values switch with the theme */
 @theme inline {
     --color-canvas: var(--rz-body-background-color);

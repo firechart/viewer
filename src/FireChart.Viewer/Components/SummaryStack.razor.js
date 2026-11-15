@@ -1,4 +1,4 @@
-// The scroller of the clinical summary: as tall as what is left of the window (the page itself does not scroll), its place kept for the state of the page,
+// The scroller of the patient summary: as tall as what is left of the window (the page itself does not scroll), its place kept for the state of the page,
 // and a section brought to its top by id
 export function attach(scroller, dotnet, bottomGap, initialTop) {
     if (!scroller) {

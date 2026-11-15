@@ -1,6 +1,7 @@
 @* The bookmarks of the Viewer on this device: those of this server first, then those of the others (opened by the host, which chooses the server) *@
 @using Flox.Core.Models
 @inherits StatelessWidget
+@implements IDisposable
 @inject IServiceProvider Services
 
 <RadzenStack Gap="var(--gap-sm)" data-viewer="bookmarks">
@@ -38,6 +39,7 @@
 @code {
 
     private IReadOnlyList<UserBookmark>? _items;
+    private IDisposable? _watch;
 
     /// <summary>The instance of the Viewer.</summary>
     [CascadingParameter]
@@ -51,7 +53,24 @@
     /// <inheritdoc/>
     protected override async Task OnInitializedAsync()
     {
+        // A bookmark added or removed in another tab
+        _watch = Flox.Shared.Services.LocalChanges.Watch<UserBookmark>(Services, () => InvokeAsync(async () =>
+        {
+            await LoadAsync();
+            StateHasChanged();
+        }));
         await LoadAsync();
+    }
+
+    /// <summary>Stops following the bookmarks of the other tabs.</summary>
+    /// <example>
+    /// <code>
+    /// view.Dispose();   // the renderer does it when the view leaves the page
+    /// </code>
+    /// </example>
+    public void Dispose()
+    {
+        _watch?.Dispose();
     }
 
     private async Task LoadAsync()

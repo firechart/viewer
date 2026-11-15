@@ -1,16 +1,23 @@
 namespace Flox.Core.Data;
 
+/// <summary>The kind of control that a generic search form renders for a property.</summary>
 public enum SearchControlType
 {
     /// <summary>
     /// Inferred from the property type (and from <see cref="SearchableAttribute.Options"/>).
     /// </summary>
     Auto,
+    /// <summary>A text box.</summary>
     Text,
+    /// <summary>A drop-down with one choice.</summary>
     Select,
+    /// <summary>A drop-down with several choices.</summary>
     MultiSelect,
+    /// <summary>A yes or no choice.</summary>
     Bool,
+    /// <summary>A range of dates.</summary>
     DateRange,
+    /// <summary>A range of numbers.</summary>
     NumberRange
 }
 
@@ -26,6 +33,7 @@ public sealed class SearchableAttribute : Attribute
     /// </summary>
     public string? Label { get; set; }
 
+    /// <summary>The control to render; <see cref="SearchControlType.Auto"/> infers it.</summary>
     public SearchControlType ControlType { get; set; } = SearchControlType.Auto;
 
     /// <summary>
@@ -40,5 +48,6 @@ public sealed class SearchableAttribute : Attribute
     /// </summary>
     public string[]? Options { get; set; }
 
+    /// <summary>The position of the field in the form; lower comes first.</summary>
     public int Order { get; set; }
 }

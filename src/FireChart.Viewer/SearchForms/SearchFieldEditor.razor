@@ -1,5 +1,8 @@
 @using Radzen.Blazor
 @using Microsoft.Extensions.DependencyInjection
+@using FireChart.Viewer.Core.Fhir
+@using FireChart.Viewer.Core.Search
+@implements IDisposable
 @inject IServiceProvider Services
 
 <RadzenStack Gap="var(--gap-xs)">
@@ -35,18 +38,27 @@
         case SearchFieldControl.Boolean:
             <RadzenDropDown TValue="string" Data=@_booleans TextProperty="Text" ValueProperty="Value" @bind-Value=Value.Text class="rz-w-100"/>
             break;
-        case SearchFieldControl.Select when _options.Count > 0 && !Field.AllowFreeText:
-            <RadzenDropDown TValue="string" Data=@_options TextProperty="Caption" ValueProperty="Key" AllowClear="true" AllowFiltering="true"
+        case SearchFieldControl.Select or SearchFieldControl.MultiSelect or SearchFieldControl.Autocomplete when _expanding:
+            <RadzenDropDown TValue="string" Data=@_noOptions Disabled="true" Placeholder=@Placeholder class="rz-w-100"/>
+            break;
+        case SearchFieldControl.Select when _expansion is not null && !Field.AllowFreeText:
+            <RadzenDropDown TValue="string" Data=@Shown TextProperty="Caption" ValueProperty="Key" AllowClear="true" AllowFiltering="true"
+                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" LoadData=@LoadOptions FilterDelay="300"
                             Placeholder=@Placeholder class="rz-w-100"
                             Value=@Value.Selected.FirstOrDefault() ValueChanged=@(v => { Value.Selected.Clear(); Value.Selected.AddRange(v is null ? [] : [v]); })/>
             break;
-        case SearchFieldControl.MultiSelect when _options.Count > 0:
-            <RadzenDropDown TValue="IEnumerable<string>" Multiple="true" Chips="true" Data=@_options TextProperty="Caption" ValueProperty="Key"
-                            AllowClear="true" AllowFiltering="true" Placeholder=@Placeholder class="rz-w-100"
+        case SearchFieldControl.MultiSelect when _expansion is not null:
+            <RadzenDropDown TValue="IEnumerable<string>" Multiple="true" Chips="true" Data=@Shown TextProperty="Caption" ValueProperty="Key"
+                            AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" LoadData=@LoadOptions FilterDelay="300"
+                            Placeholder=@Placeholder class="rz-w-100"
                             Value=@Value.Selected ValueChanged=@(v => { Value.Selected.Clear(); Value.Selected.AddRange(v?.ToList() ?? []); })/>
             break;
-        case SearchFieldControl.Select or SearchFieldControl.Autocomplete when _options.Count > 0:
-            <RadzenAutoComplete Data=@_options TextProperty="Code" @bind-Value=Value.Text Placeholder=@Placeholder class="rz-w-100"/>
+        case SearchFieldControl.Select or SearchFieldControl.Autocomplete when _expansion is not null:
+            @* A code may be typed: the box holds the code, the list shows what the codes mean *@
+            <RadzenAutoComplete Data=@_shown TextProperty="Code" LoadData=@LoadOptions FilterDelay="300" MinLength="0" OpenOnFocus="true"
+                                @bind-Value=Value.Text Placeholder=@Placeholder class="rz-w-100">
+                <Template>@(((SearchOption)context).Caption)</Template>
+            </RadzenAutoComplete>
             break;
         case SearchFieldControl.Quantity:
             <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)">
@@ -92,7 +104,13 @@
         ["sa"] = "sa", ["eb"] = "eb", ["ap"] = "≈"
     };
 
-    private List<SearchOption> _options = [];
+    // The codes of the value set of the field: the first expansion, what the list shows now, and every code met (a selected one stays shown)
+    private ValueSetExpansion? _expansion;
+    private IReadOnlyList<SearchOption> _shown = [];
+    private readonly Dictionary<string, SearchOption> _known = new Dictionary<string, SearchOption>(StringComparer.Ordinal);
+    private bool _expanding;
+    private CancellationTokenSource? _typing;
+    private static readonly IReadOnlyList<SearchOption> _noOptions = [];
     private List<ListOption<string>> _booleans = [];
     private List<ListOption<string>> _units = [];
     private List<ListOption<string>> _modifiers = [];
@@ -109,6 +127,16 @@
 
     [Parameter]
     public string? Error { get; set; }
+
+    // The FHIR server that expands the value set of the field; none: the option source of the host only
+    [Parameter]
+    public IViewerServer? Server { get; set; }
+
+    // The list with the selected codes on top of what matches: a selected code the list does not show still has its caption
+    private IEnumerable<SearchOption> Shown =>
+        Value.Selected.Where(key => _shown.All(o => o.Key != key))
+             .Select(key => _known.GetValueOrDefault(key) ?? new SearchOption(CodeOf(key), CodeOf(key)))
+             .Concat(_shown);
 
     private string Caption
     {
@@ -163,13 +191,88 @@
                              .ToList();
     }
 
+    // The codes come from the FHIR server of the search (ValueSet/$expand), else from the option source of the host; neither: a text box
     protected override async Task OnInitializedAsync()
     {
         var offersValues = Field.Control is SearchFieldControl.Select or SearchFieldControl.MultiSelect or SearchFieldControl.Autocomplete;
-        if (offersValues && !string.IsNullOrWhiteSpace(Field.ValueSetUrl))
+        if (!offersValues || string.IsNullOrWhiteSpace(Field.ValueSetUrl))
         {
-            _options = Services.GetService<ISearchFormOptionSource>() is { } source ? [.. await source.GetOptionsAsync(Field.ValueSetUrl, Field.ValueSetVersion)] : [];
+            return;
         }
+
+        _expanding = true;
+        try
+        {
+            if (Server is not null && Services.GetService<IValueSetExpander>() is { } expander)
+            {
+                _expansion = await expander.ExpandAsync(Server, Field.ValueSetUrl, Field.ValueSetVersion, null);
+            }
+
+            if (_expansion is null && Services.GetService<ISearchFormOptionSource>() is { } source
+                && await source.GetOptionsAsync(Field.ValueSetUrl, Field.ValueSetVersion) is { Count: > 0 } options)
+            {
+                _expansion = new ValueSetExpansion(options, true);
+            }
+        }
+        finally
+        {
+            _expanding = false;
+        }
+
+        Show(_expansion?.Options ?? []);
+    }
+
+    // What the user typed: the codes of a whole value set are filtered here, a value set the server cut is searched on the server
+    private async Task LoadOptions(LoadDataArgs args)
+    {
+        if (_expansion is null)
+        {
+            return;
+        }
+
+        if (_expansion.Complete || string.IsNullOrWhiteSpace(args.Filter) || Server is null || Services.GetService<IValueSetExpander>() is not { } expander)
+        {
+            Show(_expansion.Matching(args.Filter));
+            return;
+        }
+
+        _typing?.Cancel();
+        _typing?.Dispose();
+        var typing = _typing = new CancellationTokenSource();
+        try
+        {
+            var found = await expander.ExpandAsync(Server, Field.ValueSetUrl!, Field.ValueSetVersion, args.Filter, typing.Token);
+            if (!typing.IsCancellationRequested)
+            {
+                Show(found?.Options ?? _expansion.Matching(args.Filter));
+            }
+        }
+        catch (OperationCanceledException) when (typing.IsCancellationRequested)
+        {
+            // a newer text was typed
+        }
+    }
+
+    private void Show(IReadOnlyList<SearchOption> options)
+    {
+        _shown = options;
+        foreach (var option in options)
+        {
+            _known.TryAdd(option.Key, option);
+        }
+    }
+
+    // The code of a token system|code (the separators escaped by \ stay in it)
+    private static string CodeOf(string key)
+    {
+        var parts = FhirSearchQuery.SplitUnescaped(key, '|');
+        return parts[^1];
+    }
+
+    public void Dispose()
+    {
+        _typing?.Cancel();
+        _typing?.Dispose();
     }
 
     private string LabelOf(QuantityUnit unit)

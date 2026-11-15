@@ -1,9 +1,9 @@
 @implements IAsyncDisposable
 @inject IJSRuntime JS
 
-@* The scroller of a stack of sections (the clinical summary): as tall as what is left of the window, the place is kept (ScrollMemory) and a section is
+@* The scroller of a stack of sections (the patient summary): as tall as what is left of the window, the place is kept (ScrollMemory) and a section is
    brought to the top by its id. The sections are its children: each has its own sticky header and its own rows *@
-<div @ref=_scroller class="fx-summary-stack overflow-y-auto overscroll-contain">
+<div @ref=_scroller class="fx-summary-stack overflow-y-auto overscroll-contain print:h-auto print:overflow-visible">
     <div class="fx-summary-rows">@ChildContent</div>
 </div>
 
@@ -47,7 +47,7 @@
             return;
         }
 
-        _module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/FireChart.Viewer/Components/SummaryStack.razor.js");
+        _module = await JS.ImportModuleAsync("./_content/FireChart.Viewer/Components/SummaryStack.razor.js");
         if (_disposed)
         {
             await _module.DisposeAsync();

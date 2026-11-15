@@ -5,6 +5,7 @@ namespace Flox.Shared.Services;
 /// </summary>
 public static class EventsEndpoints
 {
+    /// <summary>Path of the hub of the push channel.</summary>
     public const string Hub = "/hubs/events";
 
     /// <summary>Client method the server invokes with a <see cref="EventMessage"/>.</summary>

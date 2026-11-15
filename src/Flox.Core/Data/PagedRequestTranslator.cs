@@ -5,9 +5,10 @@ using System.Linq.Expressions;
 
 namespace Flox.Core.Data;
 
+/// <summary>Turns the filters, sorts and window of a <see cref="PagedRequest{TEntity}"/> into LINQ for an <see cref="IQueryable{T}"/>.</summary>
 public static class PagedRequestTranslator
 {
-    // A top of zero or less is no limit; the skip applies either way
+    /// <summary>Applies the window; a top of zero or less is no limit, and the skip applies either way.</summary>
     public static IQueryable<T> ApplyPaging<T>(IQueryable<T> query, int skip, int top)
     {
         if (skip > 0)
@@ -18,6 +19,7 @@ public static class PagedRequestTranslator
         return top > 0 ? query.Take(top) : query;
     }
 
+    /// <summary>Orders the query by the sorts, using typed key selectors so that LINQ providers such as Marten's take them.</summary>
     public static IQueryable<T> ApplySorting<T>(IQueryable<T> query, List<Sort> sorts)
     {
         if (sorts.Count == 0)
@@ -46,6 +48,7 @@ public static class PagedRequestTranslator
         return ordered!;
     }
 
+    /// <summary>Builds one predicate from the filters, or null when there are none.</summary>
     public static Expression<Func<T, bool>>? BuildFilterExpression<T>(List<Filter> filters)
     {
         if (filters.Count == 0)

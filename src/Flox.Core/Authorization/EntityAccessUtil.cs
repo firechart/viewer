@@ -4,26 +4,30 @@ using Flox.Core.Data;
 
 namespace Flox.Core.Authorization;
 
-// The row level rules of Entity.ReadAccess and Entity.WriteAccess. The owner reads the own rows whatever the level is; the other levels are
-// Public (anyone, reading only), Authenticated (any signed-in user) and Role (the members of ReadRole or WriteRole). Whether the caller
-// may use the table at all is the other layer (Orchard's permissions, EntityPermissions): both must agree
+/// <summary>
+/// Row-level rules of Entity.ReadAccess and Entity.WriteAccess. The owner reads their own rows whatever the level is; the other levels are Public (anyone, reading only), Authenticated (any signed-in user) and Role (members of ReadRole or WriteRole). Whether the caller may use the table at all is the other layer (Orchard's permissions, EntityPermissions): both must agree.
+/// </summary>
 public static class EntityAccessUtil
 {
-    // The rows of a key lookup: what the caller may read, and everything for an administrator
+    /// <summary>
+    /// Restricts a query to the rows the caller may access for the operation; an administrator gets everything.
+    /// </summary>
     public static IQueryable<TEntity> Authorized<TEntity>(this IQueryable<TEntity> queryable, ClaimsPrincipal user, string operation = AccessOperations.Read) where TEntity : IEntity
     {
         return queryable.Where(CreateExpression<TEntity>(user, operation));
     }
 
-    // A list: the rows that the caller may read by the rules of the rows, an administrator's included (no bypass: the private rows of the
-    // others are reached by key only)
+    /// <summary>
+    /// Restricts a query to the rows the caller may read by the rules of the rows, an administrator's included: the private rows of others are reached by key only.
+    /// </summary>
     public static IQueryable<TEntity> Listed<TEntity>(this IQueryable<TEntity> queryable, ClaimsPrincipal user) where TEntity : IEntity
     {
         return queryable.Where(CreateExpression<TEntity>(user, AccessOperations.Read, administratorBypass: false));
     }
 
-    // The rule as a condition on an entity, for the database (Marten translates it to SQL) or for a list: the one rule below with
-    // the user of the caller in it as constants
+    /// <summary>
+    /// Builds the access rule as a condition on an entity, for the database (Marten translates it to SQL) or for a list, with the caller's identity substituted in as constants.
+    /// </summary>
     public static Expression<Func<TEntity, bool>> CreateExpression<TEntity>(ClaimsPrincipal user, string operation, bool administratorBypass = true) where TEntity : IEntity
     {
         ArgumentNullException.ThrowIfNull(user);
@@ -38,7 +42,9 @@ public static class EntityAccessUtil
         return Expression.Lambda<Func<TEntity, bool>>(body, rule.Parameters[0]);
     }
 
-    // The rule for one entity that is already loaded: the same rule, compiled once for the entity type and the operation
+    /// <summary>
+    /// Applies the access rule to an entity that is already loaded; the rule is compiled once per entity type and operation.
+    /// </summary>
     public static bool CanAccess<TEntity>(ClaimsPrincipal user, TEntity entity, string operation) where TEntity : IEntity
     {
         ArgumentNullException.ThrowIfNull(user);

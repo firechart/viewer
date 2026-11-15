@@ -1,6 +1,6 @@
 # FireChart.Viewer
 
-FireChart Viewer: a Blazor component that browses the data of a FHIR server from the client (resource types, lists, resources, the clinical summary of
+FireChart Viewer: a Blazor component that browses the data of a FHIR server from the client (resource types, lists, resources, the patient summary of
 a patient). It talks to the FHIR server directly, renders resources with the Liquid templates of `FireChart.Viewer.Library`, and is built on the client
 side of Flox (`Flox.Core`, `Flox.Shared`).
 
@@ -33,7 +33,7 @@ The Viewer has no styles of its own beyond its utilities: it takes the look of t
 <link rel="stylesheet" href="_content/Flox.Shared/css/Flox.Shared.Tailwind.css" />
 <link rel="stylesheet" href="_content/FireChart.Viewer/css/FireChart.Viewer.Tailwind.css" />
 <link rel="stylesheet" href="{YourApp}.styles.css" />
-<script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+<script src="_content/Radzen.Blazor/Radzen.Blazor.min.js"></script>
 ```
 
 and put `<RadzenTheme Theme="standard"/>` and `<RadzenComponents/>` into the root component. `FireChart.Viewer.App` (in the repository) is a complete example of such a host.
@@ -111,7 +111,7 @@ An authorization server that does not know the second one shows an error such as
 4. The authorization server sends the window to `smart-callback.html`. That page does nothing but post its own address to `window.opener` with
    `postMessage`, **to its own origin only**, and closes itself. It has no inline script (it works under a strict CSP) and touches no storage.
 5. The Viewer accepts the message only from its own origin and with its own type, exchanges the code for the token **in the frame** (where the PKCE
-   secret is), checks `state`, keeps the session of the tab and reads the page again, or opens the clinical summary of the patient of the launch context.
+   secret is), checks `state`, keeps the session of the tab and reads the page again, or opens the patient summary of the patient of the launch context.
 
 While it waits, the Viewer looks at the window every 0.5 s. It gives up when the window is closed, when it loses the window, or after 10 minutes.
 
@@ -135,7 +135,7 @@ What to expect. Only the rows marked *verified* were tried; the rest follows fro
 
 | Platform | Behaviour |
 |---|---|
-| **Chrome, Edge** (Windows, macOS, Linux) | A separate window. Works from a cross-origin frame as long as the frame is not sandboxed without `allow-popups`. *Verified 2026-11-07* (Chrome, Windows, the test page with the SMART App Launcher): the window opens, closes after the choice of a patient, and the frame shows the clinical summary of that patient |
+| **Chrome, Edge** (Windows, macOS, Linux) | A separate window. Works from a cross-origin frame as long as the frame is not sandboxed without `allow-popups`. *Verified 2026-11-07* (Chrome, Windows, the test page with the SMART App Launcher): the window opens, closes after the choice of a patient, and the frame shows the patient summary of that patient |
 | **Firefox** (desktop) | A separate window (or a tab, by the user's settings). A host that delays the click (an overlay, a confirmation) can get the window blocked |
 | **Safari** (macOS) | A separate window. "Block pop-up windows" is on by default but lets a window opened at a click through |
 | **Safari, Chrome on iOS / iPadOS** | A **new tab**, not a window. After the sign-in the return page closes the tab and the user is back on the tab of the host. If the tab stays, the user closes it: the sign-in is complete already |
@@ -189,7 +189,7 @@ Run it on each platform you support, with the SMART App Launcher (`https://launc
 `FireChart:Embedding:SmartFlow` = `Popup`):
 
 1. **Sign in** in the frame: a window (a tab on phones) opens with the sign-in of the launcher.
-2. Pick a provider and a patient: the window closes and the frame shows the clinical summary of that patient.
+2. Pick a provider and a patient: the window closes and the frame shows the patient summary of that patient.
 3. Close the window before the end: the frame shows the *closed* message and the two buttons; **Open the sign-in window** tries again.
 4. Block popups for `localhost` in the browser settings: **Sign in** gives the *blocked* message; **Sign in here** completes the redirect inside the frame
    (the launcher allows framing).

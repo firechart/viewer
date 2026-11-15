@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Components;
 namespace FireChart.Viewer.App;
 
 // viewer.json of the application, the keys of the plan (section 4.4) that the frame understands so far: one server, its SMART client, the language, the
-// terminology server, the clinical summary form, the theme and the variables of the appearance. An unknown key is an error, not silence
+// terminology server, the theme and the variables of the appearance. An unknown key is an error, not silence
 internal sealed record ViewerAppConfig
 {
     public required ServerConfig Server { get; init; }
@@ -20,8 +20,6 @@ internal sealed record ViewerAppConfig
     public string? Locale { get; init; }
 
     public TerminologyConfig? Terminology { get; init; }
-
-    public ClinicalSummaryConfig? ClinicalSummary { get; init; }
 
     public AppearanceConfig? Appearance { get; init; }
 }
@@ -35,6 +33,8 @@ internal sealed record ServerConfig
     public string? FhirRelease { get; init; }
 
     public int? PageSize { get; init; }
+
+    public int? TimeoutSeconds { get; init; }
 }
 
 internal sealed record SmartConfig
@@ -55,18 +55,28 @@ internal sealed record TerminologyConfig
     public string? Server { get; init; }
 }
 
-internal sealed record ClinicalSummaryConfig
-{
-    public string? Form { get; init; }
-}
-
 internal sealed record AppearanceConfig
 {
     public string? Theme { get; init; }
 
+    public string? Style { get; init; }
+
+    public List<FontConfig>? Fonts { get; init; }
+
     public Dictionary<string, string>? Variables { get; init; }
 
     public Dictionary<string, Dictionary<string, string>>? Rules { get; init; }
+}
+
+internal sealed record FontConfig
+{
+    public required string Family { get; init; }
+
+    public required string Src { get; init; }
+
+    public string? Weight { get; init; }
+
+    public string? Style { get; init; }
 }
 
 // The server of the configuration as the Viewer sees it; the key is the address, so two frames with two servers keep their sessions apart
@@ -86,6 +96,8 @@ internal sealed class ConfiguredServer(ServerConfig server, SmartConfig? smart, 
 
     public int PageSize => server.PageSize ?? DefaultPageSize;
 
+    public int TimeoutSeconds => server.TimeoutSeconds ?? FhirServerHttp.DefaultTimeoutSeconds;
+
     public string? Authority => smart?.Authority;
 
     public string? OAuth2ClientId => smart?.ClientId;
@@ -97,12 +109,12 @@ internal sealed class ConfiguredServer(ServerConfig server, SmartConfig? smart, 
 
 // What the frame shows: the Viewer with its options, or the errors of the configuration
 // Culture: none for "auto", the language of the browser
-internal sealed record ViewerAppSetup(IViewerServer? Server, SmartFlow SmartFlow, CultureInfo? Culture, string? TerminologyServer, string? ClinicalSummaryForm,
+internal sealed record ViewerAppSetup(IViewerServer? Server, SmartFlow SmartFlow, CultureInfo? Culture, string? TerminologyServer,
                                       ViewerAppearance? Appearance, IReadOnlyList<ViewerConfigError> Errors)
 {
     public static ViewerAppSetup Failed(params IReadOnlyList<ViewerConfigError> errors)
     {
-        return new ViewerAppSetup(null, SmartFlow.Redirect, null, null, null, null, errors);
+        return new ViewerAppSetup(null, SmartFlow.Redirect, null, null, null, errors);
     }
 }
 
@@ -126,7 +138,7 @@ internal sealed class ViewerAppConfigLoader(IHttpClientFactory httpClientFactory
     }
 
     // The languages of the texts of the Viewer
-    public static readonly IReadOnlyList<string> Locales = ["en", "de", "es", "ru", "zh-Hans"];
+    public static readonly IReadOnlyList<string> Locales = ["en", "de", "es", "he", "ru", "zh-Hans"];
 
     private async Task<ViewerAppSetup> ReadAsync(CancellationToken cancellationToken)
     {
@@ -224,13 +236,15 @@ internal sealed class ViewerAppConfigLoader(IHttpClientFactory httpClientFactory
             appearance = new ViewerAppearance
             {
                 Theme = theme,
+                Style = string.IsNullOrWhiteSpace(look.Style) ? null : look.Style.Trim(),
+                Fonts = [.. (look.Fonts ?? []).Select(font => new ViewerFont(font.Family, font.Src, font.Weight ?? "400", font.Style ?? "normal"))],
                 Variables = new Dictionary<string, string>(look.Variables ?? [], StringComparer.Ordinal),
                 Rules = new Dictionary<string, Dictionary<string, string>>(look.Rules ?? [], StringComparer.Ordinal)
             };
         }
 
         var server = errors.Count == 0 ? new ConfiguredServer(config.Server, config.Smart, release) : null;
-        return new ViewerAppSetup(server, flow, culture, config.Terminology?.Server, config.ClinicalSummary?.Form,
+        return new ViewerAppSetup(server, flow, culture, config.Terminology?.Server,
                                   appearance ?? new ViewerAppearance { Theme = ViewerTheme.Auto }, errors);
     }
 

@@ -2,9 +2,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Flox.Core.Data;
 
+/// <summary>Registration of data sources.</summary>
 public static class DataSourceServiceCollectionExtensions
 {
-    // Closed generics are named statically: AOT (iOS) cannot instantiate them from MakeGenericType
+    /// <summary>
+    /// Registers the data source of a <see cref="IGuidEntity"/>; the closed generics are named statically because AOT (iOS) cannot instantiate
+    /// them from <c>MakeGenericType</c>.
+    /// </summary>
     public static IServiceCollection AddDataSource<TEntity>(this IServiceCollection services) where TEntity : IGuidEntity
     {
         services.AddTransient<GuidDataSource<TEntity>>();
@@ -13,6 +17,7 @@ public static class DataSourceServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>Registers the data source of an entity with the given key type.</summary>
     public static IServiceCollection AddDataSource<TKey, TEntity>(this IServiceCollection services) where TKey : notnull
     {
         services.AddTransient<DataSource<TKey, TEntity>>();

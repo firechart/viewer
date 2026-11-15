@@ -1,10 +1,19 @@
+using System.Text.RegularExpressions;
 using FireChart.Viewer.Appearance;
+using FireChart.Viewer.Library;
 
 namespace FireChart.Viewer.Tests.Viewer;
 
-// The appearance sets the tokens of the document (FloxWind, Radzen, fx-*): a value that could do more than style is left out with an error
-public class AppearanceCssTests
+// The appearance sets the tokens of the kit (--fx-*); with a style or a variable the base of a theme passes them to Radzen around the content. A value that
+// could do more than style is left out with an error
+public partial class AppearanceCssTests
 {
+    [GeneratedRegex(@"(--[a-z0-9-]+)\s*:")]
+    private static partial Regex Declared();
+
+    [GeneratedRegex(@"var\((--fx-[a-z0-9-]+)")]
+    private static partial Regex ReadToken();
+
     [Test]
     public void NoAppearance_IsNoCss()
     {
@@ -12,33 +21,83 @@ public class AppearanceCssTests
     }
 
     [Test]
-    public void AColour_SetsTheRadzenVariable_AndItsVariants_AboveThePaletteOfFloxWind()
+    public void AVariable_SetsItsToken_AfterTheStyle_AndTheBaseOfTheThemeComesFirst()
     {
-        var sheet = AppearanceCss.Compose(new ViewerAppearance { Variables = { ["colorPrimary"] = "#0f766e", ["colorText"] = "rgb(20, 20, 20)", ["borderRadius"] = "4px" } });
+        var theme = FxStyle.ReadThemeFolder(TestLibrary.WebRoot(), "fluent");
+        var sheet = AppearanceCss.Compose(new ViewerAppearance { Style = "fluent", Variables = { ["colorPrimary"] = "#0f766e", ["borderRadius"] = "4px" } }, theme);
 
         Assert.Multiple(() =>
         {
             Assert.That(sheet.Errors, Is.Empty);
-            Assert.That(sheet.Css, Does.StartWith(":root:root:root {"), "outranks html:root[data-theme] of FloxWind");
-            Assert.That(sheet.Css, Does.Contain("--rz-primary: #0f766e;").And.Contain("--rz-primary-dark: color-mix(in oklab, #0f766e, black 15%);"));
-            Assert.That(sheet.Css, Does.Contain("--rz-link-color:"));
-            Assert.That(sheet.Css, Does.Contain("--rz-text-color: rgb(20, 20, 20);").And.Contain("--rz-text-title-color: rgb(20, 20, 20);"));
-            Assert.That(sheet.Css, Does.Contain("--fx-radius: 4px;"));
+            Assert.That(sheet.Css, Does.StartWith("@layer fx, fx-custom;"), "the order of the layers before any page declares one");
+            var bridge = sheet.Css.IndexOf("--rz-primary: var(--fx-color-accent);", StringComparison.Ordinal);
+            var style = sheet.Css.IndexOf("--fx-color-accent: #0f6cbd;", StringComparison.Ordinal);
+            var variable = sheet.Css.IndexOf("--fx-color-accent: #0f766e;", StringComparison.Ordinal);
+            Assert.That(bridge, Is.GreaterThan(0).And.LessThan(style), "the bridge of the base");
+            Assert.That(style, Is.LessThan(variable), "the style in its layer, the variable after it outside the layers");
+            Assert.That(sheet.Css, Does.Contain(":root:root:root {\n  --fx-color-accent: #0f766e;\n  --fx-radius: 4px;\n}"));
         });
     }
 
     [Test]
-    public void ARule_OfAPublicSelector_IsWrittenOnItsClass_InTheLayerOfTheCustomer()
+    public void WithoutAStyleOrAVariable_TheBaseOfATheme_IsLeftOut_AndTheViewerKeepsThePaletteOfItsHost()
     {
-        var sheet = AppearanceCss.Compose(new ViewerAppearance
-        {
-            Rules = { [".Tile:hover"] = new Dictionary<string, string> { ["backgroundColor"] = "#f0fdfa", ["letterSpacing"] = "0.02em" } }
-        });
+        var theme = FxStyle.ReadThemeFolder(TestLibrary.WebRoot(), null);
+        var sheet = AppearanceCss.Compose(new ViewerAppearance { Theme = ViewerTheme.Dark, Rules = { [".Tile"] = new Dictionary<string, string> { ["color"] = "red" } } }, theme);
+
+        Assert.That(sheet.Css, Does.Not.Contain("--rz-"));
+    }
+
+    [TestCase("Fluent", "is not the name of a style")]
+    [TestCase("../fx", "is not the name of a style")]
+    [TestCase("nope", "There is no style 'nope'")]
+    public void AStyleThatIsNotThere_IsLeftOutWithItsPath(string style, string message)
+    {
+        var sheet = AppearanceCss.Compose(new ViewerAppearance { Style = style }, FxStyle.ReadThemeFolder(TestLibrary.WebRoot(), style));
 
         Assert.Multiple(() =>
         {
-            Assert.That(sheet.Errors, Is.Empty);
-            Assert.That(sheet.Css, Does.Contain("@layer viewer-custom {").And.Contain(".fx-tile:hover {").And.Contain("background-color: #f0fdfa;").And.Contain("letter-spacing: 0.02em;"));
+            Assert.That(sheet.Errors.Single().Param, Is.EqualTo("appearance.style"));
+            Assert.That(sheet.Errors.Single().Message, Does.Contain(message));
+        });
+    }
+
+    [TestCase(":root { --fx-color-accent: red; } .fx-notice { display: none; }")]
+    [TestCase(":root { --fx-font: \"X\"; } @font-face { src: url(https://evil.example.test/x.woff2); }")]
+    [TestCase(":root { --fx-color-accent: red; } </style><script>alert(1)</script>")]
+    public void AStyleThatCouldHideTheNoticesOrReachOutside_IsLeftOut(string text)
+    {
+        var sheet = AppearanceCss.Compose(new ViewerAppearance { Style = "acme" }, new FxThemeSheets(":root:root:root { --rz-primary: var(--fx-color-accent); }", text));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(sheet.Errors.Single().Param, Is.EqualTo("appearance.style"));
+            Assert.That(sheet.Css, Does.Not.Contain("--fx-color-accent: red"));
+        });
+    }
+
+    // The contract: a theme of the vendor sets only the tokens of the kit (never a Radzen variable), passes the checks of a customer style, and every
+    // token the bridge reads has a value without a theme
+    [Test]
+    public void TheThemesOfTheVendor_SetOnlyTheTokensOfTheKit_AndTheBridgeReadsOnlyTokensThatExist()
+    {
+        var root = TestLibrary.WebRoot();
+        var tokens = TestLibrary.Styles.Tokens().Select(token => token.Name).ToHashSet(StringComparer.Ordinal);
+        var themes = Directory.GetFiles(Path.Combine(root, FxStyle.Folder, FxStyle.ThemesFolder), "*.css");
+        var themed = FxStyle.ReadThemeFolder(root, null).Base;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(themes.Select(Path.GetFileNameWithoutExtension), Is.SupersetOf(new[] { "fluent", "compact" }));
+            foreach (var file in themes)
+            {
+                var text = File.ReadAllText(file);
+                Assert.That(StyleChecks.Check(text), Is.Null, file);
+                Assert.That(Declared().Matches(text).Select(match => match.Groups[1].Value).Where(name => !tokens.Contains(name)), Is.Empty, $"{file}: tokens of the kit only");
+            }
+
+            Assert.That(StyleChecks.CheckVendor(themed), Is.Null);
+            Assert.That(ReadToken().Matches(themed).Select(match => match.Groups[1].Value).Distinct().Where(name => !tokens.Contains(name)), Is.Empty);
         });
     }
 
@@ -54,6 +113,21 @@ public class AppearanceCssTests
             Assert.That(sheet.Css, Is.Empty);
             Assert.That(sheet.Errors.Single().Code, Is.EqualTo("invalid_value"));
             Assert.That(sheet.Errors.Single().Param, Is.EqualTo($"appearance.variables.{name}"));
+        });
+    }
+
+    [Test]
+    public void ARule_OfAPublicSelector_IsWrittenOnItsClass_InTheLayerOfTheCustomer()
+    {
+        var sheet = AppearanceCss.Compose(new ViewerAppearance
+        {
+            Rules = { [".Tile:hover"] = new Dictionary<string, string> { ["backgroundColor"] = "#f0fdfa", ["letterSpacing"] = "0.02em" } }
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(sheet.Errors, Is.Empty);
+            Assert.That(sheet.Css, Does.Contain("@layer fx-custom {").And.Contain(".fx-tile:hover {").And.Contain("background-color: #f0fdfa;").And.Contain("letter-spacing: 0.02em;"));
         });
     }
 

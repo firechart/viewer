@@ -4,14 +4,15 @@
 @* The menu of a page: the button with the vertical ellipsis at the right of the app bar (or of the bar of SectionName) and a popup with what the page puts in it (any markup: a list
    of the sections of the page, switches, commands); PageMenuItem and PageMenuSeparator give the rows the common look. A page without it has no button.
    The content gets the menu as its context to close it after a choice of its own; the popup closes itself after a PageMenuItem, on a click outside,
-   on Escape and when the page changes *@
+   on Escape (the focus goes back to the button) and when the page changes. A group of buttons, not role="menu": it has no keys of a menu
+   (arrows, roving focus), and its content may be any markup *@
 <SectionContent SectionName=@SectionName>
     <RadzenButton @ref=_button Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" title=@(Title ?? Strings.Caption_More)
-                  aria-haspopup="true" Click=@ToggleAsync>
+                  aria-label=@(Title ?? Strings.Caption_More) aria-expanded=@(_open ? "true" : "false") Click=@ToggleAsync>
         <FloxIcon Icon="more_vert"/>
     </RadzenButton>
-    <RadzenPopup @ref=_popup Lazy="false" class="flox-page-menu" Style=@PopupStyle>
-        <div role="menu" @onkeydown=@OnKeyDownAsync>
+    <RadzenPopup @ref=_popup Lazy="false" class="flox-page-menu" Style=@PopupStyle Open=@(() => SetOpen(true)) Close=@(() => SetOpen(false))>
+        <div role="group" aria-label=@(Title ?? Strings.Caption_More) @onkeydown=@OnKeyDownAsync>
             <CascadingValue Value="this" IsFixed="true">
                 @ChildContent?.Invoke(this)
             </CascadingValue>
@@ -26,6 +27,7 @@
 
     private RadzenButton? _button;
     private RadzenPopup? _popup;
+    private bool _open;
 
     // Where the button goes: the app bar (appbar-menu) by default; a component that has its own bar (the Viewer) names its outlet
     [Parameter]
@@ -53,9 +55,23 @@
         return _popup is not null && _button is not null ? _popup.ToggleAsync(_button.Element) : Task.CompletedTask;
     }
 
-    private Task OnKeyDownAsync(KeyboardEventArgs args)
+    private void SetOpen(bool open)
     {
-        return args.Key == "Escape" ? CloseAsync() : Task.CompletedTask;
+        _open = open;
+    }
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        if (args.Key != "Escape")
+        {
+            return;
+        }
+
+        await CloseAsync();
+        if (_button is not null)
+        {
+            await _button.Element.FocusAsync();
+        }
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)

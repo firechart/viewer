@@ -14,9 +14,10 @@ namespace Flox.Shared.Logging;
 /// </summary>
 public sealed class FloxLogLevels
 {
-    // Namespaces that can be given a level even when appsettings does not mention them: the loggers that are the loudest
+    /// <summary>Namespaces that can be given a level even when appsettings does not mention them: the loggers that are the loudest.</summary>
     public static readonly IReadOnlyList<string> WellKnownPrefixes = ["Microsoft", "Microsoft.AspNetCore", "System", "OrchardCore", "Npgsql", "Marten", "Flox", "FireChart"];
 
+    /// <summary>The level names a user may choose from, those of Serilog.</summary>
     public static readonly IReadOnlyList<string> LevelNames = Enum.GetNames<LogEventLevel>();
 
     private readonly object _gate = new();
@@ -38,9 +39,10 @@ public sealed class FloxLogLevels
         Apply(initial);
     }
 
-    // What the configuration says; the state that Reset returns to
+    /// <summary>What the configuration says; the state that <see cref="Reset"/> returns to.</summary>
     public LogLevelSettings Initial { get; }
 
+    /// <summary>The levels now in effect.</summary>
     public LogLevelSettings Current
     {
         get
@@ -52,7 +54,7 @@ public sealed class FloxLogLevels
         }
     }
 
-    // The namespaces that have a switch, in the order of the list
+    /// <summary>The namespaces that have a switch, in the order of the list.</summary>
     public IReadOnlyList<string> Prefixes
     {
         get
@@ -61,7 +63,7 @@ public sealed class FloxLogLevels
         }
     }
 
-    // The default level comes from Serilog:MinimumLevel (a level, or the object with Default and Override), else from defaultLevel, else Information
+    /// <summary>Reads the initial levels from <c>Serilog:MinimumLevel</c> (a level, or the object with Default and Override); the default comes from there, else from <paramref name="defaultLevel"/>, else Information.</summary>
     public static FloxLogLevels FromConfiguration(IConfiguration configuration, LogEventLevel? defaultLevel = null)
     {
         var section = configuration.GetSection("Serilog:MinimumLevel");
@@ -85,12 +87,13 @@ public sealed class FloxLogLevels
         return new FloxLogLevels(new LogLevelSettings(level.ToString(), overrides));
     }
 
+    /// <summary>Parses the name of a Serilog level, ignoring case.</summary>
     public static bool TryParseLevel(string? name, out LogEventLevel level)
     {
         return Enum.TryParse(name, true, out level) && Enum.IsDefined(level);
     }
 
-    // The default level and the level of every namespace that has a switch; whoever has none follows the default
+    /// <summary>Connects the default level and the level of every namespace that has a switch to the logger configuration; a namespace without one follows the default.</summary>
     public void Configure(LoggerConfiguration configuration)
     {
         configuration.MinimumLevel.ControlledBy(_default);
@@ -100,8 +103,7 @@ public sealed class FloxLogLevels
         }
     }
 
-    // Takes the levels over. A namespace that has no switch is ignored (the logger knows its namespaces from the start); a level that is
-    // not one of the Serilog names is an error and changes nothing
+    /// <summary>Takes the levels over. A namespace that has no switch is ignored; a level that is not a Serilog name is an error and changes nothing.</summary>
     public void Apply(LogLevelSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
@@ -149,12 +151,13 @@ public sealed class FloxLogLevels
         return parent is null ? defaultLevel : Enum.Parse<LogEventLevel>(overrides[parent]!);
     }
 
+    /// <summary>Brings back the levels the configuration gave.</summary>
     public void Reset()
     {
         Apply(Initial);
     }
 
-    // True for a message of the push channel that carries levels (and then they are applied)
+    /// <summary>Applies the levels when the message of the push channel carries them; returns <c>true</c> in that case.</summary>
     public bool TryApply(EventMessage message)
     {
         if (message.PayloadType != typeof(LogLevelSettings).FullName || message.Deserialize<LogLevelSettings>() is not { } settings)
@@ -166,6 +169,7 @@ public sealed class FloxLogLevels
         return true;
     }
 
+    /// <summary>Tells whether the levels in effect are those the configuration gave.</summary>
     public bool IsInitial()
     {
         var current = Current;

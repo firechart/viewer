@@ -185,6 +185,60 @@ public class LocalEntityStorageTests
         Assert.That(capabilities[missing], Is.EqualTo(new EntityCapability<Guid>(missing, false, false, false)));
     }
 
+    // The store of one tab, written by "another tab" behind its back (the documents of one base); Elsewhere tells it as a store that hears the other tabs would
+    private sealed class TabStore(InMemoryDocumentStore shared) : ILocalDocumentStore
+    {
+        public event EventHandler<LocalDocumentsChangedEventArgs>? ChangedElsewhere;
+
+        public ValueTask<IReadOnlyList<LocalDocument>> LoadAsync(string collection, CancellationToken cancellationToken = default)
+        {
+            return shared.LoadAsync(collection, cancellationToken);
+        }
+
+        public ValueTask PutAsync(string collection, IReadOnlyCollection<LocalDocument> documents, CancellationToken cancellationToken = default)
+        {
+            return shared.PutAsync(collection, documents, cancellationToken);
+        }
+
+        public ValueTask DeleteAsync(string collection, IReadOnlyCollection<string> keys, CancellationToken cancellationToken = default)
+        {
+            return shared.DeleteAsync(collection, keys, cancellationToken);
+        }
+
+        public void Elsewhere(string? collection)
+        {
+            ChangedElsewhere?.Invoke(this, new LocalDocumentsChangedEventArgs(collection));
+        }
+    }
+
+    private static async Task AWriteOfAnotherTab_IsSeenOnceTold_AndOnlyByItsCollection()
+    {
+        var shared = new InMemoryDocumentStore();
+        var mine = new TabStore(shared);
+        using var notes = StorageOf<Note>(mine);
+        using var plains = StorageOf<Plain>(mine);
+        using var otherTab = StorageOf<Note>(new TabStore(shared));
+        await SeedAsync(notes, "Alpha");
+        await plains.InsertAsync(new Plain { Title = "P" });
+        var told = 0;
+        ((ILocalChangeNotifier)notes).ChangedElsewhere += (_, _) => told++;
+
+        await otherTab.InsertAsync(new Note { Title = "Beta" });
+        var beforeTold = await notes.CountAsync();
+        mine.Elsewhere(nameof(Plain));
+        var afterOtherCollection = await notes.CountAsync();
+        mine.Elsewhere(Collection);
+        var afterTold = await notes.CountAsync();
+        await otherTab.InsertAsync(new Note { Title = "Gamma" });
+        mine.Elsewhere(null);
+
+        Assert.That(beforeTold, Is.EqualTo(1), "the rows in memory until told");
+        Assert.That(afterOtherCollection, Is.EqualTo(1), "another collection changes nothing");
+        Assert.That(afterTold, Is.EqualTo(2));
+        Assert.That(await notes.CountAsync(), Is.EqualTo(3), "null: any collection may have changed");
+        Assert.That(told, Is.EqualTo(2));
+    }
+
     [Test]
     public async Task LocalEntityStorageScenario()
     {
@@ -198,6 +252,7 @@ public class LocalEntityStorageTests
             await DeleteMany_OverTheLimit_DeletesNothing();
             await ABrokenDocument_IsLeftOut();
             await Capabilities_AreAllOrNothing();
+            await AWriteOfAnotherTab_IsSeenOnceTold_AndOnlyByItsCollection();
         });
     }
 }

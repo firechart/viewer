@@ -2,8 +2,14 @@ using System.Security.Claims;
 
 namespace Flox.Core;
 
+/// <summary>
+/// Built-in identities.
+/// </summary>
 public static class Identities
 {
+    /// <summary>
+    /// The identity of an anonymous caller.
+    /// </summary>
     public static ClaimsPrincipal DefaultIdentity { get; } = new ClaimsPrincipal(new ClaimsIdentity());
 
     /// <summary>
@@ -15,6 +21,9 @@ public static class Identities
                                                                                                   },
                                                                                                   Constants.AUTHENTICATION_TYPE));
 
+    /// <summary>
+    /// The identity of the platform's own services.
+    /// </summary>
     public static ClaimsPrincipal Service { get; } = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                                                                                             {
                                                                                                 new Claim(Constants.SUB_CLAIM, Constants.DEFAULT_SERVICE_ID.ToString()), new Claim(Constants.NAME_CLAIM, "Background Service"), new Claim(ClaimTypes.Role, AppRoles.ADMINISTRATOR)

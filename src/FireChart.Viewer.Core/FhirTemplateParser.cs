@@ -124,8 +124,36 @@ internal sealed class FhirTemplateParser : FluidParser
                 slots.Html[FrameSlots.Age] = await LineAsync(_ageLine ??= this.Parse("{% render \"age-at\", patient: fx_ref, when: fx_at %}"), patient, at, encoder, context);
             }
 
+            if (named.HasNamed(FrameSlots.CodesArgument))
+            {
+                slots.Codes.AddRange(CodesOf(await named[FrameSlots.CodesArgument].EvaluateAsync(context)));
+            }
+
             return Completion.Normal;
         });
+    }
+
+    // The codings of a CodeableConcept, a Coding or a list of them
+    private static IEnumerable<TileCode> CodesOf(FluidValue value)
+    {
+        IEnumerable<FluidValue> items = value is ArrayValue array ? array.Values : [value];
+        foreach (var item in items)
+        {
+            if (item is not FhirNodeValue { Node: var node })
+            {
+                continue;
+            }
+
+            var codings = node.Children("coding") is { Count: > 0 } own ? own : [node];
+            foreach (var coding in codings)
+            {
+                if (coding.Children("system") is [{ } system, ..] && coding.Children("code") is [{ } code, ..]
+                    && system.ValueText() is { Length: > 0 } uri && code.ValueText() is { Length: > 0 } text)
+                {
+                    yield return new TileCode(uri, text);
+                }
+            }
+        }
     }
 
     private static async Task<string> LineAsync(IFluidTemplate template, FluidValue reference, FluidValue at, TextEncoder encoder, TemplateContext context)

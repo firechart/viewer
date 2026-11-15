@@ -1,8 +1,9 @@
-<span role="button" class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full hover:bg-hover"
-      title=@(Bookmarked ? Strings.Caption_RemoveBookmark : Strings.Caption_AddBookmark)
-      @onclick=@OnToggle @onclick:stopPropagation @onclick:preventDefault>
+@* A real button (focus, Enter and Space, its name and state for a screen reader); inside the link of a row it neither follows the link nor reaches the row *@
+<button type="button" class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-inherit hover:bg-hover"
+        title=@Caption aria-label=@Caption aria-pressed=@(Bookmarked ? "true" : "false")
+        @onclick=@OnToggle @onclick:stopPropagation @onclick:preventDefault>
     <Bookmark Bookmarked=@Bookmarked/>
-</span>
+</button>
 
 @code {
 
@@ -11,5 +12,13 @@
 
     [Parameter]
     public EventCallback OnToggle { get; set; }
+
+    private string Caption
+    {
+        get
+        {
+            return Bookmarked ? Strings.Caption_RemoveBookmark : Strings.Caption_AddBookmark;
+        }
+    }
 
 }

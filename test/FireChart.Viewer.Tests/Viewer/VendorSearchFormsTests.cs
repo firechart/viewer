@@ -6,7 +6,7 @@ using FireChart.Viewer.Library;
 
 namespace FireChart.Viewer.Tests.Viewer;
 
-// The vendor search forms of src/FireChart.Viewer.Library/wwwroot/search-forms/{release}/{type}.json (git first): each file is a valid form in its
+// The vendor search forms of library/search-forms/{release}/{type}.json (git first): each file is a valid form in its
 // canonical text, every resource type of a release with search parameters has one and every file is of a resource type of the release
 public class VendorSearchFormsTests
 {
@@ -27,7 +27,7 @@ public class VendorSearchFormsTests
             directory = directory.Parent;
         }
 
-        return Path.Combine(directory!.FullName, "src", "FireChart.Viewer.Library", VendorSearchForms.WebRoot, VendorSearchForms.Folder);
+        return Path.Combine(directory!.FullName, "library", VendorSearchForms.Folder);
     }
 
     private static IEnumerable<string> Files(string release)
@@ -76,32 +76,24 @@ public class VendorSearchFormsTests
         {
             foreach (var file in Files(release))
             {
-                Assert.That(VendorSearchForms.PathOf(release, Path.GetFileNameWithoutExtension(file)), Is.EqualTo($"_content/FireChart.Viewer.Library/search-forms/{release}/{Path.GetFileName(file)}"));
+                Assert.That(VendorSearchForms.PathOf(release, Path.GetFileNameWithoutExtension(file)), Is.EqualTo($"library/search-forms/{release}/{Path.GetFileName(file)}"));
                 var text = File.ReadAllText(file).ReplaceLineEndings("\n");
                 Assert.That(ViewerJson.Write(ViewerJson.Read<SearchFormDefinition>(text)), Is.EqualTo(text), file);
             }
         }
     }
 
+    // The vendor forms are the designed ones of the types used most (2026-11-13); every other type has its form generated (SearchFormGenerator)
     [Test]
-    public void EveryResourceTypeWithSearchParameters_HasAForm_AndEveryFormIsOfAResourceType([ValueSource(nameof(Releases))] string release)
+    public void EveryForm_IsOfAResourceTypeOfItsRelease([ValueSource(nameof(Releases))] string release)
     {
         var files = Files(release).Select(Path.GetFileNameWithoutExtension).ToHashSet(StringComparer.Ordinal);
-        if (files.Count == 0)
-        {
-            Assert.Ignore($"No vendor search forms of {release} yet: run \"Create the missing files\" in the Files mode and commit them.");
-        }
-
-        var searchable = SearchableTypes(release);
         var types = ResourceTypes(release);
-        Assert.Multiple(() =>
-        {
-            Assert.That(searchable.Where(type => !files.Contains(type)), Is.Empty, "without a form");
-            Assert.That(files.Where(file => !types.Contains(file!)), Is.Empty, "not a resource type");
-        });
+
+        Assert.That(files.Where(file => !types.Contains(file!)), Is.Empty, "not a resource type");
     }
 
-    // The list the completeness is checked against is read from Firely; it must not be empty before the files are there
+    // The list the forms are checked against is read from Firely
     [Test]
     public void TheSearchableTypes_OfEveryRelease_AreReadFromFirely([ValueSource(nameof(Releases))] string release)
     {
@@ -117,7 +109,7 @@ public class VendorSearchFormsTests
             Assert.Ignore("No vendor search forms of r4 yet.");
         }
 
-        var assets = new FolderAssets(Path.GetDirectoryName(Path.GetDirectoryName(Folder()))!);
+        var assets = new FolderAssets(Path.GetDirectoryName(Folder())!);
         var provider = new VendorSearchFormProvider(assets);
 
         var patient = await provider.FindAsync(new SearchFormKey("R4", "Patient"), CancellationToken.None);
@@ -131,8 +123,8 @@ public class VendorSearchFormsTests
             Assert.That(outside, Is.Null);
             Assert.That(assets.Paths, Is.EqualTo(new[]
             {
-                $"_content/FireChart.Viewer.Library/search-forms/r4/Patient.json?v={Uri.EscapeDataString(VendorSearchForms.Version)}",
-                $"_content/FireChart.Viewer.Library/search-forms/r4/NoSuchType.json?v={Uri.EscapeDataString(VendorSearchForms.Version)}"
+                $"library/search-forms/r4/Patient.json?v={Uri.EscapeDataString(VendorSearchForms.Version)}",
+                $"library/search-forms/r4/NoSuchType.json?v={Uri.EscapeDataString(VendorSearchForms.Version)}"
             }));
         });
     }
@@ -150,7 +142,7 @@ public class VendorSearchFormsTests
         public async Task<string?> ReadTextAsync(string path, CancellationToken cancellationToken)
         {
             Paths.Add(path);
-            var file = Path.Combine(library, VendorSearchForms.WebRoot, path.Split('?')[0][(VendorSearchForms.ContentRoot.Length + 1)..]);
+            var file = Path.Combine(library, path.Split('?')[0][(VendorSearchForms.ContentRoot.Length + 1)..]);
             return File.Exists(file) ? await File.ReadAllTextAsync(file, cancellationToken) : null;
         }
     }

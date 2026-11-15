@@ -2,10 +2,15 @@ using Microsoft.JSInterop;
 
 namespace Flox.Shared.Services;
 
+/// <summary>The banner of the telemetry consent (cookie-gdpr.js, imported with its library at the first show): shown only where telemetry is on.</summary>
 public sealed class TelemetryConsentBanner(IJSRuntime js, Func<bool, Task> onChanged) : IAsyncDisposable
 {
-    private DotNetObjectReference<TelemetryConsentBanner>? _reference;
+    private const string ModulePath = "./_content/Flox.Shared/cookie-gdpr.js";
 
+    private DotNetObjectReference<TelemetryConsentBanner>? _reference;
+    private IJSObjectReference? _module;
+
+    /// <summary>Shows the banner with the current choice; does nothing when a content blocker refuses the library.</summary>
     public async Task ShowAsync(bool allowed)
     {
         _reference = DotNetObjectReference.Create(this);
@@ -25,26 +30,59 @@ public sealed class TelemetryConsentBanner(IJSRuntime js, Func<bool, Task> onCha
             telemetryDescription = Strings.Consent_TelemetryDescription,
         };
 
-        await js.InvokeVoidAsync("floxConsent.init", _reference, texts, allowed);
+        try
+        {
+            _module = await js.ImportModuleAsync(ModulePath);
+        }
+        catch (JSException)
+        {
+            return;
+        }
+
+        await InvokeAsync("init", _reference, texts, allowed);
     }
 
+    /// <summary>Sets the telemetry choice shown by the banner.</summary>
     public async Task SetAsync(bool allowed)
     {
-        if (_reference is not null)
+        if (_module is not null)
         {
-            await js.InvokeVoidAsync("floxConsent.setTelemetry", allowed);
+            await InvokeAsync("setTelemetry", allowed);
         }
     }
 
+    // The library may be refused by a content blocker: no banner, the setting stays the source of truth
+    private async Task InvokeAsync(string identifier, params object?[] args)
+    {
+        try
+        {
+            await _module!.InvokeVoidAsync(identifier, args);
+        }
+        catch (JSException)
+        {
+        }
+    }
+
+    /// <summary>Called by the banner script when the user changes the choice; passes it on to the owner.</summary>
     [JSInvokable]
     public Task OnTelemetryConsentChanged(bool allowed)
     {
         return onChanged(allowed);
     }
 
-    public ValueTask DisposeAsync()
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
     {
         _reference?.Dispose();
-        return ValueTask.CompletedTask;
+        if (_module is not null)
+        {
+            try
+            {
+                await _module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
     }
 }

@@ -11,34 +11,53 @@ public abstract class SheetBase : ComponentBase, IFloxSheet, IDisposable
     private bool _isOpen;
     private bool _lastIsOpen;
 
+    /// <summary>
+    /// The dialog service that shows the sheet.
+    /// </summary>
     [Inject]
     protected DialogService Dialogs { get; set; } = null!;
 
+    /// <inheritdoc />
     [Parameter]
     public bool IsOpen { get; set; }
 
+    /// <summary>
+    /// Raised when the sheet opens or closes, with the new state; allows binding <c>IsOpen</c> two ways.
+    /// </summary>
     [Parameter]
     public EventCallback<bool> IsOpenChanged { get; set; }
 
+    /// <inheritdoc />
     [Parameter]
     public string TitleText { get; set; } = string.Empty;
 
+    /// <inheritdoc />
     [Parameter]
     public bool ShowCloseButton { get; set; } = true;
 
+    /// <inheritdoc />
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    // Extra commands shown above the content, aligned to the end
+    /// <inheritdoc />
     [Parameter]
     public RenderFragment? HeaderCommands { get; set; }
 
+    /// <summary>
+    /// Raised after the sheet opened.
+    /// </summary>
     [Parameter]
     public EventCallback OnOpened { get; set; }
 
+    /// <summary>
+    /// Raised after the sheet closed.
+    /// </summary>
     [Parameter]
     public EventCallback OnClosed { get; set; }
 
+    /// <summary>
+    /// The parameters passed to the sheet host: the content and the header commands.
+    /// </summary>
     protected Dictionary<string, object?> HostParameters
     {
         get
@@ -51,11 +70,17 @@ public abstract class SheetBase : ComponentBase, IFloxSheet, IDisposable
         }
     }
 
-    // Opens the dialog and completes when it is closed
+    /// <summary>
+    /// Shows the dialog and completes when it is closed.
+    /// </summary>
     protected abstract Task ShowAsync();
 
+    /// <summary>
+    /// Closes the dialog.
+    /// </summary>
     protected abstract void CloseDialog();
 
+    /// <inheritdoc />
     protected override async Task OnParametersSetAsync()
     {
         // Sync from the parameter only when the parent actually changed it, so that imperative
@@ -76,6 +101,7 @@ public abstract class SheetBase : ComponentBase, IFloxSheet, IDisposable
         }
     }
 
+    /// <inheritdoc />
     public async Task OpenAsync()
     {
         if (_isOpen)
@@ -89,6 +115,7 @@ public abstract class SheetBase : ComponentBase, IFloxSheet, IDisposable
         _ = ShowUntilClosedAsync();
     }
 
+    /// <inheritdoc />
     public Task CloseAsync()
     {
         if (_isOpen)
@@ -99,6 +126,9 @@ public abstract class SheetBase : ComponentBase, IFloxSheet, IDisposable
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Refreshes the content of the open sheet from the current state of the parent.
+    /// </summary>
     public void Refresh()
     {
         Dialogs.Refresh();
@@ -118,12 +148,14 @@ public abstract class SheetBase : ComponentBase, IFloxSheet, IDisposable
         }
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <inheritdoc />
     protected virtual void Dispose(bool disposing)
     {
         if (disposing)

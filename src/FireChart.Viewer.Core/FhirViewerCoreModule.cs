@@ -26,9 +26,10 @@ namespace FireChart.Viewer.Core;
 public sealed class FhirViewerCoreModule : BootstrapModule
 {
     /// <summary>
-    /// How long a request to a FHIR server may take.
+    /// How long a request to a FHIR server may take when nothing says otherwise; a request of a server takes its own
+    /// (<see cref="IViewerServer.TimeoutSeconds"/>, <see cref="FhirServerHttp.TimeoutOf"/>).
     /// </summary>
-    public static readonly TimeSpan FhirServerTimeout = TimeSpan.FromSeconds(30);
+    public static readonly TimeSpan FhirServerTimeout = TimeSpan.FromSeconds(FhirServerHttp.DefaultTimeoutSeconds);
 
     /// <summary>
     /// How long a request to a terminology server may take.

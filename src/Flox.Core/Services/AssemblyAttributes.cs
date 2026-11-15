@@ -2,6 +2,7 @@ using System.Reflection;
 
 namespace Flox.Core.Services;
 
+/// <summary>The assembly metadata (name, version, company, ...) of the assembly that first used this class.</summary>
 public static class AssemblyAttributes
 {
     private static readonly Assembly? s_assembly = Assembly.GetCallingAssembly();
@@ -48,6 +49,7 @@ public static class AssemblyAttributes
                                                                                          .Version
                                                                                         ?.ToString());
 
+    /// <summary>The simple name of the assembly.</summary>
     public static string? AssemblyName
     {
         get
@@ -56,6 +58,7 @@ public static class AssemblyAttributes
         }
     }
 
+    /// <summary>The authors; falls back to the company.</summary>
     public static string? Authors
     {
         get
@@ -64,6 +67,7 @@ public static class AssemblyAttributes
         }
     }
 
+    /// <summary>The company.</summary>
     public static string? Company
     {
         get
@@ -72,6 +76,7 @@ public static class AssemblyAttributes
         }
     }
 
+    /// <summary>The build configuration, such as Debug or Release.</summary>
     public static string? Configuration
     {
         get
@@ -80,6 +85,7 @@ public static class AssemblyAttributes
         }
     }
 
+    /// <summary>The copyright notice.</summary>
     public static string? Copyright
     {
         get
@@ -88,6 +94,7 @@ public static class AssemblyAttributes
         }
     }
 
+    /// <summary>The neutral culture of the assembly.</summary>
     public static string? Culture
     {
         get
@@ -96,6 +103,7 @@ public static class AssemblyAttributes
         }
     }
 
+    /// <summary>The description.</summary>
     public static string? Description
     {
         get
@@ -104,6 +112,7 @@ public static class AssemblyAttributes
         }
     }
 
+    /// <summary>The file version.</summary>
     public static string? FileVersion
     {
         get
@@ -112,6 +121,7 @@ public static class AssemblyAttributes
         }
     }
 
+    /// <summary>The informational version, which usually holds the product version and the commit.</summary>
     public static string? InformationalVersion
     {
         get
@@ -120,6 +130,7 @@ public static class AssemblyAttributes
         }
     }
 
+    /// <summary>The product name.</summary>
     public static string? Product
     {
         get
@@ -128,6 +139,7 @@ public static class AssemblyAttributes
         }
     }
 
+    /// <summary>The title.</summary>
     public static string? Title
     {
         get
@@ -136,6 +148,7 @@ public static class AssemblyAttributes
         }
     }
 
+    /// <summary>The trademark.</summary>
     public static string? Trademark
     {
         get
@@ -144,6 +157,7 @@ public static class AssemblyAttributes
         }
     }
 
+    /// <summary>The assembly version.</summary>
     public static string? Version
     {
         get

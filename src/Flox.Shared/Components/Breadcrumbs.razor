@@ -7,7 +7,7 @@
 }
 else if (Visible.Count > 0)
 {
-    <RadzenBreadCrumb class="rz-my-1 max-w-full overflow-x-auto rz-px-2 text-xs [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>.rz-breadcrumb-list]:flex-nowrap [&_.rz-breadcrumb-item]:shrink-0 [&_.rz-breadcrumb-item]:whitespace-nowrap" @attributes="UserAttributes">
+    <RadzenBreadCrumb class="fw-breadcrumbs rz-my-1 max-w-full overflow-x-auto rz-px-2 text-xs [&>.rz-breadcrumb-list]:flex-nowrap [&_.rz-breadcrumb-item]:shrink-0 [&_.rz-breadcrumb-item]:whitespace-nowrap" @attributes="UserAttributes">
         @foreach (var item in Visible.Select((value, index) => (value, last: index == Visible.Count - 1)))
         {
             <RadzenBreadCrumbItem>

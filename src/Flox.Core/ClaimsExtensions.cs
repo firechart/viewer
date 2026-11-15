@@ -2,8 +2,14 @@ using System.Security.Claims;
 
 namespace Flox.Core;
 
+/// <summary>
+/// Helpers to read the identity of the caller from a ClaimsPrincipal.
+/// </summary>
 public static class ClaimsExtensions
 {
+    /// <summary>
+    /// Adds the claim unless the identity already has a claim of the same type and value.
+    /// </summary>
     public static void AddClaimIfNotExists(this ClaimsIdentity identity, Claim claim)
     {
         var existingClaim = identity.Claims.FirstOrDefault(row => row.Type == claim.Type && row.Value == claim.Value);
@@ -13,8 +19,9 @@ public static class ClaimsExtensions
         }
     }
 
-    // ClaimTypes.Role is the only role claim type in the application: token roles are normalized to it
-    // (RoleClaimsMapper), so this agrees with IsInRole and the authorization policies
+    /// <summary>
+    /// Returns the sorted, distinct roles of the principal. ClaimTypes.Role is the only role claim type in the application: token roles are normalized to it (RoleClaimsMapper), so this agrees with IsInRole and the authorization policies.
+    /// </summary>
     public static List<string> GetRoles(this ClaimsPrincipal? value)
     {
         if (value == null)
@@ -30,8 +37,9 @@ public static class ClaimsExtensions
         return result;
     }
 
-    // Returns OAuth2 sub (NameIdentifier for Orchard's own cookie sessions, which have no sub; the
-    // two are the same value in tokens); an unauthenticated principal has no user id
+    /// <summary>
+    /// Returns the user id: the OAuth2 sub (the NameIdentifier for Orchard's own cookie sessions, which have no sub; the two are the same value in tokens). An unauthenticated principal has no user id and gets the empty one.
+    /// </summary>
     public static string GetUserId(this ClaimsPrincipal? value)
     {
         if (value?.Identity?.IsAuthenticated != true)
@@ -44,7 +52,9 @@ public static class ClaimsExtensions
                                   ?.Value ?? Constants.NULL_GUID;
     }
 
-    // Returns OAuth2 sub, see the ClaimsPrincipal overload
+    /// <summary>
+    /// Returns the user id of the identity, see the ClaimsPrincipal overload.
+    /// </summary>
     public static string? GetUserId(this ClaimsIdentity? value)
     {
         if (value == null)
@@ -66,6 +76,9 @@ public static class ClaimsExtensions
         return claim?.Value ?? Constants.NULL_GUID;
     }
 
+    /// <summary>
+    /// Returns the display name of the user, or null when the principal is not authenticated.
+    /// </summary>
     public static string? GetUserName(this ClaimsPrincipal? value)
     {
         if (value == null)
@@ -82,6 +95,9 @@ public static class ClaimsExtensions
         return GetUserName(identity);
     }
 
+    /// <summary>
+    /// Returns the display name of the user (name, preferred_username, name claim or email), or null when the identity is not authenticated.
+    /// </summary>
     public static string? GetUserName(this ClaimsIdentity? value)
     {
         if (value == null)
@@ -106,7 +122,9 @@ public static class ClaimsExtensions
         return result;
     }
 
-    // Who may see the text and the stack trace of a server failure in the answer: those who debug
+    /// <summary>
+    /// Tells whether the caller may see the text and the stack trace of a server failure in the answer: those who debug.
+    /// </summary>
     public static bool CanSeeErrorDetails(this ClaimsPrincipal? value)
     {
         if (value == null || value.Identity == null || !value.Identity.IsAuthenticated)
@@ -117,6 +135,9 @@ public static class ClaimsExtensions
         return value.IsInRole(AppRoles.ADMINISTRATOR) || value.IsInRole(AppRoles.DEVELOPER);
     }
 
+    /// <summary>
+    /// Tells whether the principal is an authenticated administrator.
+    /// </summary>
     public static bool IsAdmin(this ClaimsPrincipal? value)
     {
         if (value == null || value.Identity == null || !value.Identity.IsAuthenticated)
@@ -127,6 +148,9 @@ public static class ClaimsExtensions
         return value.IsInRole(AppRoles.ADMINISTRATOR);
     }
 
+    /// <summary>
+    /// Tells whether the principal is authenticated.
+    /// </summary>
     public static bool IsAuthenticated(this ClaimsPrincipal? value)
     {
         return value?.Identity?.IsAuthenticated == true;

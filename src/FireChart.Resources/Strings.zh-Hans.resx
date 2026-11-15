@@ -177,6 +177,24 @@
   <data name="Caption_FhirServerOAuth2ExtraParameters" xml:space="preserve">
     <value>OAuth2 附加参数（键=值&amp;键=值）</value>
   </data>
+  <data name="Caption_FhirServerTimeout" xml:space="preserve">
+    <value>超时（秒）</value>
+  </data>
+  <data name="Caption_SearchRefused" xml:space="preserve">
+    <value>服务器拒绝了搜索</value>
+  </data>
+  <data name="Caption_SearchServerError" xml:space="preserve">
+    <value>服务器无法执行搜索</value>
+  </data>
+  <data name="Caption_SearchTimedOut" xml:space="preserve">
+    <value>{0} 秒内无响应</value>
+  </data>
+  <data name="Caption_SearchUnreadable" xml:space="preserve">
+    <value>无法读取服务器的响应</value>
+  </data>
+  <data name="Caption_SectionFailed" xml:space="preserve">
+    <value>此部分的搜索失败</value>
+  </data>
   <data name="Caption_FhirServerRelease" xml:space="preserve">
     <value>FHIR 版本（/metadata 不可用时）</value>
   </data>
@@ -189,17 +207,20 @@
   <data name="Message_FhirServerAuthenticationNotSupported" xml:space="preserve">
     <value>尚不支持连接使用此类认证方式的服务器。</value>
   </data>
-  <data name="Caption_ClinicalSummary" xml:space="preserve">
-    <value>临床摘要</value>
-  </data>
-  <data name="Caption_ClinicalSummaryForm" xml:space="preserve">
-    <value>临床摘要表单</value>
+  <data name="Caption_PatientSummary" xml:space="preserve">
+    <value>患者摘要</value>
   </data>
   <data name="Message_InvalidSearch" xml:space="preserve">
     <value>地址中的搜索无效。</value>
   </data>
   <data name="Placeholder_SearchAllFields" xml:space="preserve">
     <value>在所有字段中搜索</value>
+  </data>
+  <data name="Caption_ShowAllFields" xml:space="preserve">
+    <value>显示所有字段</value>
+  </data>
+  <data name="Caption_ShowFormFields" xml:space="preserve">
+    <value>仅显示表单字段</value>
   </data>
   <data name="Message_SearchFormGenerated" xml:space="preserve">
     <value>此表单根据资源的搜索参数自动生成，因此不太方便。服务器可能不支持其中的某些参数。</value>
@@ -476,5 +497,74 @@
   </data>
   <data name="Caption_TrendOpenLast" xml:space="preserve">
     <value>打开最新记录</value>
+  </data>
+  <data name="Caption_TimesInDeviceZone" xml:space="preserve">
+    <value>时间以此设备的时区显示</value>
+  </data>
+  <data name="Message_SectionsFailed" xml:space="preserve">
+    <value>无法加载的部分：{0}</value>
+  </data>
+  <data name="Caption_TrendValues" xml:space="preserve">
+    <value>数值</value>
+  </data>
+  <data name="Caption_TrendDate" xml:space="preserve">
+    <value>日期</value>
+  </data>
+  <data name="Caption_TrendSummary" xml:space="preserve">
+    <value>{0} 个值，{1} – {2}</value>
+  </data>
+  <data name="Caption_OpenAsPage" xml:space="preserve">
+    <value>作为页面打开</value>
+  </data>
+  <data name="Caption_EncounterSummary" xml:space="preserve">
+    <value>就诊摘要</value>
+  </data>
+  <data name="Caption_LoadAll" xml:space="preserve">
+    <value>全部加载</value>
+  </data>
+  <data name="Caption_Print" xml:space="preserve">
+    <value>打印</value>
+  </data>
+  <data name="Message_PrintIncomplete" xml:space="preserve">
+    <value>此打印件可能不完整：页面的记录尚未全部加载。请使用摘要的“打印”命令打印，它会先加载全部记录。</value>
+  </data>
+  <data name="Message_PrintRefused" xml:space="preserve">
+    <value>未能加载全部记录，因此不打印此页。请重试失败的部分，然后再次打印。</value>
+  </data>
+  <data name="Caption_Record" xml:space="preserve">
+    <value>记录</value>
+  </data>
+  <data name="Caption_Summary" xml:space="preserve">
+    <value>摘要</value>
+  </data>
+  <data name="PackageBase_Download" xml:space="preserve">
+    <value>下载</value>
+  </data>
+  <data name="PackageBase_UpdateButton" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="PackageBase_Failed" xml:space="preserve">
+    <value>下载失败：{0}</value>
+  </data>
+  <data name="PackageBase_NotOnDevice" xml:space="preserve">
+    <value>此包不在设备上。下载它（{0}；设备上占用 {1}）即可离线浏览。</value>
+  </data>
+  <data name="PackageBase_Progress" xml:space="preserve">
+    <value>正在下载：{0} / {1}</value>
+  </data>
+  <data name="PackageBase_OnDevice" xml:space="preserve">
+    <value>已在设备上</value>
+  </data>
+  <data name="PackageBase_Delete" xml:space="preserve">
+    <value>从设备删除</value>
+  </data>
+  <data name="PackageBase_UpdateAvailable" xml:space="preserve">
+    <value>此包有更新版本可用（{0}）。</value>
+  </data>
+  <data name="PackageBase_ListUnavailable" xml:space="preserve">
+    <value>目前无法读取 FHIR 包列表：应用无法连接其服务器。设备上的包仍可使用。</value>
+  </data>
+  <data name="PackageBase_Occupied" xml:space="preserve">
+    <value>设备上的包：{0} 个，占用 {1}</value>
   </data>
 </root>
