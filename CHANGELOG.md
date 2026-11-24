@@ -2,6 +2,48 @@
 
 The changes of each published release of the FireChart Viewer and the public Flox libraries, newest first.
 
+## 0.95.4 - 2026-11-24
+
+### Viewer
+
+- **Components instead of templates.** Every record is drawn by the components of the library, `library/components/{Type}.{mode}.xml`
+  (`text`, `link`, `tile`, `banner`, `view`, `page`, `summary`): XML of built-in blocks bound to the data by FHIRPath, checked as a whole
+  before they are shown. The Liquid templates are gone.
+- **Search forms are components** too, `{Type}.search.xml`, one file for every FHIR release: a filter says only what differs from the form
+  the Viewer generates. The library has the forms of Patient and Encounter; any other type gets the generated form.
+- **One toolbar for a record**: Record | Summary | Source, the bookmark and the menu at its end. The JSON of a record is a mode in the
+  address (`?view=source`), so Back keeps it.
+- **Lists** read the next page as their end comes into view (up to 500 records), show skeleton rows while it loads, and appear once, whole.
+- **A summary loaded at once** shows its progress with Cancel and is about twice as fast.
+- A reference to a record the server does not have is marked "could not be found"; a search the server refuses is no dead end.
+- Keys: Enter applies a search form, Ctrl+F and / open the search form of a list.
+- The page of the resource types chooses which types are shown (the eye of its header).
+- The texts of the components are .resx resources: English, with drafts in German, Spanish, Hebrew, Russian and Chinese; the components
+  read right to left in Hebrew.
+
+### Look
+
+- The UI is built on Blazor Blueprint (shadcn/ui tokens and Tailwind); Radzen is no longer used. A warm light theme and a dark theme.
+- iOS: lists, menus and selects paint at once, typing in a field no longer zooms the page.
+
+### Application and SDK
+
+- The application shows a splash while the runtime downloads; the frame (`/embed`) a thin progress bar.
+- Development runs on the Gateway of Blazor (`dotnet run --project src/FireChart.Viewer.App`).
+
+### Platform (Flox)
+
+- The SQLite of the browser: a base being imported is invisible until it is complete, and a page kept in Safari's back-forward cache gives
+  its worker up and takes it back.
+
+### Build
+
+- .NET 11.
+- The repository is laid out flat: `src/<Project>`, `test/<Project>`, `library/`, `samples/`; the Docker files are the `Dockerfile` of the
+  root and `docker/`.
+- GitHub builds and tests every push and pull request; a release on `main` also publishes the image `ghcr.io/firechart/viewer`
+  (`linux/amd64`, `linux/arm64`) and tags the version. The version of a build is the file `VERSION`.
+
 ## 0.76.0 - 2026-11-16
 
 ### Viewer

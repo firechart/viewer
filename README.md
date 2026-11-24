@@ -37,7 +37,7 @@ configuration and the code to copy. Use your own instance for real data.
 
 ## Quick start
 
-With Docker, the published image (built by GitHub from this repository for every release, `linux/amd64` and `linux/arm64`):
+With Docker, the published image (built by GitHub from this repository with every release, `linux/amd64` and `linux/arm64`):
 
 ```bash
 docker run -d -p 8080:8080 ghcr.io/firechart/viewer
@@ -461,8 +461,9 @@ docker compose up --build                       # the image, built as GitHub bui
 sh docker/smoke.sh firechart-viewer:local       # its smoke test
 ```
 
-GitHub builds and tests every push and pull request (`.github/workflows/build.yml`) and, for a release tag, builds the image, runs its smoke
-test and publishes it to `ghcr.io` with its provenance and SBOM (`.github/workflows/image.yml`).
+GitHub builds and tests every push and pull request (`.github/workflows/ci.yml`). A push to `main` also builds the image of the version
+in the file `VERSION`, runs its smoke test, publishes it to `ghcr.io` with its provenance and SBOM, and tags the commit with the version.
+The version of every build is the file `VERSION`; it changes with each release.
 
 | Project | What it is |
 |---|---|

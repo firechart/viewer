@@ -7,8 +7,7 @@
     <File Path=".dockerignore" />
     <File Path="docker/nginx.conf" />
     <File Path="docker/smoke.sh" />
-    <File Path=".github/workflows/build.yml" />
-    <File Path=".github/workflows/image.yml" />
+    <File Path=".github/workflows/ci.yml" />
   </Folder>
   <Folder Name="/FireChart/">
     <Project Path="src/FireChart.Resources/FireChart.Resources.csproj" />

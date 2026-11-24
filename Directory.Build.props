@@ -1,7 +1,10 @@
 <Project>
 
     <!-- The build settings of every project of this repository -->
-    <Import Project="version.props"/>
+    <!-- The version of the release is the file VERSION, written with each release; no git history is needed for it -->
+    <PropertyGroup>
+        <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)VERSION').Trim())</Version>
+    </PropertyGroup>
 
     <PropertyGroup>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -50,9 +53,7 @@
         <TailwindMinify>true</TailwindMinify>
     </PropertyGroup>
 
-    <!-- MinVer computes $(Version) from the release tags at build time (version.props). Applies to every project automatically -->
     <ItemGroup>
-        <PackageReference Include="MinVer" PrivateAssets="All"/>
         <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" PrivateAssets="All"/>
         <PackageReference Include="IDisposableAnalyzers" PrivateAssets="All"/>
         <PackageReference Include="SerilogAnalyzer" PrivateAssets="All"/>

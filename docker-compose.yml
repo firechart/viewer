@@ -9,8 +9,6 @@ services:
     image: ${VIEWER_IMAGE:-firechart-viewer:local}
     build:
       context: .
-      args:
-        VERSION: ${VERSION:-0.0.0-local}
     restart: unless-stopped
     ports:
       - ${VIEWER_BIND:-127.0.0.1}:${VIEWER_PORT:-8080}:8080

@@ -1,0 +1,130 @@
+# The whole delivery of this repository on GitHub's runners. Every push and pull request: the build in Release (a public member without XML
+# docs fails it) and the unit tests. A push to main also builds the Docker image of the Viewer for the version of the file VERSION, runs its
+# smoke test and pushes it to ghcr.io/<owner>/<repository> as <version> and latest (a pre-release X.Y.Z-suffix: next), for linux/amd64 and
+# linux/arm64 with provenance and an SBOM, then tags the commit with the version when the tag does not exist yet.
+# The browser tests (test/Flox.Sqlite.BrowserTests, category Browser) need Chrome or Edge: filtered out.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DOTNET_NOLOGO: "1"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: "11.0.x"
+
+      # The Tailwind CLI once, then the stylesheets one project after another (as the Dockerfile does): projects that build in parallel would
+      # run the CLI while another still writes it
+      - name: Stylesheets
+        run: |
+          dotnet msbuild src/Flox.Shared/Flox.Shared.csproj -restore -t:TailwindDownload -p:Configuration=Release
+          for project in src/Flox.Shared/Flox.Shared.csproj src/FireChart.Viewer/FireChart.Viewer.csproj src/FireChart.Viewer.App/FireChart.Viewer.App.csproj; do
+            dotnet msbuild "$project" -restore -t:TailwindBuild -p:Configuration=Release
+          done
+
+      - name: Build
+        run: dotnet build FireChart.Viewer.slnx -c Release
+
+      - name: Test
+        run: dotnet test FireChart.Viewer.slnx -c Release --no-build --filter "TestCategory!=Browser" --logger "trx" --results-directory TestResults
+
+      - name: Test results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-results
+          path: TestResults
+          if-no-files-found: ignore
+
+  image:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Version
+        id: version
+        run: |
+          version=$(tr -d '[:space:]' < VERSION)
+          echo "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$' || { echo "VERSION is not X.Y.Z[-suffix]: $version"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Tags
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ghcr.io/${{ github.repository }}
+          flavor: latest=false
+          tags: |
+            type=raw,value=${{ steps.version.outputs.version }}
+            type=raw,value=latest,enable=${{ !contains(steps.version.outputs.version, '-') }}
+            type=raw,value=next,enable=${{ contains(steps.version.outputs.version, '-') }}
+
+      # The image of this runner's architecture, loaded into its Docker for the smoke test; the layers stay in the cache for the push
+      - name: Build for the smoke test
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          load: true
+          tags: viewer:smoke
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test
+        run: sh docker/smoke.sh viewer:smoke
+
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          provenance: mode=max
+          sbom: true
+
+      # The release is a tag of the repository too; a later push of the same version (a fix of the build) keeps the first one
+      - name: Tag
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/$VERSION" >/dev/null; then
+            echo "The tag $VERSION exists"
+          else
+            git tag "$VERSION" "$GITHUB_SHA"
+            git push origin "refs/tags/$VERSION"
+          fi

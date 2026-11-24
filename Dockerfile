@@ -2,8 +2,7 @@
 #   docker build -t firechart-viewer:local .
 # The build stage runs on the architecture of the builder: the publish is WebAssembly, the same on every architecture.
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:11.0 AS build
-# .dockerignore keeps .git out, so MinVer has no history here: the version is handed in
-ARG VERSION=0.0.0-local
+# The version is the file VERSION of the sources
 WORKDIR /src
 COPY . .
 RUN --mount=type=cache,target=/root/.nuget/packages \
@@ -13,11 +12,11 @@ RUN --mount=type=cache,target=/root/.nuget/packages \
 RUN --mount=type=cache,target=/root/.nuget/packages --mount=type=cache,id=tailwind-cli,target=/src/.tailwind,sharing=locked \
     dotnet msbuild src/Flox.Shared/Flox.Shared.csproj -t:TailwindDownload -p:Configuration=Release \
  && for project in src/Flox.Shared/Flox.Shared.csproj src/FireChart.Viewer/FireChart.Viewer.csproj src/FireChart.Viewer.App/FireChart.Viewer.App.csproj; do \
-        dotnet msbuild "$project" -t:TailwindBuild -p:Configuration=Release -p:MinVerVersionOverride=$VERSION || exit 1; \
+        dotnet msbuild "$project" -t:TailwindBuild -p:Configuration=Release || exit 1; \
     done
 # The configuration files are mounted by an installation: no compressed copies of them
 RUN --mount=type=cache,target=/root/.nuget/packages --mount=type=cache,id=tailwind-cli,target=/src/.tailwind \
-    dotnet publish src/FireChart.Viewer.App/FireChart.Viewer.App.csproj -c Release -o /publish --no-restore -p:MinVerVersionOverride=$VERSION \
+    dotnet publish src/FireChart.Viewer.App/FireChart.Viewer.App.csproj -c Release -o /publish --no-restore \
  && rm -f /publish/wwwroot/viewer.json.* /publish/wwwroot/host.json.*
 
 FROM nginxinc/nginx-unprivileged:1.29-alpine
