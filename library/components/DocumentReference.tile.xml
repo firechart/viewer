@@ -1,0 +1,17 @@
+<!-- A document in a list: its description (else its type), when and by whom; its document status and status at the end -->
+<Component name="DocumentReference.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.description.exists(), %record.description, iif(%record.type.exists(), %record.type, %record.id))}}" patient="{{%record.subject}}" encounter="{{%record.context.encounter.first()}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.date}}"/>
+        <Value value="{{%record.author.first()}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Status value="{{%record.docStatus}}"/>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

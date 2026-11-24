@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace FireChart.Viewer.Core.Fhir;
@@ -30,6 +31,9 @@ public static class ResourceMoment
         ["Consent"] = ["dateTime"]
     };
 
+    // The moment of a JSON text, read once: a section sorts and groups all its records again at every page it loads
+    private static readonly ConditionalWeakTable<string, StrongBox<DateTimeOffset?>> s_read = new();
+
     /// <summary>
     /// The moment of a record: the first of the elements of its type that is there (a date, or the start of a <c>Period</c>).
     /// </summary>
@@ -48,6 +52,11 @@ public static class ResourceMoment
             return null;
         }
 
+        return s_read.GetValue(json, text => new StrongBox<DateTimeOffset?>(Read(text, names))).Value;
+    }
+
+    private static DateTimeOffset? Read(string json, string[] names)
+    {
         try
         {
             using var document = JsonDocument.Parse(json);

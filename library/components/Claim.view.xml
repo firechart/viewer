@@ -1,0 +1,52 @@
+<!-- The page of a claim: its type, when it was created, the total and its flags, its details, diagnoses and items -->
+<Component name="Claim.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{iif(%record.type.exists(), %record.type, 'Claim')}}">
+    <Field label="{{%strings.Created}}" value="{{%record.created}}"/>
+    <Field label="{{%strings.Total}}" value="{{%record.total}}"/>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.status}}"/>
+      <If test="{{%record.use.exists()}}">
+        <Badge text="{{%record.use}}"/>
+      </If>
+      <Status value="{{%record.priority}}"/>
+    </Field>
+  </Section>
+
+  <If test="{{%record.provider.exists() or %record.insurer.exists() or %record.billablePeriod.exists() or %record.prescription.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Provider}}">
+        <Link value="{{%record.provider}}"/>
+      </Field>
+      <Field label="{{%strings.Insurer}}">
+        <Link value="{{%record.insurer}}"/>
+      </Field>
+      <Field label="{{%strings.BillablePeriod}}" value="{{%record.billablePeriod}}"/>
+      <Field label="{{%strings.Prescription}}">
+        <Link value="{{%record.prescription}}"/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.diagnosis.exists()}}">
+    <Section title="{{%strings.Diagnoses}}">
+      <Repeat each="{{%record.diagnosis}}" as="dx">
+        <If test="{{%dx.diagnosis is Reference}}">
+          <Row meta="{{%dx.sequence}}"><Main><Link value="{{%dx.diagnosis}}"/></Main></Row>
+        </If>
+        <If test="{{(%dx.diagnosis is Reference).not()}}">
+          <Row main="{{%dx.diagnosis}}" meta="{{%dx.sequence}}"/>
+        </If>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.item.exists()}}">
+    <Section title="{{%strings.Items}}">
+      <Repeat each="{{%record.item}}" as="line">
+        <Row main="{{%line.productOrService}}" meta="{{%line.net}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

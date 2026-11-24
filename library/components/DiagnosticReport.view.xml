@@ -1,0 +1,52 @@
+<!-- The page of a diagnostic report: what, when and its status, then the details, the results and the conclusion -->
+<Component name="DiagnosticReport.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{%record.code}}">
+    <Field label="{{%strings.When}}" value="{{%record.effective}}"/>
+    <Field label="{{%strings.Issued}}" value="{{%record.issued}}"/>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.status}}"/>
+    </Field>
+  </Section>
+
+  <If test="{{%record.category.exists() or %record.performer.exists() or %record.resultsInterpreter.exists() or %record.specimen.exists() or %record.basedOn.exists() or %record.imagingStudy.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Category}}">
+        <Value value="{{%record.category}}" separator=", "/>
+      </Field>
+      <Field label="{{%strings.Performer}}">
+        <Link value="{{%record.performer}}"/>
+      </Field>
+      <Field label="{{%strings.Interpreter}}">
+        <Link value="{{%record.resultsInterpreter}}"/>
+      </Field>
+      <Field label="{{%strings.Specimen}}">
+        <Link value="{{%record.specimen}}"/>
+      </Field>
+      <Field label="{{%strings.BasedOn}}">
+        <Link value="{{%record.basedOn}}"/>
+      </Field>
+      <Field label="{{%strings.ImagingStudy}}">
+        <Link value="{{%record.imagingStudy}}"/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.result.exists()}}">
+    <Section title="{{%strings.Results}}">
+      <Field label="{{%strings.Results}}">
+        <Link value="{{%record.result}}"/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.conclusion.exists() or %record.conclusionCode.exists()}}">
+    <Section title="{{%strings.Conclusion}}">
+      <Field label="{{%strings.Conclusion}}" value="{{%record.conclusion}}"/>
+      <Field label="{{%strings.Diagnosis}}">
+        <Value value="{{%record.conclusionCode}}" separator=", "/>
+      </Field>
+    </Section>
+  </If>
+</Component>

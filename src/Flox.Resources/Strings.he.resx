@@ -222,6 +222,9 @@
   <data name="Caption_More" xml:space="preserve">
     <value>עוד</value>
   </data>
+  <data name="Caption_Path" xml:space="preserve">
+    <value>נתיב</value>
+  </data>
   <data name="Caption_Bookmarks" xml:space="preserve">
     <value>סימניות</value>
   </data>
@@ -417,9 +420,6 @@
   <data name="Caption_ShowTotal" xml:space="preserve">
     <value>הצגת הספירה</value>
   </data>
-  <data name="Caption_TotalCount" xml:space="preserve">
-    <value>סה"כ: {0}</value>
-  </data>
   <data name="Caption_Connect" xml:space="preserve">
     <value>התחברות</value>
   </data>
@@ -519,6 +519,24 @@
   <data name="Caption_LicensePerpetual" xml:space="preserve">
     <value>ללא הגבלת זמן</value>
   </data>
+  <data name="Caption_LicenseProduct" xml:space="preserve">
+    <value>מוצר</value>
+  </data>
+  <data name="Caption_LicenseMode" xml:space="preserve">
+    <value>מצב</value>
+  </data>
+  <data name="LicenseMode_Demo" xml:space="preserve">
+    <value>הדגמה</value>
+  </data>
+  <data name="LicenseMode_Trial" xml:space="preserve">
+    <value>ניסיון</value>
+  </data>
+  <data name="Caption_LicenseSeats" xml:space="preserve">
+    <value>מושבים</value>
+  </data>
+  <data name="Caption_LicenseSeatsUnlimited" xml:space="preserve">
+    <value>ללא הגבלה</value>
+  </data>
   <data name="LicenseState_None" xml:space="preserve">
     <value>אין רישיון: המהדורה החינמית</value>
   </data>
@@ -563,5 +581,68 @@
   </data>
   <data name="Caption_SelectItem" xml:space="preserve">
     <value>בחירת {0}</value>
+  </data>
+  <data name="Caption_Refresh" xml:space="preserve">
+    <value>רענון</value>
+  </data>
+  <data name="Access_Button" xml:space="preserve">
+    <value>גישה…</value>
+  </data>
+  <data name="Access_TitleOf" xml:space="preserve">
+    <value>גישה אל {0}</value>
+  </data>
+  <data name="Access_Subject" xml:space="preserve">
+    <value>מי</value>
+  </data>
+  <data name="Access_Owner" xml:space="preserve">
+    <value>בעלים</value>
+  </data>
+  <data name="Access_OwnerOf" xml:space="preserve">
+    <value>בעלים ({0})</value>
+  </data>
+  <data name="Access_Everyone" xml:space="preserve">
+    <value>כולם</value>
+  </data>
+  <data name="Access_Authenticated" xml:space="preserve">
+    <value>משתמשים מחוברים</value>
+  </data>
+  <data name="Access_Role" xml:space="preserve">
+    <value>תפקיד {0}</value>
+  </data>
+  <data name="Access_UnknownUser" xml:space="preserve">
+    <value>משתמש לא ידוע {0}</value>
+  </data>
+  <data name="Access_AddSubject" xml:space="preserve">
+    <value>הוספת תפקיד או משתמש</value>
+  </data>
+  <data name="Access_Ineffective" xml:space="preserve">
+    <value>ההרשאות של {1} אינן כוללות את {0}: לרשומה זו אין השפעה.</value>
+  </data>
+  <data name="Access_Sensitive" xml:space="preserve">
+    <value>פעולה רגישה: גם מנהל זקוק לרשומה מפורשת, והיא ניתנת רק לתפקיד או למשתמש.</value>
+  </data>
+  <data name="Access_ConfirmSensitive" xml:space="preserve">
+    <value>אתה מעניק פעולות רגישות: {0}. השינוי נרשם ביומן הביקורת.</value>
+  </data>
+  <data name="Access_ConfirmSelf" xml:space="preserve">
+    <value>חלקן אתה מעניק לעצמך.</value>
+  </data>
+  <data name="Caption_Copy" xml:space="preserve">
+    <value>העתקה</value>
+  </data>
+  <data name="Message_Copied" xml:space="preserve">
+    <value>הועתק ללוח</value>
+  </data>
+  <data name="Caption_ShowDetails" xml:space="preserve">
+    <value>הצגת פרטים</value>
+  </data>
+  <data name="Caption_HideDetails" xml:space="preserve">
+    <value>הסתרת פרטים</value>
+  </data>
+  <data name="Caption_Share" xml:space="preserve">
+    <value>שיתוף</value>
+  </data>
+  <data name="Message_NotCopied" xml:space="preserve">
+    <value>הדפדפן לא איפשר העתקה</value>
   </data>
 </root>

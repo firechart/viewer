@@ -115,7 +115,7 @@ public abstract class FormState<TModel> : EntityState<TModel> where TModel : cla
     {
         if (Form != null && Form.EditContext != null)
         {
-            if (Form.EditContext.Validate())
+            if (await Form.EditContext.ValidateAsync())
             {
                 await OnValidSubmit(Form.EditContext);
             }

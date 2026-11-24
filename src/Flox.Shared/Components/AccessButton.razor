@@ -1,0 +1,63 @@
+@using Flox.Core.Authorization
+@using Flox.Shared.Services
+@using Microsoft.AspNetCore.Authorization
+@using BlazorBlueprint.Components
+@inject IAccessDialogService AccessDialogs
+@inject IAuthorizationService Authorization
+
+@* The button "Access…" of a form or a row: shown in an edition with a server (not Lite) to who may manage the access lists of the entity by the matrix; the row itself decides in the dialog *@
+@if (_allowed)
+{
+    <Button title="@Strings.Access_Button" AriaLabel="@Strings.Access_Button" Variant="ButtonVariant.Ghost"
+              Size="@(Compact ? ButtonSize.IconSmall : ButtonSize.Icon)" OnClick="@OpenAsync" Class="access-button">
+        <FloxIcon Icon="lock"/>
+    </Button>
+}
+
+@code {
+
+    private bool _allowed;
+
+    /// <summary>The name of the entity, as its permissions name it.</summary>
+    [Parameter]
+    [EditorRequired]
+    public string Entity { get; set; } = default!;
+
+    /// <summary>The key of the row.</summary>
+    [Parameter]
+    [EditorRequired]
+    public Guid Key { get; set; }
+
+    /// <summary>What the dialog calls the row.</summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>A small button, for a row of a list.</summary>
+    [Parameter]
+    public bool Compact { get; set; }
+
+    /// <summary>Raised after the list was changed and saved.</summary>
+    [Parameter]
+    public EventCallback Changed { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    /// <inheritdoc />
+    protected override async Task OnParametersSetAsync()
+    {
+        var user = AuthenticationState is null ? null : (await AuthenticationState).User;
+        _allowed = AccessDialogs.Available
+                   && user?.Identity?.IsAuthenticated == true
+                   && (await Authorization.AuthorizeAsync(user, Permissions.Policy($"{Entity}.{EntityOperations.ManageAccess}"))).Succeeded;
+    }
+
+    private async Task OpenAsync()
+    {
+        if (await AccessDialogs.EditAsync(Entity, Key, Title))
+        {
+            await Changed.InvokeAsync();
+        }
+    }
+
+}

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Flox.Core.Services;
 using Flox.Core.Settings;
 
 namespace Flox.Shared.Settings;
@@ -21,5 +22,6 @@ public class GeneralAppSettings
 
     /// <summary>Whether anonymous telemetry may be sent.</summary>
     [Display(Name = nameof(Strings.Caption_AllowTelemetry), GroupName = nameof(Strings.Caption_DataAndPrivacy), ResourceType = typeof(Strings), Order = 3)]
+    [Setting(ShownWhen = FloxTelemetryOptions.EnabledKey)]
     public bool AllowTelemetry { get; set; }
 }

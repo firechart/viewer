@@ -1,28 +1,28 @@
+@using BlazorBlueprint.Components
 @attribute [Route(SharedRoutes.HISTORY)]
 
 @using System.Globalization
 @using Flox.Core.Models
 @using Flox.Shared.Pages.Bookmarks
-@using Radzen
 
 @inherits StatefulWidget<HistoryState>
 
 @* The pages visited on this device, the newest first: no sign-in, never on a server *@
-<ListPage Title=@Strings.Caption_History Breadcrumbs=@Breadcrumbs OnRefresh=@State.RefreshAsync>
+<ListPage Title=@Strings.Caption_History Breadcrumbs=@Breadcrumbs>
     <ChildContent>
-        <Alert OneTime Key=@BookmarksPage.BookmarksOnDeviceAlert Size="AlertSize.Small" data-history="device">
+        <Alert OneTime Plain Key=@BookmarksPage.BookmarksOnDeviceAlert data-history="device">
             @Strings.Notice_BookmarksOnDevice
         </Alert>
-        <DataList State=@State Selectable>
+        <DataList State=@State Selectable ShowRefresh>
             <ItemTemplate Context="row">
                 <ListTile Row=@row TitleText=@row.Item.DisplayName SubtitleText=@row.Item.Category Href=@row.Item.Url Icon=@(row.Item.Icon ?? "history")
                           TrailingText=@VisitedText(row.Item)/>
             </ItemTemplate>
             <RowMenu Context="menu">
-                <RadzenMenuItem Text=@Strings.Caption_Delete Icon="delete" IconColor="var(--rz-danger)" Click=@(() => DeleteAsync(menu.Targets))/>
+                <RowMenuItem Text=@Strings.Caption_Delete Icon="delete" OnClick=@(() => DeleteAsync(menu.Targets)) Danger="true"/>
             </RowMenu>
             <SelectionActions Context="selected">
-                <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Click=@(() => DeleteAsync([.. selected]))/>
+                <Button Variant="BlazorBlueprint.Components.ButtonVariant.Ghost" Size="BlazorBlueprint.Components.ButtonSize.Icon" Class="text-danger" title=@Strings.Caption_Delete AriaLabel=@Strings.Caption_Delete OnClick=@(() => DeleteAsync([.. selected]))><FloxIcon Icon="delete"/></Button>
             </SelectionActions>
         </DataList>
     </ChildContent>
@@ -42,14 +42,6 @@
         {
             await TryAsync(() => State.DeleteRowsAsync(visits));
         }
-    }
-
-    protected override void InitBreadcrumbs()
-    {
-        base.InitBreadcrumbs();
-        Breadcrumbs.Add(Strings.Caption_History,
-                        href: NavigationManager.History()
-                                                .ToUrl());
     }
 
 }

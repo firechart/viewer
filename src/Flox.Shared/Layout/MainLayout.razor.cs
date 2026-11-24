@@ -28,14 +28,13 @@ public sealed partial class MainLayout : IAsyncDisposable
     private bool _systemDark;
     private SystemColorScheme? _systemColorScheme;
     private AppErrorBoundary? _bodyErrorBoundary;
-    private const string TelemetryEnabledKey = "Flox:OpenTelemetry:Enabled";
 
     private bool _isLoading = true;
     private string? _progressMessage;
     private Exception? _initializationException;
 
     [Inject]
-    private Radzen.DialogService DialogService { get; set; } = null!;
+    private FloxDialogService DialogService { get; set; } = null!;
 
     [Inject]
     private IServiceProvider ServiceProvider { get; set; } = null!;
@@ -209,13 +208,6 @@ public sealed partial class MainLayout : IAsyncDisposable
         await PerformInititializationAsync();
     }
 
-    // Any dialog closes through Radzen's dynamic calls: the first one would freeze the page, so it happens when the page is idle
-    private static async Task WarmUpDialogsAsync()
-    {
-        await Task.Delay(1000);
-        DynamicBinderWarmup.Run();
-    }
-
     /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -223,9 +215,8 @@ public sealed partial class MainLayout : IAsyncDisposable
         {
             StartupTimeline.Mark("MainLayout: first render done");
             await PerformInititializationAsync();
-            _ = WarmUpDialogsAsync();
         }
-        else if (!_isLoading && _initializationException is null && _consentBanner is null && !NavigationManager.IsEmbedded() && _generalAppSettingsProvider is not null
+        else if (!_isLoading && _initializationException is null && _consentBanner is null && _generalAppSettingsProvider is not null
                  && TelemetryEnabled())
         {
             _consentBanner = new TelemetryConsentBanner(JS, OnBannerTelemetryChangedAsync);
@@ -236,7 +227,7 @@ public sealed partial class MainLayout : IAsyncDisposable
     // No telemetry (Lite, the Viewer, a server without it): nothing to consent to, no banner
     private bool TelemetryEnabled()
     {
-        return bool.TryParse(ServiceProvider.GetService<IConfiguration>()?[TelemetryEnabledKey], out var enabled) && enabled;
+        return bool.TryParse(ServiceProvider.GetService<IConfiguration>()?[FloxTelemetryOptions.EnabledKey], out var enabled) && enabled;
     }
 
     private async Task OnBannerTelemetryChangedAsync(bool allowed)
@@ -256,7 +247,6 @@ public sealed partial class MainLayout : IAsyncDisposable
                         try
                         {
                             await task;
-                            await EventsConsumer.SubscribeAsync();
                         }
                         finally
                         {

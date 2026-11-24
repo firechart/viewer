@@ -1,0 +1,5 @@
+/* The utilities of the sandbox and the frame of the Viewer app; the tokens (colors, variants) are those of the platform */
+@import "../../../Flox.Shared/Assets/Styles/tokens.css";
+
+@source "../../Pages";
+@source "../../App.razor";

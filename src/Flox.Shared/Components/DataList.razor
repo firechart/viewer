@@ -1,9 +1,8 @@
 @typeparam TItem where TItem : class
 
+@using BlazorBlueprint.Components
 @inherits StatelessWidget
 @implements IAsyncDisposable
-
-@inject Radzen.ContextMenuService ContextMenuService
 
 @if (_state is not null)
 {
@@ -13,66 +12,68 @@
     <div @ref=@_root class=@(EffectiveLayout == ListLayout.Fill ? "data-list flex min-h-0 flex-1 flex-col" : "data-list flex flex-col")>
         @if (selectionActive)
         {
-            <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="var(--gap-xs)" class="border-b border-line rz-px-2 rz-py-1">
-                <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-xs)">
-                    <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Size="Radzen.ButtonSize.Small" Click=@ClearSelection title=@Strings.Caption_Cancel>
+            @* The toolbar of the selection: how many rows, the commands for them, the way out *@
+            <div class="flex min-h-12 items-center justify-between gap-1 rounded-lg bg-hover px-2 py-1">
+                <div class="flex items-center gap-1">
+                    <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" OnClick=@ClearSelection title=@Strings.Caption_Cancel AriaLabel=@Strings.Caption_Cancel>
                         <FloxIcon Icon="close" Size="1.25rem"/>
-                    </RadzenButton>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.Span">@string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.List_SelectedCount, _state.SelectedItems.Count)</RadzenText>
-                </RadzenStack>
-                <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-xs)">
+                    </Button>
+                    <span class="text-sm font-medium">@string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.List_SelectedCount, _state.SelectedItems.Count)</span>
+                </div>
+                <div class="flex items-center gap-1">
                     @SelectionActions?.Invoke(_state.SelectedItems)
-                </RadzenStack>
-            </RadzenStack>
+                </div>
+            </div>
+        }
+        else if (!HasSearch && HasToolbar && ListCommandsSection is not null)
+        {
+            @* No search: the commands go to the heading of the page, beside its own *@
+            <SectionContent SectionName=@ListCommandsSection>@ToolbarCommands</SectionContent>
         }
         else if (HasToolbar)
         {
-            @* The visible box of the search field sits at the bottom of its wrapper (the top is room for a floating label): the toolbar is aligned
-               to the bottom, so the buttons stand level with the box *@
-            <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.End" Gap="var(--gap-sm)" class="rz-pb-1">
-                @ToolbarStart
-                @if (ShowSearch && _state.CanSearch)
+            @* The toolbar: the search field, then the commands (the filter, the visible ones of the page, refresh) and the menu of the rarer ones *@
+            <div class="flex items-center gap-2 pb-2">
+                @if (HasSearch)
                 {
                     <div class="min-w-0 flex-1">
-                        <Search Value=@_state.SearchText ValueChanged=@SearchAsync Placeholder=@Strings.Caption_Search/>
+                        @if (SearchTextChanged.HasDelegate)
+                        {
+                            <Search Value=@SearchText ValueChanged=@SearchTextChanged Placeholder=@Strings.Caption_Search SlashFocuses/>
+                        }
+                        else
+                        {
+                            <Search Value=@_state.SearchText ValueChanged=@SearchAsync Placeholder=@Strings.Caption_Search SlashFocuses/>
+                        }
                     </div>
                 }
                 else
                 {
                     <div class="flex-1"></div>
                 }
-                @if (OnFilter.HasDelegate)
-                {
-                    <FilterButton Count=@FilterCount OnClick=@OnFilter/>
-                }
-                @ToolbarEnd
-            </RadzenStack>
+                @ToolbarCommands
+            </div>
         }
 
         @if (_state.LoadError is not null && rowCount > 0)
         {
-            <RadzenAlert AlertStyle="Radzen.AlertStyle.Warning" Variant="Radzen.Variant.Flat" Shade="Radzen.Shade.Lighter" Size="Radzen.AlertSize.Small" AllowClose="false">
-                <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="var(--gap-sm)">
+            <BbAlert Variant="AlertVariant.Warning" Class="mb-2">
+                <div class="flex items-center justify-between gap-2">
                     @Strings.List_Stale
-                    <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Size="Radzen.ButtonSize.Small" Text=@Strings.Caption_Retry Click=@RefreshAsync/>
-                </RadzenStack>
-            </RadzenAlert>
+                    <Button Variant="ButtonVariant.Outline" OnClick=@RefreshAsync>@Strings.Caption_Retry</Button>
+                </div>
+            </BbAlert>
         }
 
-        <div class=@(EffectiveLayout == ListLayout.Fill ? "relative min-h-0 flex-1" : "relative")>
-        <div @ref=@_scroller class=@(EffectiveLayout == ListLayout.Fill ? "h-full overflow-y-auto overscroll-y-contain" : "relative")>
-            @if (PullToRefresh && EffectiveLayout == ListLayout.Fill)
-            {
-                <div data-pull class="flex h-0 items-center justify-center overflow-hidden text-muted">
-                    <FloxIcon Icon="refresh" Size="1.5rem"/>
-                </div>
-            }
+        @* The rows in the frame of a ListSection; a filling list shrinks to its rows and scrolls inside the frame when they do not fit *@
+        <div class=@(EffectiveLayout == ListLayout.Fill ? $"{Frame} flex min-h-0 flex-col" : Frame)>
+        <div class=@(EffectiveLayout == ListLayout.Fill ? "min-h-0 overflow-y-auto overscroll-y-contain" : "relative")>
 
             @if (Mode == ListMode.Virtual)
             {
-                <Virtualize @ref=@_virtualize TItem="TItem" ItemsProvider=@LoadRowsAsync ItemSize=@RowHeight OverscanCount="4" Context="item">
+                <Virtualize @ref=@_virtualize TItem="TItem" ItemsProvider=@LoadRowsAsync ItemComparer=@_state!.ItemComparer ItemSize=@RowHeight OverscanCount="4" Context="item">
                     <ItemContent>
-                        <div data-row-id=@RowIndex(item) class="border-b border-line"
+                        <div data-row-id=@RowIndex(item) class="border-b border-line" role="listitem"
                              @onclick=@(() => HandleRowClickAsync(item))
                              @oncontextmenu=@(e => OpenRowMenu(e, item))
                              @oncontextmenu:preventDefault=@(RowMenu is not null)>
@@ -93,33 +94,17 @@
             }
             else
             {
-                <RadzenDataGrid TItem="TItem"
-                                Data=@_state.Items
-                                AllowPaging="false"
-                                AllowSorting="false"
-                                AllowFiltering="false"
-                                AllowAlternatingRows="false"
-                                ShowHeader="false"
-                                RowClick=@OnGridRowClickAsync
-                                CellContextMenu=@OnCellContextMenu
-                                class="border-0 [--rz-grid-border-radius:0] [--rz-grid-background-color:transparent] [--rz-grid-cell-padding:0]">
-                    <Columns>
-                        @if (Columns is not null)
-                        {
-                            @Columns
-                        }
-                        else
-                        {
-                            <RadzenDataGridColumn TItem="TItem">
-                                <Template Context="item">
-                                    <div data-row-id=@RowIndex(item)>
-                                        @ItemTemplate?.Invoke(CreateRow(item, selectionActive))
-                                    </div>
-                                </Template>
-                            </RadzenDataGridColumn>
-                        }
-                    </Columns>
-                </RadzenDataGrid>
+                <div role="list" class="divide-y divide-line">
+                    @foreach (var item in _state.Items)
+                    {
+                        <div @key=@item data-row-id=@RowIndex(item) role="listitem"
+                             @onclick=@(() => HandleRowClickAsync(item))
+                             @oncontextmenu=@(e => OpenRowMenu(e, item))
+                             @oncontextmenu:preventDefault=@(RowMenu is not null)>
+                            @ItemTemplate?.Invoke(CreateRow(item, selectionActive))
+                        </div>
+                    }
+                </div>
             }
         </div>
             @* The rows stay usable under it: a virtual list loads while it is scrolled *@
@@ -129,20 +114,52 @@
         @if (ShowPager)
         {
             var pageSize = _state.PageSize;
-            var from = (long)_state.CurrentPage * pageSize + 1;
+            var current = _state.CurrentPage;
+            var pages = (int)((_state.Total + pageSize - 1) / pageSize);
+            var from = (long)current * pageSize + 1;
             var to = Math.Min(from + pageSize - 1, _state.Total);
-            <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="var(--gap-sm)" class="border-t border-line rz-px-2 rz-py-1">
-                <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.Span" class="rz-text-nowrap">@from–@to / @_state.Total</RadzenText>
-                <RadzenPager @ref=@_pager
-                             Count=@((int)_state.Total)
-                             PageSize=@pageSize
-                             PageNumbersCount="3"
-                             ShowPagingSummary="false"
-                             HorizontalAlign="Radzen.HorizontalAlign.Right"
-                             PageChanged=@OnPageChangedAsync/>
-            </RadzenStack>
+            <div class="flex items-center justify-between gap-2 px-2 pt-2">
+                <span class="text-sm whitespace-nowrap text-muted">@from–@to / @_state.Total</span>
+                <BbPagination Class="mx-0 w-auto justify-end">
+                    <BbPaginationContent>
+                        <BbPaginationItem>
+                            <BbPaginationPrevious ShowText="false" Disabled=@(current == 0) OnClick=@(() => GoToPageAsync(current - 1))/>
+                        </BbPaginationItem>
+                        @foreach (var page in PageWindow(current, pages))
+                        {
+                            var target = page;
+                            <BbPaginationItem>
+                                <BbPaginationLink IsActive=@(target == current) OnClick=@(() => GoToPageAsync(target))>@(target + 1)</BbPaginationLink>
+                            </BbPaginationItem>
+                        }
+                        <BbPaginationItem>
+                            <BbPaginationNext ShowText="false" Disabled=@(current >= pages - 1) OnClick=@(() => GoToPageAsync(current + 1))/>
+                        </BbPaginationItem>
+                    </BbPaginationContent>
+                </BbPagination>
+            </div>
+        }
+
+        @if (Footer is not null)
+        {
+            @* A note under the rows, as the footer of a ListSection; hidden when it renders nothing *@
+            <div class="px-[calc(1px+var(--spacing)*3)] pt-2 text-xs text-muted empty:hidden">@Footer</div>
         }
     </div>
+
+    @* The menu of a row: one for the list, opened where the right click or the long tap was *@
+    @if (RowMenu is not null)
+    {
+        @* The primitive root: the styled one keeps OpenAt to itself *@
+        <BlazorBlueprint.Primitives.ContextMenu.BbContextMenu @ref=@_menu OpenChanged=@OnMenuOpenChanged>
+            <BbContextMenuContent>
+                @if (_menuContext is not null)
+                {
+                    @RowMenu(_menuContext)
+                }
+            </BbContextMenuContent>
+        </BlazorBlueprint.Primitives.ContextMenu.BbContextMenu>
+    }
 }
 
 @code {
@@ -151,7 +168,6 @@
     private ArrayListState<TItem>? _array;
     private IEnumerable<TItem>? _arraySource;
     private ElementReference _root;
-    private ElementReference _scroller;
     private IJSObjectReference? _module;
     private IJSObjectReference? _gestures;
     private DotNetObjectReference<DataList<TItem>>? _self;
@@ -159,8 +175,8 @@
     private bool _attachFailed;
     private bool _disposed;
     private Virtualize<TItem>? _virtualize;
-    private RadzenPager? _pager;
-    private (long Total, int PageSize, int Page)? _pagerSynced;
+    private BlazorBlueprint.Primitives.ContextMenu.BbContextMenu? _menu;
+    private RowMenuContext<TItem>? _menuContext;
 
     // The rows a virtual list has loaded, by their index in the whole list: a gesture finds its row by it
     private readonly Dictionary<int, TItem> _virtualRows = [];
@@ -186,6 +202,18 @@
     [Parameter]
     public bool ShowSearch { get; set; } = true;
 
+    /// <summary>The text of the search field of rows the page filters itself (<see cref="Items"/>); shown when <see cref="SearchTextChanged"/> is set.</summary>
+    [Parameter]
+    public string? SearchText { get; set; }
+
+    /// <summary>A change of the search field: the page filters the rows, the list does not search.</summary>
+    [Parameter]
+    public EventCallback<string?> SearchTextChanged { get; set; }
+
+    /// <summary>Shows the refresh command in the toolbar; a pull down of the page does the same on a touch screen.</summary>
+    [Parameter]
+    public bool ShowRefresh { get; set; }
+
     // Rows get a mark in place of the leading content to be selected
     [Parameter]
     public bool Selectable { get; set; }
@@ -199,10 +227,6 @@
 
     [Parameter]
     public EventCallback<TItem> OnRowClick { get; set; }
-
-    // A pull down at the top of a touch screen refreshes the list; only for a list that scrolls itself (Layout Fill)
-    [Parameter]
-    public bool PullToRefresh { get; set; } = true;
 
     // The height of a row in pixels, for the scroll bar of a virtual list
     [Parameter]
@@ -220,18 +244,26 @@
     [Parameter]
     public RenderFragment<IReadOnlyCollection<TItem>>? SelectionActions { get; set; }
 
+    // The commands of the list always shown in its toolbar
     [Parameter]
-    public RenderFragment? ToolbarStart { get; set; }
+    public RenderFragment? Commands { get; set; }
 
+    // The rarer commands of the list (PageMenuItem), in a menu at the end of its toolbar
     [Parameter]
-    public RenderFragment? ToolbarEnd { get; set; }
+    public RenderFragment? MenuItems { get; set; }
 
     [Parameter]
     public RenderFragment? EmptyTemplate { get; set; }
 
-    // Columns of a table; without them the list is one column with ItemTemplate
+    // The outlet in the heading of the ListPage around the list: its commands go there when it has no search
+    [CascadingParameter(Name = ListPage.ListCommandsCascade)]
+    public string? ListCommandsSection { get; set; }
+
+    // A note under the rows: a summary of the list, a text, a link
     [Parameter]
-    public RenderFragment? Columns { get; set; }
+    public RenderFragment? Footer { get; set; }
+
+    private const string Frame = "relative overflow-hidden rounded-xl border border-line bg-surface text-card-foreground shadow-xs";
 
     // A virtual list has no height of its own: it always scrolls inside its parent
     private ListLayout EffectiveLayout
@@ -254,7 +286,15 @@
     {
         get
         {
-            return ToolbarStart is not null || ToolbarEnd is not null || OnFilter.HasDelegate || (ShowSearch && _state is { CanSearch: true });
+            return Commands is not null || MenuItems is not null || OnFilter.HasDelegate || ShowRefresh || HasSearch;
+        }
+    }
+
+    private bool HasSearch
+    {
+        get
+        {
+            return ShowSearch && (SearchTextChanged.HasDelegate || _state is { CanSearch: true });
         }
     }
 
@@ -267,21 +307,40 @@
         }
     }
 
+    private RenderFragment ToolbarCommands =>
+        @<text>
+            @if (OnFilter.HasDelegate)
+            {
+                <FilterButton Count=@FilterCount OnClick=@OnFilter/>
+            }
+            @Commands
+            @if (ShowRefresh)
+            {
+                <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Strings.Caption_Refresh AriaLabel=@Strings.Caption_Refresh
+                        OnClick=@RefreshAsync data-list="refresh">
+                    <FloxIcon Icon="refresh"/>
+                </Button>
+            }
+            @if (MenuItems is not null)
+            {
+                <PageMenu>@MenuItems</PageMenu>
+            }
+        </text>;
+
     private RenderFragment EmptyState =>
         @<text>
             @if (_state!.IsBusy)
             {
-                <RadzenStack AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.Center" class="rz-px-4 rz-py-12">
+                <div class="flex items-center justify-center px-4 py-12">
                     <CircularProgress/>
-                </RadzenStack>
+                </div>
             }
             else if (_state.LoadError is not null)
             {
-                <RadzenStack AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.Center" Gap="var(--gap-sm)" class="rz-px-4 rz-py-12">
-                    <FloxIcon Icon="error" Size="2rem" Color="var(--rz-danger)"/>
-                    <RadzenText TextStyle="TextStyle.Body2" TextAlign="Radzen.TextAlign.Center">@Strings.List_LoadFailed</RadzenText>
-                    <RadzenButton Variant="Radzen.Variant.Outlined" ButtonStyle="Radzen.ButtonStyle.Base" Text=@Strings.Caption_Retry Click=@RefreshAsync/>
-                </RadzenStack>
+                <BbEmpty Title=@Strings.List_LoadFailed>
+                    <Icon><FloxIcon Icon="error" Size="2rem" Class="text-danger"/></Icon>
+                    <ChildContent><Button Variant="ButtonVariant.Outline" OnClick=@RefreshAsync>@Strings.Caption_Retry</Button></ChildContent>
+                </BbEmpty>
             }
             else if (EmptyTemplate is not null)
             {
@@ -289,9 +348,7 @@
             }
             else
             {
-                <RadzenStack AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.Center" class="rz-px-4 rz-py-12">
-                    <RadzenText TextStyle="TextStyle.Body2" class="text-muted">@Strings.List_NoData</RadzenText>
-                </RadzenStack>
+                <BbEmpty Description=@Strings.List_NoData Size="EmptySize.Small"/>
             }
         </text>;
 
@@ -323,7 +380,6 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        await SyncPagerAsync();
         if (_gestures is null && _state is not null && !_attaching && !_attachFailed && !_disposed)
         {
             _attaching = true;
@@ -353,7 +409,7 @@
         }
 
         _self ??= DotNetObjectReference.Create(this);
-        var gestures = await _module.InvokeAsync<IJSObjectReference>("attach", _root, _scroller, _self, new { pull = PullToRefresh && EffectiveLayout == ListLayout.Fill });
+        var gestures = await _module.InvokeAsync<IJSObjectReference>("attach", _root, _self);
         if (_disposed)
         {
             await gestures.InvokeVoidAsync("dispose");
@@ -372,12 +428,6 @@
         {
             OpenRowMenu(new Microsoft.AspNetCore.Components.Web.MouseEventArgs { ClientX = clientX, ClientY = clientY }, row);
         }
-    }
-
-    [JSInvokable]
-    public async Task OnPullRefresh()
-    {
-        await RefreshAsync();
     }
 
     private void OnStateChanged(object? sender, EventArgs e)
@@ -515,44 +565,30 @@
         }
     }
 
-    private async Task OnPageChangedAsync(Radzen.PagerEventArgs args)
+    private async Task GoToPageAsync(int page)
     {
-        // The pager also reports the page it was told to show (SyncPagerAsync): that one is the state's already
-        if (_state is null || args.PageIndex == _state.CurrentPage)
+        if (_state is null || page < 0 || page == _state.CurrentPage)
         {
             return;
         }
 
-        Logger.LogDebug("Pager of {Item}: page {Page}", typeof(TItem).Name, args.PageIndex);
-        await _state.GoToPageAsync(args.PageIndex);
+        Logger.LogDebug("Pager of {Item}: page {Page}", typeof(TItem).Name, page);
+        await _state.GoToPageAsync(page);
     }
 
-    // RadzenPager works out its pages after its render and does not render again (a Blazor Hybrid host shows the numbers
-    // of the render before), and its page is its own: it is told the page of the state, and drawn once more
-    private async Task SyncPagerAsync()
+    // Up to three page numbers around the current one
+    private static List<int> PageWindow(int current, int pages)
     {
-        if (_pager is null || _state is null || !ShowPager)
+        const int Count = 3;
+        var first = Math.Max(0, Math.Min(current - (Count / 2), pages - Count));
+        var last = Math.Min(pages - 1, first + Count - 1);
+        var result = new List<int>();
+        for (var page = first; page <= last; page++)
         {
-            _pagerSynced = null;
-            return;
+            result.Add(page);
         }
 
-        var current = (_state.Total, _state.PageSize, _state.CurrentPage);
-        if (_pagerSynced == current)
-        {
-            return;
-        }
-
-        _pagerSynced = current;
-        await _pager.GoToPage(_state.CurrentPage, forceReload: true);
-    }
-
-    private async Task OnGridRowClickAsync(Radzen.DataGridRowMouseEventArgs<TItem> args)
-    {
-        if (args.Data is not null)
-        {
-            await HandleRowClickAsync(args.Data);
-        }
+        return result;
     }
 
     private async Task HandleRowClickAsync(TItem row)
@@ -571,29 +607,32 @@
         }
     }
 
-    private void OnCellContextMenu(Radzen.DataGridCellMouseEventArgs<TItem> args)
-    {
-        if (args.Data is not null)
-        {
-            OpenRowMenu(args, args.Data);
-        }
-    }
-
     private void OpenRowMenu(Microsoft.AspNetCore.Components.Web.MouseEventArgs position, TItem row)
     {
-        if (_state is null || RowMenu is null)
+        if (_state is null || RowMenu is null || _menu is null)
         {
             return;
         }
 
         _state.Current = row;
-        var menu = new RowMenuContext<TItem>(row, _state.Targets(row), ContextMenuService.Close);
-        ContextMenuService.Open(position, _ => MenuContent(menu));
+        _menuContext = new RowMenuContext<TItem>(row, _state.Targets(row), CloseRowMenu);
+        UiErrors.Fire(() => _menu.OpenAt(position.ClientX, position.ClientY), nameof(OpenRowMenu));
     }
 
-    private RenderFragment MenuContent(RowMenuContext<TItem> menu)
+    private void CloseRowMenu()
     {
-        return @<RadzenMenu Click=@(_ => ContextMenuService.Close())>@RowMenu!(menu)</RadzenMenu>;
+        if (_menu is not null)
+        {
+            UiErrors.Fire(() => _menu.Close(), nameof(CloseRowMenu));
+        }
+    }
+
+    private void OnMenuOpenChanged(bool open)
+    {
+        if (!open)
+        {
+            _menuContext = null;
+        }
     }
 
     public async ValueTask DisposeAsync()

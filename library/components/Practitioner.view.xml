@@ -1,0 +1,36 @@
+<!-- The page of a practitioner: the name, gender and birth date, how to contact them, their qualifications, languages and identifiers -->
+<Component name="Practitioner.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{iif(%record.name.exists(), %record.name.first(), %record.id)}}">
+    <Field label="{{%strings.Gender}}" value="{{%record.gender}}"/>
+    <Field label="{{%strings.Born}}" value="{{%record.birthDate}}"/>
+    <If test="{{%record.active = false}}">
+      <Field label="{{%strings.Status}}">
+        <Badge text="{{%strings.InactiveBadge}}" tone="danger"/>
+      </Field>
+    </If>
+  </Section>
+
+  <If test="{{%record.telecom.exists() or %record.address.exists()}}">
+    <Section title="{{%strings.Contact}}">
+      <Field label="{{%strings.PhoneAndEmail}}" value="{{%record.telecom}}"/>
+      <Field label="{{%strings.Address}}" value="{{%record.address}}"/>
+    </Section>
+  </If>
+
+  <If test="{{%record.qualification.exists()}}">
+    <Section title="{{%strings.Qualifications}}">
+      <Repeat each="{{%record.qualification}}" as="qualification">
+        <Row main="{{%qualification.code}}" meta="{{%qualification.period}}"/>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.communication.exists() or %record.identifier.exists()}}">
+    <Section title="{{%strings.Other}}">
+      <Field label="{{%strings.Languages}}" value="{{%record.communication}}"/>
+      <Field label="{{%strings.Identifier}}" value="{{%record.identifier}}"/>
+    </Section>
+  </If>
+</Component>

@@ -28,7 +28,7 @@ public class ConfigurationModule : BootstrapModule
             if (Runtime.Platform == FloxPlatform.Console)
             {
                 var basePath = EnvironmentUtil.GetBaseDirectory();
-                if (!basePath.EndsWith(Path.DirectorySeparatorChar))
+                if (!basePath.EndsWith(Path.DirectorySeparatorChar, StringComparison.Ordinal))
                 {
                     basePath += Path.DirectorySeparatorChar;
                 }
@@ -39,11 +39,6 @@ public class ConfigurationModule : BootstrapModule
 
             // WASM: AddJsonFile works here because WebAssemblyHostBuilder.Configuration wires an
             // HTTP-based file provider under the hood (fetches from wwwroot), not a physical one.
-            // MAUI does NOT get this branch - see MauiConfigurationModule (the MAUI client library),
-            // which FloxMauiBootstrapper always swaps in via ReplaceModule instead: no MAUI target
-            // reliably exposes appsettings.*.json as a loose physical file next to the executable
-            // (confirmed: this exact FileNotFoundException on a real Windows run), so MAUI reads
-            // them as compiled-in EmbeddedResource content instead.
             if (Runtime.Platform == FloxPlatform.Wasm)
             {
                 // The env-specific file must be optional: a browser has no OS environment

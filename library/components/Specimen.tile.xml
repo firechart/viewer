@@ -1,0 +1,16 @@
+<!-- A specimen in a list: its type (else its accession number), when it was collected; its status at the end -->
+<Component name="Specimen.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.type.exists(), %record.type, iif(%record.accessionIdentifier.value.exists(), %record.accessionIdentifier.value, %record.id))}}" patient="{{%record.subject}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.collection.collected}}"/>
+        <Value value="{{%record.accessionIdentifier.value}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

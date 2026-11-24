@@ -141,7 +141,16 @@ public sealed class SqliteDocumentStore : ILocalDocumentStore, IAsyncDisposable
     private async Task<ISqliteDatabase> OpenAsync()
     {
         var database = await _engine.OpenAsync(_name, SqliteAccess.ReadWrite);
-        await database.ExecuteAsync(Schema);
+        try
+        {
+            await database.ExecuteAsync(Schema);
+        }
+        catch
+        {
+            await database.DisposeAsync();
+            throw;
+        }
+
         return database;
     }
 }

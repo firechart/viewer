@@ -46,6 +46,18 @@ public class ViewerRoutingTests
     }
 
     [Test]
+    public void TheSourceOfARecord_IsInItsAddress()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(ViewerRoutes.SourceOf("Patient", "p1").Location, Is.EqualTo("resources/Patient/p1?view=source"));
+            Assert.That(ViewerRoutes.Parse("resources/Patient/p1?view=source")?.ShowsSource, Is.True);
+            Assert.That(ViewerRoutes.Parse("resources/Patient/p1")?.ShowsSource, Is.False);
+            Assert.That(ViewerRoutes.Parse("resources/Patient?view=source")?.ShowsSource, Is.False, "only the page of a record");
+        });
+    }
+
+    [Test]
     public void TheOlderAddressOfAPatientSummary_IsWrittenInTheNewForm()
     {
         Assert.That(ViewerRoutes.Parse("summary/p1")?.Location, Is.EqualTo("summary/Patient/p1"), "bookmarks and links of before 2026-11-11 still open");
@@ -69,8 +81,14 @@ public class ViewerRoutingTests
     public void ARoute_WrittenAndReadAgain_IsTheSame()
     {
         var route = new ViewerRoute(ViewerPage.ResourceList, "Observation", Query: "code=8867-4");
+        var preview = new ViewerRoute(ViewerPage.Preview, "Observation", "o1", "mode=view&patient=p1");
 
-        Assert.That(ViewerRoutes.Parse(route.Location), Is.EqualTo(route));
+        Assert.Multiple(() =>
+        {
+            Assert.That(ViewerRoutes.Parse(route.Location), Is.EqualTo(route));
+            Assert.That(ViewerRoutes.Parse(preview.Location), Is.EqualTo(preview));
+            Assert.That(ViewerRoutes.Parse("preview/Observation?mode=tile"), Is.EqualTo(new ViewerRoute(ViewerPage.Preview, "Observation", Query: "mode=tile")));
+        });
     }
 
     [Test]

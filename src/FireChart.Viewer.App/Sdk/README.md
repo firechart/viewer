@@ -29,12 +29,13 @@ HTML, recipes and troubleshooting.
 ## Where the Viewer is served
 
 `options.url` is the address of `FireChart.Viewer.App`. The frame takes commands only from the pages that may frame it: the origin of your
-page must be in its `host.json`, `{ "frameAncestors": ["'self'", "https://emr.example.org"] }`, mounted into the Docker image (built with
-`docker compose up --build`):
+page must be in its `host.json`, `{ "frameAncestors": ["'self'", "https://emr.example.org"] }`, mounted into the Docker image
+(port 8080):
 
 ```bash
-docker run -d -p 8080:8080 -v "$PWD/host.json:/usr/share/nginx/html/host.json:ro" firechart-viewer:local
+docker run -d -p 8080:8080 -v "$PWD/host.json:/usr/share/nginx/html/host.json:ro" ghcr.io/firechart/viewer:<version>
 ```
+
 
 ## API
 

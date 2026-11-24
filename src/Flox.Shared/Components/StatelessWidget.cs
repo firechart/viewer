@@ -3,7 +3,6 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using Flox.Shared.Errors;
 using Microsoft.JSInterop;
-using Radzen;
 
 namespace Flox.Shared.Components;
 
@@ -30,13 +29,13 @@ public class StatelessWidget : ComponentBase, IHandleEvent /* optimizes repaints
     /// The dialog service.
     /// </summary>
     [Inject]
-    public DialogService DialogService { get; set; } = null!;
+    public FloxDialogService DialogService { get; set; } = null!;
 
     /// <summary>
     /// The notification service that shows snack messages.
     /// </summary>
     [Inject]
-    public NotificationService Notifications { get; set; } = null!;
+    public FloxSnackbar Notifications { get; set; } = null!;
 
     /// <summary>
     /// The factory of HTTP clients.

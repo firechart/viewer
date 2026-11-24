@@ -1,0 +1,48 @@
+<!-- The page of a task: what it is, when it was authored and modified, its status, intent and priority, its details and notes -->
+<Component name="Task.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{iif(%record.description.exists(), %record.description, %record.code)}}">
+    <Field label="{{%strings.Authored}}" value="{{%record.authoredOn}}"/>
+    <Field label="{{%strings.Modified}}" value="{{%record.lastModified}}"/>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.status}}"/>
+      <If test="{{%record.intent.exists()}}">
+        <Badge text="{{%record.intent}}"/>
+      </If>
+      <If test="{{%record.priority.exists() and %record.priority != 'routine'}}">
+        <Status value="{{%record.priority}}"/>
+      </If>
+    </Field>
+  </Section>
+
+  <If test="{{%record.for.exists() or %record.focus.exists() or %record.owner.exists() or %record.requester.exists() or %record.encounter.exists() or %record.businessStatus.exists() or %record.reasonCode.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.For}}">
+        <Link value="{{%record.for}}"/>
+      </Field>
+      <Field label="{{%strings.Focus}}">
+        <Link value="{{%record.focus}}"/>
+      </Field>
+      <Field label="{{%strings.Owner}}">
+        <Link value="{{%record.owner}}"/>
+      </Field>
+      <Field label="{{%strings.Requester}}">
+        <Link value="{{%record.requester}}"/>
+      </Field>
+      <Field label="{{%strings.Encounter}}">
+        <Link value="{{%record.encounter}}"/>
+      </Field>
+      <Field label="{{%strings.BusinessStatus}}" value="{{%record.businessStatus}}"/>
+      <Field label="{{%strings.Reason}}" value="{{%record.reasonCode}}"/>
+    </Section>
+  </If>
+
+  <If test="{{%record.note.exists()}}">
+    <Section title="{{%strings.Notes}}">
+      <Repeat each="{{%record.note}}" as="note">
+        <Row main="{{%note.text}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

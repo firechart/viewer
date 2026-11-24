@@ -1,0 +1,73 @@
+<!-- The page of a procedure: what was done, when and its status, then the reason and outcome, the details, the performers and the notes -->
+<Component name="Procedure.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{%record.code}}">
+    <Field label="{{%strings.When}}" value="{{%record.performed}}"/>
+    <Field label="{{%strings.Category}}">
+      <Value value="{{%record.category}}" separator=", "/>
+    </Field>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.status}}"/>
+    </Field>
+  </Section>
+
+  <If test="{{%record.reasonCode.exists() or %record.reason.exists() or %record.reasonReference.exists() or %record.outcome.exists()}}">
+    <Section title="{{%strings.ReasonAndOutcome}}">
+      <Field label="{{%strings.Reason}}">
+        <Value value="{{%record.reasonCode}}" separator=", "/>
+      </Field>
+      <Field label="{{%strings.Reason}}">
+        <Link value="{{%record.reasonReference}}"/>
+      </Field>
+      <Repeat each="{{%record.reason}}" as="reason">
+        <Field label="{{%strings.Reason}}">
+          <Parts separator=", ">
+            <Value value="{{%reason.value.concept}}"/>
+            <Link value="{{%reason.value.reference}}"/>
+          </Parts>
+        </Field>
+      </Repeat>
+      <Field label="{{%strings.Outcome}}" value="{{%record.outcome}}"/>
+      <Field label="{{%strings.Complication}}">
+        <Value value="{{%record.complication}}" separator=", "/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.bodySite.exists() or %record.location.exists() or %record.followUp.exists() or %record.report.exists() or %record.basedOn.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.BodySite}}">
+        <Value value="{{%record.bodySite}}" separator=", "/>
+      </Field>
+      <Field label="{{%strings.Location}}">
+        <Link value="{{%record.location}}"/>
+      </Field>
+      <Field label="{{%strings.FollowUp}}">
+        <Value value="{{%record.followUp}}" separator=", "/>
+      </Field>
+      <Field label="{{%strings.Report}}">
+        <Link value="{{%record.report}}"/>
+      </Field>
+      <Field label="{{%strings.BasedOn}}">
+        <Link value="{{%record.basedOn}}"/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.performer.exists()}}">
+    <Section title="{{%strings.Performers}}" count="{{%record.performer.count()}}">
+      <Repeat each="{{%record.performer}}" as="performer">
+        <Row meta="{{%performer.function}}"><Main><Link value="{{%performer.actor}}"/></Main></Row>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.note.exists()}}">
+    <Section title="{{%strings.Notes}}" count="{{%record.note.count()}}">
+      <Repeat each="{{%record.note}}" as="note">
+        <Row main="{{%note.text}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

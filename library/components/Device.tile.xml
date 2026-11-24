@@ -1,0 +1,10 @@
+<!-- A device in a list: its name (else its type), its manufacturer and model; its status at the end -->
+<Component name="Device.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.deviceName.exists(), %record.deviceName.first().name, iif(%record.type.exists(), %record.type, %record.id))}}" subtitle="{{%record.manufacturer &amp; iif(%record.manufacturer.exists() and %record.modelNumber.exists(), ' - ', '') &amp; %record.modelNumber}}" patient="{{%record.patient}}">
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

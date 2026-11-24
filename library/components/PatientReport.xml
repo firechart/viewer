@@ -1,0 +1,62 @@
+<!-- The report of a patient (a prototype of the components): the record is %context; the searches run in parallel, each section waits for its own.
+     The records are shown in their modes: the banner of the patient, the tiles of the lists (Show, components {Type}.{mode} of the library) -->
+<Component name="PatientReport">
+  <Data>
+    <Search id="vitals" query="Observation?patient={{%context.id}}&amp;category=vital-signs&amp;_sort=-date" max="10"/>
+    <Search id="labs" query="Observation?patient={{%context.id}}&amp;category=laboratory&amp;_sort=-date" max="20"/>
+    <Search id="conditions" query="Condition?patient={{%context.id}}" max="20"/>
+    <Search id="medications" query="MedicationRequest?patient={{%context.id}}&amp;status=active" max="20"/>
+    <Search id="encounters" query="Encounter?patient={{%context.id}}&amp;_sort=-date" max="5"/>
+  </Data>
+
+  <Show value="{{%context}}" mode="banner"/>
+
+  <Columns>
+    <Card title="{{%strings.Details}}">
+      <Field label="{{%strings.MaritalStatus}}" value="{{%context.maritalStatus}}"/>
+      <Field label="{{%strings.Phone}}" value="{{%context.telecom.where(system = 'phone').first()}}"/>
+      <Field label="{{%strings.Address}}" value="{{%context.address.first()}}"/>
+      <If test="{{%context.generalPractitioner.exists()}}">
+        <Field label="{{%strings.GeneralPractitioner}}">
+          <Link value="{{%context.generalPractitioner}}"/>
+        </Field>
+      </If>
+    </Card>
+    <Card title="{{%strings.Identifiers}}">
+      <Repeat each="{{%context.identifier}}" as="identifier" empty="{{%strings.NoIdentifiers}}">
+        <Field label="{{iif(%identifier.type.exists(), %identifier.type, %identifier.system)}}" value="{{%identifier.value}}"/>
+      </Repeat>
+    </Card>
+  </Columns>
+
+  <ListPanel title="{{%strings.VitalSigns}}" count="{{%vitals.count()}}">
+    <Repeat each="{{%vitals}}" as="observation" empty="{{%strings.NoVitalSigns}}">
+      <ObservationRow observation="{{%observation}}"/>
+    </Repeat>
+  </ListPanel>
+
+  <Section title="{{%strings.Laboratory}}" count="{{%labs.count()}}">
+    <Table each="{{%labs}}" as="observation" empty="{{%strings.NoLaboratoryResults}}">
+      <Column title="{{%strings.Test}}" value="{{%observation.code}}"/>
+      <Column title="{{%strings.Result}}" value="{{%observation.value}}">
+        <Interpretation value="{{%observation.interpretation.first()}}"/>
+      </Column>
+      <Column title="{{%strings.Date}}" value="{{%observation.effective}}"/>
+      <Column title="{{%strings.Status}}">
+        <Status value="{{%observation.status}}"/>
+      </Column>
+    </Table>
+  </Section>
+
+  <Section title="{{%strings.Conditions}}" count="{{%conditions.count()}}">
+    <Show value="{{%conditions}}" mode="tile"/>
+  </Section>
+
+  <Section title="{{%strings.ActiveMedications}}" count="{{%medications.count()}}">
+    <Show value="{{%medications}}" mode="tile"/>
+  </Section>
+
+  <Details title="{{%strings.RecentEncounters}}">
+    <Show value="{{%encounters}}" mode="tile"/>
+  </Details>
+</Component>

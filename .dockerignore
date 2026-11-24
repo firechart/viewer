@@ -1,13 +1,16 @@
+# The context of the image (Dockerfile): the sources of the application, nothing a build makes and nothing of a developer's machine
 **/bin/
 **/obj/
 **/node_modules/
 **/wwwroot/css/*.Tailwind.css
 artifacts/
+TestResults/
 test/
 samples/
 .git/
+.github/
 .vs/
 .idea/
+.vscode/
 .tailwind/
-viewer.json
-host.json
+.env

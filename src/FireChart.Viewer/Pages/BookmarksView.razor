@@ -4,12 +4,12 @@
 @implements IDisposable
 @inject IServiceProvider Services
 
-<RadzenStack Gap="var(--gap-sm)" data-viewer="bookmarks">
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="var(--gap-sm)" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
-        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-m-0 grow">@FloxStrings.Caption_Bookmarks</RadzenText>
+<div class="flex flex-col gap-2" data-viewer="bookmarks">
+    @* The title is the header of the Viewer's page *@
+    <SectionContent SectionName=@FhirViewer.PageCommandsSection>
         <BookmarkTransfer OnImported=@LoadAsync/>
-    </RadzenStack>
-    <Alert OneTime Key=@Flox.Shared.Pages.Bookmarks.BookmarksPage.BookmarksOnDeviceAlert Size="AlertSize.Small" Class="rz-m-0">
+    </SectionContent>
+    <Alert OneTime Plain Key=@Flox.Shared.Pages.Bookmarks.BookmarksPage.BookmarksOnDeviceAlert Class="m-0">
         @FloxStrings.Notice_BookmarksOnDevice
     </Alert>
 
@@ -19,7 +19,7 @@
     }
     else if (_items.Count == 0)
     {
-        <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0" data-viewer="no-bookmarks">@Strings.Message_NoBookmarks</RadzenText>
+        <p class="m-0 text-sm" data-viewer="no-bookmarks">@Strings.Message_NoBookmarks</p>
     }
     else
     {
@@ -34,7 +34,7 @@
             }
         </div>
     }
-</RadzenStack>
+</div>
 
 @code {
 

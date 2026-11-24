@@ -1,4 +1,6 @@
 @attribute [Route("/diagnostics/theme")]
+@using BlazorBlueprint.Components
+@using BlazorBlueprint.Primitives
 
 @inherits StatelessWidget
 
@@ -6,252 +8,186 @@
 
 <Breadcrumbs Items=@Breadcrumbs/>
 
-<RadzenStack Gap="var(--gap-lg)">
+@* The gallery of the look: the facades of Flox and the components of Blazor Blueprint the clients use, in the current theme *@
+<div class="flex flex-col">
 
-    <ListSection Caption="Typography">
-        <RadzenStack Gap="var(--gap-xs)" class="p-4">
-            <RadzenText TextStyle="TextStyle.H4">Heading 4: Patient summary</RadzenText>
-            <RadzenText TextStyle="TextStyle.H5">Heading 5: Observations</RadzenText>
-            <RadzenText TextStyle="TextStyle.H6">Heading 6: Vital signs</RadzenText>
-            <RadzenText TextStyle="TextStyle.Subtitle1">Subtitle 1: the active medication list</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body2">Body 2: the usual text of the application, a sentence long enough to see the line height.</RadzenText>
-            <RadzenText TextStyle="TextStyle.Caption">Caption: secondary text, dates and counters</RadzenText>
-            <RadzenText TextStyle="TextStyle.Overline">Overline: a group label</RadzenText>
-            <RadzenLink Text="A link to somewhere" Path="/diagnostics"/>
-        </RadzenStack>
+    <ListSection Title="Typography">
+        <div class="flex flex-col gap-1 p-4">
+            <h1 class="m-0 text-3xl font-semibold tracking-tight">Heading 1</h1>
+            <h2 class="m-0 text-2xl font-semibold tracking-tight">Heading 2</h2>
+            <h3 class="m-0 text-xl font-semibold tracking-tight">Heading 3</h3>
+            <h4 class="m-0 text-lg font-semibold">Heading 4</h4>
+            <p class="m-0 text-base">Body text: the record of a patient, a list of packages, a form.</p>
+            <p class="m-0 text-sm text-muted">Muted text: a hint under a field, a subtitle of a row.</p>
+            <BbLink Href="about" Class="text-sm font-medium">A link</BbLink>
+            <code class="text-sm">code: hl7.fhir.r4.core#4.0.1</code>
+        </div>
     </ListSection>
 
-    <ListSection Caption="Buttons">
-        <RadzenStack Gap="var(--gap-md)" class="p-4">
-            @foreach (var variant in s_variants)
-            {
-                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)" Wrap="Radzen.FlexWrap.Wrap" AlignItems="Radzen.AlignItems.Center">
-                    <RadzenText TextStyle="TextStyle.Caption" class="w-20">@variant</RadzenText>
-                    @foreach (var style in s_buttonStyles)
-                    {
-                        <RadzenButton Variant=@variant ButtonStyle=@style Text=@style.ToString()/>
-                    }
-                    <RadzenButton Variant=@variant ButtonStyle="Radzen.ButtonStyle.Primary" Text="Disabled" Disabled/>
-                </RadzenStack>
-            }
-            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)" Wrap="Radzen.FlexWrap.Wrap" AlignItems="Radzen.AlignItems.Center">
-                <RadzenText TextStyle="TextStyle.Caption" class="w-20">Sizes</RadzenText>
-                @foreach (var size in s_buttonSizes)
-                {
-                    <RadzenButton Size=@size Text=@size.ToString()/>
-                }
-                @foreach (var size in s_buttonSizes)
-                {
-                    <RadzenButton Size=@size Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base"><FloxIcon Icon="refresh"/></RadzenButton>
-                }
-                <RadzenButton><FloxIcon Icon="add"/><span>With icon</span></RadzenButton>
-                <RadzenButton Text="Busy" IsBusy BusyText="Saving..."/>
-            </RadzenStack>
-        </RadzenStack>
+    <ListSection Title="Buttons">
+        <div class="flex flex-wrap items-center gap-2 p-4">
+            <Button>Default</Button>
+            <Button Variant="ButtonVariant.Secondary">Secondary</Button>
+            <Button Variant="ButtonVariant.Outline">Outline</Button>
+            <Button Variant="ButtonVariant.Ghost">Ghost</Button>
+            <Button Variant="ButtonVariant.Destructive">Destructive</Button>
+            <Button Variant="ButtonVariant.Link">Link</Button>
+            <Button Disabled="true">Disabled</Button>
+            <Button Loading="true">Loading</Button>
+            <Button><FloxIcon Icon="add"/>With an icon</Button>
+            <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" AriaLabel="Refresh"><FloxIcon Icon="refresh"/></Button>
+            <Button>Small</Button>
+            <Button Size="ButtonSize.Large">Large</Button>
+        </div>
     </ListSection>
 
-    <ListSection Caption="Form fields">
-        <RadzenStack Gap="var(--gap-md)" class="p-4">
-            <RadzenRow Gap="var(--gap-md)">
-                <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenFormField Variant="Radzen.Variant.Text" Text="Name" class="w-full">
-                        <RadzenTextBox @bind-Value=@_text Placeholder="Jane Doe"/>
-                    </RadzenFormField>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenFormField Variant="Radzen.Variant.Text" Text="Empty field" class="w-full">
-                        <RadzenTextBox Placeholder="Placeholder"/>
-                    </RadzenFormField>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenFormField Variant="Radzen.Variant.Text" Text="Kind" class="w-full">
-                        <RadzenDropDown @bind-Value=@_choice Data=@s_choices/>
-                    </RadzenFormField>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenFormField Variant="Radzen.Variant.Text" Text="Birth date" class="w-full">
-                        <RadzenDatePicker @bind-Value=@_date DateFormat="d"/>
-                    </RadzenFormField>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenFormField Variant="Radzen.Variant.Text" Text="Count" class="w-full">
-                        <RadzenNumeric @bind-Value=@_number/>
-                    </RadzenFormField>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenFormField Variant="Radzen.Variant.Text" Text="Password" class="w-full">
-                        <RadzenPassword @bind-Value=@_password/>
-                    </RadzenFormField>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenFormField Variant="Radzen.Variant.Text" Text="Invalid field" class="w-full">
-                        <ChildContent>
-                            <RadzenTextBox class="invalid" Value="not a url"/>
-                        </ChildContent>
-                        <Helper>
-                            <RadzenText TextStyle="TextStyle.Caption" class="text-danger">The address must start with https://</RadzenText>
-                        </Helper>
-                    </RadzenFormField>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="6">
-                    <RadzenFormField Variant="Radzen.Variant.Text" Text="Disabled" class="w-full">
-                        <RadzenTextBox Value="Read only" Disabled/>
-                    </RadzenFormField>
-                </RadzenColumn>
-                <RadzenColumn Size="12">
-                    <RadzenFormField Variant="Radzen.Variant.Text" Text="Notes" class="w-full">
-                        <RadzenTextArea @bind-Value=@_notes Rows="3"/>
-                    </RadzenFormField>
-                </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
-                <RadzenTextBox Placeholder="A bare text box" class="w-60"/>
-                <RadzenDropDown @bind-Value=@_choice Data=@s_choices class="w-48"/>
-                <RadzenButton Text="Search"/>
-            </RadzenStack>
-
-            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-lg)" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
-                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)" AlignItems="Radzen.AlignItems.Center">
-                    <RadzenCheckBox @bind-Value=@_check Name="check"/>
-                    <RadzenLabel Text="Check box" Component="check"/>
-                </RadzenStack>
-                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)" AlignItems="Radzen.AlignItems.Center">
-                    <RadzenCheckBox TValue="bool" Value="false" Name="check2"/>
-                    <RadzenLabel Text="Unchecked" Component="check2"/>
-                </RadzenStack>
-                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)" AlignItems="Radzen.AlignItems.Center">
-                    <RadzenSwitch @bind-Value=@_switch Name="switch"/>
-                    <RadzenLabel Text="Switch" Component="switch"/>
-                </RadzenStack>
-                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)" AlignItems="Radzen.AlignItems.Center">
-                    <RadzenSwitch Value="false" Name="switch2"/>
-                    <RadzenLabel Text="Off" Component="switch2"/>
-                </RadzenStack>
-                <RadzenRadioButtonList @bind-Value=@_radio TValue="int">
-                    <Items>
-                        <RadzenRadioButtonListItem TValue="int" Text="One" Value="1"/>
-                        <RadzenRadioButtonListItem TValue="int" Text="Two" Value="2"/>
-                    </Items>
-                </RadzenRadioButtonList>
-                <RadzenSlider @bind-Value=@_slider TValue="int" Min="0" Max="100" class="w-48"/>
-            </RadzenStack>
-        </RadzenStack>
+    <ListSection Title="Form fields">
+        <div class="flex flex-col gap-4 p-4">
+            <FormField Text="Text" For="theme-text" Description="A hint under the field">
+                <BbInput Id="theme-text" @bind-Value=_text/>
+            </FormField>
+            <FormField Text="Choice">
+                <BbSelect TValue="string" @bind-Value=_choice Options=@s_choices.Select(SelectOption.FromValue) AriaLabel="Choice"/>
+            </FormField>
+            <FormField Text="Search a choice">
+                <BbCombobox TValue="string" @bind-Value=_choice Options=@s_choices.Select(SelectOption.FromValue) AriaLabel="Search a choice" Class="w-full"/>
+            </FormField>
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <FormField Text="Date">
+                    <BbDatePicker @bind-Value=_date AriaLabel="Date"/>
+                </FormField>
+                <FormField Text="Number" For="theme-number">
+                    <BbNumericInput TValue="int" Id="theme-number" @bind-Value=_number Min="0" Max="10"/>
+                </FormField>
+            </div>
+            <FormField Text="Password" For="theme-password">
+                <BbInput Id="theme-password" Type="InputType.Password" @bind-Value=_password/>
+            </FormField>
+            <FormField Text="Notes" For="theme-notes">
+                <BbTextarea Id="theme-notes" @bind-Value=_notes Placeholder="Several lines"/>
+            </FormField>
+            <FormField Text="Check box" For="theme-check" Horizontal="true">
+                <BbCheckbox Id="theme-check" @bind-Checked=_check/>
+            </FormField>
+            <FormField Text="Switch" For="theme-switch" Horizontal="true">
+                <Switch Id="theme-switch" @bind-Checked=_switch/>
+            </FormField>
+            <FormField Text="Radio">
+                <BbRadioGroup TValue="int" @bind-Value=_radio AriaLabel="Radio">
+                    <BbRadioGroupItem TValue="int" Value="1" Label="One" Id="theme-radio-1"/>
+                    <BbRadioGroupItem TValue="int" Value="2" Label="Two" Id="theme-radio-2"/>
+                </BbRadioGroup>
+            </FormField>
+            <FormField Text="Slider">
+                <SliderWithDisplay T="int" Min="0" Max="100" Step="10" @bind-Value=_slider Label="Slider"/>
+            </FormField>
+            <FormField Text="Segments">
+                <BbToggleGroup TValue="string" @bind-Value=_segment Variant="ToggleVariant.Outline" Size="ToggleSize.Small" Required="true">
+                    <BbToggleGroupItem TValue="string" Value=@("snapshot")>Snapshot</BbToggleGroupItem>
+                    <BbToggleGroupItem TValue="string" Value=@("differential")>Differential</BbToggleGroupItem>
+                </BbToggleGroup>
+            </FormField>
+        </div>
     </ListSection>
 
-    <ListSection Caption="Badges and chips">
-        <RadzenStack Gap="var(--gap-md)" class="p-4">
-            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)" Wrap="Radzen.FlexWrap.Wrap" AlignItems="Radzen.AlignItems.Center">
-                @foreach (var style in s_badgeStyles)
-                {
-                    <RadzenBadge BadgeStyle=@style Text=@style.ToString()/>
-                }
-            </RadzenStack>
-            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)" Wrap="Radzen.FlexWrap.Wrap" AlignItems="Radzen.AlignItems.Center">
-                @foreach (var style in s_badgeStyles)
-                {
-                    <RadzenBadge BadgeStyle=@style Variant="Radzen.Variant.Outlined" Text=@style.ToString()/>
-                }
-            </RadzenStack>
-            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)" Wrap="Radzen.FlexWrap.Wrap" AlignItems="Radzen.AlignItems.Center">
-                @foreach (var style in s_badgeStyles)
-                {
-                    <RadzenChip ChipStyle=@style Size="Radzen.ChipSize.Small" Text=@style.ToString()/>
-                }
-                <RadzenChip Text="Medium chip"/>
-            </RadzenStack>
-        </RadzenStack>
+    <ListSection Title="Badges">
+        <div class="flex flex-wrap items-center gap-2 p-4">
+            <BbBadge>Default</BbBadge>
+            <BbBadge Variant="BadgeVariant.Secondary">Secondary</BbBadge>
+            <BbBadge Variant="BadgeVariant.Outline">Outline</BbBadge>
+            <BbBadge Variant="BadgeVariant.Destructive">Destructive</BbBadge>
+            <BbBadge Variant="BadgeVariant.Success">Success</BbBadge>
+            <BbBadge Variant="BadgeVariant.Warning">Warning</BbBadge>
+            <BbBadge Variant="BadgeVariant.Info">Info</BbBadge>
+        </div>
     </ListSection>
 
-    <ListSection Caption="Alerts">
-        <RadzenStack Gap="var(--gap-sm)" class="p-4">
-            @foreach (var style in s_alertStyles)
-            {
-                <RadzenAlert AlertStyle=@style Variant="Radzen.Variant.Flat" AllowClose="false">@style: the FHIR server did not answer in time.</RadzenAlert>
-            }
-            <RadzenAlert AlertStyle="Radzen.AlertStyle.Warning" Variant="Radzen.Variant.Flat" AllowClose="false" Size="Radzen.AlertSize.Small">Small warning alert</RadzenAlert>
-            <RadzenAlert AlertStyle="Radzen.AlertStyle.Danger" Variant="Radzen.Variant.Filled" AllowClose="false">Filled danger alert</RadzenAlert>
-            <RadzenAlert AlertStyle="Radzen.AlertStyle.Info" Variant="Radzen.Variant.Outlined" AllowClose="false">Outlined info alert</RadzenAlert>
-        </RadzenStack>
+    <ListSection Title="Alerts">
+        <div class="flex flex-col gap-2 p-4">
+            <Alert Kind="AlertKind.Info" Title="Info">A note the user reads.</Alert>
+            <Alert Kind="AlertKind.Success">The package is on the device.</Alert>
+            <Alert Kind="AlertKind.Warning">The list may be out of date.</Alert>
+            <Alert Kind="AlertKind.Danger" AllowClose="true">The server did not answer.</Alert>
+            <Alert Plain="true">A plain note, without the colour of a kind.</Alert>
+        </div>
     </ListSection>
 
-    <ListSection Caption="List tiles">
+    <ListSection Title="List tiles" List="true">
         <ListTile TitleText="Patient: Jane Doe" SubtitleText="Born 1984-02-11, female" Icon="person" TrailingText="12"/>
-        <ListTile TitleText="Observation: Blood pressure" SubtitleText="120/80 mmHg, 2026-11-01" Icon="monitor_heart" OnSelected=@(() => { })/>
+        <ListTile TitleText="Observation: Blood pressure" SubtitleText="120/80 mmHg, 2026-11-01" Icon="monitor_heart" OnSelected=@(() => { }) Chevron="true"/>
         <ListTile TitleText="A row without subtitle" Icon="description"/>
+        <ListTileSkeleton Lines="2"/>
     </ListSection>
 
-    <ListSection Caption="Tabs">
-        <RadzenTabs>
-            <Tabs>
-                <RadzenTabsItem Text="View"><RadzenText>The rendered resource.</RadzenText></RadzenTabsItem>
-                <RadzenTabsItem Text="Source"><RadzenText>The JSON source.</RadzenText></RadzenTabsItem>
-                <RadzenTabsItem Text="Related"><RadzenText>Related resources.</RadzenText></RadzenTabsItem>
-            </Tabs>
-        </RadzenTabs>
+    <ListSection Title="Properties" Definitions="true">
+        <PropertyTile Label="Name" Value="hl7.fhir.r4.core"/>
+        <PropertyTile Label="Version" Value="4.0.1"/>
+        <PropertyTile Label="Canonical" Value="http://hl7.org/fhir/StructureDefinition/Patient"/>
     </ListSection>
 
-    <ListSection Caption="Data grid">
-        <RadzenDataGrid TItem="Row" Data=@s_rows AllowPaging PageSize="4" AllowSorting PagerHorizontalAlign="Radzen.HorizontalAlign.Left">
+    <ListSection Title="Tabs">
+        <div class="p-4">
+            <BbTabs DefaultValue="view">
+                <BbTabsList>
+                    <BbTabsTrigger Value="view">View</BbTabsTrigger>
+                    <BbTabsTrigger Value="source">Source</BbTabsTrigger>
+                    <BbTabsTrigger Value="related">Related</BbTabsTrigger>
+                </BbTabsList>
+                <BbTabsContent Value="view"><p class="m-0 text-sm">The rendered resource.</p></BbTabsContent>
+                <BbTabsContent Value="source"><p class="m-0 text-sm">The JSON source.</p></BbTabsContent>
+                <BbTabsContent Value="related"><p class="m-0 text-sm">Related resources.</p></BbTabsContent>
+            </BbTabs>
+        </div>
+    </ListSection>
+
+    <ListSection Title="Table">
+        <BbDataTable TData="Row" Data=@s_rows ShowPagination="true" InitialPageSize="4">
             <Columns>
-                <RadzenDataGridColumn TItem="Row" Property="Code" Title="Code" Width="120px"/>
-                <RadzenDataGridColumn TItem="Row" Property="Display" Title="Display"/>
-                <RadzenDataGridColumn TItem="Row" Property="Value" Title="Value" Width="120px" TextAlign="Radzen.TextAlign.Right"/>
+                <BbDataTableColumn TData="Row" TValue="string" Property=@(row => row.Code) Header="Code" Sortable="true"/>
+                <BbDataTableColumn TData="Row" TValue="string" Property=@(row => row.Display) Header="Display" Sortable="true"/>
+                <BbDataTableColumn TData="Row" TValue="string" Property=@(row => row.Value) Header="Value"/>
             </Columns>
-        </RadzenDataGrid>
+        </BbDataTable>
     </ListSection>
 
-    <ListSection Caption="Containers">
-        <RadzenStack Gap="var(--gap-md)" class="p-4">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.H6">Card</RadzenText>
-                <RadzenText>A card with the default padding.</RadzenText>
-            </RadzenCard>
-            <RadzenFieldset Text="Fieldset">
-                <RadzenText>Content of the fieldset.</RadzenText>
-            </RadzenFieldset>
-            <RadzenPanel AllowCollapse Text="Collapsible panel">
-                <RadzenText>Content of the panel.</RadzenText>
-            </RadzenPanel>
-            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="var(--gap-sm)" AlignItems="Radzen.AlignItems.Center">
-                <RadzenMenu>
-                    <RadzenMenuItem Text="Menu">
-                        <RadzenMenuItem Text="Open" Icon="open_in_new"/>
-                        <RadzenMenuItem Text="Delete" Icon="delete"/>
-                    </RadzenMenuItem>
-                </RadzenMenu>
+    <ListSection Title="Containers">
+        <div class="flex flex-col gap-3 p-4">
+            <BbCard>
+                <BbCardHeader>
+                    <BbCardTitle>Card</BbCardTitle>
+                    <BbCardDescription>A card with a header and content.</BbCardDescription>
+                </BbCardHeader>
+                <BbCardContent><p class="m-0 text-sm">The content of the card.</p></BbCardContent>
+            </BbCard>
+            <details class="rounded-xl border border-line p-3">
+                <summary class="cursor-pointer text-sm font-medium">A collapsible group</summary>
+                <p class="m-0 mt-2 text-sm">The content of the group.</p>
+            </details>
+            <div class="flex flex-wrap items-center gap-3">
+                <BbDropdownMenu>
+                    <BbDropdownMenuTrigger><Button Variant="ButtonVariant.Outline">Menu</Button></BbDropdownMenuTrigger>
+                    <BbDropdownMenuContent>
+                        <PageMenuItem Icon="open_in_new" Text="Open"/>
+                        <PageMenuItem Icon="delete" Text="Delete"/>
+                    </BbDropdownMenuContent>
+                </BbDropdownMenu>
                 <CircularProgress/>
-                <RadzenProgressBar Value="60" class="w-48"/>
-                <RadzenSkeleton class="h-4 w-40"/>
-            </RadzenStack>
-        </RadzenStack>
+                <ProgressRing Value="60"/>
+                <BbProgress Value="60" Class="w-48"/>
+                <BbSkeleton Class="h-4 w-40"/>
+            </div>
+        </div>
     </ListSection>
 
-    <ListSection Caption="Dialogs">
-        <ListTile TitleText="Confirm dialog" SubtitleText="Radzen's Confirm with OK and Cancel" OnSelected=@ConfirmAsync/>
+    <ListSection Title="Dialogs and messages" List="true">
+        <ListTile TitleText="Confirm dialog" SubtitleText="A message box with Delete and Cancel" Icon="help" OnSelected=@ConfirmAsync Chevron="true"/>
+        <ListTile TitleText="Snack message" SubtitleText="A toast at the bottom with a command" Icon="chat" OnSelected=@ShowSnack Chevron="true"/>
+        <ListTile TitleText="Error message" SubtitleText="An error that stays until it is closed" Icon="error" OnSelected=@(() => Notifications.Show("The server did not answer.", SnackSeverity.Error, 0)) Chevron="true"/>
     </ListSection>
 
-</RadzenStack>
+</div>
 
 @code {
-    private static readonly Radzen.Variant[] s_variants = [Radzen.Variant.Filled, Radzen.Variant.Flat, Radzen.Variant.Outlined, Radzen.Variant.Text];
-
-    private static readonly Radzen.ButtonStyle[] s_buttonStyles =
-    [
-        Radzen.ButtonStyle.Primary, Radzen.ButtonStyle.Secondary, Radzen.ButtonStyle.Base, Radzen.ButtonStyle.Light, Radzen.ButtonStyle.Dark,
-        Radzen.ButtonStyle.Success, Radzen.ButtonStyle.Danger, Radzen.ButtonStyle.Warning, Radzen.ButtonStyle.Info
-    ];
-
-    private static readonly Radzen.ButtonSize[] s_buttonSizes = [Radzen.ButtonSize.ExtraSmall, Radzen.ButtonSize.Small, Radzen.ButtonSize.Medium, Radzen.ButtonSize.Large];
-
-    private static readonly Radzen.BadgeStyle[] s_badgeStyles =
-    [
-        Radzen.BadgeStyle.Primary, Radzen.BadgeStyle.Secondary, Radzen.BadgeStyle.Base, Radzen.BadgeStyle.Light,
-        Radzen.BadgeStyle.Success, Radzen.BadgeStyle.Danger, Radzen.BadgeStyle.Warning, Radzen.BadgeStyle.Info
-    ];
-
-    private static readonly Radzen.AlertStyle[] s_alertStyles =
-        [Radzen.AlertStyle.Primary, Radzen.AlertStyle.Success, Radzen.AlertStyle.Warning, Radzen.AlertStyle.Danger, Radzen.AlertStyle.Info];
 
     private static readonly string[] s_choices = ["Patient", "Practitioner", "Organization"];
 
@@ -275,16 +211,21 @@
     private bool _switch = true;
     private int _radio = 1;
     private int _slider = 40;
+    private string? _segment = "snapshot";
 
     protected override void InitBreadcrumbs()
     {
         Breadcrumbs.Add("Diagnostics", href: "/diagnostics");
-        Breadcrumbs.Add("Theme", href: "/diagnostics/theme");
     }
 
     private async Task ConfirmAsync()
     {
-        await DialogService.Confirm("Delete the selected server?", "Delete");
+        await DialogService.ShowMessageBoxAsync("Delete", "Delete the selected server?", "Delete", cancelText: "Cancel");
+    }
+
+    private void ShowSnack()
+    {
+        Notifications.Show("The bookmark was deleted.", SnackSeverity.Info, actionText: "Undo", action: () => Notifications.Show("Restored.", SnackSeverity.Success));
     }
 
     private sealed record Row(string Code, string Display, string Value);

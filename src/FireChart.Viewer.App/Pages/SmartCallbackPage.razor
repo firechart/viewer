@@ -1,3 +1,4 @@
+@using BlazorBlueprint.Components
 @page "/smart/callback"
 @inject ISmartAuthorizer Authorizer
 @inject NavigationManager NavigationManager
@@ -7,14 +8,14 @@
 <div class="p-4">
     @if (_failure is null)
     {
-        <RadzenProgressBarCircular ShowValue="false" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Small"/>
+        <CircularProgress Compact="true"/>
     }
     else
     {
-        <RadzenStack Gap="var(--gap-lg)" class="max-w-md">
-            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false">@_failure</RadzenAlert>
-            <RadzenButton ButtonStyle="ButtonStyle.Base" Text="Back to the viewer" Click=@(() => NavigationManager.NavigateTo(EmbedPage.Prefix))/>
-        </RadzenStack>
+        <div class="flex flex-col gap-4 max-w-md">
+            <Alert Kind="AlertKind.Warning">@_failure</Alert>
+            <Button Variant="ButtonVariant.Secondary" OnClick=@(() => NavigationManager.NavigateTo(EmbedPage.Prefix))>Back to the viewer</Button>
+        </div>
     }
 </div>
 

@@ -1,0 +1,32 @@
+<!-- The page of an account: its name, service period and status, its details and the coverages it bills -->
+<Component name="Account.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{iif(%record.name.exists(), %record.name, %record.id)}}">
+    <Field label="{{%strings.ServicePeriod}}" value="{{%record.servicePeriod}}"/>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.status}}"/>
+    </Field>
+  </Section>
+
+  <If test="{{%record.type.exists() or %record.subject.exists() or %record.owner.exists() or %record.description.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Type}}" value="{{%record.type}}"/>
+      <Field label="{{%strings.Subject}}">
+        <Link value="{{%record.subject}}"/>
+      </Field>
+      <Field label="{{%strings.Owner}}">
+        <Link value="{{%record.owner}}"/>
+      </Field>
+      <Field label="{{%strings.Description}}" value="{{%record.description}}"/>
+    </Section>
+  </If>
+
+  <If test="{{%record.coverage.exists()}}">
+    <Section title="{{%strings.Coverage}}">
+      <Repeat each="{{%record.coverage}}" as="cover">
+        <Row meta="{{%cover.priority}}"><Main><Link value="{{%cover.coverage}}"/></Main></Row>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

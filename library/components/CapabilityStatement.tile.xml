@@ -1,0 +1,13 @@
+<!-- A capability statement in a list: its name, the software and the FHIR version; its kind and status at the end -->
+<Component name="CapabilityStatement.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.name.exists(), %record.name, iif(%record.title.exists(), %record.title, %record.id))}}" subtitle="{{%record.software.name}}{{iif(%record.software.name.exists() and %record.fhirVersion.exists(), ' · ', '')}}{{%record.fhirVersion}}">
+    <Trailing>
+      <If test="{{%record.kind.exists()}}">
+        <Badge text="{{%record.kind}}"/>
+      </If>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

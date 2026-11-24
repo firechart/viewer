@@ -1,3 +1,4 @@
+@using BlazorBlueprint.Components
 @attribute [Route(SharedRoutes.SETTINGS)]
 @attribute [Authorize]
 
@@ -10,17 +11,24 @@
 <NavigationLock OnBeforeInternalNavigation=@OnBeforeNavigationAsync/>
 
 <BusyOverlay Busy=@State.IsBusy Concealed=@State.Activating>
-    <RadzenStack Gap="var(--gap-md)" class="rz-my-2">
-        @foreach (var section in State.Sections)
-        {
-            <SettingsSection Section=@section OnModified=@StateHasChanged/>
-        }
-    </RadzenStack>
+    @* The buttons end where the fields end, not at the edge of a wide window *@
+    <div class="max-w-2xl">
+        <div class="my-2 flex flex-col gap-6">
+            @foreach (var (section, index) in State.Sections.Select((section, index) => (section, index)))
+            {
+                @if (index > 0)
+                {
+                    <BbFieldSeparator/>
+                }
+                <SettingsSection Section=@section OnModified=@StateHasChanged/>
+            }
+        </div>
 
-    <DialogActions>
-        <RadzenButton Variant="Radzen.Variant.Outlined" ButtonStyle="Radzen.ButtonStyle.Base" Text=@Strings.Caption_Reset Click=@State.ResetAsync/>
-        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Primary" Text=@Strings.Caption_Save Disabled=@(!State.IsModified) Click=@State.SaveAsync/>
-    </DialogActions>
+        <DialogActions>
+            <Button Variant="ButtonVariant.Outline" OnClick=@State.ResetAsync>@Strings.Caption_Reset</Button>
+            <Button Disabled=@(!State.IsModified) OnClick=@State.SaveAsync>@Strings.Caption_Save</Button>
+        </DialogActions>
+    </div>
 </BusyOverlay>
 
     @code {
@@ -40,12 +48,6 @@
         {
             context.PreventNavigation();
         }
-    }
-
-    protected override void InitBreadcrumbs()
-    {
-        base.InitBreadcrumbs();
-        Breadcrumbs.Add(Strings.Caption_Settings);
     }
 
 }

@@ -1,0 +1,43 @@
+@using BlazorBlueprint.Components
+@using Flox.Core.Data
+@inject IServiceProvider Services
+
+@* The toggle of word wrap of a CodeEditor, kept on the device (IKeyValueStorage, one key for every source): a source opens as the user left the last
+   one. It stands at the end of a row of tabs; its text goes where that row, a size container, is narrow *@
+<BbToggle Pressed=@Wrap PressedChanged=@SetAsync Variant="ToggleVariant.Outline" Size="ToggleSize.Small" title=@Strings.Caption_WordWrap>
+    <FloxIcon Icon="wrap_text" Size="1rem"/><span class=@("@max-md:sr-only")>@Strings.Caption_WordWrap</span>
+</BbToggle>
+
+@code {
+
+    /// <summary>The key of the state in the <see cref="IKeyValueStorage"/>.</summary>
+    public const string Key = "codemirror.word-wrap";
+
+    /// <summary>Whether the lines wrap.</summary>
+    [Parameter]
+    public bool Wrap { get; set; }
+
+    /// <summary>Raised when the user turns the toggle, and once when the kept state differs from <see cref="Wrap"/>.</summary>
+    [Parameter]
+    public EventCallback<bool> WrapChanged { get; set; }
+
+    private IKeyValueStorage? Values => Services.GetService<IKeyValueStorage>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Values is { } values && await values.GetValueAsync(Key, Wrap) is var kept && kept != Wrap)
+        {
+            await WrapChanged.InvokeAsync(kept);
+        }
+    }
+
+    private async Task SetAsync(bool wrap)
+    {
+        await WrapChanged.InvokeAsync(wrap);
+        if (Values is { } values)
+        {
+            await values.SetValueAsync(Key, wrap);
+        }
+    }
+
+}

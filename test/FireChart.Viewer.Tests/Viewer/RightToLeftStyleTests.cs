@@ -18,7 +18,7 @@ public partial class RightToLeftStyleTests
     [Test]
     public void TheStylesOfThePublicPart_SayStartAndEnd_NotLeftAndRight()
     {
-        Assert.That(Physical(PublicRoot(), ["library/styles", "src"]), Is.Empty);
+        Assert.That(Physical(TestRepository.Root(), ["library/styles", "src/FireChart.Viewer", "src/FireChart.Viewer.Core", "src/FireChart.Viewer.Library", "src/FireChart.Viewer.App", "src/Flox.Shared"]), Is.Empty);
     }
 
     // The lines of the styles and the classes of the Razor files under the folders that name a physical side
@@ -29,7 +29,7 @@ public partial class RightToLeftStyleTests
         {
             var relative = Path.GetRelativePath(root, file).Replace('\\', '/');
             if (relative.Contains("/bin/", StringComparison.Ordinal) || relative.Contains("/obj/", StringComparison.Ordinal) || relative.Contains("/lib/", StringComparison.Ordinal)
-                || relative.EndsWith(".Tailwind.css", StringComparison.Ordinal) || relative.Contains("daisy", StringComparison.Ordinal))
+                || relative.EndsWith(".Tailwind.css", StringComparison.Ordinal))
             {
                 continue;
             }
@@ -62,16 +62,5 @@ public partial class RightToLeftStyleTests
         }
 
         return found;
-    }
-
-    private static string PublicRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "FireChart.Viewer.slnx")))
-        {
-            directory = directory.Parent;
-        }
-
-        return directory!.FullName;
     }
 }

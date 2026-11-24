@@ -1,7 +1,26 @@
+# FireChart Viewer in Docker: static files behind nginx (Dockerfile, docker/nginx.conf). The settings are in .env next to this file
+# (docker/.env.example). These sources, built here:
+#   docker compose up --build
+# The published image instead (VIEWER_IMAGE in .env): docker compose pull && docker compose up -d
+name: firechart-viewer
+
 services:
   viewer:
-    build: .
-    image: firechart-viewer:local
-    pull_policy: build
+    image: ${VIEWER_IMAGE:-firechart-viewer:local}
+    build:
+      context: .
+      args:
+        VERSION: ${VERSION:-0.0.0-local}
+    restart: unless-stopped
     ports:
-      - 8080:8080
+      - ${VIEWER_BIND:-127.0.0.1}:${VIEWER_PORT:-8080}:8080
+    # The configuration of the image (README of src/FireChart.Viewer.App, Docker): mount what you change, the image has the files of the sources
+    # volumes:
+    #   - ./viewer.json:/usr/share/nginx/html/viewer.json:ro      # the FHIR server and the options, read at every load of the page
+    #   - ./host.json:/usr/share/nginx/html/host.json:ro          # the origins that may drive the frame
+    #   - ./appearance:/usr/share/nginx/appearance:ro             # a project of the FHIR Designer over the vendor library
+    logging:
+      driver: json-file
+      options:
+        max-size: ${VIEWER_LOG_MAX_SIZE:-20m}
+        max-file: ${VIEWER_LOG_MAX_FILE:-5}

@@ -1,7 +1,7 @@
 namespace FireChart.Viewer.Core.Forms;
 
 /// <summary>
-/// The records a summary grows from (<see cref="SummaryFormDefinition.Context"/>): any resource type that has a form, <c>summary-forms/{Type}.json</c>
+/// The records a summary grows from (<see cref="SummaryFormDefinition.Context"/>): any resource type that has a summary, the component <c>{Type}.summary</c>
 /// (the summary of a patient, of an encounter). Its searches refer to that record, its banners show it (and its patient).
 /// </summary>
 /// <example>

@@ -1,4 +1,5 @@
-﻿@using Flox.Core.Authorization
+@using BlazorBlueprint.Components
+@using Flox.Core.Authorization
 
 @attribute [Route(SharedRoutes.TASKS)]
 @attribute [Authorize]
@@ -6,13 +7,15 @@
 @inherits StatefulWidget<BackgroundTasksState>
 @implements IDisposable
 
-<ListPage Title=@Strings.Caption_ImportTasks Breadcrumbs=@Breadcrumbs OnRefresh=@State.RefreshAsync>
+<ListPage Title=@Strings.Caption_ImportTasks Breadcrumbs=@Breadcrumbs>
+    <Commands>
+        <AppBarCommand Icon="add" Title=@Strings.Caption_Add OnClick=@(() => State.AddSimpleAsync())/>
+    </Commands>
     <MenuItems>
-        <RadzenMenuItem Icon="add" Text="Simple" Click=@(() => State.AddSimpleAsync())/>
-        <RadzenMenuItem Icon="mop" Text="Cleanup" Click=@(() => State.CleanupAsync())/>
+        <PageMenuItem Icon="mop" Text=@Strings.Caption_Clear OnClick=@(() => State.CleanupAsync())/>
     </MenuItems>
     <ChildContent>
-        <DataList State=@State Selectable>
+        <DataList State=@State Selectable ShowRefresh>
             <ItemTemplate Context="row">
                 <ListTile Row=@row
                           TitleText=@row.Item.DisplayName
@@ -26,21 +29,16 @@
                 </ListTile>
             </ItemTemplate>
             <RowMenu Context="menu">
-                <RadzenMenuItem Text=@Strings.Caption_Delete Icon="delete" IconColor="var(--rz-danger)" Click=@(() => DeleteAsync(menu.Targets))/>
+                <RowMenuItem Text=@Strings.Caption_Delete Icon="delete" OnClick=@(() => DeleteAsync(menu.Targets)) Danger="true"/>
             </RowMenu>
             <SelectionActions Context="selected">
-                <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Click=@(() => DeleteAsync([.. selected]))/>
+                <Button Variant="BlazorBlueprint.Components.ButtonVariant.Ghost" Size="BlazorBlueprint.Components.ButtonSize.Icon" Class="text-danger" title=@Strings.Caption_Delete AriaLabel=@Strings.Caption_Delete OnClick=@(() => DeleteAsync([.. selected]))><FloxIcon Icon="delete"/></Button>
             </SelectionActions>
         </DataList>
     </ChildContent>
 </ListPage>
 
 @code {
-
-    protected override void InitBreadcrumbs()
-    {
-        Breadcrumbs.Add(Strings.Caption_ImportTasks, href: SharedRoutes.TASKS);
-    }
 
     private static string GetTimes(Flox.Core.Models.BackgroundTask task)
     {

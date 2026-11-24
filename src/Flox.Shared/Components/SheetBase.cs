@@ -1,9 +1,7 @@
-using Radzen;
-
 namespace Flox.Shared.Components;
 
 /// <summary>
-/// A sheet is declared in markup like a component but shown by Radzen's <see cref="DialogService"/>: the content
+/// A sheet is declared in markup like a component but shown by <see cref="FloxDialogService"/>: the content
 /// is a snapshot taken when the sheet opens (call <see cref="Refresh"/> after the parent changed it).
 /// </summary>
 public abstract class SheetBase : ComponentBase, IFloxSheet, IDisposable
@@ -15,7 +13,12 @@ public abstract class SheetBase : ComponentBase, IFloxSheet, IDisposable
     /// The dialog service that shows the sheet.
     /// </summary>
     [Inject]
-    protected DialogService Dialogs { get; set; } = null!;
+    protected FloxDialogService Dialogs { get; set; } = null!;
+
+    /// <summary>
+    /// The task of the open sheet: completes when it closes.
+    /// </summary>
+    protected Task<object?>? Shown { get; set; }
 
     /// <inheritdoc />
     [Parameter]

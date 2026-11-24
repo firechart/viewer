@@ -1,19 +1,23 @@
-@* The switch between a record and its summary: on the page of a record of a type that has a summary form (summary-forms/{Type}.json) and on the
-   summary. The address says which one shows (resources/Patient/1, summary/Patient/1), so Back, the bookmarks and the links keep it *@
-@inject ViewerSummaryForms SummaryForms
+@* What the page of a record shows: the record, its summary (a type with the component {Type}.summary) or its JSON. The address says which one
+   (resources/Patient/1, summary/Patient/1, resources/Patient/1?view=source), so Back, the bookmarks and the links keep it; a record in a sheet
+   switches to its JSON in place (SourceChanged) *@
+@inject ViewerSummaries Summaries
 
-@if (_hasSummary)
-{
-    <RadzenSelectBar TValue="bool" Value=@Summary Change=@((bool summary) => Switch(summary)) Size="ButtonSize.Small" class="fx-summary-switch print:hidden"
-                     data-viewer="summary-switch">
-        <Items>
-            <RadzenSelectBarItem Text=@Strings.Caption_Record Value="false" data-viewer="show-record"/>
-            <RadzenSelectBarItem Text=@Strings.Caption_Summary Value="true" data-viewer="show-summary"/>
-        </Items>
-    </RadzenSelectBar>
-}
+<BbToggleGroup TValue="string" Value=@Current ValueChanged=@((string? mode) => Switch(mode)) Variant="ToggleVariant.Outline" Size="ToggleSize.Small"
+               Required="true" Class="fx-summary-switch print:hidden" data-viewer="summary-switch">
+    <BbToggleGroupItem TValue="string" Value=@RecordMode data-viewer="show-record">@Strings.Caption_Record</BbToggleGroupItem>
+    @if (_hasSummary)
+    {
+        <BbToggleGroupItem TValue="string" Value=@SummaryMode data-viewer="show-summary">@Strings.Caption_Summary</BbToggleGroupItem>
+    }
+    <BbToggleGroupItem TValue="string" Value=@SourceMode data-viewer="show-source">@FloxStrings.Caption_Source</BbToggleGroupItem>
+</BbToggleGroup>
 
 @code {
+
+    private const string RecordMode = "record";
+    private const string SummaryMode = "summary";
+    private const string SourceMode = "source";
 
     private bool _hasSummary;
     private string? _checkedType;
@@ -30,9 +34,19 @@
     [Parameter, EditorRequired]
     public string ResourceId { get; set; } = string.Empty;
 
-    /// <summary>The summary shows (on the page of the summary); otherwise the record.</summary>
+    /// <summary>The summary shows (on the page of the summary).</summary>
     [Parameter]
     public bool Summary { get; set; }
+
+    /// <summary>The JSON of the record shows.</summary>
+    [Parameter]
+    public bool Source { get; set; }
+
+    /// <summary>Switches between the record and its JSON in place (a record in a sheet); without it the switch goes to the address of the mode.</summary>
+    [Parameter]
+    public EventCallback<bool> SourceChanged { get; set; }
+
+    private string Current => Summary ? SummaryMode : Source ? SourceMode : RecordMode;
 
     /// <inheritdoc/>
     protected override async Task OnParametersSetAsync()
@@ -43,15 +57,28 @@
         }
 
         _checkedType = ResourceType;
-        _hasSummary = Summary || await SummaryForms.HasFormAsync(ResourceType);
+        _hasSummary = Summary || await Summaries.HasSummaryAsync(ResourceType);
     }
 
-    private void Switch(bool summary)
+    private async Task Switch(string? mode)
     {
-        if (summary != Summary)
+        if (mode is null || mode == Current)
         {
-            Session.Navigate(new ViewerRoute(summary ? ViewerPage.Summary : ViewerPage.Resource, ResourceType, ResourceId));
+            return;
         }
+
+        if (SourceChanged.HasDelegate && mode != SummaryMode)
+        {
+            await SourceChanged.InvokeAsync(mode == SourceMode);
+            return;
+        }
+
+        Session.Navigate(mode switch
+        {
+            SummaryMode => new ViewerRoute(ViewerPage.Summary, ResourceType, ResourceId),
+            SourceMode => ViewerRoutes.SourceOf(ResourceType, ResourceId),
+            _ => new ViewerRoute(ViewerPage.Resource, ResourceType, ResourceId)
+        });
     }
 
 }

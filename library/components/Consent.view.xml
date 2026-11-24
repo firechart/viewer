@@ -1,0 +1,30 @@
+<!-- The page of a consent: when it was signed, its category, policy and parties, then what its provision allows -->
+<Component name="Consent.view">
+  <Param name="record" required="true"/>
+
+  <If test="{{%record.dateTime.exists() or %record.provision.type.exists() or %record.category.exists() or %record.policyRule.exists() or %record.organization.exists() or %record.performer.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Signed}}" value="{{%record.dateTime}}"/>
+      <Field label="{{%strings.ProvisionType}}">
+        <Status value="{{%record.provision.type}}"/>
+      </Field>
+      <Field label="{{%strings.Category}}" value="{{%record.category}}"/>
+      <Field label="{{%strings.Policy}}" value="{{%record.policyRule}}"/>
+      <Field label="{{%strings.Organization}}">
+        <Link value="{{%record.organization}}"/>
+      </Field>
+      <Field label="{{%strings.Performer}}">
+        <Link value="{{%record.performer}}"/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.provision.period.exists() or %record.provision.action.exists() or %record.provision.purpose.exists() or %record.provision.class.exists()}}">
+    <Section title="{{%strings.Provision}}">
+      <Field label="{{%strings.Period}}" value="{{%record.provision.period}}"/>
+      <Field label="{{%strings.Action}}" value="{{%record.provision.action}}"/>
+      <Field label="{{%strings.Purpose}}" value="{{%record.provision.purpose}}"/>
+      <Field label="{{%strings.DataClass}}" value="{{%record.provision.class}}"/>
+    </Section>
+  </If>
+</Component>

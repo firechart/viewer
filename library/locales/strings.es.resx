@@ -1,0 +1,801 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Abatement" xml:space="preserve">
+    <value>Remisión</value>
+  </data>
+  <data name="AbstractBadge" xml:space="preserve">
+    <value>abstracto</value>
+  </data>
+  <data name="Accession" xml:space="preserve">
+    <value>Número de registro</value>
+  </data>
+  <data name="Action" xml:space="preserve">
+    <value>Acción</value>
+  </data>
+  <data name="ActiveMedications" xml:space="preserve">
+    <value>Medicación activa</value>
+  </data>
+  <data name="Activities" xml:space="preserve">
+    <value>Actividades</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Dirección</value>
+  </data>
+  <data name="Addresses" xml:space="preserve">
+    <value>Aborda</value>
+  </data>
+  <data name="AdvanceDirectives" xml:space="preserve">
+    <value>Voluntades anticipadas</value>
+  </data>
+  <data name="Alias" xml:space="preserve">
+    <value>Alias</value>
+  </data>
+  <data name="AllergiesAndIntolerances" xml:space="preserve">
+    <value>Alergias e intolerancias</value>
+  </data>
+  <data name="Applies" xml:space="preserve">
+    <value>Vigencia</value>
+  </data>
+  <data name="AppliesTo" xml:space="preserve">
+    <value>Se aplica a</value>
+  </data>
+  <data name="Asserted" xml:space="preserve">
+    <value>Declarado</value>
+  </data>
+  <data name="AssertedBy" xml:space="preserve">
+    <value>Declarado por</value>
+  </data>
+  <data name="Authenticator" xml:space="preserve">
+    <value>Autenticado por</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Autor</value>
+  </data>
+  <data name="Authored" xml:space="preserve">
+    <value>Prescrito</value>
+  </data>
+  <data name="Authority" xml:space="preserve">
+    <value>Autoridad</value>
+  </data>
+  <data name="BasedOn" xml:space="preserve">
+    <value>Basado en</value>
+  </data>
+  <data name="BillablePeriod" xml:space="preserve">
+    <value>Período facturable</value>
+  </data>
+  <data name="BirthDate" xml:space="preserve">
+    <value>Fecha de nacimiento</value>
+  </data>
+  <data name="BodySite" xml:space="preserve">
+    <value>Localización anatómica</value>
+  </data>
+  <data name="Born" xml:space="preserve">
+    <value>Nacido</value>
+  </data>
+  <data name="BusinessStatus" xml:space="preserve">
+    <value>Estado de gestión</value>
+  </data>
+  <data name="Care" xml:space="preserve">
+    <value>Atención</value>
+  </data>
+  <data name="CareManager" xml:space="preserve">
+    <value>Gestor de casos</value>
+  </data>
+  <data name="CareTeam" xml:space="preserve">
+    <value>Equipo asistencial</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Categoría</value>
+  </data>
+  <data name="Claim" xml:space="preserve">
+    <value>Reclamación</value>
+  </data>
+  <data name="Class" xml:space="preserve">
+    <value>Tipo de encuentro</value>
+  </data>
+  <data name="Collected" xml:space="preserve">
+    <value>Obtenida</value>
+  </data>
+  <data name="Collector" xml:space="preserve">
+    <value>Obtenida por</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Comentario</value>
+  </data>
+  <data name="Complication" xml:space="preserve">
+    <value>Complicación</value>
+  </data>
+  <data name="Conclusion" xml:space="preserve">
+    <value>Conclusión</value>
+  </data>
+  <data name="Conditions" xml:space="preserve">
+    <value>Afecciones</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>Contacto</value>
+  </data>
+  <data name="ContactDetails" xml:space="preserve">
+    <value>Datos de contacto</value>
+  </data>
+  <data name="Containers" xml:space="preserve">
+    <value>Contenedores</value>
+  </data>
+  <data name="Content" xml:space="preserve">
+    <value>Contenido</value>
+  </data>
+  <data name="Contributors" xml:space="preserve">
+    <value>Colaboradores</value>
+  </data>
+  <data name="Coverage" xml:space="preserve">
+    <value>Cobertura</value>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>Creado</value>
+  </data>
+  <data name="Custodian" xml:space="preserve">
+    <value>Custodio</value>
+  </data>
+  <data name="DataClass" xml:space="preserve">
+    <value>Clase de datos</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Fecha</value>
+  </data>
+  <data name="Deceased" xml:space="preserve">
+    <value>Fallecido</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Descripción</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Detalles</value>
+  </data>
+  <data name="Device" xml:space="preserve">
+    <value>Dispositivo</value>
+  </data>
+  <data name="Diagnoses" xml:space="preserve">
+    <value>Diagnósticos</value>
+  </data>
+  <data name="Diagnosis" xml:space="preserve">
+    <value>Diagnóstico</value>
+  </data>
+  <data name="DiagnosticResults" xml:space="preserve">
+    <value>Resultados diagnósticos</value>
+  </data>
+  <data name="Disposition" xml:space="preserve">
+    <value>Resolución</value>
+  </data>
+  <data name="Documents" xml:space="preserve">
+    <value>Documentos</value>
+  </data>
+  <data name="DocumentStatus" xml:space="preserve">
+    <value>Estado del documento</value>
+  </data>
+  <data name="Domain" xml:space="preserve">
+    <value>Ámbito</value>
+  </data>
+  <data name="Dosage" xml:space="preserve">
+    <value>Posología</value>
+  </data>
+  <data name="Dose" xml:space="preserve">
+    <value>Dosis</value>
+  </data>
+  <data name="DueInline" xml:space="preserve">
+    <value>vence</value>
+  </data>
+  <data name="EligibilityOf" xml:space="preserve">
+    <value>Elegibilidad: {0}</value>
+  </data>
+  <data name="Encounter" xml:space="preserve">
+    <value>Encuentro</value>
+  </data>
+  <data name="EncounterOf" xml:space="preserve">
+    <value>Encuentro: {0}</value>
+  </data>
+  <data name="Encounters" xml:space="preserve">
+    <value>Encuentros</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>Fin</value>
+  </data>
+  <data name="Enterer" xml:space="preserve">
+    <value>Registrado por</value>
+  </data>
+  <data name="Evidence" xml:space="preserve">
+    <value>Evidencia</value>
+  </data>
+  <data name="Expires" xml:space="preserve">
+    <value>Caduca</value>
+  </data>
+  <data name="ExpressedBy" xml:space="preserve">
+    <value>Expresado por</value>
+  </data>
+  <data name="FamilyName" xml:space="preserve">
+    <value>Apellido</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filtro</value>
+  </data>
+  <data name="Focus" xml:space="preserve">
+    <value>Objeto</value>
+  </data>
+  <data name="FollowUp" xml:space="preserve">
+    <value>Seguimiento</value>
+  </data>
+  <data name="For" xml:space="preserve">
+    <value>Para</value>
+  </data>
+  <data name="Gender" xml:space="preserve">
+    <value>Sexo</value>
+  </data>
+  <data name="GeneralPractitioner" xml:space="preserve">
+    <value>Médico de cabecera</value>
+  </data>
+  <data name="GivenName" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="Goals" xml:space="preserve">
+    <value>Objetivos</value>
+  </data>
+  <data name="High" xml:space="preserve">
+    <value>Superior</value>
+  </data>
+  <data name="HighRiskBadge" xml:space="preserve">
+    <value>riesgo alto</value>
+  </data>
+  <data name="HistoryOfPastIllness" xml:space="preserve">
+    <value>Antecedentes de enfermedades</value>
+  </data>
+  <data name="HistoryOfPregnancy" xml:space="preserve">
+    <value>Antecedentes obstétricos</value>
+  </data>
+  <data name="HistoryOfProcedures" xml:space="preserve">
+    <value>Antecedentes de procedimientos</value>
+  </data>
+  <data name="Id" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Identifier" xml:space="preserve">
+    <value>Identificador</value>
+  </data>
+  <data name="Identifiers" xml:space="preserve">
+    <value>Identificadores</value>
+  </data>
+  <data name="ImagesCount" xml:space="preserve">
+    <value>{0} imágenes</value>
+  </data>
+  <data name="ImagingStudy" xml:space="preserve">
+    <value>Estudio de imagen</value>
+  </data>
+  <data name="Immunizations" xml:space="preserve">
+    <value>Vacunas</value>
+  </data>
+  <data name="Inactive" xml:space="preserve">
+    <value>Inactivo</value>
+  </data>
+  <data name="InactiveBadge" xml:space="preserve">
+    <value>inactivo</value>
+  </data>
+  <data name="Insurer" xml:space="preserve">
+    <value>Aseguradora</value>
+  </data>
+  <data name="Interpreter" xml:space="preserve">
+    <value>Médico informante</value>
+  </data>
+  <data name="Issued" xml:space="preserve">
+    <value>Emitido</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>Partidas</value>
+  </data>
+  <data name="Laboratory" xml:space="preserve">
+    <value>Laboratorio</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="Languages" xml:space="preserve">
+    <value>Idiomas</value>
+  </data>
+  <data name="LastOccurrence" xml:space="preserve">
+    <value>Última aparición</value>
+  </data>
+  <data name="Length" xml:space="preserve">
+    <value>Duración</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Ubicación</value>
+  </data>
+  <data name="Locations" xml:space="preserve">
+    <value>Ubicaciones</value>
+  </data>
+  <data name="Lot" xml:space="preserve">
+    <value>Lote</value>
+  </data>
+  <data name="LotInline" xml:space="preserve">
+    <value>lote</value>
+  </data>
+  <data name="Low" xml:space="preserve">
+    <value>Inferior</value>
+  </data>
+  <data name="LowRiskBadge" xml:space="preserve">
+    <value>riesgo bajo</value>
+  </data>
+  <data name="ManagingOrganization" xml:space="preserve">
+    <value>Organización responsable</value>
+  </data>
+  <data name="Manufacturer" xml:space="preserve">
+    <value>Fabricante</value>
+  </data>
+  <data name="MaritalStatus" xml:space="preserve">
+    <value>Estado civil</value>
+  </data>
+  <data name="MedicalDevices" xml:space="preserve">
+    <value>Dispositivos médicos</value>
+  </data>
+  <data name="Medication" xml:space="preserve">
+    <value>Medicamento</value>
+  </data>
+  <data name="MedicationOrders" xml:space="preserve">
+    <value>Prescripciones</value>
+  </data>
+  <data name="MedicationSummary" xml:space="preserve">
+    <value>Resumen de medicación</value>
+  </data>
+  <data name="Medium" xml:space="preserve">
+    <value>Medio</value>
+  </data>
+  <data name="Members" xml:space="preserve">
+    <value>Miembros</value>
+  </data>
+  <data name="MembersInline" xml:space="preserve">
+    <value>miembros</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>Mensaje</value>
+  </data>
+  <data name="Method" xml:space="preserve">
+    <value>Método</value>
+  </data>
+  <data name="Modality" xml:space="preserve">
+    <value>Modalidad</value>
+  </data>
+  <data name="Model" xml:space="preserve">
+    <value>Modelo</value>
+  </data>
+  <data name="Modified" xml:space="preserve">
+    <value>Modificado</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="Network" xml:space="preserve">
+    <value>Red</value>
+  </data>
+  <data name="NoIdentifiers" xml:space="preserve">
+    <value>Sin identificadores</value>
+  </data>
+  <data name="NoLaboratoryResults" xml:space="preserve">
+    <value>Sin resultados de laboratorio</value>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>Notas</value>
+  </data>
+  <data name="NoValue" xml:space="preserve">
+    <value>sin valor</value>
+  </data>
+  <data name="NoVitalSigns" xml:space="preserve">
+    <value>Sin constantes vitales</value>
+  </data>
+  <data name="Onset" xml:space="preserve">
+    <value>Inicio</value>
+  </data>
+  <data name="Order" xml:space="preserve">
+    <value>Orden</value>
+  </data>
+  <data name="OrderDetails" xml:space="preserve">
+    <value>Detalles de la solicitud</value>
+  </data>
+  <data name="Orders" xml:space="preserve">
+    <value>Solicitudes</value>
+  </data>
+  <data name="Organization" xml:space="preserve">
+    <value>Organización</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Otros</value>
+  </data>
+  <data name="Outcome" xml:space="preserve">
+    <value>Resultado</value>
+  </data>
+  <data name="Owner" xml:space="preserve">
+    <value>Titular</value>
+  </data>
+  <data name="Parent" xml:space="preserve">
+    <value>Muestra de origen</value>
+  </data>
+  <data name="Participants" xml:space="preserve">
+    <value>Participantes</value>
+  </data>
+  <data name="ParticipantsCount" xml:space="preserve">
+    <value>{0} participantes</value>
+  </data>
+  <data name="PartOf" xml:space="preserve">
+    <value>Parte de</value>
+  </data>
+  <data name="Patient" xml:space="preserve">
+    <value>Paciente</value>
+  </data>
+  <data name="PatientInstruction" xml:space="preserve">
+    <value>Instrucciones al paciente</value>
+  </data>
+  <data name="Payment" xml:space="preserve">
+    <value>Pago</value>
+  </data>
+  <data name="Payor" xml:space="preserve">
+    <value>Pagador</value>
+  </data>
+  <data name="Performer" xml:space="preserve">
+    <value>Realizado por</value>
+  </data>
+  <data name="Performers" xml:space="preserve">
+    <value>Ejecutores</value>
+  </data>
+  <data name="Period" xml:space="preserve">
+    <value>Período</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Teléfono</value>
+  </data>
+  <data name="PhoneAndEmail" xml:space="preserve">
+    <value>Teléfono y correo electrónico</value>
+  </data>
+  <data name="PhysicalType" xml:space="preserve">
+    <value>Tipo de ubicación</value>
+  </data>
+  <data name="Plan" xml:space="preserve">
+    <value>Plan</value>
+  </data>
+  <data name="PlanOfCare" xml:space="preserve">
+    <value>Plan de cuidados</value>
+  </data>
+  <data name="Policy" xml:space="preserve">
+    <value>Política</value>
+  </data>
+  <data name="Practitioner" xml:space="preserve">
+    <value>Profesional</value>
+  </data>
+  <data name="Prescription" xml:space="preserve">
+    <value>Receta</value>
+  </data>
+  <data name="Priority" xml:space="preserve">
+    <value>Prioridad</value>
+  </data>
+  <data name="ProblemList" xml:space="preserve">
+    <value>Lista de problemas</value>
+  </data>
+  <data name="Procedure" xml:space="preserve">
+    <value>Procedimiento</value>
+  </data>
+  <data name="Provider" xml:space="preserve">
+    <value>Proveedor</value>
+  </data>
+  <data name="Provision" xml:space="preserve">
+    <value>Disposición</value>
+  </data>
+  <data name="ProvisionType" xml:space="preserve">
+    <value>Tipo de disposición</value>
+  </data>
+  <data name="Purpose" xml:space="preserve">
+    <value>Finalidad</value>
+  </data>
+  <data name="Qualifications" xml:space="preserve">
+    <value>Titulaciones</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>Cantidad</value>
+  </data>
+  <data name="Reactions" xml:space="preserve">
+    <value>Reacciones</value>
+  </data>
+  <data name="Reason" xml:space="preserve">
+    <value>Motivo</value>
+  </data>
+  <data name="ReasonAndDiagnoses" xml:space="preserve">
+    <value>Motivo y diagnósticos</value>
+  </data>
+  <data name="ReasonAndOutcome" xml:space="preserve">
+    <value>Motivo y resultado</value>
+  </data>
+  <data name="Received" xml:space="preserve">
+    <value>Recibido</value>
+  </data>
+  <data name="RecentEncounters" xml:space="preserve">
+    <value>Encuentros recientes</value>
+  </data>
+  <data name="Recipient" xml:space="preserve">
+    <value>Destinatario</value>
+  </data>
+  <data name="Recorded" xml:space="preserve">
+    <value>Registrado</value>
+  </data>
+  <data name="RecordedBy" xml:space="preserve">
+    <value>Registrado por</value>
+  </data>
+  <data name="ReferenceRanges" xml:space="preserve">
+    <value>Intervalos de referencia</value>
+  </data>
+  <data name="Referral" xml:space="preserve">
+    <value>Derivación</value>
+  </data>
+  <data name="Referrer" xml:space="preserve">
+    <value>Remitente</value>
+  </data>
+  <data name="RelatedPersons" xml:space="preserve">
+    <value>Personas relacionadas</value>
+  </data>
+  <data name="Relations" xml:space="preserve">
+    <value>Relaciones</value>
+  </data>
+  <data name="Relationship" xml:space="preserve">
+    <value>Parentesco</value>
+  </data>
+  <data name="Report" xml:space="preserve">
+    <value>Informe</value>
+  </data>
+  <data name="Request" xml:space="preserve">
+    <value>Solicitud</value>
+  </data>
+  <data name="Requester" xml:space="preserve">
+    <value>Solicitante</value>
+  </data>
+  <data name="Requestor" xml:space="preserve">
+    <value>Solicitante</value>
+  </data>
+  <data name="Result" xml:space="preserve">
+    <value>Resultado</value>
+  </data>
+  <data name="Results" xml:space="preserve">
+    <value>Resultados</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>Función</value>
+  </data>
+  <data name="Route" xml:space="preserve">
+    <value>Vía de administración</value>
+  </data>
+  <data name="Scope" xml:space="preserve">
+    <value>Alcance</value>
+  </data>
+  <data name="Security" xml:space="preserve">
+    <value>Confidencialidad</value>
+  </data>
+  <data name="Sender" xml:space="preserve">
+    <value>Remitente</value>
+  </data>
+  <data name="Sent" xml:space="preserve">
+    <value>Enviado</value>
+  </data>
+  <data name="SerialNumber" xml:space="preserve">
+    <value>Número de serie</value>
+  </data>
+  <data name="Series" xml:space="preserve">
+    <value>Series</value>
+  </data>
+  <data name="SeriesAndImages" xml:space="preserve">
+    <value>{0} series, {1} imágenes</value>
+  </data>
+  <data name="SeriesCount" xml:space="preserve">
+    <value>{0} series</value>
+  </data>
+  <data name="Service" xml:space="preserve">
+    <value>Servicio</value>
+  </data>
+  <data name="Serviced" xml:space="preserve">
+    <value>Fecha del servicio</value>
+  </data>
+  <data name="ServicePeriod" xml:space="preserve">
+    <value>Período de servicio</value>
+  </data>
+  <data name="ServiceProvider" xml:space="preserve">
+    <value>Proveedor del servicio</value>
+  </data>
+  <data name="ServiceType" xml:space="preserve">
+    <value>Tipo de servicio</value>
+  </data>
+  <data name="Signed" xml:space="preserve">
+    <value>Firmado</value>
+  </data>
+  <data name="Signers" xml:space="preserve">
+    <value>Firmantes</value>
+  </data>
+  <data name="Site" xml:space="preserve">
+    <value>Localización</value>
+  </data>
+  <data name="Size" xml:space="preserve">
+    <value>Tamaño</value>
+  </data>
+  <data name="SocialHistory" xml:space="preserve">
+    <value>Antecedentes sociales</value>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>Fuente</value>
+  </data>
+  <data name="Specialty" xml:space="preserve">
+    <value>Especialidad</value>
+  </data>
+  <data name="Specimen" xml:space="preserve">
+    <value>Muestra</value>
+  </data>
+  <data name="Stage" xml:space="preserve">
+    <value>Estadio</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Inicio</value>
+  </data>
+  <data name="Started" xml:space="preserve">
+    <value>Iniciado</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Estado</value>
+  </data>
+  <data name="Subject" xml:space="preserve">
+    <value>Sujeto</value>
+  </data>
+  <data name="Subscriber" xml:space="preserve">
+    <value>Titular de la póliza</value>
+  </data>
+  <data name="SubscriberID" xml:space="preserve">
+    <value>Número de asegurado</value>
+  </data>
+  <data name="Subtype" xml:space="preserve">
+    <value>Subtipo</value>
+  </data>
+  <data name="Targets" xml:space="preserve">
+    <value>Metas</value>
+  </data>
+  <data name="Test" xml:space="preserve">
+    <value>Prueba</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="Totals" xml:space="preserve">
+    <value>Totales</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="Use" xml:space="preserve">
+    <value>Uso</value>
+  </data>
+  <data name="Visit" xml:space="preserve">
+    <value>Visita</value>
+  </data>
+  <data name="VitalSigns" xml:space="preserve">
+    <value>Constantes vitales</value>
+  </data>
+  <data name="When" xml:space="preserve">
+    <value>Cuándo</value>
+  </data>
+  <data name="Where" xml:space="preserve">
+    <value>Dónde</value>
+  </data>
+</root>

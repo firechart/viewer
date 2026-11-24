@@ -1,0 +1,18 @@
+<!-- A care team in a list: its name, its period and the number of its members; its status at the end -->
+<Component name="CareTeam.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.name.exists(), %record.name, %record.id)}}" patient="{{%record.subject}}" encounter="{{%record.encounter}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.period}}"/>
+        <If test="{{%record.participant.exists()}}">
+          <Text><Value value="{{%record.participant.count()}}"/> {{%strings.MembersInline}}</Text>
+        </If>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

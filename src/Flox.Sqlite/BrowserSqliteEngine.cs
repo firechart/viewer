@@ -22,6 +22,17 @@ public sealed partial class BrowserSqliteEngine(IJSRuntime runtime, string pool 
 
     private const string ModulePath = "./_content/Flox.Sqlite/flox-sqlite.js";
 
+    // Why two calls of this engine are tried again (ImportAsync, OpenAsync). The interop of Blazor WebAssembly now and then answers a call with null
+    // although the script returned a value: the module of an import, the number of the handle of an open (the script cannot return null there).
+    // Seen with the browser extension Urban VPN Proxy, under the debugger of Visual Studio, once in the browser pane of Claude, and in production
+    // without either (demo.firechart.org, 2026-11-21: the home page of Pro opening flox.sqlite for its bookmarks and recent pages); the cause is
+    // not found, and the same call made again succeeds (delivery-pitfalls.md 9.10 and 9.11). Only a call that may run twice is tried again: an
+    // import, and an open (an open made twice gives a second handle of the same base; the first, if the script made it, stays open in this tab
+    // until the page goes, which costs nothing). A query, an execute or a batch is never tried again: a write would be done twice.
+    // Attempts pause 100, 200, 300 ms (0.6 s at most), then fail with a message that names the likely cause.
+    private const int Attempts = 4;
+    private static readonly TimeSpan s_pause = TimeSpan.FromMilliseconds(100);
+
     private readonly SemaphoreSlim _gate = new(1, 1);
     private IJSObjectReference? _module;
 
@@ -30,8 +41,21 @@ public sealed partial class BrowserSqliteEngine(IJSRuntime runtime, string pool 
     {
         Validate(name);
         var module = await ModuleAsync(cancellationToken);
-        var handle = await CallAsync(() => module.InvokeAsync<int>("open", cancellationToken, name, access == SqliteAccess.ReadOnly));
-        return new BrowserSqliteDatabase(name, access, module, handle);
+        // An empty answer of the interop is tried again: see Attempts
+        for (var attempt = 1; ; attempt++)
+        {
+            if (await CallAsync(() => module.InvokeAsync<int?>("open", cancellationToken, name, access == SqliteAccess.ReadOnly)) is { } handle)
+            {
+                return new BrowserSqliteDatabase(name, access, module, handle);
+            }
+
+            if (attempt == Attempts)
+            {
+                throw new SqliteEngineException($"The base {name} came back without a handle from the interop {Attempts} times: a browser extension or the debugger may break the interop of the page.");
+            }
+
+            await Task.Delay(s_pause * attempt, cancellationToken);
+        }
     }
 
     /// <inheritdoc />
@@ -57,7 +81,10 @@ public sealed partial class BrowserSqliteEngine(IJSRuntime runtime, string pool 
         return await CallAsync(() => module.InvokeAsync<string[]>("list", cancellationToken));
     }
 
-    /// <summary>Imports a base from <paramref name="source"/>: the worker fetches and unpacks it straight into OPFS, so it never passes through the memory of .NET. Returns its size.</summary>
+    /// <summary>
+    /// Imports a base from <paramref name="source"/>: the worker fetches and unpacks it straight into OPFS, so it never passes through the memory
+    /// of .NET. Returns its size. A cancellation stops the download in the worker, and the call ends when nothing of the base is left.
+    /// </summary>
     public async Task<long> ImportAsync(string name, Uri source, IProgress<long>? progress = null, CancellationToken cancellationToken = default)
     {
         Validate(name);
@@ -68,8 +95,31 @@ public sealed partial class BrowserSqliteEngine(IJSRuntime runtime, string pool 
         }
 
         var module = await ModuleAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         using var reporter = DotNetObjectReference.Create(new ImportProgress(progress));
-        return await CallAsync(() => module.InvokeAsync<long>("importGzip", cancellationToken, name, source.AbsoluteUri, reporter));
+        // The call is not abandoned on a cancellation: the worker is told to stop, and its answer is awaited
+        var importing = CallAsync(() => module.InvokeAsync<long>("importGzip", CancellationToken.None, name, source.AbsoluteUri, reporter));
+        await using var cancelling = cancellationToken.Register(() => _ = CancelImportAsync(module, name));
+        try
+        {
+            return await importing;
+        }
+        catch (SqliteEngineException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw new OperationCanceledException(cancellationToken);
+        }
+    }
+
+    private static async Task CancelImportAsync(IJSObjectReference module, string name)
+    {
+        try
+        {
+            await module.InvokeAsync<bool>("cancelImport", name);
+        }
+        catch (Exception exception) when (exception is JSException or JSDisconnectedException or ObjectDisposedException)
+        {
+            // the import ends by itself
+        }
     }
 
     /// <inheritdoc />
@@ -116,7 +166,7 @@ public sealed partial class BrowserSqliteEngine(IJSRuntime runtime, string pool 
         }
     }
 
-    // Now and then the interop answers an import with nothing although the module loaded (JSModuleImport of Flox.Shared): tried again a few times
+    // An empty answer of the interop is tried again: see Attempts (as JSModuleImport of Flox.Shared, which this library does not reference)
     private async Task<IJSObjectReference> ImportAsync(CancellationToken cancellationToken)
     {
         for (var attempt = 1; ; attempt++)
@@ -126,12 +176,12 @@ public sealed partial class BrowserSqliteEngine(IJSRuntime runtime, string pool 
                 return module;
             }
 
-            if (attempt == 4)
+            if (attempt == Attempts)
             {
-                throw new SqliteEngineException($"The script {ModulePath} came back empty from the interop 4 times: a browser extension may break the interop of the page.");
+                throw new SqliteEngineException($"The script {ModulePath} came back empty from the interop {Attempts} times: a browser extension or the debugger may break the interop of the page.");
             }
 
-            await Task.Delay(TimeSpan.FromMilliseconds(100 * attempt), cancellationToken);
+            await Task.Delay(s_pause * attempt, cancellationToken);
         }
     }
 
@@ -184,7 +234,7 @@ internal sealed class BrowserSqliteDatabase(string name, SqliteAccess access, IJ
 
     public async Task<SqliteRows> QueryAsync(string sql, IReadOnlyDictionary<string, object?>? parameters = null, CancellationToken cancellationToken = default)
     {
-        var text = await BrowserSqliteEngine.CallAsync(() => module.InvokeAsync<string>("query", cancellationToken, Open(), sql, SqliteWire.Parameters(parameters)));
+        var text = await BrowserSqliteEngine.CallAsync(() => module.InvokeAsync<byte[]>("query", cancellationToken, Open(), sql, SqliteWire.Parameters(parameters)));
         return SqliteWire.Rows(text);
     }
 
@@ -211,9 +261,9 @@ internal sealed class BrowserSqliteDatabase(string name, SqliteAccess access, IJ
         {
             await module.InvokeAsync<bool>("close", handle);
         }
-        catch (JSDisconnectedException)
+        catch (Exception exception) when (exception is JSDisconnectedException or JSException or ObjectDisposedException)
         {
-            // the page is gone, and the worker with it
+            // the page is gone, and the worker with it; or the leading tab has nothing to close
         }
     }
 
@@ -224,8 +274,9 @@ internal sealed class BrowserSqliteDatabase(string name, SqliteAccess access, IJ
     }
 }
 
-// The JSON text that crosses into the worker: written and read by hand (the serializer of the interop is slow for thousands of values). A blob is
-// {"b64":...}, an integer beyond the safe range of JavaScript {"i64":"..."}
+// The JSON text that crosses into the worker: written and read by hand (the serializer of the interop is slow for thousands of values); the rows
+// come back as its UTF-8 bytes, which the interop passes as they are. A blob is {"b64":...}, an integer beyond the safe range of JavaScript
+// {"i64":"..."}
 internal static class SqliteWire
 {
     private const long SafeInteger = 9_007_199_254_740_991L;
@@ -271,9 +322,9 @@ internal static class SqliteWire
         return Encoding.UTF8.GetString(buffer.GetBuffer(), 0, (int)buffer.Length);
     }
 
-    public static SqliteRows Rows(string text)
+    public static SqliteRows Rows(ReadOnlySpan<byte> text)
     {
-        var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(text));
+        var reader = new Utf8JsonReader(text);
         var columns = new List<string>();
         var rows = new List<object?[]>();
         Read(ref reader, JsonTokenType.StartObject);
@@ -313,7 +364,7 @@ internal static class SqliteWire
         foreach (var (key, value) in parameters)
         {
             writer.WritePropertyName(key);
-            switch (value)
+            switch (SqliteValues.Normalize(value))
             {
                 case null:
                     writer.WriteNullValue();
@@ -326,9 +377,6 @@ internal static class SqliteWire
                     writer.WriteBase64String("b64", bytes);
                     writer.WriteEndObject();
                     break;
-                case bool flag:
-                    writer.WriteNumberValue(flag ? 1 : 0);
-                    break;
                 case long number when number is > SafeInteger or < -SafeInteger:
                     writer.WriteStartObject();
                     writer.WriteString("i64", number.ToString(CultureInfo.InvariantCulture));
@@ -337,20 +385,8 @@ internal static class SqliteWire
                 case long number:
                     writer.WriteNumberValue(number);
                     break;
-                case int number:
-                    writer.WriteNumberValue(number);
-                    break;
                 case double number:
                     writer.WriteNumberValue(number);
-                    break;
-                case float number:
-                    writer.WriteNumberValue(number);
-                    break;
-                case decimal number:
-                    writer.WriteNumberValue(number);
-                    break;
-                default:
-                    writer.WriteStringValue(Convert.ToString(value, CultureInfo.InvariantCulture));
                     break;
             }
         }

@@ -1,46 +1,25 @@
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+# The image of FireChart Viewer: the published files of FireChart.Viewer.App behind nginx (docker/nginx.conf), not root, port 8080.
+#   docker build -t firechart-viewer:local .
+# The build stage runs on the architecture of the builder: the publish is WebAssembly, the same on every architecture.
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:11.0 AS build
+# .dockerignore keeps .git out, so MinVer has no history here: the version is handed in
 ARG VERSION=0.0.0-local
 WORKDIR /src
 COPY . .
-RUN dotnet msbuild src/Flox.Shared/Flox.Shared.csproj -restore -t:TailwindDownload -p:Configuration=Release -p:MinVerSkip=true
-RUN dotnet msbuild src/Flox.Shared/Flox.Shared.csproj -restore -t:TailwindBuild -p:Configuration=Release -p:MinVerSkip=true
-RUN dotnet msbuild src/FireChart.Viewer/FireChart.Viewer.csproj -restore -t:TailwindBuild -p:Configuration=Release -p:MinVerSkip=true
-RUN dotnet publish src/FireChart.Viewer.App/FireChart.Viewer.App.csproj -c Release -o /publish -p:MinVerSkip=true -p:Version=$VERSION
-RUN rm -f /publish/wwwroot/viewer.json.* /publish/wwwroot/host.json.*
+RUN --mount=type=cache,target=/root/.nuget/packages \
+    dotnet restore src/FireChart.Viewer.App/FireChart.Viewer.App.csproj
+# The stylesheets before the publish, one project after another with the one Tailwind CLI: on a clean tree the CSS a project writes during the
+# publish is missing from its static assets. The CLI (about 100 MB from GitHub) is kept in a cache of the builder
+RUN --mount=type=cache,target=/root/.nuget/packages --mount=type=cache,id=tailwind-cli,target=/src/.tailwind,sharing=locked \
+    dotnet msbuild src/Flox.Shared/Flox.Shared.csproj -t:TailwindDownload -p:Configuration=Release \
+ && for project in src/Flox.Shared/Flox.Shared.csproj src/FireChart.Viewer/FireChart.Viewer.csproj src/FireChart.Viewer.App/FireChart.Viewer.App.csproj; do \
+        dotnet msbuild "$project" -t:TailwindBuild -p:Configuration=Release -p:MinVerVersionOverride=$VERSION || exit 1; \
+    done
+# The configuration files are mounted by an installation: no compressed copies of them
+RUN --mount=type=cache,target=/root/.nuget/packages --mount=type=cache,id=tailwind-cli,target=/src/.tailwind \
+    dotnet publish src/FireChart.Viewer.App/FireChart.Viewer.App.csproj -c Release -o /publish --no-restore -p:MinVerVersionOverride=$VERSION \
+ && rm -f /publish/wwwroot/viewer.json.* /publish/wwwroot/host.json.*
 
-FROM nginxinc/nginx-unprivileged:1.27-alpine
+FROM nginxinc/nginx-unprivileged:1.29-alpine
 COPY --from=build /publish/wwwroot /usr/share/nginx/html
-COPY <<EOF /etc/nginx/conf.d/default.conf
-# The modules of sqlite-wasm are .mjs, which the mime.types of nginx 1.27 does not know (application/octet-stream): a browser refuses to load such a
-# module, and the SQLite worker of the Viewer failed. Added to the types of the http block (a types block adds to what mime.types gave)
-types {
-    text/javascript mjs;
-}
-
-server {
-    listen 8080;
-    root /usr/share/nginx/html;
-    gzip_static on;
-    # Revalidated (ETag, a cheap 304): dotnet.js, index.html and the configs have no fingerprint, and without a header of ours a proxy
-    # (Cloudflare: max-age=14400) lets the browser start the previous release for hours; the fingerprinted files are cached by the Blazor loader anyway
-    add_header Cache-Control "no-cache" always;
-    location / {
-        try_files \$uri \$uri/ /index.html;
-    }
-    # The files of the libraries: a missing one is a 404, never the page (the Viewer asks for templates that may not exist)
-    location /_content/ {
-        try_files \$uri =404;
-    }
-    # The library: a file of the customer layer (a folder of the designer mounted at /usr/share/nginx/appearance) wins over the vendor one;
-    # a missing file is a 404, never the page
-    location ~ ^/library/(.*)\$ {
-        root /usr/share/nginx;
-        try_files /appearance/\$1 /html/library/\$1 =404;
-    }
-    # The JavaScript SDK is imported as an ES module by pages of other origins: CORS for any, and revalidated so a page never mixes versions
-    location /sdk/ {
-        add_header Access-Control-Allow-Origin "*" always;
-        add_header Cache-Control "no-cache" always;
-    }
-}
-EOF
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf

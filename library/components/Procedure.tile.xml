@@ -1,0 +1,10 @@
+<!-- A procedure in a list: what was done, when; its status at the end -->
+<Component name="Procedure.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.code.exists(), %record.code, %record.id)}}" subtitle="{{%record.performed}}" patient="{{%record.subject}}" encounter="{{%record.encounter}}">
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

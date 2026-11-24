@@ -1,9 +1,10 @@
-@* The bookmark of a page of the Viewer: filled when the page is bookmarked; none when the host keeps no bookmarks *@
+@* The bookmark of a page of the Viewer: filled when the page is bookmarked; none when the host keeps no bookmarks. In a toolbar it stands at the
+   end, beside the menu (data-toolbar-end) *@
 @inject IServiceProvider Services
 
 @if (_bookmarks is not null && _known && Session.Bookmarks)
 {
-    <span class="contents" data-viewer="bookmark" data-bookmarked=@(_bookmarked ? "true" : "false")><BookmarkToggle Bookmarked=@_bookmarked OnToggle=@ToggleAsync/></span>
+    <span class="inline-flex" data-viewer="bookmark" data-toolbar-end data-bookmarked=@(_bookmarked ? "true" : "false")><BookmarkToggle Bookmarked=@_bookmarked OnToggle=@ToggleAsync/></span>
 }
 
 @code {

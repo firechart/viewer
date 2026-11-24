@@ -9,7 +9,7 @@ namespace FireChart.Viewer.Library;
 /// <remarks>The administration of the templates reads them from the web root of its server (<see cref="Read"/>), a test from the folder.</remarks>
 /// <example>
 /// <code>
-/// var samples = TemplateSamples.ReadFolder(@"public\library");
+/// var samples = TemplateSamples.ReadFolder(@"library");
 /// var json = samples.Find("Patient-full");
 /// </code>
 /// </example>
@@ -78,7 +78,7 @@ public sealed class TemplateSamples
     /// <returns>The samples.</returns>
     /// <example>
     /// <code>
-    /// var samples = TemplateSamples.ReadFolder(@"public\library");
+    /// var samples = TemplateSamples.ReadFolder(@"library");
     /// </code>
     /// </example>
     public static TemplateSamples ReadFolder(string webRoot)

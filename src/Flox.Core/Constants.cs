@@ -144,6 +144,11 @@ public static class Constants
     public const int MAX_CAPABILITY_KEYS = 500;
 
     /// <summary>
+    /// The entries an access list of a document may have when a client writes it.
+    /// </summary>
+    public const int MAX_ACL_ENTRIES = 200;
+
+    /// <summary>
     /// The rows of a list read whole in one request (the shared servers of the administration).
     /// </summary>
     public const int MAX_LIST_PAGE = 500;

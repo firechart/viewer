@@ -1,33 +1,49 @@
+@using BlazorBlueprint.Components
 @implements IDisposable
+@inject BlazorBlueprint.Primitives.Services.IKeyboardShortcutService Shortcuts
 
-<RadzenFormField Variant="Radzen.Variant.Text" AllowFloatingLabel="false" class="rz-w-100 [--rz-form-field-margin-block:0] [--fw-field-max-width:none]" role="search">
-    <Start>
-        <FloxIcon Icon="search" Size="1.25rem" Color="var(--rz-text-secondary-color)"/>
-    </Start>
-    <ChildContent>
-        <RadzenTextBox Value=@_value
-                       Immediate="true"
+@* The search box of a list. With SlashFocuses, the key / puts the focus into it from anywhere on the page but a field, and the empty box shows that
+   key at its end (not on a touch screen, which has no keyboard), as on GitHub *@
+
+<BbInputGroup Class="w-full" role="search">
+    <BbInputGroupAddon>
+        <FloxIcon Icon="search" Size="1.25rem" Class="text-muted"/>
+    </BbInputGroupAddon>
+    <BbInputGroupInput @ref=_input Type="InputType.Search"
+                       Value=@_value
+                       UpdateTiming="UpdateTiming.Immediate"
                        Placeholder=@Placeholder
-                       AutoFocus=@AutoFocus
                        ValueChanged=@OnInput
-                       aria-label=@Placeholder
+                       AriaLabel=@Placeholder
                        enterkeyhint="search"
+                       autofocus=@AutoFocus
                        @onkeydown=@KeyDownAsync/>
-    </ChildContent>
-    <End>
-        @if (!string.IsNullOrEmpty(_value))
-        {
-            <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Size="Radzen.ButtonSize.Small" Click=@ClearAsync
-                          aria-label=@Strings.Caption_Clear title=@Strings.Caption_Clear>
+    @if (SlashFocuses && string.IsNullOrEmpty(_value))
+    {
+        <BbInputGroupAddon Align="InputGroupAlign.InlineEnd" Class="pointer-coarse:hidden" aria-hidden="true">
+            <BbKbd>/</BbKbd>
+        </BbInputGroupAddon>
+    }
+    @if (!string.IsNullOrEmpty(_value))
+    {
+        <BbInputGroupAddon Align="InputGroupAlign.InlineEnd">
+            <BbInputGroupButton Variant="ButtonVariant.Ghost" Size="ButtonSize.IconSmall" OnClick=@ClearAsync AriaLabel=@Strings.Caption_Clear title=@Strings.Caption_Clear>
                 <FloxIcon Icon="close" Size="1rem"/>
-            </RadzenButton>
-        }
-    </End>
-</RadzenFormField>
+            </BbInputGroupButton>
+        </BbInputGroupAddon>
+    }
+</BbInputGroup>
 
 @code {
     private CancellationTokenSource? _debounce;
     private string? _value;
+    private BbInputGroupInput? _input;
+    private IDisposable? _slash;
+    private bool _disposed;
+
+    // The key / focuses the box; one box of a page asks for it
+    [Parameter]
+    public bool SlashFocuses { get; set; }
 
     [Parameter]
     public bool AutoFocus { get; set; } = false;
@@ -56,6 +72,26 @@
     protected override void OnParametersSet()
     {
         _value = Value;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && SlashFocuses)
+        {
+            _slash = await Shortcuts.RegisterAsync("/", FocusAsync);
+            if (_disposed)
+            {
+                _slash.Dispose();
+            }
+        }
+    }
+
+    private async Task FocusAsync()
+    {
+        if (_input is not null)
+        {
+            await _input.FocusAsync();
+        }
     }
 
     private async Task OnInput(string? text)
@@ -87,6 +123,8 @@
 
     public void Dispose()
     {
+        _disposed = true;
+        _slash?.Dispose();
         _debounce?.Cancel();
         _debounce?.Dispose();
     }

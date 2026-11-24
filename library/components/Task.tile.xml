@@ -1,0 +1,19 @@
+<!-- A task in a list: its description (else its code), when it was authored; a priority above routine and the status at the end -->
+<Component name="Task.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.description.exists(), %record.description, iif(%record.code.exists(), %record.code, %record.id))}}" patient="{{%record.for}}" encounter="{{%record.encounter}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.authoredOn}}"/>
+        <Value value="{{%record.owner}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <If test="{{%record.priority.exists() and %record.priority != 'routine'}}">
+        <Status value="{{%record.priority}}"/>
+      </If>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

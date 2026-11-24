@@ -1,6 +1,9 @@
 using System.Reflection;
 using System.Security.Claims;
+using Flox.Core.Data;
 using Flox.Core.Host;
+using Flox.Core.Models;
+using Flox.Core.Settings;
 using Flox.Core.Services;
 using Flox.Shared.Host;
 using Flox.Shared.Layout;
@@ -112,8 +115,31 @@ public class MoreMenuTests
             Assert.That(main, Does.Contain(SharedMenuItems.Bookmarks.Text));
             Assert.That(main, Does.Not.Contain(SharedMenuItems.Tasks.Text));
             Assert.That(more, Does.Contain(SharedMenuItems.Tasks.Text));
-            Assert.That(more, Does.Contain(SharedMenuItems.About.Text));
+            Assert.That(main.IndexOf(SharedMenuItems.About.Text), Is.EqualTo(main.IndexOf(SharedMenuItems.History.Text) + 1), "About right under History");
+            Assert.That(more, Does.Not.Contain(SharedMenuItems.About.Text));
         });
+    }
+
+    // The settings, the bookmarks and the history are offered only where the application registered their store
+    private void TheSettingsTheBookmarksAndTheHistory_NeedTheirStore()
+    {
+        string?[] Items(Action<IServiceCollection> register)
+        {
+            var services = new ServiceCollection();
+            register(services);
+            using var provider = services.BuildServiceProvider();
+            var menu = new SharedMenuSource(new FakeRuntime("Production"), services: provider.GetRequiredService<IServiceProviderIsService>()).GetMenu(s_signedIn);
+            return [.. menu.Items.Select(row => row.Text)];
+        }
+
+        var none = Items(_ => { });
+        var bookmarksOnly = Items(services => services.AddLocalEntity<UserBookmark>());
+        var settingsOnly = Items(services => services.AddScoped<ISettingsStore>(_ => null!));
+
+        Assert.That(none, Does.Not.Contain(SharedMenuItems.Settings.Text).And.Not.Contain(SharedMenuItems.Bookmarks.Text).And.Not.Contain(SharedMenuItems.History.Text)
+                              .And.Contain(SharedMenuItems.About.Text));
+        Assert.That(bookmarksOnly, Does.Contain(SharedMenuItems.Bookmarks.Text).And.Not.Contain(SharedMenuItems.History.Text));
+        Assert.That(settingsOnly, Does.Contain(SharedMenuItems.Settings.Text).And.Not.Contain(SharedMenuItems.Bookmarks.Text));
     }
 
     // The diagnostics pages are in the menu of a debug build in the development environment, and nowhere else
@@ -138,6 +164,7 @@ public class MoreMenuTests
             await AGroup_IsHiddenWhenAllItsChildrenAre();
             await ThePlatformMenu_KeepsTheEverydayItemsAndMovesTheRestToMore();
             TheDiagnosticsPages_AreOnlyInADebugBuildInDevelopment();
+            TheSettingsTheBookmarksAndTheHistory_NeedTheirStore();
         });
     }
 }

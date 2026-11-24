@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <!-- The license: the model, its JSON and JWT forms, the check with the public keys of the vendor. No packages: ES256 is the ECDsa of .NET.
-         Public on purpose: the protection is the private key of the vendor; the generator stays closed (licensing/) -->
+    <!-- The license as the products see it: the model, its state, the summary for the clients, the services. No format and no cryptography: the
+         document of the issuer is read on the server, so a client of this library carries no crypto package -->
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFramework>net11.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>

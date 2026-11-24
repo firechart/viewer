@@ -10,7 +10,7 @@
     import * as sqlite from './flox-sqlite.js';
 
     const params = values => values ? JSON.stringify(values) : null;
-    const rows = text => JSON.parse(text).rows;
+    const rows = bytes => JSON.parse(new TextDecoder().decode(bytes)).rows;
 
     window.harness = {
         sqlite,
@@ -21,6 +21,17 @@
         query: async (handle, sql, values) => rows(await sqlite.query(handle, sql, params(values))),
         remove: name => sqlite.remove(name),
         list: () => sqlite.list(),
+        exists: name => sqlite.exists(name),
+        leads: () => sqlite.leads(),
+        cancelImport: name => sqlite.cancelImport(name),
+        // The tab as hidden or shown; announce: with the event of the browser
+        hide(hidden, announce) {
+            Object.defineProperty(document, 'hidden', { configurable: true, get: () => hidden });
+            if (announce) {
+                document.dispatchEvent(new Event('visibilitychange'));
+            }
+        },
+        importGzip: (name, url) => sqlite.importGzip(name, url, { invokeMethodAsync: () => Promise.resolve() }),
 
         // count statements one by one, upserts keyed by (tab, n); the time of each in ms
         async writeOneByOne(handle, tab, count, from = 0) {

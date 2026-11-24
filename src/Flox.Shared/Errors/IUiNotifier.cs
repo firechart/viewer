@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
+using Flox.Shared.Components;
 using Microsoft.AspNetCore.Components.Routing;
-using Radzen;
 
 namespace Flox.Shared.Errors;
 
@@ -18,24 +18,20 @@ public interface IUiNotifier
 }
 
 /// <summary>
-/// <see cref="IUiNotifier"/> on Radzen notifications. Errors stay until the user closes them or leaves the page, so the reference
+/// <see cref="IUiNotifier"/> on the snack messages of Flox. Errors stay until the user closes them or leaves the page, so the reference
 /// in the text can be read and copied.
 /// </summary>
 [FloxService(typeof(IUiNotifier))]
 public sealed class NotificationUiNotifier : IUiNotifier, IDisposable
 {
-    private const double WarningDurationMs = 6000;
-    private const double UntilClosedMs = 3_600_000;
+    private const int WarningDurationMs = 6000;
 
-    // A long word (a path, a URL) wraps: otherwise the message grows past the window and takes its close button along
-    private const string MessageStyle = "max-width: min(28rem, calc(100vw - 2rem)); overflow-wrap: anywhere";
-
-    private readonly NotificationService _notifications;
+    private readonly FloxSnackbar _notifications;
     private readonly NavigationManager _navigation;
-    private readonly List<NotificationMessage> _errors = [];
+    private readonly List<string> _errors = [];
 
-    /// <summary>Creates the notifier over the Radzen notification service and the navigation manager used to close errors when the page changes.</summary>
-    public NotificationUiNotifier(NotificationService notifications, NavigationManager navigation)
+    /// <summary>Creates the notifier over the snack messages and the navigation manager used to close errors when the page changes.</summary>
+    public NotificationUiNotifier(FloxSnackbar notifications, NavigationManager navigation)
     {
         _notifications = notifications;
         _navigation = navigation;
@@ -51,31 +47,13 @@ public sealed class NotificationUiNotifier : IUiNotifier, IDisposable
     /// <inheritdoc />
     public void Error(string message)
     {
-        Show(message, NotificationSeverity.Error, UntilClosedMs);
+        _errors.Add(_notifications.Show(message, SnackSeverity.Error, 0));
     }
 
     /// <inheritdoc />
     public void Warning(string message)
     {
-        Show(message, NotificationSeverity.Warning, WarningDurationMs);
-    }
-
-    private void Show(string message, NotificationSeverity severity, double duration)
-    {
-        var notification = new NotificationMessage
-        {
-            Severity = severity,
-            Summary = message,
-            Duration = duration,
-            CloseOnClick = false,
-            Style = MessageStyle
-        };
-        if (severity == NotificationSeverity.Error)
-        {
-            _errors.Add(notification);
-        }
-
-        _notifications.Notify(notification);
+        _notifications.Show(message, SnackSeverity.Warning, WarningDurationMs);
     }
 
     // An error belongs to the page it happened on: another page closes it
@@ -83,7 +61,7 @@ public sealed class NotificationUiNotifier : IUiNotifier, IDisposable
     {
         foreach (var error in _errors)
         {
-            _notifications.Messages.Remove(error);
+            _notifications.Dismiss(error);
         }
 
         _errors.Clear();

@@ -1,0 +1,18 @@
+<!-- An appointment in a list: what it is for, when it starts and how many take part; its status at the end -->
+<Component name="Appointment.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.description.exists(), %record.description, iif(%record.serviceType.exists(), %record.serviceType.first(), iif(%record.appointmentType.exists(), %record.appointmentType, %record.id)))}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.start}}"/>
+        <If test="{{%record.participant.exists()}}">
+          <Text>{{%strings.ParticipantsCount(%record.participant.count())}}</Text>
+        </If>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

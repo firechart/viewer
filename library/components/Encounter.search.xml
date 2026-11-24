@@ -1,0 +1,9 @@
+<!-- The search form of Encounter: the filters shown first; the other parameters of the release are in the form, hidden -->
+<Component name="Encounter.search">
+  <SearchForm>
+    <Filter param="patient"/>
+    <Filter param="identifier"/>
+    <Filter param="date"/>
+    <Filter param="class"/>
+  </SearchForm>
+</Component>

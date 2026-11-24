@@ -73,6 +73,19 @@ public interface IListState<TItem> where TItem : class
     Task<ListRange<TItem>> LoadRangeAsync(int skip, int count, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Tells whether two rows are the same row, so that a virtual list sees a range loaded again as the same rows and not as rows
+    /// inserted above. By reference by default: a state whose rows stay the same instances; a state that loads new instances compares
+    /// by the key of the row.
+    /// </summary>
+    IEqualityComparer<TItem> ItemComparer
+    {
+        get
+        {
+            return ReferenceEqualityComparer.Instance;
+        }
+    }
+
+    /// <summary>
     /// Loads the page with the given zero-based index.
     /// </summary>
     Task GoToPageAsync(int page);

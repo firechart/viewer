@@ -1,0 +1,228 @@
+@* The preview of a component of a mode for the designer (preview/{Type}?mode=…&patient=…): the component {Type}.{mode} alone, over records of
+   the type, of the patient of the environment when there is one. A mode of a list (text, link, tile) shows the first records; a mode of a record
+   (banner, view, page) the chosen one; a summary opens the summary of the patient or of the first record. The problems of the component are
+   shown first: the pages of the Viewer fall back to the built-in view of the mode, and the author would not see them *@
+@using System.Globalization
+@using System.Security
+@using FireChart.Viewer.Core
+@using FireChart.Viewer.Core.Fhir
+@using FireChart.Viewer.Core.Fhir.Metadata
+@using FireChart.Viewer.Core.Reports
+@using FireChart.Viewer.Core.Search
+@using FireChart.Viewer.Library
+@using FireChart.Viewer.Routing
+@inject IFhirServerReader Reader
+@inject IReleaseModels Models
+@inject IServerResourceTypeProvider Types
+@inject IViewerAssets LibraryAssets
+
+<div class="fx-stack" style="display:flex;flex-direction:column;gap:var(--fx-space-4, 1rem)" data-viewer="component-preview">
+    <div class="flex items-center flex-wrap gap-2">
+        <code data-preview-component>@Name</code>
+        @if (_missing)
+        {
+            <BbBadge Variant="BadgeVariant.Secondary" title=@($"The library has no {Name}: the built-in view of the mode is shown")>built-in</BbBadge>
+        }
+        @if (_records.Count > 1 && !IsListMode)
+        {
+            <BbSelect TValue="string" Options=@(_records.Select(record => new SelectOption<string>(record.Id, record.Title))) Value=@_chosen?.Id
+                      ValueChanged=@(value => Choose(value!)) AriaLabel="The record" Class="min-w-64" data-preview-records/>
+        }
+        @if (InContext is { } context)
+        {
+            <Button Variant="ButtonVariant.Outline" Class="text-primary" OnClick=@(() => Session.Navigate(context)) title="The page of the Viewer that shows it among the others" data-preview-context IconName="open_in_new" Text="In context"/>
+        }
+    </div>
+
+    @if (_problems is { Count: > 0 })
+    {
+        <div class="fx-notice fx-notice-danger" data-preview-problems>
+            <div class="fx-notice-title">@Name has problems: the pages of the Viewer show the built-in view instead</div>
+            <ul>
+                @foreach (var problem in _problems)
+                {
+                    <li>@problem.ToString()</li>
+                }
+            </ul>
+        </div>
+    }
+    else if (_message is not null)
+    {
+        <div class="fx-notice fx-notice-warning" data-preview-message>@_message</div>
+    }
+    else if (_definition is not null && _contextType is not null && _contextId is not null)
+    {
+        <ReportView @key=@($"{_contextType}/{_contextId}") Component=@Name Definition=@_definition ContextType=@_contextType ContextId=@_contextId
+                    Record=@_chosen?.Json Safety=@(_mode is "view")/>
+    }
+    else if (_mode is "page" && _chosen is { } chosen)
+    {
+        <ReportView @key=@chosen.Id Component=@Name ContextType=@ResourceType ContextId=@chosen.Id Record=@chosen.Json Safety/>
+    }
+    else
+    {
+        <BbSkeleton Class="h-4" style="height: 4rem"/>
+    }
+</div>
+
+@code {
+
+    private const int Count = 20;
+
+    private static readonly HashSet<string> s_listModes = new(StringComparer.Ordinal) { "text", "link", "tile" };
+    private static readonly HashSet<string> s_recordModes = new(StringComparer.Ordinal) { "banner", "view", "page" };
+
+    private string _mode = string.Empty;
+    private string? _patient;
+    private string _search = string.Empty;
+    private bool _missing;
+    private IReadOnlyList<ReportProblem>? _problems;
+    private string? _message;
+    private string? _definition;
+    private string? _contextType;
+    private string? _contextId;
+    private List<PreviewRecord> _records = [];
+    private PreviewRecord? _chosen;
+
+    [CascadingParameter]
+    private ViewerSession Session { get; set; } = null!;
+
+    // The type of the component: {Type}.{mode}
+    [Parameter, EditorRequired]
+    public string ResourceType { get; set; } = string.Empty;
+
+    // The record of a mode that shows one; none: the first record found
+    [Parameter]
+    public string? RecordId { get; set; }
+
+    // mode=…&patient=…
+    [Parameter]
+    public string Query { get; set; } = string.Empty;
+
+    private string Name => $"{ResourceType}.{_mode}";
+
+    private bool IsListMode => s_listModes.Contains(_mode);
+
+    // The page of the Viewer that shows the component among the others
+    private ViewerRoute? InContext => _problems is null && _message is null
+        ? IsListMode ? new ViewerRoute(ViewerPage.ResourceList, ResourceType, Query: _search)
+          : _chosen is { } record ? new ViewerRoute(ViewerPage.Resource, ResourceType, record.Id)
+          : null
+        : null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var parameters = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(Query);
+        _mode = parameters.TryGetValue("mode", out var mode) ? mode.ToString() : string.Empty;
+        _patient = parameters.TryGetValue("patient", out var patient) && patient.ToString().Length > 0 ? patient.ToString() : null;
+        if (!s_listModes.Contains(_mode) && !s_recordModes.Contains(_mode) && _mode != "summary")
+        {
+            _message = $"\"{_mode}\" is not a mode: a component of a mode is named {{Type}}.{{mode}}, one of text, link, tile, banner, view, page, summary.";
+            return;
+        }
+
+        try
+        {
+            var bundle = await new ReportLibrary(LibraryAssets, VendorLibrary.UrlOf).LoadAsync(Name);
+            _missing = bundle.Missing;
+            if (!bundle.Missing && bundle.Problems.Length > 0)
+            {
+                _problems = bundle.Problems;
+                return;
+            }
+
+            var release = await Types.ReleaseOfAsync(Session.Server);
+            _search = SearchOf(FhirMetadata.Of(release));
+            var model = await Models.GetAsync(release);
+            if (ResourceType == ViewerRoutes.PatientContext && _patient is not null)
+            {
+                _records = [new PreviewRecord(_patient, _patient, await Reader.ReadAsync(Session.Server, ResourceType, _patient))];
+            }
+            else
+            {
+                var page = await Reader.SearchAsync(Session.Server, ResourceType, FhirSearchState.Parse(_search + $"&{FhirSearchState.CountParameter}={Count}"));
+                _records = [.. page.Items.Where(item => item.Json is not null).Take(Count)
+                                  .Select(item => new PreviewRecord(item.Id, TitleOf(item, model), item.Json))];
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _message = $"The records of {ResourceType} could not be read: {ex.Message}";
+            return;
+        }
+
+        _chosen = _records.FirstOrDefault(record => record.Id == RecordId) ?? _records.FirstOrDefault();
+        if (_chosen is null)
+        {
+            _message = _patient is null ? $"The server has no {ResourceType}." : $"The patient {_patient} has no {ResourceType}.";
+            return;
+        }
+
+        switch (_mode)
+        {
+            case "summary":
+                Session.Navigate(new ViewerRoute(ViewerPage.Summary, ResourceType, _chosen.Id), replace: true);
+                break;
+            case "banner" or "view":
+                _definition = $$$"""<Component name="Preview"><Show value="{{%context}}" mode="{{{_mode}}}"/></Component>""";
+                _contextType = ResourceType;
+                _contextId = _chosen.Id;
+                break;
+            case "page":
+                break;
+            default:
+                ListOf();
+                break;
+        }
+    }
+
+    // A mode of a list: the first records of the search, each in the mode; the patient (or the first record) is the context
+    private void ListOf()
+    {
+        var shown = ResourceType == ViewerRoutes.PatientContext && _patient is not null
+            ? $$$"""<Show value="{{%context}}" mode="{{{_mode}}}"/>"""
+            : $$$"""
+               <Repeat each="{{%records}}" as="record">
+                 <Show value="{{%record}}" mode="{{{_mode}}}"/>
+               </Repeat>
+               """;
+        var data = ResourceType == ViewerRoutes.PatientContext && _patient is not null
+            ? string.Empty
+            : $"""<Data><Search id="records" query="{SecurityElement.Escape($"{ResourceType}?{_search}")}" max="{Count}"/></Data>""";
+        _definition = $"""<Component name="Preview">{data}<Section title="{SecurityElement.Escape(Name)}">{shown}</Section></Component>""";
+        (_contextType, _contextId) = _patient is not null ? (ViewerRoutes.PatientContext, _patient) : (ResourceType, _chosen!.Id);
+    }
+
+    // The search of the records: of the patient, by the parameter of the type that refers to one (patient, else subject)
+    private string SearchOf(FhirReleaseMetadata? metadata)
+    {
+        if (_patient is null || ResourceType == ViewerRoutes.PatientContext)
+        {
+            return string.Empty;
+        }
+
+        return metadata?.SearchParameterOf(ResourceType, "patient") is not null ? $"patient={Uri.EscapeDataString(_patient)}"
+            : metadata?.SearchParameterOf(ResourceType, "subject") is not null ? $"subject=Patient/{Uri.EscapeDataString(_patient)}"
+            : string.Empty;
+    }
+
+    private static string TitleOf(ResourceSummary item, Hl7.Fhir.Introspection.ModelInspector model)
+    {
+        try
+        {
+            return $"{ReportText.TitleOf(ReportExpressions.Parse(item.Json!, model), CultureInfo.CurrentCulture)} ({item.Id})";
+        }
+        catch (FormatException)
+        {
+            return item.Id;
+        }
+    }
+
+    private void Choose(string id)
+    {
+        Session.Navigate(new ViewerRoute(ViewerPage.Preview, ResourceType, id, Query), replace: true);
+    }
+
+    private sealed record PreviewRecord(string Id, string Title, string? Json);
+
+}

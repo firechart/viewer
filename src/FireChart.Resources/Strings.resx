@@ -196,7 +196,7 @@
     <value>A search of this section failed</value>
   </data>
   <data name="Caption_FhirServerRelease" xml:space="preserve">
-    <value>FHIR release (if /metadata is unavailable)</value>
+    <value>FHIR release (detected when empty)</value>
   </data>
   <data name="Caption_FhirServerTerminologyUrl" xml:space="preserve">
     <value>Terminology server URL (optional)</value>
@@ -213,8 +213,11 @@
   <data name="Message_InvalidSearch" xml:space="preserve">
     <value>The search in the address is not valid.</value>
   </data>
-  <data name="Placeholder_SearchAllFields" xml:space="preserve">
-    <value>Search all fields</value>
+  <data name="Message_SearchRejected" xml:space="preserve">
+    <value>The server did not accept the search.</value>
+  </data>
+  <data name="Caption_ClearSearch" xml:space="preserve">
+    <value>Clear search</value>
   </data>
   <data name="Caption_ShowAllFields" xml:space="preserve">
     <value>Show all fields</value>
@@ -369,6 +372,15 @@
   <data name="Home_DocumentationDescription" xml:space="preserve">
     <value>How to browse FHIR packages and FHIR servers</value>
   </data>
+  <data name="Caption_Installation" xml:space="preserve">
+    <value>Installation</value>
+  </data>
+  <data name="Home_Install" xml:space="preserve">
+    <value>Install</value>
+  </data>
+  <data name="Home_InstallDescription" xml:space="preserve">
+    <value>As an application of its own, from the home screen or the desktop</value>
+  </data>
   <data name="Message_NoBookmarks" xml:space="preserve">
     <value>No bookmarks</value>
   </data>
@@ -522,6 +534,42 @@
   <data name="Caption_LoadAll" xml:space="preserve">
     <value>Load all</value>
   </data>
+  <data name="Caption_LoadingRecord" xml:space="preserve">
+    <value>Loading the record</value>
+  </data>
+  <data name="Message_LoadingProgress" xml:space="preserve">
+    <value>{0} of {1} parts loaded</value>
+  </data>
+  <data name="Message_LoadedRecords" xml:space="preserve">
+    <value>Loaded: {0} ({1})</value>
+  </data>
+  <data name="Caption_AgeYears" xml:space="preserve">
+    <value>{0} y</value>
+  </data>
+  <data name="Caption_AgeMonths" xml:space="preserve">
+    <value>{0} mo</value>
+  </data>
+  <data name="Caption_AgeDays" xml:space="preserve">
+    <value>{0} d</value>
+  </data>
+  <data name="Message_RecordNotFound" xml:space="preserve">
+    <value>{0} could not be found</value>
+  </data>
+  <data name="Message_LoadingCancelled" xml:space="preserve">
+    <value>The loading was cancelled: the record shown is not complete.</value>
+  </data>
+  <data name="Caption_SearchCancelled" xml:space="preserve">
+    <value>Not loaded: the loading was cancelled</value>
+  </data>
+  <data name="Caption_PatientRecordSettings" xml:space="preserve">
+    <value>Patient record</value>
+  </data>
+  <data name="Caption_SummaryPageSize" xml:space="preserve">
+    <value>Records per request</value>
+  </data>
+  <data name="Caption_SummaryLoadAll" xml:space="preserve">
+    <value>Load the whole record before showing it</value>
+  </data>
   <data name="Caption_Print" xml:space="preserve">
     <value>Print</value>
   </data>
@@ -558,6 +606,9 @@
   <data name="PackageBase_Delete" xml:space="preserve">
     <value>Delete from the device</value>
   </data>
+  <data name="PackageBase_DeleteConfirm" xml:space="preserve">
+    <value>Delete {0} from this device? It can be downloaded again.</value>
+  </data>
   <data name="PackageBase_UpdateAvailable" xml:space="preserve">
     <value>A newer version of the package is available ({0}).</value>
   </data>
@@ -566,5 +617,56 @@
   </data>
   <data name="PackageBase_Occupied" xml:space="preserve">
     <value>Packages on the device: {0}, taking {1}</value>
+  </data>
+  <data name="Caption_FindRecord" xml:space="preserve">
+    <value>Find…</value>
+  </data>
+  <data name="Caption_ChooseRecord" xml:space="preserve">
+    <value>Choose: {0}</value>
+  </data>
+  <data name="Caption_RecentRecords" xml:space="preserve">
+    <value>Opened recently</value>
+  </data>
+  <data name="Caption_ChangeFilter" xml:space="preserve">
+    <value>Change the filter</value>
+  </data>
+  <data name="Message_NothingFound" xml:space="preserve">
+    <value>Nothing found</value>
+  </data>
+  <data name="Placeholder_TypeToFind" xml:space="preserve">
+    <value>Type to find</value>
+  </data>
+  <data name="Caption_RangeFrom" xml:space="preserve">
+    <value>{0}: from</value>
+  </data>
+  <data name="Caption_RangeTo" xml:space="preserve">
+    <value>to</value>
+  </data>
+  <data name="Caption_IdentifierSystem" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Message_ListLimit" xml:space="preserve">
+    <value>The first {0} records are shown. Narrow the search with the filter to find the others.</value>
+  </data>
+  <data name="Message_ListLimitOf" xml:space="preserve">
+    <value>The first {0} of {1} records are shown. Narrow the search with the filter to find the others.</value>
+  </data>
+  <data name="Caption_ConfigureView" xml:space="preserve">
+    <value>Configure view</value>
+  </data>
+  <data name="Caption_Done" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="Caption_ShowAll" xml:space="preserve">
+    <value>Show all</value>
+  </data>
+  <data name="Caption_HideAll" xml:space="preserve">
+    <value>Hide all</value>
+  </data>
+  <data name="Caption_HideResourceType" xml:space="preserve">
+    <value>Hide {0}</value>
+  </data>
+  <data name="Caption_ShowResourceType" xml:space="preserve">
+    <value>Show {0}</value>
   </data>
 </root>

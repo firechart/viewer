@@ -1,0 +1,11 @@
+<!-- A prescription in a list: the medication, when it was prescribed and how to take it; its status at the end -->
+<Component name="MedicationRequest.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{%record.medication}}" subtitle="{{%record.authoredOn}}" patient="{{%record.subject}}" encounter="{{%record.encounter}}">
+    <Trailing>
+      <Value value="{{%record.dosageInstruction.text.first()}}"/>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

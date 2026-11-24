@@ -2,12 +2,14 @@
 @implements IAsyncDisposable
 @inherits StatelessWidget
 @using Flox.Shared.Services
-@using Radzen
 @inject UserBookmarkTransfer Transfer
 
 
-<RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Icon="download" Text=@Strings.Caption_ExportBookmarks Click=@ExportAsync data-bookmarks="export"/>
-<RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Icon="upload" Text=@Strings.Caption_ImportBookmarks Click=@PickAsync data-bookmarks="import"/>
+@* Rare commands: the menu More of the header of the page *@
+<PageMenu Title=@Strings.Caption_More>
+    <PageMenuItem Icon="download" Text=@Strings.Caption_ExportBookmarks OnClick=@ExportAsync data-bookmarks="export"/>
+    <PageMenuItem Icon="upload" Text=@Strings.Caption_ImportBookmarks OnClick=@PickAsync data-bookmarks="import"/>
+</PageMenu>
 <InputFile @ref=@_input accept=".json,application/json" class="hidden" OnChange=@ImportAsync/>
 
 @code {
@@ -55,11 +57,11 @@
             }
             catch (Exception ex) when (ex is InvalidDataException or IOException)
             {
-                this.ShowSnack(Strings.Message_BookmarksFileInvalid, NotificationSeverity.Error);
+                this.ShowSnack(Strings.Message_BookmarksFileInvalid, SnackSeverity.Error);
                 return;
             }
 
-            this.ShowSnack(string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.Message_BookmarksImported, result.Added, result.Existing), NotificationSeverity.Success);
+            this.ShowSnack(string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.Message_BookmarksImported, result.Added, result.Existing), SnackSeverity.Success);
             await OnImported.InvokeAsync();
         });
     }

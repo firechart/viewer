@@ -1,0 +1,30 @@
+<!-- The page of an organization: its name and kind, how to contact it, and what it belongs to -->
+<Component name="Organization.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{iif(%record.name.exists(), %record.name, %record.id)}}">
+    <Field label="{{%strings.Type}}" value="{{%record.type}}"/>
+    <If test="{{%record.active = false}}">
+      <Field label="{{%strings.Status}}">
+        <Badge text="{{%strings.InactiveBadge}}" tone="danger"/>
+      </Field>
+    </If>
+  </Section>
+
+  <If test="{{%record.telecom.exists() or %record.address.exists()}}">
+    <Section title="{{%strings.Contact}}">
+      <Field label="{{%strings.PhoneAndEmail}}" value="{{%record.telecom}}"/>
+      <Field label="{{%strings.Address}}" value="{{%record.address}}"/>
+    </Section>
+  </If>
+
+  <If test="{{%record.partOf.exists() or %record.alias.exists() or %record.identifier.exists()}}">
+    <Section title="{{%strings.Relations}}">
+      <Field label="{{%strings.PartOf}}">
+        <Link value="{{%record.partOf}}"/>
+      </Field>
+      <Field label="{{%strings.Alias}}" value="{{%record.alias}}"/>
+      <Field label="{{%strings.Identifier}}" value="{{%record.identifier}}"/>
+    </Section>
+  </If>
+</Component>

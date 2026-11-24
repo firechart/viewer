@@ -1,0 +1,26 @@
+<!-- The page of an appointment: when, its type, service, reason and instructions, then who takes part -->
+<Component name="Appointment.view">
+  <Param name="record" required="true"/>
+
+  <If test="{{%record.start.exists() or %record.end.exists() or %record.appointmentType.exists() or %record.serviceType.exists() or %record.specialty.exists() or %record.reasonCode.exists() or %record.priority.exists() or %record.comment.exists() or %record.patientInstruction.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Start}}" value="{{%record.start}}"/>
+      <Field label="{{%strings.End}}" value="{{%record.end}}"/>
+      <Field label="{{%strings.Type}}" value="{{%record.appointmentType}}"/>
+      <Field label="{{%strings.ServiceType}}" value="{{%record.serviceType}}"/>
+      <Field label="{{%strings.Specialty}}" value="{{%record.specialty}}"/>
+      <Field label="{{%strings.Reason}}" value="{{%record.reasonCode}}"/>
+      <Field label="{{%strings.Priority}}" value="{{%record.priority}}"/>
+      <Field label="{{%strings.Comment}}" value="{{%record.comment}}"/>
+      <Field label="{{%strings.PatientInstruction}}" value="{{%record.patientInstruction}}"/>
+    </Section>
+  </If>
+
+  <If test="{{%record.participant.exists()}}">
+    <Section title="{{%strings.Participants}}" count="{{%record.participant.count()}}">
+      <Repeat each="{{%record.participant}}" as="participant">
+        <Row meta="{{%participant.status}}"><Main><Link value="{{%participant.actor}}"/></Main></Row>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

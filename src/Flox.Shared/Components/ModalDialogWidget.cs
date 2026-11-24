@@ -1,5 +1,3 @@
-using Radzen;
-
 namespace Flox.Shared.Components;
 
 /// <summary>
@@ -12,7 +10,13 @@ public class ModalDialogWidget<T> : ComponentBase where T : class
     /// The dialog service that closes the dialog.
     /// </summary>
     [Inject]
-    public DialogService DialogService { get; set; } = default!;
+    public FloxDialogService DialogService { get; set; } = default!;
+
+    /// <summary>
+    /// The dialog that shows the widget.
+    /// </summary>
+    [CascadingParameter]
+    public FloxDialog? Dialog { get; set; }
 
     /// <summary>
     /// The model the dialog works on.
@@ -43,7 +47,7 @@ public class ModalDialogWidget<T> : ComponentBase where T : class
     /// </summary>
     protected void Close()
     {
-        DialogService.Close();
+        CloseWith(null);
     }
 
     /// <summary>
@@ -51,7 +55,7 @@ public class ModalDialogWidget<T> : ComponentBase where T : class
     /// </summary>
     protected void Cancel()
     {
-        DialogService.Close();
+        CloseWith(null);
     }
 
     /// <summary>
@@ -59,6 +63,18 @@ public class ModalDialogWidget<T> : ComponentBase where T : class
     /// </summary>
     protected void Ok()
     {
-        DialogService.Close(Model);
+        CloseWith(Model);
+    }
+
+    private void CloseWith(object? result)
+    {
+        if (Dialog is not null)
+        {
+            DialogService.CloseDialog(Dialog, result);
+        }
+        else
+        {
+            DialogService.Close(result);
+        }
     }
 }

@@ -7,9 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Flox.Shared.Services;
 
 /// <summary>The bookmarks of this device as a file and back: the way to move them to another device, since they are never sent to a server. An import adds what the device has not got (one place is one bookmark) and leaves the rest as it is.</summary>
+/// <param name="services">The services of the scope; the storage of the bookmarks is read from them when it is used, so an application without
+/// bookmarks still builds its container.</param>
 [FloxService(typeof(UserBookmarkTransfer), ServiceLifetime.Scoped)]
-public sealed class UserBookmarkTransfer(IGuidEntityStorage<UserBookmark> storage)
+public sealed class UserBookmarkTransfer(IServiceProvider services)
 {
+    private IGuidEntityStorage<UserBookmark> Storage => services.GetRequiredService<IGuidEntityStorage<UserBookmark>>();
+
     /// <summary>Name of the file format.</summary>
     public const string Format = "flox-bookmarks";
     /// <summary>Version of the file format.</summary>
@@ -38,7 +42,7 @@ public sealed class UserBookmarkTransfer(IGuidEntityStorage<UserBookmark> storag
             ReturnTotal = false
         };
         request.Sorts.SetValue(nameof(UserBookmark.CreatedAt));
-        var rows = (await storage.FindAsync(request, cancellationToken)).Items;
+        var rows = (await Storage.FindAsync(request, cancellationToken)).Items;
         var file = new BookmarkFile(Format, Version, DateTimeOffset.UtcNow, [.. rows.Select(BookmarkFileEntry.Of)]);
         return JsonSerializer.SerializeToUtf8Bytes(file, s_json);
     }
@@ -75,7 +79,7 @@ public sealed class UserBookmarkTransfer(IGuidEntityStorage<UserBookmark> storag
 
             try
             {
-                await storage.InsertAsync(bookmark, cancellationToken);
+                await Storage.InsertAsync(bookmark, cancellationToken);
                 added++;
             }
             catch (DuplicateException)

@@ -7,7 +7,6 @@ using Flox.Core.Host;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Radzen;
 
 namespace FireChart.Viewer.SearchForms;
 
@@ -57,10 +56,12 @@ public static class SearchFormDialog
     /// <summary>
     /// Shows a form and waits for the user.
     /// </summary>
-    /// <param name="dialogs">The dialogs of Radzen.</param>
+    /// <param name="dialogs">The dialogs of Flox.</param>
     /// <param name="definition">The form.</param>
     /// <param name="title">The title of the sheet.</param>
     /// <param name="values">The values the form opens with (<see cref="SearchFormSearchMapping.Read"/>); none: the defaults.</param>
+    /// <param name="session">The session of the list: a reference field offers the records opened in it and the list of its type to choose from; none:
+    /// a reference field searches as the person types only.</param>
     /// <param name="server">
     /// The FHIR server the search goes to: a field bound to a value set offers the codes this server expands (<see cref="IValueSetExpander"/>); none, or a
     /// server that does not expand it: the codes of the <see cref="ISearchFormOptionSource"/> of the host, else a text box.
@@ -72,8 +73,8 @@ public static class SearchFormDialog
     /// var result = await SearchFormDialog.ShowAsync(dialogs, definition, "Patients", read.Values, server);
     /// </code>
     /// </example>
-    public static async Task<SearchFormDialogResult?> ShowAsync(DialogService dialogs, SearchFormDefinition definition, string title, IReadOnlyDictionary<string, SearchFieldValue>? values = null,
-        IViewerServer? server = null)
+    public static async Task<SearchFormDialogResult?> ShowAsync(Flox.Shared.Components.FloxDialogService dialogs, SearchFormDefinition definition, string title, IReadOnlyDictionary<string, SearchFieldValue>? values = null,
+        IViewerServer? server = null, ViewerSession? session = null)
     {
         ArgumentNullException.ThrowIfNull(dialogs);
         ArgumentNullException.ThrowIfNull(definition);
@@ -91,18 +92,22 @@ public static class SearchFormDialog
             parameters[nameof(SearchFormView.Server)] = server;
         }
 
-        // No title bar: the form takes the height; Cancel, Esc and a click beside it close it
-        var options = Flox.Shared.Components.SheetOptions.Modal();
-        options.ShowTitle = false;
+        if (session is not null)
+        {
+            parameters[nameof(SearchFormView.Session)] = session;
+        }
+
+        // The title of the form above the fields, beside the close button; as high as the fields (the whole screen on a phone); Cancel, Esc and a
+        // click beside it close it
+        var options = Flox.Shared.Components.SheetOptions.Modal() with { Height = null };
         return await dialogs.OpenAsync<SearchFormView>(title, parameters, options) as SearchFormDialogResult;
     }
 }
 
 /// <summary>
-/// The search form of a resource type, chosen by a <see cref="ViewerFormResolver{TKey, TDefinition}"/> among the providers of the host
-/// (<see cref="IViewerFormProvider{TKey, TDefinition}"/> services) and the designed forms of the library (<c>search-forms/{release}/{type}.json</c>);
-/// when none has one, the form is generated from the metadata of the release (<see cref="SearchFormGenerator"/>). Scoped: the answers are kept for
-/// the scope.
+/// The search form of a resource type: the component <c>components/{Type}.search.xml</c> of the library (the vendor's, a customer's over it), one file
+/// for every FHIR release, over the form generated from the metadata of the release (<see cref="SearchFormGenerator"/>); without the component, or with
+/// one that does not pass its check, the generated form. Scoped: the answers are kept for the scope.
 /// </summary>
 /// <example>
 /// <code>
@@ -111,46 +116,58 @@ public static class SearchFormDialog
 /// </code>
 /// </example>
 [FloxService(ServiceLifetime.Scoped)]
-public sealed class ViewerSearchForms : IDisposable
+public sealed class ViewerSearchForms
 {
-    private readonly ViewerFormResolver<SearchFormKey, SearchFormDefinition> _resolver;
+    private readonly FireChart.Viewer.Core.Reports.ReportLibrary _library;
+    private readonly ILogger<ViewerSearchForms> _logger;
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<SearchFormKey, Lazy<Task<SearchFormDefinition?>>> _forms = new();
 
     /// <summary>
     /// Creates the service.
     /// </summary>
-    /// <param name="providers">The providers of the host.</param>
-    /// <param name="assets">Reads the vendor forms, the static files of the vendor library.</param>
-    /// <param name="logger">Logs a provider that failed.</param>
-    public ViewerSearchForms(IEnumerable<IViewerFormProvider<SearchFormKey, SearchFormDefinition>> providers, IViewerAssets assets, ILogger<ViewerSearchForms> logger)
+    /// <param name="assets">Reads the files of the library.</param>
+    /// <param name="logger">Logs a search form that does not pass its check.</param>
+    public ViewerSearchForms(IViewerAssets assets, ILogger<ViewerSearchForms> logger)
     {
-        _resolver = new ViewerFormResolver<SearchFormKey, SearchFormDefinition>([.. providers, new VendorSearchFormProvider(assets, logger)],
-                                                                                (key, _) => Task.FromResult(SearchFormGenerator.Generate(key.Release, key.ResourceType) ?? new SearchFormDefinition()),
-                                                                                logger);
+        _library = new FireChart.Viewer.Core.Reports.ReportLibrary(assets, VendorLibrary.UrlOf);
+        _logger = logger;
     }
 
     /// <summary>
     /// The form of a key.
     /// </summary>
     /// <param name="key">The release in lower case and the resource type.</param>
-    /// <param name="cancellationToken">Cancels the resolution.</param>
-    /// <returns>The form of a provider, else the generated one; <see langword="null"/> for a release without metadata or a type it does not have (the
+    /// <param name="cancellationToken">Cancels the reading.</param>
+    /// <returns>The form of the library, else the generated one; <see langword="null"/> for a release without metadata or a type it does not have (the
     /// list then has no filter).</returns>
     /// <example>
     /// <code>
     /// var form = await searchForms.FindAsync(new SearchFormKey("r4", "Basic"));   // generated: nobody designs a form of Basic
     /// </code>
     /// </example>
-    public async Task<SearchFormDefinition?> FindAsync(SearchFormKey key, CancellationToken cancellationToken = default)
+    public Task<SearchFormDefinition?> FindAsync(SearchFormKey key, CancellationToken cancellationToken = default)
     {
-        var resolved = await _resolver.ResolveAsync(key, cancellationToken);
-        return resolved.Source == FormSource.Fallback && resolved.Definition.Fields.Count == 0 ? null : resolved.Definition;
+        ArgumentNullException.ThrowIfNull(key);
+        return _forms.GetOrAdd(key, k => new Lazy<Task<SearchFormDefinition?>>(() => ReadAsync(k, cancellationToken))).Value;
     }
 
-    /// <summary>
-    /// Unsubscribes from the providers.
-    /// </summary>
-    public void Dispose()
+    private async Task<SearchFormDefinition?> ReadAsync(SearchFormKey key, CancellationToken cancellationToken)
     {
-        _resolver.Dispose();
+        var bundle = await _library.LoadAsync(SearchFormComponents.NameOf(key.ResourceType), cancellationToken);
+        if (bundle is { Missing: false, Root: { } root, Problems.Length: 0 })
+        {
+            var culture = System.Globalization.CultureInfo.CurrentUICulture;
+            var strings = await _library.StringsAsync(culture, cancellationToken);
+            if (SearchFormComponents.Read(root, key.Release, strings, culture) is { } form)
+            {
+                return form;
+            }
+        }
+        else if (!bundle.Missing)
+        {
+            _logger.LogWarning("The search form of {Type} is not shown, the generated one is: {Problems}", key.ResourceType, string.Join("; ", bundle.Problems));
+        }
+
+        return SearchFormGenerator.Generate(key.Release, key.ResourceType);
     }
 }

@@ -8,7 +8,7 @@ namespace FireChart.Viewer.Core;
 /// </summary>
 /// <example>
 /// <code>
-/// var version = TemplateHash.Of(File.ReadAllText("Patient@tile.liquid"));   // "3F9A0C1B2D4E5F60"
+/// var version = TemplateHash.Of(File.ReadAllText("Patient.json"));   // "3F9A0C1B2D4E5F60"
 /// </code>
 /// </example>
 public static class TemplateHash

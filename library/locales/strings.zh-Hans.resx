@@ -1,0 +1,801 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Abatement" xml:space="preserve">
+    <value>缓解</value>
+  </data>
+  <data name="AbstractBadge" xml:space="preserve">
+    <value>抽象</value>
+  </data>
+  <data name="Accession" xml:space="preserve">
+    <value>登记号</value>
+  </data>
+  <data name="Action" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="ActiveMedications" xml:space="preserve">
+    <value>当前用药</value>
+  </data>
+  <data name="Activities" xml:space="preserve">
+    <value>活动</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>地址</value>
+  </data>
+  <data name="Addresses" xml:space="preserve">
+    <value>针对</value>
+  </data>
+  <data name="AdvanceDirectives" xml:space="preserve">
+    <value>预先医疗指示</value>
+  </data>
+  <data name="Alias" xml:space="preserve">
+    <value>别名</value>
+  </data>
+  <data name="AllergiesAndIntolerances" xml:space="preserve">
+    <value>过敏与不耐受</value>
+  </data>
+  <data name="Applies" xml:space="preserve">
+    <value>有效期</value>
+  </data>
+  <data name="AppliesTo" xml:space="preserve">
+    <value>适用于</value>
+  </data>
+  <data name="Asserted" xml:space="preserve">
+    <value>陈述日期</value>
+  </data>
+  <data name="AssertedBy" xml:space="preserve">
+    <value>陈述者</value>
+  </data>
+  <data name="Authenticator" xml:space="preserve">
+    <value>认证者</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>作者</value>
+  </data>
+  <data name="Authored" xml:space="preserve">
+    <value>开具日期</value>
+  </data>
+  <data name="Authority" xml:space="preserve">
+    <value>机构</value>
+  </data>
+  <data name="BasedOn" xml:space="preserve">
+    <value>依据</value>
+  </data>
+  <data name="BillablePeriod" xml:space="preserve">
+    <value>计费期间</value>
+  </data>
+  <data name="BirthDate" xml:space="preserve">
+    <value>出生日期</value>
+  </data>
+  <data name="BodySite" xml:space="preserve">
+    <value>身体部位</value>
+  </data>
+  <data name="Born" xml:space="preserve">
+    <value>出生</value>
+  </data>
+  <data name="BusinessStatus" xml:space="preserve">
+    <value>处理状态</value>
+  </data>
+  <data name="Care" xml:space="preserve">
+    <value>照护</value>
+  </data>
+  <data name="CareManager" xml:space="preserve">
+    <value>个案管理员</value>
+  </data>
+  <data name="CareTeam" xml:space="preserve">
+    <value>医疗团队</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>类别</value>
+  </data>
+  <data name="Claim" xml:space="preserve">
+    <value>理赔</value>
+  </data>
+  <data name="Class" xml:space="preserve">
+    <value>就诊类型</value>
+  </data>
+  <data name="Collected" xml:space="preserve">
+    <value>采集时间</value>
+  </data>
+  <data name="Collector" xml:space="preserve">
+    <value>采集者</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>备注</value>
+  </data>
+  <data name="Complication" xml:space="preserve">
+    <value>并发症</value>
+  </data>
+  <data name="Conclusion" xml:space="preserve">
+    <value>结论</value>
+  </data>
+  <data name="Conditions" xml:space="preserve">
+    <value>疾病</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>联系人</value>
+  </data>
+  <data name="ContactDetails" xml:space="preserve">
+    <value>联系方式</value>
+  </data>
+  <data name="Containers" xml:space="preserve">
+    <value>容器</value>
+  </data>
+  <data name="Content" xml:space="preserve">
+    <value>内容</value>
+  </data>
+  <data name="Contributors" xml:space="preserve">
+    <value>参与者</value>
+  </data>
+  <data name="Coverage" xml:space="preserve">
+    <value>保险覆盖</value>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>创建日期</value>
+  </data>
+  <data name="Custodian" xml:space="preserve">
+    <value>保管方</value>
+  </data>
+  <data name="DataClass" xml:space="preserve">
+    <value>数据类别</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>日期</value>
+  </data>
+  <data name="Deceased" xml:space="preserve">
+    <value>已故</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>描述</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>详情</value>
+  </data>
+  <data name="Device" xml:space="preserve">
+    <value>器械</value>
+  </data>
+  <data name="Diagnoses" xml:space="preserve">
+    <value>诊断</value>
+  </data>
+  <data name="Diagnosis" xml:space="preserve">
+    <value>诊断</value>
+  </data>
+  <data name="DiagnosticResults" xml:space="preserve">
+    <value>诊断结果</value>
+  </data>
+  <data name="Disposition" xml:space="preserve">
+    <value>处理结果</value>
+  </data>
+  <data name="Documents" xml:space="preserve">
+    <value>文档</value>
+  </data>
+  <data name="DocumentStatus" xml:space="preserve">
+    <value>文档状态</value>
+  </data>
+  <data name="Domain" xml:space="preserve">
+    <value>领域</value>
+  </data>
+  <data name="Dosage" xml:space="preserve">
+    <value>用法用量</value>
+  </data>
+  <data name="Dose" xml:space="preserve">
+    <value>剂量</value>
+  </data>
+  <data name="DueInline" xml:space="preserve">
+    <value>截止</value>
+  </data>
+  <data name="EligibilityOf" xml:space="preserve">
+    <value>资格核查：{0}</value>
+  </data>
+  <data name="Encounter" xml:space="preserve">
+    <value>就诊</value>
+  </data>
+  <data name="EncounterOf" xml:space="preserve">
+    <value>就诊：{0}</value>
+  </data>
+  <data name="Encounters" xml:space="preserve">
+    <value>就诊记录</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>结束</value>
+  </data>
+  <data name="Enterer" xml:space="preserve">
+    <value>录入者</value>
+  </data>
+  <data name="Evidence" xml:space="preserve">
+    <value>依据</value>
+  </data>
+  <data name="Expires" xml:space="preserve">
+    <value>有效期至</value>
+  </data>
+  <data name="ExpressedBy" xml:space="preserve">
+    <value>提出者</value>
+  </data>
+  <data name="FamilyName" xml:space="preserve">
+    <value>姓</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>筛选</value>
+  </data>
+  <data name="Focus" xml:space="preserve">
+    <value>对象</value>
+  </data>
+  <data name="FollowUp" xml:space="preserve">
+    <value>随访</value>
+  </data>
+  <data name="For" xml:space="preserve">
+    <value>对象</value>
+  </data>
+  <data name="Gender" xml:space="preserve">
+    <value>性别</value>
+  </data>
+  <data name="GeneralPractitioner" xml:space="preserve">
+    <value>全科医生</value>
+  </data>
+  <data name="GivenName" xml:space="preserve">
+    <value>名</value>
+  </data>
+  <data name="Goals" xml:space="preserve">
+    <value>目标</value>
+  </data>
+  <data name="High" xml:space="preserve">
+    <value>上限</value>
+  </data>
+  <data name="HighRiskBadge" xml:space="preserve">
+    <value>高风险</value>
+  </data>
+  <data name="HistoryOfPastIllness" xml:space="preserve">
+    <value>既往病史</value>
+  </data>
+  <data name="HistoryOfPregnancy" xml:space="preserve">
+    <value>妊娠史</value>
+  </data>
+  <data name="HistoryOfProcedures" xml:space="preserve">
+    <value>手术与操作史</value>
+  </data>
+  <data name="Id" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="Identifier" xml:space="preserve">
+    <value>标识符</value>
+  </data>
+  <data name="Identifiers" xml:space="preserve">
+    <value>标识符</value>
+  </data>
+  <data name="ImagesCount" xml:space="preserve">
+    <value>{0} 幅图像</value>
+  </data>
+  <data name="ImagingStudy" xml:space="preserve">
+    <value>影像检查</value>
+  </data>
+  <data name="Immunizations" xml:space="preserve">
+    <value>疫苗接种</value>
+  </data>
+  <data name="Inactive" xml:space="preserve">
+    <value>非活动</value>
+  </data>
+  <data name="InactiveBadge" xml:space="preserve">
+    <value>非活动</value>
+  </data>
+  <data name="Insurer" xml:space="preserve">
+    <value>保险公司</value>
+  </data>
+  <data name="Interpreter" xml:space="preserve">
+    <value>报告医生</value>
+  </data>
+  <data name="Issued" xml:space="preserve">
+    <value>签发日期</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>项目</value>
+  </data>
+  <data name="Laboratory" xml:space="preserve">
+    <value>实验室</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="Languages" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="LastOccurrence" xml:space="preserve">
+    <value>最近一次发生</value>
+  </data>
+  <data name="Length" xml:space="preserve">
+    <value>时长</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>地点</value>
+  </data>
+  <data name="Locations" xml:space="preserve">
+    <value>地点</value>
+  </data>
+  <data name="Lot" xml:space="preserve">
+    <value>批号</value>
+  </data>
+  <data name="LotInline" xml:space="preserve">
+    <value>批号</value>
+  </data>
+  <data name="Low" xml:space="preserve">
+    <value>下限</value>
+  </data>
+  <data name="LowRiskBadge" xml:space="preserve">
+    <value>低风险</value>
+  </data>
+  <data name="ManagingOrganization" xml:space="preserve">
+    <value>管理机构</value>
+  </data>
+  <data name="Manufacturer" xml:space="preserve">
+    <value>生产商</value>
+  </data>
+  <data name="MaritalStatus" xml:space="preserve">
+    <value>婚姻状况</value>
+  </data>
+  <data name="MedicalDevices" xml:space="preserve">
+    <value>医疗器械</value>
+  </data>
+  <data name="Medication" xml:space="preserve">
+    <value>药物</value>
+  </data>
+  <data name="MedicationOrders" xml:space="preserve">
+    <value>用药医嘱</value>
+  </data>
+  <data name="MedicationSummary" xml:space="preserve">
+    <value>用药摘要</value>
+  </data>
+  <data name="Medium" xml:space="preserve">
+    <value>沟通方式</value>
+  </data>
+  <data name="Members" xml:space="preserve">
+    <value>成员</value>
+  </data>
+  <data name="MembersInline" xml:space="preserve">
+    <value>名成员</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>消息</value>
+  </data>
+  <data name="Method" xml:space="preserve">
+    <value>方法</value>
+  </data>
+  <data name="Modality" xml:space="preserve">
+    <value>检查模态</value>
+  </data>
+  <data name="Model" xml:space="preserve">
+    <value>型号</value>
+  </data>
+  <data name="Modified" xml:space="preserve">
+    <value>修改日期</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>姓名</value>
+  </data>
+  <data name="Network" xml:space="preserve">
+    <value>网络</value>
+  </data>
+  <data name="NoIdentifiers" xml:space="preserve">
+    <value>无标识符</value>
+  </data>
+  <data name="NoLaboratoryResults" xml:space="preserve">
+    <value>无实验室结果</value>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>备注</value>
+  </data>
+  <data name="NoValue" xml:space="preserve">
+    <value>无数值</value>
+  </data>
+  <data name="NoVitalSigns" xml:space="preserve">
+    <value>无生命体征</value>
+  </data>
+  <data name="Onset" xml:space="preserve">
+    <value>发病</value>
+  </data>
+  <data name="Order" xml:space="preserve">
+    <value>顺序</value>
+  </data>
+  <data name="OrderDetails" xml:space="preserve">
+    <value>医嘱详情</value>
+  </data>
+  <data name="Orders" xml:space="preserve">
+    <value>医嘱</value>
+  </data>
+  <data name="Organization" xml:space="preserve">
+    <value>机构</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>其他</value>
+  </data>
+  <data name="Outcome" xml:space="preserve">
+    <value>结果</value>
+  </data>
+  <data name="Owner" xml:space="preserve">
+    <value>所有者</value>
+  </data>
+  <data name="Parent" xml:space="preserve">
+    <value>原始标本</value>
+  </data>
+  <data name="Participants" xml:space="preserve">
+    <value>参与者</value>
+  </data>
+  <data name="ParticipantsCount" xml:space="preserve">
+    <value>{0} 名参与者</value>
+  </data>
+  <data name="PartOf" xml:space="preserve">
+    <value>隶属于</value>
+  </data>
+  <data name="Patient" xml:space="preserve">
+    <value>患者</value>
+  </data>
+  <data name="PatientInstruction" xml:space="preserve">
+    <value>患者须知</value>
+  </data>
+  <data name="Payment" xml:space="preserve">
+    <value>付款</value>
+  </data>
+  <data name="Payor" xml:space="preserve">
+    <value>付款方</value>
+  </data>
+  <data name="Performer" xml:space="preserve">
+    <value>执行者</value>
+  </data>
+  <data name="Performers" xml:space="preserve">
+    <value>执行者</value>
+  </data>
+  <data name="Period" xml:space="preserve">
+    <value>期间</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>电话</value>
+  </data>
+  <data name="PhoneAndEmail" xml:space="preserve">
+    <value>电话和电子邮件</value>
+  </data>
+  <data name="PhysicalType" xml:space="preserve">
+    <value>地点类型</value>
+  </data>
+  <data name="Plan" xml:space="preserve">
+    <value>保险计划</value>
+  </data>
+  <data name="PlanOfCare" xml:space="preserve">
+    <value>照护计划</value>
+  </data>
+  <data name="Policy" xml:space="preserve">
+    <value>政策</value>
+  </data>
+  <data name="Practitioner" xml:space="preserve">
+    <value>医务人员</value>
+  </data>
+  <data name="Prescription" xml:space="preserve">
+    <value>处方</value>
+  </data>
+  <data name="Priority" xml:space="preserve">
+    <value>优先级</value>
+  </data>
+  <data name="ProblemList" xml:space="preserve">
+    <value>问题列表</value>
+  </data>
+  <data name="Procedure" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="Provider" xml:space="preserve">
+    <value>服务提供方</value>
+  </data>
+  <data name="Provision" xml:space="preserve">
+    <value>条款</value>
+  </data>
+  <data name="ProvisionType" xml:space="preserve">
+    <value>条款类型</value>
+  </data>
+  <data name="Purpose" xml:space="preserve">
+    <value>目的</value>
+  </data>
+  <data name="Qualifications" xml:space="preserve">
+    <value>资质</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>数量</value>
+  </data>
+  <data name="Reactions" xml:space="preserve">
+    <value>反应</value>
+  </data>
+  <data name="Reason" xml:space="preserve">
+    <value>原因</value>
+  </data>
+  <data name="ReasonAndDiagnoses" xml:space="preserve">
+    <value>原因与诊断</value>
+  </data>
+  <data name="ReasonAndOutcome" xml:space="preserve">
+    <value>原因与结果</value>
+  </data>
+  <data name="Received" xml:space="preserve">
+    <value>接收时间</value>
+  </data>
+  <data name="RecentEncounters" xml:space="preserve">
+    <value>近期就诊</value>
+  </data>
+  <data name="Recipient" xml:space="preserve">
+    <value>接收者</value>
+  </data>
+  <data name="Recorded" xml:space="preserve">
+    <value>记录日期</value>
+  </data>
+  <data name="RecordedBy" xml:space="preserve">
+    <value>记录者</value>
+  </data>
+  <data name="ReferenceRanges" xml:space="preserve">
+    <value>参考范围</value>
+  </data>
+  <data name="Referral" xml:space="preserve">
+    <value>转诊</value>
+  </data>
+  <data name="Referrer" xml:space="preserve">
+    <value>转诊医生</value>
+  </data>
+  <data name="RelatedPersons" xml:space="preserve">
+    <value>相关人员</value>
+  </data>
+  <data name="Relations" xml:space="preserve">
+    <value>关联</value>
+  </data>
+  <data name="Relationship" xml:space="preserve">
+    <value>关系</value>
+  </data>
+  <data name="Report" xml:space="preserve">
+    <value>报告</value>
+  </data>
+  <data name="Request" xml:space="preserve">
+    <value>请求</value>
+  </data>
+  <data name="Requester" xml:space="preserve">
+    <value>开单者</value>
+  </data>
+  <data name="Requestor" xml:space="preserve">
+    <value>请求者</value>
+  </data>
+  <data name="Result" xml:space="preserve">
+    <value>结果</value>
+  </data>
+  <data name="Results" xml:space="preserve">
+    <value>结果</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>角色</value>
+  </data>
+  <data name="Route" xml:space="preserve">
+    <value>给药途径</value>
+  </data>
+  <data name="Scope" xml:space="preserve">
+    <value>范围</value>
+  </data>
+  <data name="Security" xml:space="preserve">
+    <value>保密级别</value>
+  </data>
+  <data name="Sender" xml:space="preserve">
+    <value>发送者</value>
+  </data>
+  <data name="Sent" xml:space="preserve">
+    <value>发送时间</value>
+  </data>
+  <data name="SerialNumber" xml:space="preserve">
+    <value>序列号</value>
+  </data>
+  <data name="Series" xml:space="preserve">
+    <value>序列</value>
+  </data>
+  <data name="SeriesAndImages" xml:space="preserve">
+    <value>{0} 个序列，{1} 幅图像</value>
+  </data>
+  <data name="SeriesCount" xml:space="preserve">
+    <value>{0} 个序列</value>
+  </data>
+  <data name="Service" xml:space="preserve">
+    <value>服务</value>
+  </data>
+  <data name="Serviced" xml:space="preserve">
+    <value>服务日期</value>
+  </data>
+  <data name="ServicePeriod" xml:space="preserve">
+    <value>服务期间</value>
+  </data>
+  <data name="ServiceProvider" xml:space="preserve">
+    <value>医疗机构</value>
+  </data>
+  <data name="ServiceType" xml:space="preserve">
+    <value>服务类型</value>
+  </data>
+  <data name="Signed" xml:space="preserve">
+    <value>签署日期</value>
+  </data>
+  <data name="Signers" xml:space="preserve">
+    <value>签署人</value>
+  </data>
+  <data name="Site" xml:space="preserve">
+    <value>部位</value>
+  </data>
+  <data name="Size" xml:space="preserve">
+    <value>规模</value>
+  </data>
+  <data name="SocialHistory" xml:space="preserve">
+    <value>社会史</value>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>来源</value>
+  </data>
+  <data name="Specialty" xml:space="preserve">
+    <value>专科</value>
+  </data>
+  <data name="Specimen" xml:space="preserve">
+    <value>标本</value>
+  </data>
+  <data name="Stage" xml:space="preserve">
+    <value>分期</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>开始</value>
+  </data>
+  <data name="Started" xml:space="preserve">
+    <value>开始时间</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>状态</value>
+  </data>
+  <data name="Subject" xml:space="preserve">
+    <value>对象</value>
+  </data>
+  <data name="Subscriber" xml:space="preserve">
+    <value>投保人</value>
+  </data>
+  <data name="SubscriberID" xml:space="preserve">
+    <value>保单号</value>
+  </data>
+  <data name="Subtype" xml:space="preserve">
+    <value>子类型</value>
+  </data>
+  <data name="Targets" xml:space="preserve">
+    <value>目标值</value>
+  </data>
+  <data name="Test" xml:space="preserve">
+    <value>检验项目</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>合计</value>
+  </data>
+  <data name="Totals" xml:space="preserve">
+    <value>合计</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>类型</value>
+  </data>
+  <data name="Use" xml:space="preserve">
+    <value>用途</value>
+  </data>
+  <data name="Visit" xml:space="preserve">
+    <value>就诊</value>
+  </data>
+  <data name="VitalSigns" xml:space="preserve">
+    <value>生命体征</value>
+  </data>
+  <data name="When" xml:space="preserve">
+    <value>时间</value>
+  </data>
+  <data name="Where" xml:space="preserve">
+    <value>地点</value>
+  </data>
+</root>

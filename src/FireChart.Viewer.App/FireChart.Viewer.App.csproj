@@ -2,14 +2,16 @@
 
   <!-- The application of the Viewer and the content of its Docker image: the sandbox at /, the frame /embed that another application embeds -->
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <!-- The language follows the browser or the configuration, not only the subset of cultures the browser language picks -->
     <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
-    <!-- The vendor library is the folder library/ of the application (public/library, Directory.Build.targets) -->
+    <!-- The vendor library is the folder library/ of the application (library, Directory.Build.targets) -->
     <FireChartLibrary>true</FireChartLibrary>
+    <!-- Development runs on the Gateway of Blazor (dotnet run, F5): an address of the application is answered with its page -->
+    <StaticWebAssetSpaFallbackEnabled>true</StaticWebAssetSpaFallbackEnabled>
   </PropertyGroup>
 
   <!-- No AOT (measured 2026-11-09, README.md, Performance). Not RunAOTCompilation=false: a value other than the runtime pack's forces a native relink -->
@@ -19,8 +21,14 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
-    <PackageReference Include="Radzen.Blazor" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Gateway" PrivateAssets="all" />
+    <PackageReference Include="BlazorBlueprint.Components" />
+    <PackageReference Include="Lombiq.Tailwind.Targets" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Inputs of the Tailwind build (Assets/Styles/site.css -> wwwroot/css/FireChart.Viewer.App.Tailwind.css): the utilities of the sandbox -->
+    <TailwindContentFiles Include="Pages/**/*.razor;App.razor;Assets/**/*.css;../Flox.Shared/Assets/Styles/*.css" />
   </ItemGroup>
 
   <ItemGroup>

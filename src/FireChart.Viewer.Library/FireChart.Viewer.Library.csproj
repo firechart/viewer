@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Description>The readers of the vendor library of FireChart Viewer: where a template, a locale, a search form, a summary form, the fx-* style kit and the samples are, and how a client and a server read them. The files themselves are not here: they are the package public/library, published by an application as its folder library/.</Description>
-    <PackageTags>fhir;hl7;liquid;templates;daisyui;healthcare;viewer</PackageTags>
+    <Description>The readers of the vendor library of FireChart Viewer: where a component, a search form, a summary form, the fx-* style kit and the samples are, and how a client and a server read them. The files themselves are not here: they are the package library, published by an application as its folder library/.</Description>
+    <PackageTags>fhir;hl7;components;healthcare;viewer</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
@@ -23,8 +23,6 @@
 
   <ItemGroup>
     <PackageReference Include="Hl7.Fhir.R4" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
 
 </Project>

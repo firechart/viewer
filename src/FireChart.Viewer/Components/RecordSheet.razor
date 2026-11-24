@@ -11,10 +11,8 @@
         <IconResource ResourceType=@Route.ResourceType Autocolor/>
         <span class="grow truncate font-medium">@Route.ResourceType</span>
         <SectionOutlet SectionName=@CommandsSection/>
-        <RadzenButton Icon="open_in_full" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" title=@Strings.Caption_OpenAsPage
-                      aria-label=@Strings.Caption_OpenAsPage Click=@OnOpenPage/>
-        <RadzenButton Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" title=@FloxStrings.Caption_Close
-                      aria-label=@FloxStrings.Caption_Close Click=@OnClose/>
+        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Strings.Caption_OpenAsPage AriaLabel=@Strings.Caption_OpenAsPage OnClick=@OnOpenPage><FloxIcon Icon="open_in_full"/></Button>
+        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@FloxStrings.Caption_Close AriaLabel=@FloxStrings.Caption_Close OnClick=@OnClose><FloxIcon Icon="close"/></Button>
     </div>
     <div class="grow overflow-y-auto overscroll-contain px-3 pb-3">
         <ResourceDetailView @key=@Route.Location ResourceType=@(Route.ResourceType!) ResourceId=@(Route.Id!) InSheet/>

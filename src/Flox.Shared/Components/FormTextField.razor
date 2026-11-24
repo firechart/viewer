@@ -1,30 +1,39 @@
+@using BlazorBlueprint.Components
 @using System.Linq.Expressions
 @implements IDisposable
 
 @* A text field of a form with its validation: the label (a mark when required), the box and the messages below it. The messages are in the
    box's aria-describedby and aria-invalid is set while the field is invalid; the field is validated when it is left, then on every key while it
    stays invalid (no "invalid" after the first letter). In a FormFieldFocus the first invalid field takes the focus after a failed submit *@
-<RadzenFormField Text=@Text TextTemplate=@(Required && !ReadOnly ? RequiredLabel : null) Variant="Radzen.Variant.Text" class="rz-w-100">
+<FormField Text=@Text For=@InputId Required=@(Required && !ReadOnly) MessagesId=@MessagesId Invalid=@Invalid>
+    <Messages><ValidationMessage For=@ValueExpression/></Messages>
     <ChildContent>
-        <RadzenTextBox @ref=_box
-                       ReadOnly=@ReadOnly
-                       Value=@Value
-                       ValueChanged=@ValueChanged
-                       ValueExpression=@ValueExpression
-                       Immediate=@Invalid
-                       Name=@Name
-                       @attributes=@InputAttributes()/>
+        @* The suggestions are a datalist of the browser: any other text is still accepted *@
+        <BbInput @ref=_box
+                 Id=@InputId
+                 Name=@Name
+                 Value=@Value
+                 ValueChanged=@ValueChanged
+                 ValueExpression=@ValueExpression
+                 UpdateTiming=@(Invalid ? UpdateTiming.Immediate : UpdateTiming.OnChange)
+                 readonly=@ReadOnly
+                 list=@(Suggestions is not null && !ReadOnly ? ListId : null)
+                 @attributes=@InputAttributes()/>
+        @if (Suggestions is not null && !ReadOnly)
+        {
+            <datalist id=@ListId>
+                @foreach (var suggestion in Suggestions)
+                {
+                    <option value=@suggestion></option>
+                }
+            </datalist>
+        }
     </ChildContent>
-    <Helper>
-        <div id=@MessagesId>
-            <ValidationMessage For=@ValueExpression/>
-        </div>
-    </Helper>
-</RadzenFormField>
+</FormField>
 
 @code {
 
-    private RadzenTextBox? _box;
+    private BbInput? _box;
     private FieldIdentifier _field;
     private EditContext? _subscribed;
     private FormFieldFocus? _registeredIn;
@@ -84,11 +93,19 @@
     [Parameter]
     public FormTextKind Kind { get; set; } = FormTextKind.Text;
 
-    private string MessagesId => $"{Name ?? _field.FieldName}-messages";
+    /// <summary>
+    /// Values the field offers when it takes the focus and as the person types (an autocomplete); any other text is still accepted.
+    /// </summary>
+    [Parameter]
+    public IEnumerable<string>? Suggestions { get; set; }
+
+    private string MessagesId => $"{InputId}-messages";
+
+    private string InputId => Name ?? _field.FieldName;
+
+    private string ListId => $"{InputId}-suggestions";
 
     private bool Invalid => FieldAria.IsInvalid(EditContext, _field);
-
-    private RenderFragment RequiredLabel => @<text>@Text<span aria-hidden="true" class="rz-color-danger"> *</span></text>;
 
     protected override void OnParametersSet()
     {
@@ -135,7 +152,7 @@
 
     private ValueTask FocusAsync()
     {
-        return _box is null ? ValueTask.CompletedTask : _box.Element.FocusAsync();
+        return _box is null ? ValueTask.CompletedTask : _box.FocusAsync();
     }
 
     private void OnValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)

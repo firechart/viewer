@@ -1,0 +1,10 @@
+<!-- A contract in a list: its title, when it was issued (else when it applies); its status at the end -->
+<Component name="Contract.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.title.exists(), %record.title, iif(%record.type.exists(), %record.type, %record.id))}}" subtitle="{{iif(%record.issued.exists(), %record.issued, %record.applies)}}">
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

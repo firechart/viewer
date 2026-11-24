@@ -3,11 +3,10 @@ FONTS
 
 Keep this sheet free of @media rules. When a viewport change flips a media rule of a sheet, the browser
 registers that sheet's font faces again and the glyphs are missing for a moment (icons vanish, text falls
-back). The faces therefore live here and not in Radzen's theme or in site.css, which are full of
-media rules; Radzen's own "Material Symbols" face is replaced by "Flox Symbols" in the theme variables.
+back). The faces therefore live here and not in site.css, which is full of media rules.
 **********************************************************/
 
-/* Radzen's Material Symbols with the weight fixed at 400 and the axis FILL kept (filled icons): 0.4 MB instead of 1.07 MB, every icon stays
+/* Google's Material Symbols Outlined with the weight fixed at 400 and the axis FILL kept (filled icons): 0.4 MB instead of 1.07 MB, every icon stays
    (fonts/FloxSymbols.woff2, written by .claude/skills/package-upgrade/icon_font.py); font-display: block keeps a not yet applied icon invisible */
 @font-face {
     font-family: "Flox Symbols";
@@ -25,27 +24,56 @@ media rules; Radzen's own "Material Symbols" face is replaced by "Flox Symbols" 
     size-adjust: 0.01%;
 }
 
-@font-face {
-    font-family: "Inter";
-    font-style: normal;
-    font-weight: 100 900;
-    font-display: swap;
-    src: url("../Radzen.Blazor/fonts/InterVariable.woff2") format("woff2");
-}
-
 /**********************************************************
 GENERIC STYLES
 **********************************************************/
 
 body, html, #app {
-    font-family: var(--rz-text-font-family, ui-sans-serif, system-ui, sans-serif);
+    font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
 }
 
-/* An installed app: no pull-to-refresh, it reloads the whole Blazor app */
-@media (display-mode: standalone) {
-    html, body {
-        overscroll-behavior-y: none;
-    }
+/* No pull-to-refresh of the browser, in a tab and installed: it reloads the whole Blazor app; the page's own pull (PullRefreshHost) refreshes its lists */
+html, body {
+    overscroll-behavior-y: none;
+}
+
+/* The status bar: the installed application on iOS starts below it (status-bar-style default). iOS 26 blurs the top of an installed web app
+   unless an opaque sticky or fixed full-width box is at the top edge: the app bar. The top inset is left for an icon installed with the old
+   black-translucent; the side insets are a landscape notch. The insets are 0 elsewhere */
+body {
+    padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+}
+
+/* An icon of the font (FloxIcon): its name is a ligature of Flox Symbols, 1.25rem unless sized */
+.flox-icon {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 1em;
+    height: 1em;
+    overflow: hidden;
+    font-family: "Flox Symbols", "Flox Icon Fallback";
+    font-size: 1.25rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    font-feature-settings: "liga";
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+}
+
+/* The height of the app bar and the padding of the page around its content */
+:root {
+    --flox-header-height: 3.5rem;
+    --flox-body-padding: 1rem;
+}
+
+#main-layout {
+    padding-top: env(safe-area-inset-top);
 }
 
 .dialog-blurry-bg {

@@ -116,6 +116,12 @@ public sealed class SettingFieldDescriptor
         }
     }
 
+    /// <summary>Whether the setting is shown with this configuration: the key of <see cref="SettingAttribute.ShownWhen"/>, when there is one, is <c>true</c>.</summary>
+    public bool IsShownWith(Microsoft.Extensions.Configuration.IConfiguration? configuration)
+    {
+        return _setting?.ShownWhen is not { } key || (bool.TryParse(configuration?[key], out var shown) && shown);
+    }
+
     /// <summary>Lists the values the user can choose from: those of the options source, or the members of an enum.</summary>
     /// <returns>The options; empty when there are none.</returns>
     public IReadOnlyList<SettingOption> GetOptions()

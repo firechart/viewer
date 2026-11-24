@@ -1,0 +1,272 @@
+@using System.Globalization
+@using System.Text.RegularExpressions
+@using Microsoft.Extensions.DependencyInjection
+@using FireChart.Viewer.Core.Fhir
+@using FireChart.Viewer.Core.Search
+@implements IDisposable
+@inject IServiceProvider Services
+@inject IFhirServerReader Reader
+@inject IReleaseModels Models
+@inject IServerResourceTypeProvider Types
+@inject Flox.Shared.Components.FloxDialogService Dialogs
+
+@* A reference field: the record it holds shown as a line of text, the records opened lately and the bookmarks of its type offered at once, a search of
+   the type as the person types, and Find… for the list of the type with its own search form. In that list (Nested) a reference is a plain text box *@
+<div class="flex items-end gap-2">
+    @if (_targets.Count > 1)
+    {
+        <FormField Text=@FloxStrings.Caption_Type Class="w-36 shrink-0">
+            <BbSelect TValue="string" Options=@_targets.Select(SelectOption.FromValue) Value=@_target ValueChanged=@(target => OnTargetChanged(target!)) AriaLabel=@FloxStrings.Caption_Type/>
+        </FormField>
+    }
+    <FormField Text=@Label Class="min-w-0 flex-1">
+        <BbCombobox TValue="string" Options=@ShownOptions SearchQueryChanged=@FindAsync Placeholder=@Placeholder SearchPlaceholder=@Label MatchTriggerWidth="true"
+                    Value=@Value.Text ValueChanged=@OnChosen AriaLabel=@Label Class="w-full"
+                    TriggerAttributes=@(new Dictionary<string, object> { ["data-reference-field"] = Field.QueryName })/>
+    </FormField>
+    @if (Session is not null && _target is not null)
+    {
+        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Strings.Caption_FindRecord AriaLabel=@Strings.Caption_FindRecord OnClick=@PickAsync data-reference-find=@Field.QueryName><FloxIcon Icon="manage_search"/></Button>
+    }
+</div>
+
+@code {
+
+    // A record in the list: its reference (Patient/123), its line of text; Recent: offered because it was opened in this session or bookmarked
+    private sealed record RecordOption(string Reference, string Caption, bool Recent = false);
+
+    private static readonly Regex s_reference = new(@"^[A-Z][A-Za-z]{0,63}/[A-Za-z0-9\-.]{1,64}$", RegexOptions.CultureInvariant);
+
+    private static readonly Regex s_id = new(@"^[A-Za-z0-9\-.]{1,64}$", RegexOptions.CultureInvariant);
+
+    private readonly Dictionary<string, RecordOption> _known = new(StringComparer.Ordinal);
+    private IReadOnlyList<RecordOption> _found = [];
+    private IReadOnlyList<RecordOption> _suggested = [];
+    private IReadOnlyList<string> _targets = [];
+    private string? _target;
+    private string? _release;
+    private CancellationTokenSource? _typing;
+    private readonly CancellationTokenSource _cancel = new();
+    private readonly CancellationToken _token;
+
+    // The token is taken once: the source is disposed with the component, and a load awaited since may still ask for it
+    public ReferenceFieldEditor()
+    {
+        _token = _cancel.Token;
+    }
+
+    [Parameter, EditorRequired]
+    public SearchFormField Field { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public SearchFieldValue Value { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public IViewerServer Server { get; set; } = null!;
+
+    // The session of the list: the records opened in it, the bookmarks, the list of a type to choose from; none: the search as the person types only
+    [Parameter]
+    public ViewerSession? Session { get; set; }
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    // The record held first, then what the search found, else what is offered at once
+    private IEnumerable<RecordOption> Shown =>
+        (Value.Text is { Length: > 0 } held ? [_known.GetValueOrDefault(held) ?? new RecordOption(held, held)] : Array.Empty<RecordOption>())
+        .Concat(_found.Count > 0 ? _found : _suggested)
+        .DistinctBy(option => option.Reference);
+
+    protected override async Task OnInitializedAsync()
+    {
+        _targets = Field.Lookup?.TargetTypes is { Count: > 0 } targets ? targets : [];
+        // The type of the record held, else a patient where the field may hold one, else the first type
+        _target = Value.Text is { } held && s_reference.IsMatch(held) && _targets.Contains(held.Split('/')[0])
+            ? held.Split('/')[0]
+            : _targets.Contains("Patient") ? "Patient" : _targets.FirstOrDefault();
+        try
+        {
+            _release = (await Types.GetAsync(Server, cancellationToken: _token)).Release;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            _release = null;
+        }
+
+        await SuggestAsync();
+        if (Value.Text is { Length: > 0 } text && !_known.ContainsKey(text))
+        {
+            // A reference, or the id alone of a record of the one type (patient=123)
+            var reference = s_reference.IsMatch(text) ? text : _targets.Count == 1 && s_id.IsMatch(text) ? $"{_targets[0]}/{text}" : null;
+            if (reference is not null)
+            {
+                await CaptionAsync([reference]);
+                _known[text] = _known[reference] with { Reference = text };
+            }
+        }
+    }
+
+    private async Task OnTargetChanged(string target)
+    {
+        _target = target;
+        _found = [];
+        await SuggestAsync();
+    }
+
+    private void OnChosen(string? reference)
+    {
+        Value.Text = reference;
+    }
+
+    // The records of the type opened in this session, then its bookmarks on this server, at most 8
+    private async Task SuggestAsync()
+    {
+        if (_target is null || Session is null)
+        {
+            _suggested = [];
+            return;
+        }
+
+        var target = _target;
+        var recent = Session.RecentRecords.Where(reference => reference.StartsWith(target + "/", StringComparison.Ordinal)).Take(8).ToList();
+        recent.AddRange((await BookmarkedAsync(target)).Where(reference => !recent.Contains(reference)).Take(8 - recent.Count));
+        await CaptionAsync(recent);
+        _suggested = [.. recent.Select(reference => _known[reference] with { Recent = true })];
+    }
+
+    // The bookmarked records of the type on this server; the bookmarks of the device that do not answer in a moment are left out
+    private async Task<IReadOnlyList<string>> BookmarkedAsync(string type)
+    {
+        if (ViewerBookmarks.Of(Services) is not { } bookmarks)
+        {
+            return [];
+        }
+
+        try
+        {
+            var list = await bookmarks.ListAsync().WaitAsync(TimeSpan.FromSeconds(2), _token);
+            return [.. list.Where(bookmark => ViewerBookmarks.IsOf(bookmark, Server))
+                           .Select(bookmark => bookmark.Location is { } location && ViewerRoutes.Parse(location) is { ResourceType: { } t, Id: { } id } && t == type
+                                       ? $"{t}/{id}"
+                                       : null)
+                           .OfType<string>()];
+        }
+        catch (Exception ex) when (ex is TimeoutException or OperationCanceledException or InvalidOperationException)
+        {
+            return [];
+        }
+    }
+
+    // The line of text of each record, read from the server; one it cannot read shows its reference
+    private async Task CaptionAsync(IReadOnlyList<string> references)
+    {
+        var missing = references.Where(reference => !_known.ContainsKey(reference)).ToList();
+        var read = await Task.WhenAll(missing.Select(async reference =>
+        {
+            var parts = reference.Split('/');
+            try
+            {
+                return await OptionOfAsync(await Reader.ReadAsync(Server, parts[0], parts[1], _token), reference);
+            }
+            catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or InvalidOperationException)
+            {
+                return new RecordOption(reference, reference);
+            }
+        }));
+        foreach (var option in read)
+        {
+            _known[option.Reference] = option;
+        }
+    }
+
+    private async Task<RecordOption> OptionOfAsync(string json, string reference)
+    {
+        var model = await Models.GetAsync(_release, _token);
+        var text = FireChart.Viewer.Core.Reports.ReportText.TitleOf(FireChart.Viewer.Core.Reports.ReportExpressions.Parse(json, model), CultureInfo.CurrentCulture);
+        return new RecordOption(reference, string.IsNullOrWhiteSpace(text) ? reference : text);
+    }
+
+    // What the person typed: a search of the type by the parameter of the lookup, ten records; a reference typed as it is (Patient/123) is offered too
+    // The records offered, those opened lately or bookmarked marked as such
+    private IEnumerable<SelectOption<string>> ShownOptions =>
+        Shown.Select(option => new SelectOption<string>(option.Reference, option.Recent ? $"{option.Caption} · {Strings.Caption_RecentRecords}" : option.Caption));
+
+    private async Task FindAsync(string? query)
+    {
+        _typing?.Cancel();
+        _typing?.Dispose();
+        var text = query?.Trim() ?? string.Empty;
+        if (_target is null || text.Length < Math.Max(1, Field.Lookup?.MinChars ?? 2))
+        {
+            _found = [];
+            return;
+        }
+
+        var typing = _typing = CancellationTokenSource.CreateLinkedTokenSource(_token);
+        var typed = s_reference.IsMatch(text) ? new RecordOption(text, text) : null;
+        try
+        {
+            var search = FhirSearchState.Parse($"{Uri.EscapeDataString(LookupParameter())}={Uri.EscapeDataString(SearchFhirFormat.Escape(text))}&{FhirSearchState.CountParameter}=10");
+            var page = await Reader.SearchAsync(Server, _target, search, cancellationToken: typing.Token);
+            var options = new List<RecordOption>();
+            foreach (var item in page.Items.Where(item => item.Json is not null))
+            {
+                var option = await OptionOfAsync(item.Json!, $"{item.ResourceType}/{item.Id}");
+                _known[option.Reference] = option;
+                options.Add(option);
+            }
+
+            if (!typing.IsCancellationRequested)
+            {
+                _found = typed is null ? options : [typed, .. options];
+            }
+        }
+        catch (OperationCanceledException) when (typing.IsCancellationRequested)
+        {
+            // a newer text was typed
+        }
+        catch (HttpRequestException)
+        {
+            _found = typed is null ? [] : [typed];
+        }
+    }
+
+    // The parameter of the target the lookup searches by: the one of the form, else name, title or identifier where the type has it, else _id
+    private string LookupParameter()
+    {
+        if (Field.Lookup?.LookupParameter is { Length: > 0 } given)
+        {
+            return given;
+        }
+
+        var metadata = FireChart.Viewer.Core.Fhir.Metadata.FhirMetadata.Of(FireChart.Viewer.Core.Forms.SearchFormGenerator.ReleaseOf(_release));
+        return new[] { "name", "title", "identifier" }.FirstOrDefault(code => metadata?.SearchParameterOf(_target!, code) is not null) ?? "_id";
+    }
+
+    // The list of the type with its own search form, over the form: a record chosen there comes back to the field
+    private async Task PickAsync()
+    {
+        if (Session is null || _target is null)
+        {
+            return;
+        }
+
+        if (await ReferencePicker.ShowAsync(Dialogs, Session, _target) is { } chosen)
+        {
+            _known[chosen.Reference] = new RecordOption(chosen.Reference, chosen.Caption);
+            Value.Text = chosen.Reference;
+        }
+    }
+
+    public void Dispose()
+    {
+        _typing?.Cancel();
+        _typing?.Dispose();
+        _cancel.Cancel();
+        _cancel.Dispose();
+    }
+
+}

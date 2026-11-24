@@ -1,37 +1,36 @@
+@using BlazorBlueprint.Components
 @using System.Globalization
 @implements IDisposable
 @inject IFloxRuntime Runtime
 
-<Center Gap="var(--gap-lg)" Class="rz-text-align-center">
-    <FloxIcon Icon="cloud_off" Color="var(--rz-text-disabled-color)" Size="4rem"/>
-    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1" class="rz-m-0">@Strings.Connection_Title</RadzenText>
-    <RadzenText TextStyle="TextStyle.Body1" class="rz-m-0 max-w-md">@Strings.Connection_Description</RadzenText>
-
-    @if (_isRetrying)
-    {
-        <CircularProgress/>
-    }
-    else
-    {
-        <RadzenText TextStyle="TextStyle.Caption" class="rz-m-0">@string.Format(CultureInfo.CurrentCulture, Strings.Connection_RetryIn, _secondsLeft)</RadzenText>
-    }
-
-    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Primary" Text=@Strings.Caption_Retry Disabled=@_isRetrying Click="@RetryAsync"/>
+<Center>
+    <BbEmpty Title=@Strings.Connection_Title Description=@Strings.Connection_Description Size="EmptySize.Large">
+        <Icon><FloxIcon Icon="cloud_off" Size="3rem"/></Icon>
+        <ChildContent>
+            <div class="flex flex-col items-center gap-3">
+                @if (_isRetrying)
+                {
+                    <CircularProgress/>
+                }
+                else
+                {
+                    <span class="text-xs text-muted">@string.Format(CultureInfo.CurrentCulture, Strings.Connection_RetryIn, _secondsLeft)</span>
+                }
+                <Button Disabled=@_isRetrying OnClick="@RetryAsync">@Strings.Caption_Retry</Button>
+            </div>
+        </ChildContent>
+    </BbEmpty>
 
     @if (Exception is not null)
     {
-        <RadzenPanel AllowCollapse="true" Collapsed="true" class="rz-w-100 max-w-2xl rz-text-align-left">
-            <HeaderTemplate>
-                <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0">@Strings.Connection_Details</RadzenText>
-            </HeaderTemplate>
-            <ChildContent>
-                <RadzenText TextStyle="TextStyle.Body2">@Exception.Message</RadzenText>
-                @if (Runtime.IsDevelopment)
-                {
-                    <StackTraceView Trace=@Exception.StackTrace/>
-                }
-            </ChildContent>
-        </RadzenPanel>
+        <details class="w-full max-w-2xl rounded-lg border border-line p-3 text-start">
+            <summary class="cursor-pointer text-sm font-medium">@Strings.Connection_Details</summary>
+            <p class="m-0 mt-2 text-sm">@Exception.Message</p>
+            @if (Runtime.IsDevelopment)
+            {
+                <StackTraceView Trace=@Exception.StackTrace/>
+            }
+        </details>
     }
 </Center>
 
@@ -69,7 +68,10 @@
         _secondsLeft--;
         if (_secondsLeft <= 0)
         {
-            await RetryAsync();
+            // Outside an event the component draws only when told: the button shows the retry while it runs
+            var retry = RetryAsync();
+            StateHasChanged();
+            await retry;
         }
         else
         {
@@ -85,7 +87,6 @@
         }
 
         _isRetrying = true;
-        StateHasChanged();
         await OnRetry.InvokeAsync();
     }
 

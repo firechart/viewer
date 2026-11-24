@@ -1,9 +1,15 @@
+@using BlazorBlueprint.Components
+@using BlazorBlueprint.Primitives
 @using Flox.Shared.Errors
 @using Flox.Shared.Extensions
 @inherits LayoutComponentBase
 
 <FloxThemeHost Dark=@_isDarkMode/>
-<RadzenComponents/>
+@* The overlays of Blazor Blueprint (dialogs, popovers, menus), its programmatic dialogs and its toasts (the snackbar: bottom centre) *@
+<BbPortalHost/>
+<BbDialogProvider/>
+<BbToastProvider Position="ToastPosition.BottomCenter"/>
+<FloxDialogHost/>
 <ConnectivityMonitor/>
 <IdentityProviderMonitor/>
 
@@ -24,23 +30,25 @@
         {
             <Splash Message=@_progressMessage/>
         }
-        else if (NavigationManager.IsEmbedded())
-        {
-            <div id="embedded-layout" class="rz-p-2" @key=_cultureVersion>@Body</div>
-        }
         else
         {
             @* The first stop of the keyboard: past the app bar and the menu to the page *@
-            <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-[1100] focus:rounded-field focus:bg-surface focus:px-3 focus:py-2 focus:text-ink focus:shadow-lg"
+            <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-[1100] focus:rounded-md focus:bg-surface focus:px-3 focus:py-2 focus:text-ink focus:shadow-lg"
                @onclick=@SkipToContentAsync @onclick:preventDefault>@Strings.Caption_SkipToContent</a>
-            <RadzenLayout id="main-layout" @key=_cultureVersion>
+            @* The app bar across the whole width; under it the main menu at the side and the page next to it; the document scrolls *@
+            <BbSidebarProvider id="main-layout" @key=_cultureVersion CookieKey="@null" class="flex min-h-dvh w-full flex-col">
                 <AppBar/>
-                <RadzenBody>
-                    <main id="main" tabindex="-1" class="outline-none" @ref=_main>
-                        <PageWidth>@Body</PageWidth>
-                    </main>
-                </RadzenBody>
-            </RadzenLayout>
+                <div class="flex flex-1">
+                    <AppSidebar/>
+                    @* min-w-0: a flex item beside the sidebar, it would otherwise grow to its widest content (a line of code not wrapped) and scroll the page *@
+                    <BbSidebarInset Class="min-w-0">
+                        <main id="main" tabindex="-1" class="p-[var(--flox-body-padding)] outline-none" @ref=_main>
+                            <PullRefreshHost/>
+                            <PageWidth>@Body</PageWidth>
+                        </main>
+                    </BbSidebarInset>
+                </div>
+            </BbSidebarProvider>
 
         }
     </ChildContent>

@@ -1,0 +1,13 @@
+<!-- A naming system in a list: its name and first unique id; its kind and status at the end -->
+<Component name="NamingSystem.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.name.exists(), %record.name, iif(%record.title.exists(), %record.title, %record.id))}}" subtitle="{{%record.uniqueId.first().value}}">
+    <Trailing>
+      <If test="{{%record.kind.exists()}}">
+        <Badge text="{{%record.kind}}"/>
+      </If>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

@@ -1,0 +1,13 @@
+<!-- A care plan in a list: its title (else its category), its period; its intent unless a plan and its status at the end -->
+<Component name="CarePlan.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.title.exists(), %record.title, iif(%record.category.exists(), %record.category.first(), %record.id))}}" subtitle="{{%record.period}}" patient="{{%record.subject}}" encounter="{{%record.encounter}}">
+    <Trailing>
+      <If test="{{%record.intent.exists() and %record.intent != 'plan'}}">
+        <Badge text="{{%record.intent}}"/>
+      </If>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

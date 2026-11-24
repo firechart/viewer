@@ -1,6 +1,6 @@
 # FireChart.Viewer.App
 
-The application of FireChart Viewer: a Blazor WebAssembly application whose published files any web server can serve (the Docker image serves them with nginx). It shows one FHIR server, set in `viewer.json`.
+The application of FireChart Viewer: a Blazor WebAssembly application whose published files any web server can serve (the Docker image below). It shows one FHIR server, set in `viewer.json`.
 
 | Address | What it is |
 |---|---|
@@ -9,12 +9,12 @@ The application of FireChart Viewer: a Blazor WebAssembly application whose publ
 | `/smart/callback` | The way back of a SMART sign-in by redirect |
 | `/_content/FireChart.Viewer/smart-callback.html` | The way back of a SMART sign-in in a popup |
 
-It references the Viewer as projects and is in `FireChart.Viewer.slnx` (the solution of the public part) and in `FireChart.slnx`; it is the content of the Docker image `firechart-viewer` (`viewer.firechart.org`: the sandbox on).
+It references the Viewer as projects and is in `FireChart.Viewer.slnx`.
 
 ## Build
 
-From the folder of `FireChart.Viewer.slnx`: `dotnet run --project src/FireChart.Viewer.App` runs it with the development server,
-`docker compose up --build` builds the Docker image and runs it (below). The steps of a publish are in the `Dockerfile` there.
+From the folder of `FireChart.Viewer.slnx`: `dotnet run --project src/FireChart.Viewer.App` runs it with the development server; the Docker
+image is built from the `Dockerfile` of that folder (below).
 
 ## viewer.json
 
@@ -24,7 +24,8 @@ From the folder of `FireChart.Viewer.slnx`: `dotnet run --project src/FireChart.
   "smart": { "clientId": "viewer", "scopes": "launch/patient patient/*.rs openid fhirUser", "flow": "redirect" },
   "locale": "auto",
   "terminology": { "server": "https://tx.fhir.org/r4" },
-  "appearance": { "theme": "auto", "variables": { "colorPrimary": "#0a7f5a" } }
+  "appearance": { "theme": "auto", "variables": { "colorPrimary": "#0a7f5a" } },
+  "summary": { "pageSize": 100, "loadAll": true }
 }
 ```
 
@@ -33,36 +34,36 @@ Only `server.url` is required. `smart` is there when the server needs a sign-in 
 when wanted (`ru-RU`); `appearance.theme` is `light`, `dark` or `auto`. An unknown key, a missing one or a wrong value is shown in the page with
 its path (`'apperance' is not an option. Did you mean 'appearance'?`); the Viewer does not start with a wrong configuration.
 
+`summary` is how a patient summary loads. `summary.pageSize` is the page size of its searches whose summary form gives none (1 to 500,
+default 20; it is not `server.pageSize`, the page of a list). With `summary.loadAll` the summary loads every record of every section before it
+is shown, behind a panel of progress with Cancel (what has come is then shown, marked incomplete), so it does not move as the sections fill.
+
 ## Docker
 
-The image is nginx with the static files (not root, port 8080), built from the sources: `docker compose up --build` in the folder of
-`FireChart.Viewer.slnx`, or
+The image is nginx with the published static files, not root, port 8080: `ghcr.io/firechart/viewer:<version>` (`latest` is the newest
+release, `next` the newest pre-release), or your own build of these sources (`docker compose up --build` in the folder of
+`FireChart.Viewer.slnx`, or `docker build -t firechart-viewer:local .`):
 
 ```bash
-docker build -t firechart-viewer:local .
-docker run -d --name fhir-viewer -p 8080:8080 \
-  -v "$PWD/viewer.json:/usr/share/nginx/html/viewer.json:ro" \
-  -v "$PWD/host.json:/usr/share/nginx/html/host.json:ro" \
-  firechart-viewer:local
+docker run -d --name fhir-viewer -p 8080:8080   -v "$PWD/viewer.json:/usr/share/nginx/html/viewer.json:ro"   -v "$PWD/host.json:/usr/share/nginx/html/host.json:ro"   ghcr.io/firechart/viewer:<version>
 ```
 
 `viewer.json` is the configuration (read at every load of the page), `host.json` the origins that may drive the frame (below); without them
 the image has the files of the sources: the open SMART Health IT server, `'self'` only. `/` is the sandbox, `/embed` the frame.
 
-**Your own templates, forms and style.** The vendor library is the folder `/usr/share/nginx/html/library` of the image (the package
-`public/library` with its manifest `firechart.project.json`, which says its version). A project of the FireChart FHIR Designer mounted at
+**Your own components, forms and style.** The vendor library is the folder `/usr/share/nginx/html/library` of the image (the package
+`library` with its manifest `firechart.project.json`, which says its version). A project of the FireChart FHIR Designer mounted at
 `/usr/share/nginx/appearance` goes over it: a file the project has wins, the others stay the vendor's and follow the updates of the image.
-The project holds only the files it changes (in the same folders: `templates/resources/Patient@tile.liquid`, `summary-forms/Patient.json`,
+The project holds only the files it changes (in the same folders: `components/Patient.tile.xml`, `components/Patient.summary.xml`,
 `styles/...`) and its own `firechart.project.json`.
 
 ```bash
-docker run -d --name fhir-viewer -p 8080:8080 \
-  -v "$PWD/my-appearance:/usr/share/nginx/appearance:ro" \
-  firechart-viewer:local
+docker run -d --name fhir-viewer -p 8080:8080   -v "$PWD/my-appearance:/usr/share/nginx/appearance:ro"   ghcr.io/firechart/viewer:<version>
 ```
 
 Every file is revalidated (`no-cache`), so a changed file shows at the next load of the page without a restart. Nothing checks the project in the
-container: check it in the designer (FireChart: Check Project) before you mount it.
+container: check it in the designer (FireChart: Check Project) before you mount it. The image sends no CSP `frame-ancestors`: the proxy decides
+who may frame the Viewer.
 
 **HTTPS** comes from the reverse proxy in front of the container (nginx, Caddy, Traefik, an ingress): SMART and the browser need it. So do
 the headers the image does not send: CSP `frame-ancestors` (who may frame the Viewer; without it any page may), `Cache-Control`. The image sends
@@ -114,13 +115,6 @@ stops the build with an error). Measured on 2026-11-09 (.NET 10, nginx on the sa
 - **It defeats the lazy loading** of the SDKs of the other FHIR releases (STU3, R4B, R5, R6): their code is compiled into `dotnet.native.wasm`,
   which every visitor downloads.
 - **It did not work**: the AOT build stopped at the start of the runtime (`RuntimeError: null function`), with no warning of the build.
-
-**What the profile showed** (2026-11-09; `dotnet-trace` of the tiles on the desktop runtime, timings in the browser): a row cost 1.4 ms
-on the desktop and 16–70 ms in the browser, and three quarters of it was the garbage collector. Fixed: a row is parsed by AngleSharp once
-(the sanitized HTML and its text in one walk, the parser kept per thread), a single value no longer asks the FHIR model again whether it is
-a collection, and a resource is read from its JSON once (the pool of a page, its rows and the blocks of a summary share it). A row now costs
-0.85 ms on the desktop; in the browser the main thread of the Patient Summary is busy about a third less (2.4 s instead of 2.9 s with
-the 1 s of the start), the list of Observations 17 % less. What remains: Fluid itself and AngleSharp's document per fragment.
 
 ## License
 

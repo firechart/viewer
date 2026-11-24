@@ -14,7 +14,8 @@ public class ModalSheet : SheetBase
     /// <inheritdoc />
     protected override async Task ShowAsync()
     {
-        await Dialogs.OpenAsync<SheetHost>(TitleText, HostParameters, SheetOptions.Modal(MaxWidth, ShowCloseButton));
+        Shown = Dialogs.OpenAsync<SheetHost>(TitleText, HostParameters, SheetOptions.Modal(MaxWidth, ShowCloseButton));
+        await Shown;
     }
 
     /// <inheritdoc />

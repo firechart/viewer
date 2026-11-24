@@ -288,7 +288,7 @@ internal sealed class FileSqliteDatabase(string name, SqliteAccess access, Sqlit
 #pragma warning restore CA2100
         foreach (var (key, value) in parameters ?? new Dictionary<string, object?>())
         {
-            command.Parameters.AddWithValue(key, value ?? DBNull.Value);
+            command.Parameters.AddWithValue(key, SqliteValues.Normalize(value) ?? DBNull.Value);
         }
 
         return command;

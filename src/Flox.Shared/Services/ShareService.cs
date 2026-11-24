@@ -8,55 +8,69 @@ public enum ShareResult
     /// <summary>The text was passed to the sharing dialog.</summary>
     Shared,
 
-    /// <summary>The text was copied to the clipboard instead.</summary>
-    Copied,
-
-    /// <summary>The user dismissed the sharing dialog.</summary>
+    /// <summary>The user dismissed the sharing dialog, or another one is open.</summary>
     Cancelled,
 
-    /// <summary>Neither sharing nor copying is available.</summary>
+    /// <summary>The sharing dialog could not be opened (no click of the user, not allowed here).</summary>
+    Failed,
+
+    /// <summary>The browser or the device has no sharing dialog.</summary>
     Unsupported
 }
 
-/// <summary>Shares text through the sharing dialog of the browser or the device, or copies it where sharing is not available.</summary>
+/// <summary>Shares text through the sharing dialog of the browser or the device, and copies text to the clipboard.</summary>
 [FloxService]
 public sealed class ShareService
 (
     IJSRuntime js
 ) : IAsyncDisposable
 {
-    private IJSObjectReference? _module;
+    private Task<IJSObjectReference>? _module;
 
-    /// <summary>Shares the text under the title and reports what happened.</summary>
+    // One import for every caller, also those that come before it is done
+    private Task<IJSObjectReference> Module => _module ??= js.ImportModuleAsync("./_content/Flox.Shared/share.js").AsTask();
+
+    /// <summary>Loads the script ahead, so the sharing dialog opens within the click of the user; tells whether there is such a dialog.</summary>
+    public async Task<bool> PrepareAsync()
+    {
+        return await (await Module).InvokeAsync<bool>("canShare");
+    }
+
+    /// <summary>Shares the text under the title and reports what happened; call it from a click, after <see cref="PrepareAsync"/>.</summary>
     public async Task<ShareResult> ShareAsync(string title, string text)
     {
-        _module ??= await js.ImportModuleAsync("./_content/Flox.Shared/share.js");
-
-        var result = await _module.InvokeAsync<string>("share", title, text);
+        var result = await (await Module).InvokeAsync<string>("share", title, text);
 
         return result switch
         {
             "shared" => ShareResult.Shared,
-            "copied" => ShareResult.Copied,
             "cancelled" => ShareResult.Cancelled,
+            "failed" => ShareResult.Failed,
             var _ => ShareResult.Unsupported
         };
     }
 
-    /// <summary>Tells whether the browser or the device has a sharing dialog.</summary>
-    public async Task<bool> CanShareAsync()
+    /// <summary>Copies the text to the clipboard.</summary>
+    /// <returns>Whether the text was copied.</returns>
+    public async Task<bool> CopyAsync(string text)
     {
-        _module ??= await js.ImportModuleAsync("./_content/Flox.Shared/share.js");
+        ArgumentNullException.ThrowIfNull(text);
 
-        return await _module.InvokeAsync<bool>("canShare");
+        return await (await Module).InvokeAsync<bool>("copy", text);
     }
 
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
-        if (_module is not null)
+        if (_module is { IsCompletedSuccessfully: true })
         {
-            await _module.DisposeAsync();
+            try
+            {
+                await (await _module).DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
         }
     }
 }

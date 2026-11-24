@@ -1,0 +1,53 @@
+<!-- The page of an allergy: the substance, its onset, statuses and risk, then the details, the reactions and the notes -->
+<Component name="AllergyIntolerance.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{%record.code}}">
+    <Field label="{{%strings.Onset}}" value="{{%record.onset}}"/>
+    <Field label="{{%strings.Recorded}}" value="{{%record.recordedDate}}"/>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.clinicalStatus}}"/>
+      <Status value="{{%record.verificationStatus}}"/>
+      <If test="{{%record.criticality = 'high'}}">
+        <Badge text="{{%strings.HighRiskBadge}}" tone="danger"/>
+      </If>
+      <If test="{{%record.criticality.exists() and %record.criticality != 'high'}}">
+        <Badge text="{{%record.criticality}}"/>
+      </If>
+    </Field>
+  </Section>
+
+  <If test="{{%record.type.exists() or %record.category.exists() or %record.recorder.exists() or %record.asserter.exists() or %record.lastOccurrence.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Type}}" value="{{%record.type}}"/>
+      <Field label="{{%strings.Category}}">
+        <Value value="{{%record.category}}" separator=", "/>
+      </Field>
+      <Field label="{{%strings.RecordedBy}}">
+        <Link value="{{%record.recorder}}"/>
+      </Field>
+      <Field label="{{%strings.AssertedBy}}">
+        <Link value="{{%record.asserter}}"/>
+      </Field>
+      <Field label="{{%strings.LastOccurrence}}" value="{{%record.lastOccurrence}}"/>
+    </Section>
+  </If>
+
+  <If test="{{%record.reaction.exists()}}">
+    <Section title="{{%strings.Reactions}}">
+      <Repeat each="{{%record.reaction}}" as="reaction">
+        <Row main="{{%reaction.manifestation}}" meta="{{%reaction.severity}}">
+          <Value value="{{%reaction.substance}}"/>
+        </Row>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.note.exists()}}">
+    <Section title="{{%strings.Notes}}">
+      <Repeat each="{{%record.note}}" as="note">
+        <Row main="{{%note.text}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

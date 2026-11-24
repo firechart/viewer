@@ -12,4 +12,7 @@ public sealed class SettingAttribute : Attribute
 
     /// <summary>The step of a slider; 0 is the default of the control.</summary>
     public int Step { get; init; }
+
+    /// <summary>A key of the configuration that must be <c>true</c> for the setting to be shown (a feature the application may not have); always shown when null.</summary>
+    public string? ShownWhen { get; init; }
 }

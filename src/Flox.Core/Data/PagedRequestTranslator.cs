@@ -233,8 +233,8 @@ public static class PagedRequestTranslator
             return null;
         }
 
-        var sw = pattern.StartsWith('*');
-        var ew = pattern.EndsWith('*');
+        var sw = pattern.StartsWith('*', StringComparison.Ordinal);
+        var ew = pattern.EndsWith('*', StringComparison.Ordinal);
         var value = pattern.Trim('*')
                            .ToLower(CultureInfo.CurrentCulture);
         var method = (sw, ew) switch

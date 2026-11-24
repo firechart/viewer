@@ -37,7 +37,13 @@ configuration and the code to copy. Use your own instance for real data.
 
 ## Quick start
 
-With Docker (Compose v2); the image is built from these sources, the first build takes several minutes:
+With Docker, the published image (built by GitHub from this repository for every release, `linux/amd64` and `linux/arm64`):
+
+```bash
+docker run -d -p 8080:8080 ghcr.io/firechart/viewer
+```
+
+or from these sources with Compose v2 (the first build takes several minutes):
 
 ```bash
 git clone https://github.com/firechart/viewer.git
@@ -48,7 +54,7 @@ docker compose up --build
 Open <http://localhost:8080> for the sandbox and <http://localhost:8080/embed> for the frame itself (by default it shows the open SMART
 Health IT test server).
 
-Without Docker (the .NET 10 SDK):
+Without Docker (the .NET 11 SDK):
 
 ```bash
 dotnet run --project src/FireChart.Viewer.App
@@ -71,14 +77,15 @@ place where the Viewer is served): every address below (`/embed`, `/sdk/viewer.j
 
 ### 1. Serve the Viewer
 
-The image is nginx with the published static files, not root, port 8080. Two files configure it; mount your own versions:
+The image is nginx with the published static files, not root, port 8080: `ghcr.io/firechart/viewer:<version>` (`latest` is the newest
+release, `next` the newest pre-release), or your own build of these sources (`docker build -t firechart-viewer:local .`). Two files configure
+it; mount your own versions:
 
 ```bash
-docker build -t firechart-viewer:local .
 docker run -d --name fhir-viewer -p 8080:8080 \
   -v "$PWD/viewer.json:/usr/share/nginx/html/viewer.json:ro" \
   -v "$PWD/host.json:/usr/share/nginx/html/host.json:ro" \
-  firechart-viewer:local
+  ghcr.io/firechart/viewer:<version>
 ```
 
 or, with Compose, add to the service in `docker-compose.yml`:
@@ -302,7 +309,6 @@ SSR or with prerendering (it shows an error there): the data of a patient and th
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Radzen.Blazor" Version="12.2.0" />
   <ProjectReference Include="viewer/src/FireChart.Viewer/FireChart.Viewer.csproj" />
   <ProjectReference Include="viewer/src/FireChart.Viewer.Core/FireChart.Viewer.Core.csproj" />
   <ProjectReference Include="viewer/src/FireChart.Viewer.Library/FireChart.Viewer.Library.csproj" />
@@ -317,7 +323,7 @@ SSR or with prerendering (it shows an error there): the data of a patient and th
 
 **2. Services.** The Viewer is built on the client side of the Flox platform, set up by a bootstrapper. Copy into your project, from
 `src/FireChart.Viewer.App`: `ViewerAppBootstrapper.cs` (the Flox client without an application server: an anonymous user of your app, the
-Viewer's services), `VendorTemplateRenderers.cs` (the built-in templates), `wwwroot/appsettings.json` (the bootstrapper reads it at the
+Viewer's services), `wwwroot/appsettings.json` (the bootstrapper reads it at the
 start and stops without it: the levels of the log) and, if you lazy-load, `WasmReleaseAssemblyLoader.cs`. Then in `Program.cs`:
 
 ```csharp
@@ -339,17 +345,18 @@ In the copied bootstrapper, remove the two registrations that belong to the appl
 `Services.AddScoped<ViewerAppConfigLoader>()` (it reads `viewer.json`) and `Services.AddScoped<Sandbox.DemoPresets>()` (the sandbox), and
 rename the namespace.
 
-**3. Styles and Radzen.** The Viewer takes the look of the host. In `wwwroot/index.html`, in this order:
+**3. Styles.** The Viewer takes the look of the host. In `wwwroot/index.html`, in this order:
 
 ```html
 <link rel="stylesheet" href="_content/Flox.Shared/app.css" />
+<link rel="stylesheet" href="_content/Flox.Shared/theme.css" />
+<link rel="stylesheet" href="_content/BlazorBlueprint.Components/blazorblueprint.css" />
 <link rel="stylesheet" href="_content/Flox.Shared/css/Flox.Shared.Tailwind.css" />
 <link rel="stylesheet" href="_content/FireChart.Viewer/css/FireChart.Viewer.Tailwind.css" />
 <link rel="stylesheet" href="YourApp.styles.css" />
-<script src="_content/Radzen.Blazor/Radzen.Blazor.min.js"></script>
 ```
 
-and in `App.razor`, before the router: `<RadzenTheme Theme="standard"/>` and `<RadzenComponents/>`.
+and in `App.razor`, before the router, the hosts of Blazor Blueprint: `<BbPortalHost/>`, `<BbDialogProvider/>` and `<BbToastProvider/>`.
 
 **4. A page.** The host owns one catch-all route; the Viewer navigates below `RoutePrefix`, so links and the Back button work:
 
@@ -449,19 +456,28 @@ Every platform, the risks and a troubleshooting table: [src/FireChart.Viewer/REA
 
 ```bash
 dotnet build FireChart.Viewer.slnx
-dotnet test FireChart.Viewer.slnx
-docker compose up --build          # the image, as published
+dotnet test FireChart.Viewer.slnx --filter "TestCategory!=Browser"   # the browser tests need Chrome or Edge
+docker compose up --build                       # the image, built as GitHub builds it (Dockerfile, docker/nginx.conf)
+sh docker/smoke.sh firechart-viewer:local       # its smoke test
 ```
+
+GitHub builds and tests every push and pull request (`.github/workflows/build.yml`) and, for a release tag, builds the image, runs its smoke
+test and publishes it to `ghcr.io` with its provenance and SBOM (`.github/workflows/image.yml`).
 
 | Project | What it is |
 |---|---|
 | `src/FireChart.Viewer` | The Razor component `<FhirViewer>`, its pages, SMART, appearance ([README](src/FireChart.Viewer/README.md)) |
-| `src/FireChart.Viewer.Core` | The engine: FHIR client per release, Liquid (Fluid) rendering, summary forms, SMART authorizer ([README](src/FireChart.Viewer.Core/README.md)) |
-| `src/FireChart.Viewer.Library` | The built-in templates of the resources and the vendor summary forms ([README](src/FireChart.Viewer.Library/README.md)) |
+| `src/FireChart.Viewer.Core` | The engine: FHIR client per release, the components (parse, check, FHIRPath, data), summary forms, SMART authorizer ([README](src/FireChart.Viewer.Core/README.md)) |
+| `src/FireChart.Viewer.Library` | The readers of the vendor library `library/` (the components, the forms, the style) ([README](src/FireChart.Viewer.Library/README.md)) |
 | `src/FireChart.Viewer.App` | The application: sandbox, `/embed`, the JavaScript SDK in `wwwroot/sdk` ([README](src/FireChart.Viewer.App/README.md), [SDK](src/FireChart.Viewer.App/Sdk/README.md), [HOWTO](src/FireChart.Viewer.App/Sdk/HOWTO.md)) |
-| `src/Flox.Core`, `src/Flox.Shared`, `src/Flox.Resources`, `src/FireChart.Resources` | The client side of the Flox platform the Viewer is built on, and the texts |
-| `test/` | Unit tests of the Viewer and of the client Flox |
+| `src/FireChart.FhirMetadata` | The tool that writes the FHIR metadata of the core releases into `FireChart.Viewer.Core` (`dotnet run --project src/FireChart.FhirMetadata`) |
+| `src/Flox.Core`, `src/Flox.Shared`, `src/Flox.Sqlite`, `src/Flox.Licensing`, `src/Flox.Resources`, `src/FireChart.Resources` | The client side of the Flox platform the Viewer is built on, and the texts |
+| `src/Flox.Sqlite.Files` | SQLite of Flox over files for .NET (tests and tools; never in a browser) |
+| `test/` | Unit tests of the Viewer and of the client Flox; `test/Flox.Sqlite.BrowserTests` drives the SQLite of the browser in Chrome or Edge |
+| `library/` | The vendor library: the components, the forms, the locales, the styles and the samples, a project of the FireChart FHIR Designer |
 | `samples/` | An HTML page that uses the SDK |
+
+Every project is a folder of `src/` or `test/`; the build files of the root (`Directory.Build.props`, `Directory.Packages.props`) are shared by all.
 
 The application is not compiled with AOT on purpose (it doubles the download and wins nothing measurable): see the
 [performance notes](src/FireChart.Viewer.App/README.md#performance).

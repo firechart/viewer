@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Components;
 namespace FireChart.Viewer.App;
 
 // viewer.json of the application, the keys of the plan (section 4.4) that the frame understands so far: one server, its SMART client, the language, the
-// terminology server, the theme and the variables of the appearance. An unknown key is an error, not silence
+// terminology server, the theme and the variables of the appearance, how the summary loads. An unknown key is an error, not silence
 internal sealed record ViewerAppConfig
 {
     public required ServerConfig Server { get; init; }
@@ -22,6 +22,16 @@ internal sealed record ViewerAppConfig
     public TerminologyConfig? Terminology { get; init; }
 
     public AppearanceConfig? Appearance { get; init; }
+
+    public SummaryConfig? Summary { get; init; }
+}
+
+// How the summary loads: the page size of its searches, everything before it is shown
+internal sealed record SummaryConfig
+{
+    public int? PageSize { get; init; }
+
+    public bool? LoadAll { get; init; }
 }
 
 internal sealed record ServerConfig
@@ -112,6 +122,8 @@ internal sealed class ConfiguredServer(ServerConfig server, SmartConfig? smart, 
 internal sealed record ViewerAppSetup(IViewerServer? Server, SmartFlow SmartFlow, CultureInfo? Culture, string? TerminologyServer,
                                       ViewerAppearance? Appearance, IReadOnlyList<ViewerConfigError> Errors)
 {
+    public ViewerSummaryOptions Summary { get; init; } = ViewerSummaryOptions.Default;
+
     public static ViewerAppSetup Failed(params IReadOnlyList<ViewerConfigError> errors)
     {
         return new ViewerAppSetup(null, SmartFlow.Redirect, null, null, null, errors);
@@ -243,9 +255,18 @@ internal sealed class ViewerAppConfigLoader(IHttpClientFactory httpClientFactory
             };
         }
 
+        if (config.Summary?.PageSize is { } pageSize and (< ViewerSummaryOptions.MinPageSize or > ViewerSummaryOptions.MaxPageSize))
+        {
+            errors.Add(new ViewerConfigError("invalid_option", "summary.pageSize",
+                                             $"{pageSize} is not a page size: {ViewerSummaryOptions.MinPageSize} to {ViewerSummaryOptions.MaxPageSize}."));
+        }
+
         var server = errors.Count == 0 ? new ConfiguredServer(config.Server, config.Smart, release) : null;
         return new ViewerAppSetup(server, flow, culture, config.Terminology?.Server,
-                                  appearance ?? new ViewerAppearance { Theme = ViewerTheme.Auto }, errors);
+                                  appearance ?? new ViewerAppearance { Theme = ViewerTheme.Auto }, errors)
+        {
+            Summary = new ViewerSummaryOptions { PageSize = config.Summary?.PageSize, LoadAll = config.Summary?.LoadAll ?? false }
+        };
     }
 
     // A tag of a language the Viewer has texts for (ru, ru-RU, zh-Hans); the region stays for the formats of dates and numbers

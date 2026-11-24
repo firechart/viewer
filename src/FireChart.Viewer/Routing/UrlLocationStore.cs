@@ -144,7 +144,7 @@ public sealed class UrlLocationStore : IViewerLocationStore
     private static string Normalize(string? prefix)
     {
         var trimmed = (prefix ?? string.Empty).Trim().TrimStart('/');
-        return trimmed.Length == 0 || trimmed.EndsWith('/') ? trimmed : trimmed + "/";
+        return trimmed.Length == 0 || trimmed.EndsWith('/', StringComparison.Ordinal) ? trimmed : trimmed + "/";
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)

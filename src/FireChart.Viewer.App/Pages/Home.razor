@@ -1,3 +1,4 @@
+@using BlazorBlueprint.Components
 @page "/"
 @using System.Text.Json
 @using System.Text.Json.Nodes
@@ -10,146 +11,133 @@
    The page opens empty: the frame (a second .NET runtime) is created when a server is chosen *@
 <PageTitle>FireChart Viewer: sandbox</PageTitle>
 
-<div class="sandbox">
-    <RadzenRow Gap="1rem">
-        <RadzenColumn Size="12" SizeLG="4">
-            <RadzenStack Gap="0.75rem">
-                <RadzenText TextStyle="TextStyle.H5" class="m-0">FireChart Viewer</RadzenText>
-                <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Size="AlertSize.Small" AllowClose="false" data-sandbox="public-servers">
+<div class="p-4">
+    <div class="grid grid-cols-12 gap-4">
+        <div class="col-span-12 xl:col-span-4">
+            <div class="flex flex-col gap-3">
+                <h5 class="m-0 text-base font-semibold">FireChart Viewer</h5>
+                <Alert Kind="AlertKind.Info" data-sandbox="public-servers">
                     Public test servers with synthetic data. Do not upload real patient data to them.
-                </RadzenAlert>
+                </Alert>
 
-                <RadzenFormField Text="Server" Variant="Variant.Outlined">
-                    <RadzenDropDown TValue="string" Data=@_presets TextProperty="Name" ValueProperty="Id" Value=@_presetId
-                                    Placeholder="Select a server" AllowClear="true"
-                                    ValueChanged=@((string? id) => SelectPresetAsync(id)) data-sandbox="preset">
-                        <Template Context="item">
-                            @{ var preset = (DemoPreset)item; }
-                            <span class=@(Availability(preset) == PresetAvailability.Unavailable ? "sandbox-unavailable" : null)>
-                                @preset.Name
-                                @if (Availability(preset) == PresetAvailability.Unavailable)
-                                {
-                                    <span> (not reachable)</span>
-                                }
-                            </span>
-                        </Template>
-                    </RadzenDropDown>
-                </RadzenFormField>
+                <FormField Text="Server">
+                    <BbSelect TValue="string" Options=@PresetOptions Value=@_presetId Placeholder="Select a server" AriaLabel="Server"
+                              ValueChanged=@((string? id) => SelectPresetAsync(id)) data-sandbox="preset"/>
+                </FormField>
                 @if (Selected is { } selected)
                 {
-                    <RadzenText TextStyle="TextStyle.Body2" class="m-0">@selected.Description</RadzenText>
+                    <p class="m-0 text-sm">@selected.Description</p>
                 }
 
-                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.End">
-                    <RadzenFormField Text="Theme" Variant="Variant.Outlined">
-                        <RadzenSelectBar TValue="string" Value=@_theme ValueChanged=@((string theme) => SetThemeAsync(theme)) Size="ButtonSize.Small" data-sandbox="theme">
-                            <Items>
-                                <RadzenSelectBarItem Text="Light" Value="@("light")"/>
-                                <RadzenSelectBarItem Text="Dark" Value="@("dark")"/>
-                                <RadzenSelectBarItem Text="Auto" Value="@("auto")"/>
-                            </Items>
-                        </RadzenSelectBar>
-                    </RadzenFormField>
-                    <RadzenFormField Text="Style" Variant="Variant.Outlined">
-                        <RadzenSelectBar TValue="string" Value=@_style ValueChanged=@((string style) => SetStyleAsync(style)) Size="ButtonSize.Small" data-sandbox="style">
-                            <Items>
-                                <RadzenSelectBarItem Text="Vendor" Value="@("")"/>
-                                <RadzenSelectBarItem Text="Fluent" Value="@("fluent")"/>
-                                <RadzenSelectBarItem Text="Compact" Value="@("compact")"/>
-                            </Items>
-                        </RadzenSelectBar>
-                    </RadzenFormField>
-                    <RadzenFormField Text="Language" Variant="Variant.Outlined">
-                        <RadzenDropDown TValue="string" Data=@s_locales Value=@_locale ValueChanged=@((string locale) => SetLocaleAsync(locale)) data-sandbox="locale"/>
-                    </RadzenFormField>
+                <div class="flex items-end flex-wrap gap-3">
+                    <FormField Text="Theme" Class="w-auto">
+                        <BbToggleGroup TValue="string" Value=@_theme ValueChanged=@((string? theme) => SetThemeAsync(theme!)) Variant="ToggleVariant.Outline" Size="ToggleSize.Small"
+                                       Required="true" data-sandbox="theme">
+                            <BbToggleGroupItem TValue="string" Value=@("light")>Light</BbToggleGroupItem>
+                            <BbToggleGroupItem TValue="string" Value=@("dark")>Dark</BbToggleGroupItem>
+                            <BbToggleGroupItem TValue="string" Value=@("auto")>Auto</BbToggleGroupItem>
+                        </BbToggleGroup>
+                    </FormField>
+                    <FormField Text="Style" Class="w-auto">
+                        <BbToggleGroup TValue="string" Value=@_style ValueChanged=@((string? style) => SetStyleAsync(style ?? string.Empty)) Variant="ToggleVariant.Outline"
+                                       Size="ToggleSize.Small" Required="true" data-sandbox="style">
+                            <BbToggleGroupItem TValue="string" Value=@(string.Empty)>Vendor</BbToggleGroupItem>
+                            <BbToggleGroupItem TValue="string" Value=@("fluent")>Fluent</BbToggleGroupItem>
+                            <BbToggleGroupItem TValue="string" Value=@("compact")>Compact</BbToggleGroupItem>
+                        </BbToggleGroup>
+                    </FormField>
+                    <FormField Text="Language" Class="w-40">
+                        <BbSelect TValue="string" Options=@s_locales.Select(SelectOption.FromValue) Value=@_locale ValueChanged=@((string? locale) => SetLocaleAsync(locale!))
+                                  AriaLabel="Language" data-sandbox="locale"/>
+                    </FormField>
                     @if (Selected?.Patient is { } patient)
                     {
-                        <RadzenButton ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Icon="person" Text="Patient summary"
-                                      Click=@(() => NavigateAsync(new ViewerRoute(ViewerPage.Summary, "Patient", patient).Location)) data-sandbox="patient"/>
+                        <Button Variant="ButtonVariant.Outline" OnClick=@(() => NavigateAsync(new ViewerRoute(ViewerPage.Summary, "Patient", patient).Location)) data-sandbox="patient" IconName="person" Text="Patient summary"/>
                     }
-                </RadzenStack>
+                </div>
 
-                <RadzenFormField Text="Configuration (viewer.json)" Variant="Variant.Outlined">
-                    <RadzenTextArea @bind-Value=@_editor Rows="18" class="sandbox-editor" spellcheck="false" data-sandbox="editor"/>
-                </RadzenFormField>
-                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
-                    <RadzenButton ButtonStyle="ButtonStyle.Primary" Icon="restart_alt" Text="Apply (restart)" Click=@ApplyAsync data-sandbox="apply"/>
+                <FormField Text="Configuration (viewer.json)" For="sandbox-editor">
+                    <BbTextarea Id="sandbox-editor" @bind-Value=@_editor rows="18" spellcheck="false" Class="min-h-80 font-mono text-[0.8125rem]" data-sandbox="editor"/>
+                </FormField>
+                <div class="flex gap-2">
+                    <Button OnClick=@ApplyAsync data-sandbox="apply" IconName="restart_alt" Text="Apply (restart)"/>
                     @if (Selected is not null)
                     {
-                        <RadzenButton ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Text="Reset" Click=@(() => SelectPresetAsync(Selected.Id))/>
+                        <Button Variant="ButtonVariant.Outline" OnClick=@(() => SelectPresetAsync(Selected.Id))>Reset</Button>
                     }
-                </RadzenStack>
+                </div>
                 @if (_errors.Count > 0)
                 {
-                    <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Size="AlertSize.Small" AllowClose="false" data-sandbox="errors">
+                    <Alert Kind="AlertKind.Danger" data-sandbox="errors">
                         <ul class="m-0 ps-4">
                             @foreach (var error in _errors)
                             {
                                 <li><code>@error.Param</code> (@error.Code): @error.Message</li>
                             }
                         </ul>
-                    </RadzenAlert>
+                    </Alert>
                 }
-            </RadzenStack>
-        </RadzenColumn>
+            </div>
+        </div>
 
-        <RadzenColumn Size="12" SizeLG="8">
-            <RadzenStack Gap="0.75rem">
+        <div class="col-span-12 xl:col-span-8">
+            <div class="flex flex-col gap-3">
                 <div @ref=@_frameHost>
                     @if (_applied is not null)
                     {
-                        <iframe src="embed?host=parent" title="FireChart Viewer" class="sandbox-frame" data-sandbox="frame"></iframe>
+                        <iframe src="embed?host=parent" title="FireChart Viewer" class="h-[75vh] min-h-[480px] w-full rounded-lg border border-line bg-surface" data-sandbox="frame"></iframe>
                     }
                     else
                     {
-                        <div class="sandbox-frame sandbox-empty" data-sandbox="empty">
-                            <RadzenText TextStyle="TextStyle.Body1" class="m-0">Select a server, or write a configuration and apply it.</RadzenText>
+                        <div class="flex h-[75vh] min-h-[480px] w-full items-center justify-center rounded-lg border border-line bg-surface p-4 text-center text-muted" data-sandbox="empty">
+                            <p class="m-0 text-base">Select a server, or write a configuration and apply it.</p>
                         </div>
                     }
                 </div>
-                <RadzenTabs RenderMode="TabRenderMode.Client">
-                    <Tabs>
-                        <RadzenTabsItem Text=@($"Events ({_events.Count})")>
-                            <div class="sandbox-events" data-sandbox="events">
+                <BbTabs DefaultValue="events">
+                    <BbTabsList>
+                        <BbTabsTrigger Value="events">@($"Events ({_events.Count})")</BbTabsTrigger>
+                        <BbTabsTrigger Value="code">Code</BbTabsTrigger>
+                    </BbTabsList>
+                        <BbTabsContent Value="events">
+                            <div class="max-h-72 overflow-auto text-[0.8125rem]" data-sandbox="events">
                                 @if (_events.Count == 0)
                                 {
-                                    <RadzenText TextStyle="TextStyle.Body2">The messages between the sandbox and the frame appear here.</RadzenText>
+                                    <p class="m-0 text-sm">The messages between the sandbox and the frame appear here.</p>
                                 }
                                 @foreach (var entry in _events)
                                 {
-                                    <div class="sandbox-event">
-                                        <span class="sandbox-event-time">@entry.Time.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)</span>
+                                    <div class="flex items-baseline gap-2 border-b border-line py-0.5">
+                                        <span class="text-subtle">@entry.Time.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)</span>
                                         <span>@(entry.Sent ? "→" : "←")</span>
                                         <strong>@entry.Type</strong>
-                                        <code>@entry.Payload</code>
+                                        <code class="wrap-anywhere">@entry.Payload</code>
                                     </div>
                                 }
                             </div>
                             @if (_events.Count > 0)
                             {
-                                <RadzenButton ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Size="ButtonSize.Small" Text="Clear" Click=@(() => _events.Clear())/>
+                                <Button Variant="ButtonVariant.Outline" OnClick=@(() => _events.Clear())>Clear</Button>
                             }
-                        </RadzenTabsItem>
-                        <RadzenTabsItem Text="Code">
-                            <RadzenStack Gap="1rem" data-sandbox="code">
+                        </BbTabsContent>
+                        <BbTabsContent Value="code">
+                            <div class="flex flex-col gap-4" data-sandbox="code">
                                 @foreach (var snippet in _snippets)
                                 {
-                                    <RadzenStack Gap="0.25rem">
-                                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-                                            <RadzenText TextStyle="TextStyle.Subtitle2" class="m-0">@snippet.Title</RadzenText>
-                                            <RadzenButton ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Size="ButtonSize.Small" Icon="content_copy" Text="Copy"
-                                                          Click=@(() => CopyAsync(snippet.Code))/>
-                                        </RadzenStack>
-                                        <pre class="sandbox-code"><code>@snippet.Code</code></pre>
-                                    </RadzenStack>
+                                    <div class="flex flex-col gap-1">
+                                        <div class="flex items-center justify-between gap-4">
+                                            <h6 class="m-0 text-sm font-medium">@snippet.Title</h6>
+                                            <Button Variant="ButtonVariant.Outline" OnClick=@(() => CopyAsync(snippet.Code)) IconName="content_copy" Text="Copy"/>
+                                        </div>
+                                        <pre class="m-0 max-h-96 overflow-auto rounded-md bg-hover p-3 text-[0.8125rem]"><code>@snippet.Code</code></pre>
+                                    </div>
                                 }
-                            </RadzenStack>
-                        </RadzenTabsItem>
-                    </Tabs>
-                </RadzenTabs>
-            </RadzenStack>
-        </RadzenColumn>
-    </RadzenRow>
+                            </div>
+                        </BbTabsContent>
+                </BbTabs>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
@@ -176,6 +164,10 @@
     private DotNetObjectReference<Home>? _self;
 
     private DemoPreset? Selected => _presets.FirstOrDefault(p => p.Id == _presetId);
+
+    // The servers of the list; one that does not answer says so
+    private IEnumerable<SelectOption<string>> PresetOptions =>
+        _presets.Select(preset => new SelectOption<string>(preset.Id, Availability(preset) == PresetAvailability.Unavailable ? $"{preset.Name} (not reachable)" : preset.Name));
 
     protected override async Task OnInitializedAsync()
     {

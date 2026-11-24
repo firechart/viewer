@@ -7,6 +7,7 @@ public abstract partial class StatefulWidget<TState> : StatelessWidget, IDisposa
 {
     private bool _activated;
     private object? _activatedKey;
+    private IDisposable? _pullRefresh;
 
     /// <summary>
     /// The service provider the state is resolved from.
@@ -29,6 +30,8 @@ public abstract partial class StatefulWidget<TState> : StatelessWidget, IDisposa
 
             field = value;
             field.Changed += State_OnChanged;
+            _pullRefresh?.Dispose();
+            _pullRefresh = value.RefreshesOnPull ? StateServices?.GetService<PullRefreshTargets>()?.Add(value) : null;
         }
     } = null!;
 
@@ -112,6 +115,8 @@ public abstract partial class StatefulWidget<TState> : StatelessWidget, IDisposa
         if (disposing)
         {
             State?.Changed -= State_OnChanged;
+            _pullRefresh?.Dispose();
+            _pullRefresh = null;
         }
     }
 }

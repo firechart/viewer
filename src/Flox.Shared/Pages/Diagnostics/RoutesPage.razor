@@ -6,11 +6,11 @@
 
 @if (!State.Routes.Any())
 {
-    <RadzenText class="rz-m-4">No routes found. Make sure assemblies are registered via AddBlazorAssembly&lt;T&gt;().</RadzenText>
+    <p class="m-0 text-base m-4">No routes found. Make sure assemblies are registered via AddBlazorAssembly&lt;T&gt;().</p>
 }
 else
 {
-    <RadzenStack Gap="var(--gap-sm)" class="rz-p-3">
+    <div class="flex flex-col gap-2 p-3">
         <Search Value="@State.Filter"
                 ValueChanged="@(v =>
                               {
@@ -19,10 +19,10 @@ else
                               })"
                 Placeholder="Filter routes..."/>
 
-        <RadzenText TextStyle="TextStyle.Caption">
+        <span class="m-0 text-xs text-muted">
             @State.FilteredRoutes.Count() of @State.Routes.Count routes across @State.Routes.Select(r => r.Assembly).Distinct().Count() assemblies
-        </RadzenText>
-    </RadzenStack>
+        </span>
+    </div>
 
     <ListSection>
         @foreach (var route in State.FilteredRoutes)

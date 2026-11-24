@@ -7,7 +7,9 @@ namespace FireChart.Viewer.Pages;
 /// <param name="definition">The search of the form.</param>
 /// <param name="culture">The culture of the label of the order.</param>
 /// <param name="context">The record the summary grows from (<see cref="SummaryFormDefinition.Context"/>).</param>
-public sealed class SectionSearch(SummaryFormSearch definition, string culture, string context = SummaryContexts.Patient)
+/// <param name="pageSize">The size of a page when the form does not give one (<see cref="ViewerSummaryOptions.PageSize"/>); <see cref="DefaultPageSize"/> when
+/// <see langword="null"/>.</param>
+public sealed class SectionSearch(SummaryFormSearch definition, string culture, string context = SummaryContexts.Patient, int? pageSize = null)
 {
     /// <summary>The parameter that refers to the record of the summary (<c>patient</c>, <c>encounter</c>).</summary>
     public string Param { get; } = definition.ParamOf(context);
@@ -28,7 +30,7 @@ public sealed class SectionSearch(SummaryFormSearch definition, string culture, 
     public string SortedBy { get; } = definition.SortLabel.Resolve(culture);
 
     /// <summary>The size of a page.</summary>
-    public int PageSize { get; } = definition.PageSize ?? DefaultPageSize;
+    public int PageSize { get; } = definition.PageSize ?? pageSize ?? DefaultPageSize;
 
     /// <summary>False when the server did not know the order and the records came in whatever order it likes.</summary>
     public bool ServerSorted { get; set; } = true;
@@ -100,8 +102,9 @@ public sealed class SummarySection
     /// <param name="culture">The culture of the titles.</param>
     /// <param name="tileOptions">The options of its rows; the defaults when <see langword="null"/>.</param>
     /// <param name="context">The record the summary grows from (<see cref="SummaryFormDefinition.Context"/>).</param>
+    /// <param name="pageSize">The size of a page of a search whose form gives none; the default when <see langword="null"/>.</param>
     public SummarySection(SummaryFormSection definition, IEnumerable<SummaryFormSearch> searches, string culture, TileOptions? tileOptions = null,
-                          string context = SummaryContexts.Patient)
+                          string context = SummaryContexts.Patient, int? pageSize = null)
     {
         Code = definition.Code;
         CollapsedByDefault = definition.CollapsedByDefault;
@@ -112,7 +115,7 @@ public sealed class SummarySection
         OpenIn = definition.OpenIn;
         Component = SummaryComponents.IsKnown(definition.Component) ? definition.Component : SummaryComponents.Tiles;
         TileOptions = tileOptions ?? FireChart.Viewer.Core.TileOptions.Default;
-        Searches = [.. searches.Select(search => new SectionSearch(search, culture, context))];
+        Searches = [.. searches.Select(search => new SectionSearch(search, culture, context, pageSize))];
         var title = definition.Title.Resolve(culture);
         Title = string.IsNullOrWhiteSpace(title) ? (Searches.Count > 0 ? Searches[0].ResourceType : Code) : title;
     }
@@ -155,24 +158,6 @@ public sealed class SummarySection
         return RecordOpening.Resolve(OpenIn, resourceType) == RecordOpening.Sheet;
     }
 
-    /// <summary>The measures of a block of the component <c>observation-trends</c> (<see cref="ObservationTrends"/>); empty for another component.</summary>
-    public IReadOnlyList<TrendGroup> Trends { get; set; } = [];
-
-    /// <summary>The key of the measure whose chart is shown.</summary>
-    public string? SelectedTrend { get; set; }
-
-    /// <summary>The history of a measure (its records found by its code) by the key of the measure.</summary>
-    public Dictionary<string, IReadOnlyList<ResourceSummary>> TrendHistory { get; } = new(StringComparer.Ordinal);
-
-    /// <summary>The history of the chosen measure is being loaded.</summary>
-    public bool TrendLoading { get; set; }
-
-    /// <summary>The groups of a block of the component <c>lab-results</c> (<see cref="LabResults"/>); empty for another component.</summary>
-    public IReadOnlyList<LabGroup> LabGroups { get; set; } = [];
-
-    /// <summary>The cells of the rows of the table of <c>lab-results</c> by the key of the record (<see cref="KeyOf"/>).</summary>
-    public Dictionary<string, IReadOnlyDictionary<string, string>> Cells { get; } = [];
-
     /// <summary>The options of the rows of the block: its own, else the ones of the form.</summary>
     public TileOptions TileOptions { get; }
 
@@ -212,9 +197,6 @@ public sealed class SummarySection
     }
 
     private sealed record Ranked(ResourceSummary Item, DateTimeOffset? Moment, int Index);
-
-    /// <summary>The row of every record as the template of its tile makes it, by "Type/id".</summary>
-    public Dictionary<string, TileModel> Tiles { get; } = [];
 
     /// <summary>The key of a record in Tiles: Type/id.</summary>
     /// <param name="item">The record.</param>
@@ -292,8 +274,9 @@ public static class SummarySections
     /// <param name="form">The form.</param>
     /// <param name="declaredTypes">The types the server says it has; null when it does not say (every search is tried).</param>
     /// <param name="culture">The culture of the titles.</param>
+    /// <param name="pageSize">The size of a page of a search whose form gives none (<see cref="ViewerSummaryOptions.PageSize"/>).</param>
     /// <returns>The visible blocks that have a search.</returns>
-    public static IReadOnlyList<SummarySection> Build(SummaryFormDefinition form, IReadOnlyCollection<string>? declaredTypes, string culture)
+    public static IReadOnlyList<SummarySection> Build(SummaryFormDefinition form, IReadOnlyCollection<string>? declaredTypes, string culture, int? pageSize = null)
     {
         var result = new List<SummarySection>();
         foreach (var definition in form.Sections.Where(section => section.Visible))
@@ -301,7 +284,7 @@ public static class SummarySections
             var searches = definition.Searches.Where(search => !definition.HideIfUnsupported || declaredTypes is null || declaredTypes.Contains(search.ResourceType)).ToList();
             if (searches.Count > 0)
             {
-                result.Add(new SummarySection(definition, searches, culture, SummaryComponents.TileOptionsOf(form, definition), form.Context));
+                result.Add(new SummarySection(definition, searches, culture, SummaryComponents.TileOptionsOf(form, definition), form.Context, pageSize));
             }
         }
 

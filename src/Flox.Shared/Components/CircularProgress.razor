@@ -1,11 +1,11 @@
+@using BlazorBlueprint.Components
 @* An indeterminate circular indicator in the color of the text, for a load of unknown length *@
-<span class="circular-progress">
-    <RadzenProgressBarCircular ShowValue="false" Mode="Radzen.ProgressBarMode.Indeterminate" Size=@Size/>
-</span>
+<BbSpinner Size=@(Compact ? SpinnerSize.Small : SpinnerSize.Default) Class="text-muted"/>
 
 @code {
 
+    // Smaller, for a line of text or a button
     [Parameter]
-    public Radzen.ProgressBarCircularSize Size { get; set; } = Radzen.ProgressBarCircularSize.Small;
+    public bool Compact { get; set; }
 
 }

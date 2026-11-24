@@ -1,10 +1,12 @@
+@using BlazorBlueprint.Components
 @using System.Numerics
 @typeparam T where T : struct, INumber<T>
 
-<RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.End" Gap="var(--gap-lg)" Style=@Style class="fw-slider">
-    <RadzenText TextStyle="TextStyle.Body2">@_value</RadzenText>
-    <RadzenSlider TValue=@T Value=@_value ValueChanged=@OnValueChanged Min=@decimal.CreateChecked(Min) Max=@decimal.CreateChecked(Max) Step=@Step.ToString(null, System.Globalization.CultureInfo.InvariantCulture) Disabled=@Disabled HandleLabel=@Label class="min-w-32 flex-1"/>
-</RadzenStack>
+<div class="flex items-center gap-4" style=@Style>
+    <span class="min-w-8 text-sm tabular-nums">@_value</span>
+    <BbSlider Value=@double.CreateChecked(_value) ValueChanged=@OnValueChanged Min=@double.CreateChecked(Min) Max=@double.CreateChecked(Max) Step=@double.CreateChecked(Step)
+              Disabled=@Disabled aria-label=@Label Class="min-w-32 flex-1"/>
+</div>
 
 @code {
 
@@ -40,10 +42,10 @@
         _value = Value;
     }
 
-    private async Task OnValueChanged(T newValue)
+    private async Task OnValueChanged(double newValue)
     {
-        _value = newValue;
-        await ValueChanged.InvokeAsync(newValue);
+        _value = T.CreateChecked(Math.Round(newValue));
+        await ValueChanged.InvokeAsync(_value);
     }
 
 }

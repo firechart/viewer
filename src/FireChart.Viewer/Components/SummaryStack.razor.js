@@ -13,7 +13,7 @@ export function attach(scroller, dotnet, bottomGap, initialTop) {
         const height = Math.max(160, available - scroller.getBoundingClientRect().top - bottomGap);
         scroller.style.height = height + "px";
 
-        const page = scroller.parentElement.closest(".rz-body") ?? document.scrollingElement;
+        const page = document.scrollingElement;
         const over = page.scrollHeight - page.clientHeight;
         if (over > 0) {
             scroller.style.height = Math.max(160, height - over) + "px";

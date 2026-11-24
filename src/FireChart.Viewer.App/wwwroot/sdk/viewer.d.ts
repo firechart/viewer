@@ -45,6 +45,12 @@ export interface ViewerConfig {
         /** Properties of public selectors (.Banner, .Tile, .Badge--status, ...). */
         rules?: Record<string, Record<string, string>>;
     };
+    summary?: {
+        /** The page size (_count) of the searches of a summary whose form gives none: 1 to 500; default 20. */
+        pageSize?: number;
+        /** Load every record before the summary is shown, behind a panel of progress with Cancel; default false. */
+        loadAll?: boolean;
+    };
 }
 
 /** The options that change without a restart. */

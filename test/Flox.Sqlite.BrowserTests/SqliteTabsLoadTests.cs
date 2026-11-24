@@ -161,6 +161,108 @@ public sealed class SqliteTabsLoadTests
         Assert.That(names, Does.Not.Contain("gone.sqlite"));
     }
 
+    [Test]
+    public async Task ABaseBeingImported_IsThereForNobody_UntilItIsComplete()
+    {
+        const string Name = "held.sqlite";
+        var tabs = await OpenTabsAsync(2);
+        var address = new Uri(BrowserHarness.Address, "held.sqlite.gz").AbsoluteUri;
+        var started = BrowserHarness.HoldDownload();
+        var importing = tabs[0].EvaluateAsync<long>("([n, u]) => window.harness.importGzip(n, u)", new object[] { Name, address });
+        await started;
+        // The first half reaches the worker
+        await Task.Delay(300);
+
+        Assert.That(await tabs[1].EvaluateAsync<bool>("n => window.harness.exists(n)", Name), Is.False);
+        Assert.That(await tabs[1].EvaluateAsync<string[]>("() => window.harness.list()"), Does.Not.Contain(Name));
+        foreach (var call in new[] { "n => window.harness.remove(n)", "n => window.harness.open(n)", $"n => window.harness.importGzip(n, '{address}')" })
+        {
+            var refused = await Assert.ThrowsAsync<PlaywrightException>(() => tabs[1].EvaluateAsync(call, Name));
+            Assert.That(refused!.Message, Does.Contain("[5]"), call);
+        }
+
+        BrowserHarness.ReleaseDownload();
+        Assert.That(await importing, Is.EqualTo(512));
+        Assert.That(await tabs[1].EvaluateAsync<bool>("n => window.harness.exists(n)", Name), Is.True);
+        var handle = await tabs[1].EvaluateAsync<int>("n => window.harness.open(n, true)", Name);
+        var version = await tabs[1].EvaluateAsync<int>("async h => (await window.harness.query(h, 'PRAGMA user_version'))[0][0]", handle);
+        Assert.That(version, Is.EqualTo(BrowserHarness.HeldUserVersion), "the base came whole");
+    }
+
+    [Test]
+    public async Task AnImportCancelled_LeavesNothing_AndTheNameIsFreeAgain()
+    {
+        const string Name = "held.sqlite";
+        var tabs = await OpenTabsAsync(2);
+        var address = new Uri(BrowserHarness.Address, "held.sqlite.gz").AbsoluteUri;
+        var started = BrowserHarness.HoldDownload();
+        var importing = tabs[1].EvaluateAsync<long>("([n, u]) => window.harness.importGzip(n, u)", new object[] { Name, address });
+        await started;
+        await Task.Delay(300);
+
+        await tabs[1].EvaluateAsync("n => window.harness.cancelImport(n)", Name);
+        var cancelled = await Assert.ThrowsAsync<PlaywrightException>(() => importing);
+        Assert.That(cancelled!.Message, Does.Contain("[9]"));
+        Assert.That(await tabs[0].EvaluateAsync<bool>("n => window.harness.exists(n)", Name), Is.False);
+
+        started = BrowserHarness.HoldDownload();
+        importing = tabs[1].EvaluateAsync<long>("([n, u]) => window.harness.importGzip(n, u)", new object[] { Name, address });
+        await started;
+        BrowserHarness.ReleaseDownload();
+        Assert.That(await importing, Is.EqualTo(512));
+        Assert.That(await tabs[0].EvaluateAsync<bool>("n => window.harness.exists(n)", Name), Is.True);
+    }
+
+    [Test]
+    public async Task ThePool_GrowsWithItsBases()
+    {
+        var tabs = await OpenTabsAsync(1);
+        const string Fill = "async ([c, s]) => { for (let i = 0; i < c; i++) { const h = await window.harness.open(`many-${i}.sqlite`); " +
+                            "await window.harness.execute(h, s); await window.harness.writeOneByOne(h, i, 1); } return (await window.harness.list()).length; }";
+
+        var bases = await tabs[0].EvaluateAsync<int>(Fill, new object[] { 24, Schema });
+
+        Assert.That(bases, Is.EqualTo(24), "more bases than the 16 files the pool started with, each written with its journal");
+    }
+
+    [Test]
+    public async Task APage_HoldsOnePool()
+    {
+        var tabs = await OpenTabsAsync(1);
+
+        var refused = await Assert.ThrowsAsync<PlaywrightException>(() => tabs[0].EvaluateAsync("() => window.harness.init('another-pool')"));
+        Assert.That(refused!.Message, Does.Contain(_pool).And.Contain("another-pool"));
+        Assert.That(await tabs[0].EvaluateAsync<string>("p => window.harness.init(p)", _pool), Is.Not.Empty, "the same pool again is the same pool");
+    }
+
+    [Test]
+    public async Task AHiddenLeader_GivesTheLeadToTheTabThatAsks_AndNothingIsLost()
+    {
+        var tabs = await OpenTabsAsync(2);
+        var handles = await OpenBaseAsync(tabs);
+        await tabs[0].EvaluateAsync<double[]>("([h, t, c]) => window.harness.writeOneByOne(h, t, c)", new object[] { handles[0], 0, 50 });
+        Assert.That(await LeadsAsync(tabs[0]), Is.True);
+
+        // Hidden without the event of the browser (a phone may not send it in time): the request of the tab the user looks at moves the lead
+        await tabs[0].EvaluateAsync("() => window.harness.hide(true, false)");
+        await tabs[1].EvaluateAsync<double[]>("([h, t, c]) => window.harness.writeOneByOne(h, t, c)", new object[] { handles[1], 1, 50 });
+        await tabs[1].WaitForFunctionAsync("() => window.harness.leads()");
+        Assert.That(await LeadsAsync(tabs[0]), Is.False);
+        Assert.That(await CountAsync(tabs[0], handles[0]), Is.EqualTo(100), "the tab that led reads through the new leader");
+
+        // Back: the first tab is shown, the second hidden with the event
+        await tabs[0].EvaluateAsync("() => window.harness.hide(false, true)");
+        await tabs[1].EvaluateAsync("() => window.harness.hide(true, true)");
+        await tabs[0].WaitForFunctionAsync("() => window.harness.leads()");
+        await tabs[0].EvaluateAsync<double[]>("([h, t, c]) => window.harness.writeOneByOne(h, t, c)", new object[] { handles[0], 2, 50 });
+        Assert.That(await CountAsync(tabs[1], handles[1]), Is.EqualTo(150));
+    }
+
+    private static Task<bool> LeadsAsync(IPage tab)
+    {
+        return tab.EvaluateAsync<bool>("() => window.harness.leads()");
+    }
+
     private async Task<IPage[]> OpenTabsAsync(int count)
     {
         // One after another: the first one leads

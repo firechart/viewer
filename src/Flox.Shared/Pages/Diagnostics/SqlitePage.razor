@@ -8,22 +8,22 @@
 <AppBarTitle>SQLite</AppBarTitle>
 
 @* The scenarios of the engines on the engine of this client, in this browser; data-sqlite-self-test is read by a test of the browser *@
-<RadzenStack Gap="var(--gap-sm)" class="rz-p-3" data-sqlite-self-test=@_state>
+<div class="flex flex-col gap-2 p-3" data-sqlite-self-test=@_state>
     @if (_engine is null)
     {
-        <RadzenText>This client has no SQLite engine (ISqliteEngine).</RadzenText>
+        <p class="m-0 text-base">This client has no SQLite engine (ISqliteEngine).</p>
     }
     else
     {
-        <RadzenText TextStyle="TextStyle.Caption">@_engine.GetType().Name: @_state</RadzenText>
+        <span class="m-0 text-xs text-muted">@_engine.GetType().Name: @_state</span>
         @foreach (var check in _checks)
         {
-            <RadzenText data-sqlite-check=@(check.Passed ? "passed" : "failed")>
+            <p class="m-0 text-base" data-sqlite-check=@(check.Passed ? "passed" : "failed")>
                 @(check.Passed ? "✓" : "✗") @check.Name (@check.Milliseconds.ToString("0") ms): @check.Message
-            </RadzenText>
+            </p>
         }
     }
-</RadzenStack>
+</div>
 
 @code {
     private ISqliteEngine? _engine;

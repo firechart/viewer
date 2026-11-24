@@ -12,7 +12,7 @@
 
 @if (_setup is null)
 {
-    <div class="p-4"><RadzenProgressBarCircular ShowValue="false" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Small"/></div>
+    <div class="p-4"><CircularProgress Compact="true"/></div>
 }
 else if (_setup.Server is null)
 {
@@ -28,6 +28,7 @@ else
                     SmartRedirectUri=@NavigationManager.ToAbsoluteUri(SmartCallbackPage.Route).ToString()
                     SmartFlow=@_setup.SmartFlow
                     TerminologyServer=@_setup.TerminologyServer
+                    Summary=@_setup.Summary
                     Appearance=@_setup.Appearance
                     OnConfigError=@ReportAsync/>
     </div>
@@ -106,6 +107,7 @@ else
 
         var text = config.ToJsonString();
         var setup = ViewerAppConfigLoader.Parse(text);
+        var otherServer = IsOtherServer(setup);
         await ApplyAsync(setup);
         if (setup.Server is null)
         {
@@ -116,7 +118,7 @@ else
 
         _configText = text;
         var location = CurrentLocation();
-        if (restart || string.IsNullOrEmpty(Path))
+        if (restart || otherServer || string.IsNullOrEmpty(Path))
         {
             _hostNavigation = true;
             GoToStart();
@@ -157,7 +159,14 @@ else
         }
 
         _configText = result.Text;
+        var otherServer = IsOtherServer(setup);
         await ApplyAsync(setup);
+        if (otherServer)
+        {
+            _hostNavigation = true;
+            GoToStart();
+        }
+
         var applied = new JsonObject { ["applied"] = new JsonArray([.. result.Applied.Select(a => (JsonNode)JsonValue.Create(a))]) };
         await _channel!.PostAsync("updated", applied);
         await _channel.SucceedAsync(request, applied.DeepClone().AsObject());
@@ -188,6 +197,13 @@ else
         CultureInfo.CurrentCulture = _culture;
         CultureInfo.CurrentUICulture = _culture;
         await Flox.Shared.Layout.DocumentDirection.ApplyAsync(JS, _culture);
+    }
+
+    // The address of one server (a list with its search, a record) means nothing on another: the frame starts again from the types
+    private bool IsOtherServer(ViewerAppSetup setup)
+    {
+        return _setup?.Server is { } current && setup.Server is { } next
+               && !string.Equals(current.BaseUrl.TrimEnd('/'), next.BaseUrl.TrimEnd('/'), StringComparison.OrdinalIgnoreCase);
     }
 
     private static string StartLocation => new ViewerRoute(ViewerPage.ResourceTypes).Location;

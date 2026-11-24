@@ -1,25 +1,26 @@
+@using BlazorBlueprint.Components
 @{
     RenderFragment? leading = Icon
-        ? @<RadzenSkeleton Variant="Radzen.SkeletonVariant.Circular" Style="width: 32px; height: 32px"/>
+        ? @<BbSkeleton Shape="SkeletonShape.Circular" Class="size-6"/>
         : null;
 }
 
 <ListTile Leading="@leading">
     <Title>
-        <RadzenSkeleton Style=@($"width: {_titleWidth}%") />
+        <BbSkeleton Class="h-4" Width=@($"{_titleWidth}%")/>
     </Title>
     <Subtitle>
         @if (Lines >= 2)
         {
-            <RadzenSkeleton Style=@($"width: {_subtitleWidths[0]}%") class="rz-mt-1"/>
+            <BbSkeleton Class="mt-1 h-3" Width=@($"{_subtitleWidths[0]}%")/>
         }
         @if (Lines >= 3)
         {
-            <RadzenSkeleton Style=@($"width: {_subtitleWidths[1]}%") class="rz-mt-1"/>
+            <BbSkeleton Class="mt-1 h-3" Width=@($"{_subtitleWidths[1]}%")/>
         }
         @if (Lines >= 4)
         {
-            <RadzenSkeleton Style=@($"width: {_subtitleWidths[2]}%") class="rz-mt-1"/>
+            <BbSkeleton Class="mt-1 h-3" Width=@($"{_subtitleWidths[2]}%")/>
         }
     </Subtitle>
 </ListTile>

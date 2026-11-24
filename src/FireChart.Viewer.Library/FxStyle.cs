@@ -20,11 +20,9 @@ namespace FireChart.Viewer.Library;
 public sealed record FxToken(string Name, string Value);
 
 /// <summary>
-/// The vendor style of the kit fx-*: <c>wwwroot/styles/fx.css</c> (the classes and the tokens of the kit) and <c>wwwroot/styles/fx.daisy.css</c> (the subset of
-/// daisyUI 5 with the prefix fx-, built by <c>styles/daisy/build.cmd</c>).
+/// The vendor style of the kit fx-*: <c>wwwroot/styles/fx.css</c> (the tokens, the components and the classes of the kit).
 /// </summary>
 /// <param name="Vendor">The text of <c>fx.css</c>.</param>
-/// <param name="Daisy">The text of <c>fx.daisy.css</c>.</param>
 /// <remarks>Read by a client from the static files of its host (<see cref="FxStyle.LoadAsync"/>), by a server from its web root, by a test from the folder.</remarks>
 /// <example>
 /// <code>
@@ -32,7 +30,7 @@ public sealed record FxToken(string Name, string Value);
 /// var css = sheets.Compose(customerCss);
 /// </code>
 /// </example>
-public sealed partial record FxStyleSheets(string Vendor, string Daisy)
+public sealed partial record FxStyleSheets(string Vendor)
 {
     /// <summary>
     /// The style of the visualization: the vendor style in the layer <see cref="FxStyle.VendorLayer"/>, the custom one in <see cref="FxStyle.CustomLayer"/>,
@@ -48,7 +46,7 @@ public sealed partial record FxStyleSheets(string Vendor, string Daisy)
     /// </example>
     public string Compose(string? custom)
     {
-        var text = $"@layer {FxStyle.VendorLayer}, {FxStyle.CustomLayer};\n@layer {FxStyle.VendorLayer} {{\n{Daisy}\n{Vendor}\n}}\n";
+        var text = $"@layer {FxStyle.VendorLayer}, {FxStyle.CustomLayer};\n@layer {FxStyle.VendorLayer} {{\n{Vendor}\n}}\n";
         return string.IsNullOrWhiteSpace(custom) ? text : $"{text}@layer {FxStyle.CustomLayer} {{\n{custom}\n}}\n";
     }
 
@@ -72,7 +70,7 @@ public sealed partial record FxStyleSheets(string Vendor, string Daisy)
 
 /// <summary>
 /// What a theme of the Viewer is made of: the base (<c>styles/fx.themed.css</c>: the vendor palette as values and the bridge from the tokens to the
-/// Radzen variables) and the file of the theme (<c>styles/themes/{name}.css</c>: the tokens <c>--fx-*</c>, light and dark).
+/// tokens of Blazor Blueprint) and the file of the theme (<c>styles/themes/{name}.css</c>: the tokens <c>--fx-*</c>, light and dark).
 /// </summary>
 /// <param name="Base">The text of <c>fx.themed.css</c>.</param>
 /// <param name="Theme">The text of the theme; <see langword="null"/> when none was asked for or the library has no such file.</param>
@@ -118,7 +116,6 @@ public static partial class FxStyle
     public const string ThemesFolder = "themes";
 
     private const string VendorFile = "fx.css";
-    private const string DaisyFile = "fx.daisy.css";
     private const string ThemedFile = "fx.themed.css";
 
     /// <summary>
@@ -177,12 +174,12 @@ public static partial class FxStyle
     /// <summary>
     /// Reads the base of a theme and the file of a theme from a folder of a disk.
     /// </summary>
-    /// <param name="webRoot">The folder of the library (<c>public/library</c>).</param>
+    /// <param name="webRoot">The folder of the library (<c>library</c>).</param>
     /// <param name="name">The name of the theme; none: the base only.</param>
     /// <returns>The base and the theme (<see langword="null"/> when there is no such file).</returns>
     /// <example>
     /// <code>
-    /// var theme = FxStyle.ReadThemeFolder(@"public\library", "compact");
+    /// var theme = FxStyle.ReadThemeFolder(@"library", "compact");
     /// </code>
     /// </example>
     public static FxThemeSheets ReadThemeFolder(string webRoot, string? name)
@@ -207,9 +204,8 @@ public static partial class FxStyle
     public static async Task<FxStyleSheets> LoadAsync(IViewerAssets assets, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(assets);
-        var vendor = assets.ReadTextAsync(VendorLibrary.UrlOf($"{Folder}/{VendorFile}"), cancellationToken);
-        var daisy = assets.ReadTextAsync(VendorLibrary.UrlOf($"{Folder}/{DaisyFile}"), cancellationToken);
-        return new FxStyleSheets(await vendor ?? throw Missing(VendorFile), await daisy ?? throw Missing(DaisyFile));
+        var vendor = await assets.ReadTextAsync(VendorLibrary.UrlOf($"{Folder}/{VendorFile}"), cancellationToken);
+        return new FxStyleSheets(vendor ?? throw Missing(VendorFile));
     }
 
     /// <summary>
@@ -243,7 +239,7 @@ public static partial class FxStyle
             return reader.ReadToEnd();
         }
 
-        return new FxStyleSheets(Text(VendorFile), Text(DaisyFile));
+        return new FxStyleSheets(Text(VendorFile));
     }
 
     /// <summary>
@@ -253,12 +249,12 @@ public static partial class FxStyle
     /// <returns>The style.</returns>
     /// <example>
     /// <code>
-    /// var sheets = FxStyle.ReadFolder(@"public\library");
+    /// var sheets = FxStyle.ReadFolder(@"library");
     /// </code>
     /// </example>
     public static FxStyleSheets ReadFolder(string webRoot)
     {
-        return new FxStyleSheets(File.ReadAllText(Path.Combine(webRoot, Folder, VendorFile)), File.ReadAllText(Path.Combine(webRoot, Folder, DaisyFile)));
+        return new FxStyleSheets(File.ReadAllText(Path.Combine(webRoot, Folder, VendorFile)));
     }
 
     private static InvalidOperationException Missing(string name)

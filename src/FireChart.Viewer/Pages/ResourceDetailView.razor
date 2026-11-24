@@ -1,4 +1,5 @@
-@* The page of a resource: its view template and its JSON (read-only: the Viewer only reads FHIR servers) *@
+@* The page of a resource: its components (the page of its type, else its banner and its view, with the safety net) and its JSON (read-only: the
+   Viewer only reads FHIR servers) *@
 @inherits StatefulWidget<ResourceDetailViewState>
 
 <BusyOverlay Busy=@State.IsBusy Concealed=@State.Activating>
@@ -10,9 +11,9 @@
     {
         @if (State.Access == ServerAccess.NotSupported)
         {
-            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+            <Alert Kind="AlertKind.Warning" Class="mt-4">
                 @Strings.Message_FhirServerAuthenticationNotSupported
-            </RadzenAlert>
+            </Alert>
         }
         else if (State.Access is ServerAccess.NeedsAuthorization or ServerAccess.NeedsCredentials)
         {
@@ -20,31 +21,35 @@
         }
         else if (State.Failed)
         {
-            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+            <Alert Kind="AlertKind.Warning" Class="mt-4">
                 @Strings.Message_FhirServerUnavailable
-                <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Text=@FloxStrings.Caption_Retry Click=@State.RetryAsync/>
-            </RadzenAlert>
+                <Button Variant="ButtonVariant.Outline" OnClick=@State.RetryAsync>@FloxStrings.Caption_Retry</Button>
+            </Alert>
         }
-        else if (State.View is not null)
+        else if (State.Record is not null)
         {
-            <style>@State.View.Style</style>
+            @* The switch Record | Summary | Source and the bookmark in the toolbar of the page (or the header of the sheet); the word wrap with the source *@
             <SectionContent SectionName=@(InSheet ? RecordSheet.CommandsSection : FhirViewer.PageCommandsSection)>
-                <SummarySwitch ResourceType=@ResourceType ResourceId=@ResourceId/>
+                <SummarySwitch ResourceType=@ResourceType ResourceId=@ResourceId Source=@ShowsSource
+                               SourceChanged=@(InSheet ? EventCallback.Factory.Create<bool>(this, source => _sheetSource = source) : default)/>
+                @if (ShowsSource)
+                {
+                    <WordWrapToggle @bind-Wrap=_wordWrap/>
+                }
                 <BookmarkStar Route=@(new ViewerRoute(ViewerPage.Resource, ResourceType, ResourceId)) Title=@State.TextAsync Category=@ResourceType/>
             </SectionContent>
-            <div>
-            <RadzenTabs class="rz-mt-2">
-                <Tabs>
-                    <RadzenTabsItem Text=@FloxStrings.Caption_View>
-                        @* The HTML of the template has passed the white list of FxHtml *@
-                        <div class="fx-root">@((MarkupString)State.View.Html)<p class="fx-muted" title=@Strings.Caption_TimesInDeviceZone><span class="fx-visually-hidden">@Strings.Caption_TimesInDeviceZone: </span>@DisplayZone.Text()</p></div>
-                    </RadzenTabsItem>
-                    <RadzenTabsItem Text=@FloxStrings.Caption_Source>
-                        <CodeEditor Value=@State.Json ReadOnly="true" WordWrap="true" Height=@(InSheet ? "60dvh" : "calc(100dvh - 15rem)")/>
-                    </RadzenTabsItem>
-                </Tabs>
-            </RadzenTabs>
-            </div>
+            @if (ShowsSource)
+            {
+                <CodeEditor Class="mt-2" Value=@State.Json ReadOnly="true" WordWrap=@_wordWrap Height=@(InSheet ? "60dvh" : "calc(100dvh - 12rem)")/>
+            }
+            else
+            {
+                <div class="fx-root mt-2">
+                    <FireChart.Viewer.Reports.ReportView @key=@($"{ResourceType}/{ResourceId}") Component=@($"{ResourceType}.page") ContextType=@ResourceType
+                                                         ContextId=@ResourceId Record=@State.Record Safety/>
+                    <p class="fx-muted" title=@Strings.Caption_TimesInDeviceZone><span class="fx-visually-hidden">@Strings.Caption_TimesInDeviceZone: </span>@DisplayZone.Text()</p>
+                </div>
+            }
         }
         else if (State.Json is not null)
         {
@@ -54,6 +59,9 @@
 </BusyOverlay>
 
 @code {
+
+    private bool _sheetSource;
+    private bool _wordWrap = true;
 
     /// <summary>The instance of the Viewer.</summary>
     [CascadingParameter]
@@ -70,6 +78,12 @@
     /// <summary>Shown in a sheet (<see cref="RecordSheet"/>): its commands go to the header of the sheet, not to the toolbar of the page.</summary>
     [Parameter]
     public bool InSheet { get; set; }
+
+    /// <summary>The JSON of the record shows rather than its components (the address <c>?view=source</c>); a sheet switches by itself.</summary>
+    [Parameter]
+    public bool Source { get; set; }
+
+    private bool ShowsSource => InSheet ? _sheetSource : Source;
 
 
     protected override object? ActivationKey => new ResourceDetailKey(Session, ResourceType, ResourceId);

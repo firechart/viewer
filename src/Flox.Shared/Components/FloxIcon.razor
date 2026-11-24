@@ -1,6 +1,6 @@
 @if (!string.IsNullOrWhiteSpace(Icon))
 {
-    <RadzenIcon Icon=@Icon IconColor=@Color Style=@GetFontStyle() class=@($"shrink-0 {Class}") title=@Title/>
+    <i class=@($"flox-icon notranslate {Class}") style=@GetFontStyle() title=@Title aria-hidden=@(Title is null ? "true" : null)>@Icon</i>
 }
 
 @code {
@@ -44,6 +44,11 @@
     private string? GetFontStyle()
     {
         var style = string.Empty;
+        if (!string.IsNullOrEmpty(Color))
+        {
+            style += $"color: {Color};";
+        }
+
         if (!string.IsNullOrEmpty(Size))
         {
             style += $"font-size: {Size};";

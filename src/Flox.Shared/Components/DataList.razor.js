@@ -1,12 +1,10 @@
-// Touch gestures of a DataList: a long press on a row opens its menu, a pull down at the top refreshes the list.
+// Touch gestures of a DataList: a long press on a row opens its menu (a pull down is the page's, PullRefreshHost).
 // A mouse keeps the context menu of the browser (a right click); touch is handled here, as iOS sends no contextmenu event
 
 const LONG_PRESS_MS = 500;
 const MOVE_TOLERANCE_PX = 10;
-const PULL_THRESHOLD_PX = 72;
-const PULL_MAX_PX = 120;
 
-export function attach(root, scroller, dotnet, options) {
+export function attach(root, dotnet) {
     let pointerType = "mouse";
     let pressTimer = 0;
     let pressStart = null;
@@ -70,68 +68,6 @@ export function attach(root, scroller, dotnet, options) {
     root.addEventListener("click", onClick, true);
     root.addEventListener("contextmenu", onContextMenu, true);
 
-    let pullStartY = null;
-    let pull = 0;
-    const indicator = options.pull ? scroller.querySelector("[data-pull]") : null;
-
-    const showPull = (distance, animate) => {
-        if (!indicator) {
-            return;
-        }
-
-        indicator.style.transition = animate ? "height 150ms ease" : "none";
-        indicator.style.height = `${distance}px`;
-        indicator.style.opacity = String(Math.min(1, distance / PULL_THRESHOLD_PX));
-        const icon = indicator.firstElementChild;
-        if (icon) {
-            icon.style.transform = `rotate(${(distance / PULL_THRESHOLD_PX) * 270}deg)`;
-        }
-    };
-
-    const onTouchStart = (e) => {
-        pullStartY = scroller.scrollTop <= 0 && e.touches.length === 1 ? e.touches[0].clientY : null;
-        pull = 0;
-    };
-
-    const onTouchMove = (e) => {
-        if (pullStartY === null) {
-            return;
-        }
-
-        const dy = e.touches[0].clientY - pullStartY;
-        if (dy <= 0 || scroller.scrollTop > 0) {
-            if (pull > 0) {
-                pull = 0;
-                showPull(0, true);
-            }
-
-            return;
-        }
-
-        pull = Math.min(dy * 0.5, PULL_MAX_PX);
-        showPull(pull, false);
-        if (e.cancelable) {
-            e.preventDefault();
-        }
-    };
-
-    const onTouchEnd = () => {
-        const refresh = pull >= PULL_THRESHOLD_PX;
-        pullStartY = null;
-        pull = 0;
-        showPull(0, true);
-        if (refresh) {
-            dotnet.invokeMethodAsync("OnPullRefresh");
-        }
-    };
-
-    if (indicator) {
-        scroller.addEventListener("touchstart", onTouchStart, { passive: true });
-        scroller.addEventListener("touchmove", onTouchMove, { passive: false });
-        scroller.addEventListener("touchend", onTouchEnd, { passive: true });
-        scroller.addEventListener("touchcancel", onTouchEnd, { passive: true });
-    }
-
     return {
         dispose() {
             cancelPress();
@@ -141,12 +77,6 @@ export function attach(root, scroller, dotnet, options) {
             root.removeEventListener("pointercancel", cancelPress);
             root.removeEventListener("click", onClick, true);
             root.removeEventListener("contextmenu", onContextMenu, true);
-            if (indicator) {
-                scroller.removeEventListener("touchstart", onTouchStart);
-                scroller.removeEventListener("touchmove", onTouchMove);
-                scroller.removeEventListener("touchend", onTouchEnd);
-                scroller.removeEventListener("touchcancel", onTouchEnd);
-            }
         }
     };
 }

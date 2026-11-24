@@ -1,0 +1,33 @@
+<!-- A device use in a list: the device (its name from the record it points to), when it was used (else recorded) and the body site; its status at the end -->
+<Component name="DeviceUseStatement.tile">
+  <Param name="record" required="true"/>
+
+  <If test="{{%record.device.reference.exists()}}">
+    <Resolve value="{{%record.device}}" as="device">
+      <Tile title="{{iif(%device.deviceName.exists(), %device.deviceName.name.first(), iif(%device.type.exists(), %device.type, iif(%record.device.display.exists(), %record.device.display, %record.id)))}}" patient="{{%record.subject}}">
+        <Subtitle>
+          <Parts separator=" - ">
+            <Value value="{{iif(%record.timing.exists(), %record.timing, %record.recordedOn)}}"/>
+            <Value value="{{%record.bodySite}}"/>
+          </Parts>
+        </Subtitle>
+        <Trailing>
+          <Status value="{{%record.status}}"/>
+        </Trailing>
+      </Tile>
+    </Resolve>
+  </If>
+  <If test="{{%record.device.reference.empty()}}">
+    <Tile title="{{iif(%record.device.display.exists(), %record.device.display, %record.id)}}" patient="{{%record.subject}}">
+      <Subtitle>
+        <Parts separator=" - ">
+          <Value value="{{iif(%record.timing.exists(), %record.timing, %record.recordedOn)}}"/>
+          <Value value="{{%record.bodySite}}"/>
+        </Parts>
+      </Subtitle>
+      <Trailing>
+        <Status value="{{%record.status}}"/>
+      </Trailing>
+    </Tile>
+  </If>
+</Component>

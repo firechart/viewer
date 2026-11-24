@@ -1,0 +1,23 @@
+<!-- An explanation of benefit in a list: its type, when it was created and the insurer; the amount paid (else the first total), its outcome and status at the end -->
+<Component name="ExplanationOfBenefit.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.type.exists(), %record.type, iif(%record.use.exists(), 'Explanation of benefit (' &amp; %record.use &amp; ')', %record.id))}}" patient="{{%record.patient}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.created}}"/>
+        <Value value="{{%record.insurer}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <If test="{{%record.payment.amount.exists()}}">
+        <Value value="{{%record.payment.amount}}"/>
+      </If>
+      <If test="{{%record.payment.amount.empty()}}">
+        <Value value="{{%record.total.first().amount}}"/>
+      </If>
+      <Status value="{{%record.outcome}}"/>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

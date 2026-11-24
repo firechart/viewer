@@ -1,4 +1,4 @@
-@* Full component nesting, shared by the WASM and MAUI hosts (both use this component as their root) *@
+@* Full component nesting: the root of the WebAssembly hosts *@
 
 @using System.Reflection
 
@@ -27,10 +27,10 @@
                         <ModalMessageBox Caption="Please login"></ModalMessageBox>
                     </NotAuthorized>
                     <Authorizing>
-                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-sm)" class="rz-mt-4">
+                        <div class="mt-4 flex items-center gap-2">
                             <FloxIcon Icon="login"/>
-                            <RadzenText TextStyle="TextStyle.H6" class="rz-m-0">@Strings.Auth_CompletingSignIn_Message</RadzenText>
-                        </RadzenStack>
+                            <span class="text-base font-semibold">@Strings.Auth_CompletingSignIn_Message</span>
+                        </div>
                     </Authorizing>
                 </AuthorizeRouteView>
                 <FocusOnNavigate RouteData="@routeData" Selector="h1"/>

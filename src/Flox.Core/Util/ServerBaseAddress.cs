@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 namespace Flox.Core.Util;
 
 /// <summary>
-/// The address of the application server as the clients see it. The Flox:Bootstrap:BaseAddress setting sets it explicitly (MAUI and desktop have to, a WASM client may to talk to another server); without it the address the client came from is used (WASM: the host that served the page).
+/// The address of the application server as the clients see it. The Flox:Bootstrap:BaseAddress setting sets it explicitly (a WASM client may, to talk to another server); without it the address the client came from is used (WASM: the host that served the page).
 /// </summary>
 public static class ServerBaseAddress
 {

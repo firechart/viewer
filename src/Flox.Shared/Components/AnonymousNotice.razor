@@ -1,13 +1,14 @@
+@using BlazorBlueprint.Components
 @inject IAuthenticationService AuthenticationService
 
 <AuthorizeView>
     <NotAuthorized>
         @if (Text is { } text)
         {
-            <RadzenAlert AlertStyle="Radzen.AlertStyle.Info" Variant="Radzen.Variant.Flat" Shade="Radzen.Shade.Lighter" Size="Radzen.AlertSize.Small" AllowClose="false">
+            <Alert Kind="AlertKind.Info">
                 <span>@text</span>
-                <RadzenButton Variant="Radzen.Variant.Text" Size="Radzen.ButtonSize.Small" Text=@Strings.Caption_Login Click="LoginAsync"/>
-            </RadzenAlert>
+                <Button Variant="ButtonVariant.Link" Class="h-auto p-0 ps-1" OnClick="LoginAsync">@Strings.Caption_Login</Button>
+            </Alert>
         }
     </NotAuthorized>
 </AuthorizeView>

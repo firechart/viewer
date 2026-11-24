@@ -1,0 +1,15 @@
+<!-- One observation in a line: what was measured, the value or the values of its components, when, and its interpretation when there is one -->
+<Component name="ObservationRow">
+  <Param name="observation" required="true"/>
+
+  <Field label="{{%observation.code}}">
+    <If test="{{%observation.value.exists()}}">
+      <Value value="{{%observation.value}}"/>
+    </If>
+    <If test="{{%observation.value.empty()}}">
+      <Value value="{{%observation.component.value}}" separator=" / " empty="{{%strings.NoValue}}"/>
+    </If>
+    <Interpretation value="{{%observation.interpretation.first()}}"/>
+    <Badge text="{{%observation.effective}}"/>
+  </Field>
+</Component>

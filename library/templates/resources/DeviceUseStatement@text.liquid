@@ -1,3 +1,0 @@
-{%- assign device = self.device | resolve -%}
-{%- capture name -%}{% if device %}{% apply device mode: "text" %}{% else %}{{ self.device.display }}{% endif %}{%- endcapture -%}
-{{- name | default: self.id -}}

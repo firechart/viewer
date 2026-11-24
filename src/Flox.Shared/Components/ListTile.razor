@@ -1,3 +1,4 @@
+@using BlazorBlueprint.Components
 @using System.ComponentModel
 @inherits StatelessWidget
 
@@ -13,39 +14,43 @@
                                         }
                                     </text>;
 
-    RenderFragment tileContent = @<RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-md)"
-                                               class=@GetOuterClass() Style=@Style @onclick=@HandleStackClick>
+    // An Item of Blazor Blueprint: the leading box, the text (title, subtitle, trailing text) and the controls at the end. A row with a link is the
+    // link itself (AsChild a); the hover of Blueprint comes with a click
+    RenderFragment tileContent = @<BbItem AsChild=@(IsLink ? "a" : null) Href=@(IsLink ? AppUrl.ToHref(Href!) : null) Size="ItemSize.Sm" Class=@GetOuterClass()
+                                         style=@Style @attributes=@ClickAttributes>
                                      @if (IsSelectable)
                                      {
-                                         <button type="button" class="group/lead relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-inherit"
-                                                 role="checkbox" aria-checked=@(IsSelected ? "true" : "false") aria-label=@SelectLabel
-                                                 @onclick=@ToggleSelectedAsync @onclick:stopPropagation @onclick:preventDefault>
-                                             @leadingContent
-                                             <span aria-hidden="true" class=@GetSelectionMarkClass()>
-                                                 <FloxIcon Icon="done" Size="1.25rem"/>
-                                             </span>
-                                         </button>
+                                         <BbItemMedia>
+                                             <button type="button" class="group/lead relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent p-0 text-inherit"
+                                                     role="checkbox" aria-checked=@(IsSelected ? "true" : "false") aria-label=@SelectLabel
+                                                     @onclick=@ToggleSelectedAsync @onclick:stopPropagation @onclick:preventDefault>
+                                                 @leadingContent
+                                                 <span aria-hidden="true" class=@GetSelectionMarkClass()>
+                                                     <FloxIcon Icon="done" Size="1.25rem"/>
+                                                 </span>
+                                             </button>
+                                         </BbItemMedia>
                                      }
                                      else if (Leading != null || Icon != null)
                                      {
-                                         @* A box of a fixed size, the same as of a selectable row: the icons of the rows of a list are in one column *@
-                                         <div class="flex size-8 shrink-0 items-center justify-center">
+                                         @* A box of a fixed size, the same as of a selectable row: the icons of the rows of a list are in one column; an icon in a square *@
+                                         <BbItemMedia Variant="ItemMediaVariant.Icon" Class="size-8 text-muted">
                                              @leadingContent
-                                         </div>
+                                         </BbItemMedia>
                                      }
 
                                      @* The text of the row: the trailing text stays on the line of the title while both fit, then goes under the subtitle;
                                         then takes up to three lines (an address breaks anywhere). The leading box and the controls keep their places *@
-                                     <RadzenStack Orientation="Radzen.Orientation.Horizontal" Wrap="Radzen.FlexWrap.Wrap" AlignItems="Radzen.AlignItems.Center" Gap="0"
-                                                  class="min-w-0 flex-1 gap-x-3">
-                                         <RadzenStack Gap="0" class="min-w-0 flex-auto">
+                                     <BbItemContent Class="min-w-0 flex-row flex-wrap items-center gap-x-3 gap-y-0">
+                                         <div class="flex min-w-0 flex-auto flex-col gap-1">
                                              @if (Title != null)
                                              {
                                                  @Title
                                              }
                                              else if (!string.IsNullOrEmpty(TitleText))
                                              {
-                                                 <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.Div" class="rz-text-truncate" Style="color: var(--rz-text-title-color)">@TitleText</RadzenText>
+                                                 @* Regular, not the medium of Blueprint: a list of medium titles reads heavy, the headings of the page carry the weight *@
+                                                 <BbItemTitle Class="min-w-0 font-normal leading-snug"><span class="truncate">@TitleText</span></BbItemTitle>
                                              }
                                              @if (Subtitle != null)
                                              {
@@ -53,58 +58,50 @@
                                              }
                                              else if (!string.IsNullOrEmpty(SubtitleText))
                                              {
-                                                 <RadzenText TextStyle="TextStyle.Caption" TagName="TagName.Div" class="rz-text-truncate">@SubtitleText</RadzenText>
+                                                 <BbItemDescription Class="line-clamp-1 wrap-anywhere">@SubtitleText</BbItemDescription>
                                              }
-                                         </RadzenStack>
+                                         </div>
 
                                          @if (Trailing == null && !string.IsNullOrEmpty(TrailingText))
                                          {
-                                             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.Div" class="rz-m-0 min-w-0 max-w-full flex-initial line-clamp-3 wrap-anywhere" title=@TrailingText>@TrailingText</RadzenText>
+                                             <div class="min-w-0 max-w-full flex-initial text-sm text-muted line-clamp-3 wrap-anywhere" title=@TrailingText>@TrailingText</div>
                                          }
-                                     </RadzenStack>
+                                     </BbItemContent>
 
                                      @* A control (a switch, a button, a counter) is not text: it stays at the end of the row *@
-                                     @if (Trailing != null)
+                                     @if (Trailing != null || !string.IsNullOrEmpty(Warning) || Bookmarked is not null || Chevron || HasHref)
                                      {
-                                         @Trailing
-                                     }
+                                         <BbItemActions>
+                                             @Trailing
 
-                                     @if (!string.IsNullOrEmpty(Warning))
-                                     {
-                                         <span class="flex shrink-0" role="img" title=@Warning aria-label=@Warning>
-                                             <FloxIcon Icon="sync_problem" Color="var(--rz-danger)"/>
-                                         </span>
-                                     }
+                                             @if (!string.IsNullOrEmpty(Warning))
+                                             {
+                                                 <span class="flex shrink-0 text-danger" role="img" title=@Warning aria-label=@Warning>
+                                                     <FloxIcon Icon="sync_problem"/>
+                                                 </span>
+                                             }
 
-                                     @if (Bookmarked is { } bookmarked)
-                                     {
-                                         <BookmarkToggle Bookmarked=@bookmarked OnToggle=@OnBookmark/>
-                                     }
+                                             @if (Bookmarked is { } bookmarked)
+                                             {
+                                                 <BookmarkToggle Bookmarked=@bookmarked OnToggle=@OnBookmark/>
+                                             }
 
-                                     @if (Chevron || !string.IsNullOrEmpty(Href))
-                                     {
-                                         <Chevron/>
+                                             @if (Chevron || HasHref)
+                                             {
+                                                 <Chevron/>
+                                             }
+                                         </BbItemActions>
                                      }
-                                 </RadzenStack>;
-
-    RenderFragment tileHrefContent = null!;
-    if (!string.IsNullOrWhiteSpace(Href))
-    {
-        tileHrefContent = @<a href=@AppUrl.ToHref(Href) class="block text-inherit no-underline" @onclick=@HandleAnchorClick @onclick:preventDefault=@TapSelects>@tileContent</a>;
-    }
-    else
-    {
-        tileHrefContent = tileContent;
-    }
+                                 </BbItem>;
 }
 
 @if (InList)
 {
-    <div role="listitem">@tileHrefContent</div>
+    <div role="listitem">@tileContent</div>
 }
 else
 {
-    @tileHrefContent
+    @tileContent
 }
 
 @code {
@@ -128,19 +125,15 @@ else
 
     private string SelectLabel => string.IsNullOrEmpty(TitleText) ? Strings.Caption_Select : string.Format(Strings.Caption_SelectItem, TitleText);
 
-    // With a link the anchor owns the click, without one the stack does
-    private async Task HandleStackClick()
-    {
-        if (!HasHref)
-        {
-            await HandleClick();
-        }
-    }
+    // A link opens its page, unless a tap selects the row
+    private bool IsLink => HasHref && !TapSelects;
 
-    private async Task HandleAnchorClick()
-    {
-        await HandleClick();
-    }
+    private bool IsClickable => HasHref || OnClick.HasDelegate || OnSelected.HasDelegate || TapSelects || Row is { Clickable: true };
+
+    // The click only where the row does something: Blueprint draws the hover of an Item that has one
+    private Dictionary<string, object>? ClickAttributes => IsClickable
+        ? new() { ["onclick"] = EventCallback.Factory.Create(this, HandleClick) }
+        : null;
 
     private async Task ToggleSelectedAsync()
     {
@@ -259,10 +252,10 @@ else
 
     private string GetSelectionMarkClass()
     {
-        const string Base = "absolute inset-0 flex items-center justify-center rounded-full transition-opacity";
+        const string Base = "absolute inset-0 flex items-center justify-center rounded-md transition-opacity";
         if (IsSelected)
         {
-            return $"{Base} bg-accent text-white";
+            return $"{Base} bg-accent text-primary-foreground";
         }
 
         return IsSelectionActive ? $"{Base} border-2 border-line bg-surface" : $"{Base} border-2 border-line bg-surface opacity-0 group-hover/lead:opacity-100";
@@ -270,16 +263,17 @@ else
 
     protected string GetOuterClass()
     {
-        var result = new List<string> { "rz-px-3", Dense ? "min-h-10 rz-py-2" : "min-h-12 rz-py-2" };
+        // A row of a list has no corners of its own: the frame of the list (ListSection) has them
+        var result = new List<string> { "rounded-none text-inherit no-underline hover:bg-row-hover", Dense ? "min-h-10" : "min-h-12" };
 
         if (!string.IsNullOrEmpty(Class))
         {
             result.Add(Class);
         }
 
-        if (!string.IsNullOrEmpty(Href) || OnClick.HasDelegate || OnSelected.HasDelegate || TapSelects || Row is { Clickable: true })
+        if (IsClickable)
         {
-            result.Add("cursor-pointer transition-colors hover:bg-hover");
+            result.Add("cursor-pointer");
         }
 
         if (IsSelectable && IsSelected)

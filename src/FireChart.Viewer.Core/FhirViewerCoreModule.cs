@@ -9,7 +9,7 @@ namespace FireChart.Viewer.Core;
 /// </summary>
 /// <remarks>
 /// The services of the Viewer are <c>[FloxService]</c> types the bootstrapper of Flox finds by itself (<see cref="IFhirServerReader"/>,
-/// <see cref="IServerCredentialStore"/>, <see cref="IResourceTiles"/>, ...); the host registers its <see cref="ITemplateRenderers"/>. The two clients have no
+/// <see cref="IServerCredentialStore"/>, ...). The two clients have no
 /// handler of the host application, so no token of the host goes to a FHIR server or to a terminology server.
 /// </remarks>
 /// <example>

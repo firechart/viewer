@@ -1,0 +1,139 @@
+@using BlazorBlueprint.Components
+@using BlazorBlueprint.Primitives
+@implements IDisposable
+@inject FloxDialogService Dialogs
+
+@* The dialogs of FloxDialogService, the topmost last: a dialog of Blazor Blueprint in the middle of the screen, or a sheet at the bottom.
+   The title stays on top, the body scrolls when the content does not fit *@
+@foreach (var dialog in Dialogs.Dialogs)
+{
+    var options = dialog.Options;
+    if (options.Placement == FloxDialogPlacement.Bottom)
+    {
+        <BbSheet @key=@dialog.Id Open="true" Modal="true" OpenChanged=@(open => OnOpenChanged(dialog, open))>
+            <BbSheetContent Side="SheetSide.Bottom" ShowClose=@(options.ShowClose && !HasTitle(dialog)) CloseOnEscape=@options.CloseOnEscape
+                            CloseOnOverlayClick=@options.CloseOnOverlayClick CloseOnInteractOutside=@options.CloseOnOverlayClick
+                            Class="flex max-h-dvh flex-col gap-0 p-0" style=@SheetStyle(options)>
+                @Body(dialog)
+            </BbSheetContent>
+        </BbSheet>
+    }
+    else
+    {
+        <BbDialog @key=@dialog.Id Open="true" OpenChanged=@(open => OnOpenChanged(dialog, open))>
+            <BbDialogContent ShowClose=@(options.ShowClose && !HasTitle(dialog)) CloseOnEscape=@options.CloseOnEscape CloseOnOverlayClick=@options.CloseOnOverlayClick
+                             Class=@DialogClass(options) style=@DialogStyle(options)>
+                @Body(dialog)
+            </BbDialogContent>
+        </BbDialog>
+    }
+}
+
+@code {
+
+    // The title of a sheet is the title of the sheet, of a dialog the title of the dialog: each needs its own container around it
+    private RenderFragment Body(FloxDialog dialog)
+    {
+        return @<text>
+                   @if (HasTitle(dialog))
+                   {
+                       @if (dialog.Options.Placement == FloxDialogPlacement.Bottom)
+                       {
+                           <BbSheetHeader Class=@HeaderClass>
+                               <BbSheetTitle Class="min-w-0 truncate text-base">@dialog.Title</BbSheetTitle>
+                               @Close(dialog)
+                           </BbSheetHeader>
+                       }
+                       else
+                       {
+                           <BbDialogHeader Class=@HeaderClass>
+                               <BbDialogTitle Class="min-w-0 truncate text-base">@dialog.Title</BbDialogTitle>
+                               @Close(dialog)
+                           </BbDialogHeader>
+                       }
+                   }
+                   <div class=@(HasTitle(dialog) ? "min-h-0 flex-1 overflow-y-auto px-6 pt-4 pb-6" : "min-h-0 flex-1 overflow-y-auto p-6")>
+                       <CascadingValue Value=@dialog IsFixed="true">
+                           <DynamicComponent Type=@dialog.Component Parameters=@dialog.Parameters/>
+                       </CascadingValue>
+                   </div>
+               </text>;
+    }
+
+    private static bool HasTitle(FloxDialog dialog) => dialog.Options.ShowTitle && !string.IsNullOrEmpty(dialog.Title);
+
+    // The row of the title: a band of 48 px, the title (the size of the text of a section) and the close button in its middle; the close button of
+    // Blueprint, placed apart from it, is off where there is a title
+    private const string HeaderClass = "h-12 shrink-0 flex-row items-center justify-between gap-2 space-y-0 ps-6 pe-3 text-start";
+
+    private RenderFragment Close(FloxDialog dialog)
+    {
+        return @<text>
+                   @if (dialog.Options.ShowClose)
+                   {
+                       <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" AriaLabel=@Strings.Caption_Close title=@Strings.Caption_Close OnClick=@(() => Dialogs.CloseDialog(dialog))>
+                           <FloxIcon Icon="close" Size="1.25rem"/>
+                       </Button>
+                   }
+               </text>;
+    }
+
+    private static string DialogClass(FloxDialogOptions options)
+    {
+        // The dialog stands out from the dimmed page: a deep soft shadow in light (a glow around it), a line of the colour of the text at a quarter in
+        // dark, where a shadow does not show; the corners of the lists
+        const string Base = "flex max-h-[calc(100dvh-2rem)] flex-col gap-0 rounded-xl p-0 shadow-[0_0_48px_8px_rgb(0_0_0/0.25)] dark:border-ink/25 dark:shadow-none";
+        return options.FullScreenOnPhone
+            // the whole screen on a phone, above the app bar (z-60), which would cover its title row
+            ? $"{Base} max-sm:z-[70] max-sm:inset-0 max-sm:h-dvh max-sm:max-h-dvh max-sm:w-screen max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-none max-sm:border-0"
+            : Base;
+    }
+
+    private static string DialogStyle(FloxDialogOptions options)
+    {
+        var style = new List<string>();
+        if (!string.IsNullOrEmpty(options.Width))
+        {
+            style.Add($"width: min({options.Width}, calc(100vw - 2rem))");
+            style.Add("max-width: none");
+        }
+
+        if (!string.IsNullOrEmpty(options.Height))
+        {
+            style.Add($"height: min({options.Height}, calc(100dvh - 2rem))");
+        }
+
+        return string.Join("; ", style);
+    }
+
+    private static string? SheetStyle(FloxDialogOptions options)
+    {
+        return string.IsNullOrEmpty(options.Height) ? null : $"height: min({options.Height}, 100dvh)";
+    }
+
+    // Escape, the close button or a click outside: the dialog ends without a result
+    private void OnOpenChanged(FloxDialog dialog, bool open)
+    {
+        if (!open)
+        {
+            Dialogs.CloseDialog(dialog);
+        }
+    }
+
+    private void OnChanged(object? sender, EventArgs e)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    protected override void OnInitialized()
+    {
+        Dialogs.Changed += OnChanged;
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        Dialogs.Changed -= OnChanged;
+    }
+
+}

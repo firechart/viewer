@@ -5,6 +5,14 @@ the notes of a release are the section of that version. Patch: a fix of a text. 
 
 ## Unreleased
 
+- **Major:** the kit has no daisyUI: `styles/fx.daisy.css` and the tools of `styles/daisy` are gone, the components of the kit (badge, card, list,
+  table, stat, status, skeleton, kbd, divider, alert) are written in `fx.css` in the layer `kit` with the same class names, and
+  `FxStyleSheets` holds `fx.css` alone. The families the library never used (`fx-collapse`, `fx-timeline`, `fx-join`, `fx-avatar`, the stack of
+  cards) are gone. Without a theme the tokens follow the theme of Blazor Blueprint of the host, and `fx.themed.css` writes its tokens.
+- **The search forms are components** (major: a new engine contract): `components/{Type}.search.xml`, one file for every FHIR release, a
+  `<SearchForm>` of `<Filter param>` and `<Group>` over the form the Viewer generates; the folder `search-forms` (180 JSON files) and
+  `schemas/search-form.schema.json` are gone. The library has `Patient.search`; its texts are keys of `locales/strings.resx` (`Filter`, `FamilyName`,
+  `GivenName` added in every language).
 - Accessibility of the kit (patch, the classes and the slots are the same): a field (partial `field`) is a `dl` of its `dt` (`fx-label`) and `dd`
   (`fx-value`), so a reader links the label to the value; a banner is a `div class="fx-banner"` (the frame and the partial `view-header`), no more a
   `header`, which made two or three banner landmarks of a page; a tile row is a `div class="fx-list-row"` (the frame; the list of the rows is the
@@ -24,7 +32,7 @@ the notes of a release are the section of that version. Patch: a fix of a text. 
   Viewer reads a search form laxly (`SearchFormReader`: an unknown property ignored, an unknown value replaced by the default, a field it cannot
   read left out, each with a warning in the log). The engine needs `SearchFormReader`.
 - The metadata of R4 and R5 are generated from the current builds of their core packages (the registry republished them): the bindings of the
-  units of `Age`, `Distance` and `Duration` are new. The generator is public: `public/tools/FireChart.FhirMetadata`.
+  units of `Age`, `Distance` and `Duration` are new. The generator is public: `src/FireChart.FhirMetadata`.
 - `schemas/search-form.schema.json`: the JSON Schema of a search form, made from the model of the Viewer (strict: no other property).
 - **Major:** a field of a search form is hidden with `hidden: true` (optional, `false` when missing) instead of `included: false`, and a group
   can be hidden too (its fields with it); a hidden field still sends its value (a default value is a fixed filter). The search dialog has no
@@ -99,5 +107,5 @@ the notes of a release are the section of that version. Patch: a fix of a text. 
 - The partial `lab-row`: the cells of a row of the laboratory results (slots `test`, `value`, `range`, `flag`) for the component `lab-results`; the vendor summary form shows the diagnostic results with it, rounded to two places. The engine needs `RenderSlotsAsync` and the component.
 - The vendor summary form shows the vital signs with the component `observation-trends` (the measures and the chart of the history of the chosen one).
 - The engine shows a record of a type without a `@tile` (Basic and the other rare types) as the beginning of its narrative with the type below, else its id and type: no template is needed for such types.
-- **Major (the delivery, no template changes):** the library is the folder `public/library`, a package of the designer with its manifest `firechart.project.json` (name `firechart-vendor`, version of the release, `engine` 1), served as `library/...` instead of `_content/FireChart.Viewer.Library/...`; the project `FireChart.Viewer.Library` holds only the readers. A host that read the old address must read `VendorLibrary.ContentRoot`.
+- **Major (the delivery, no template changes):** the library is the folder `library`, a package of the designer with its manifest `firechart.project.json` (name `firechart-vendor`, version of the release, `engine` 1), served as `library/...` instead of `_content/FireChart.Viewer.Library/...`; the project `FireChart.Viewer.Library` holds only the readers. A host that read the old address must read `VendorLibrary.ContentRoot`.
 - The style of the error tile of a failed search of a section of the clinical summary: `fx-summary-error` (with `-icon`, `-text`, `-title`, `-detail`) and the sign in the header `fx-summary-failed`; `fx.custom.css` may restyle them.

@@ -2,8 +2,7 @@
 
 These files are the **sources of the Tailwind build**, not stylesheets the browser loads.
 
-`Lombiq.Tailwind.Targets` compiles `site.css` (with its `@import`s: `tokens.css`, `palette.css`,
-`components.css`) on every build into `wwwroot/css/Flox.Shared.Tailwind.css`. Only that output is
+`Lombiq.Tailwind.Targets` compiles `site.css` (with its `@import` of `tokens.css`) on every build into `wwwroot/css/Flox.Shared.Tailwind.css`. Only that output is
 served. The paths are set in `Flox.Shared.csproj`; `Assets/Styles/site.css` is the package's default input.
 
 Why the sources are not in `wwwroot`:

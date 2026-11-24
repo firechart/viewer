@@ -42,19 +42,34 @@ body:has(.flox-splash-live, [data-app-ready]) .flox-splash-early {
     border-radius: 2px;
 }
 
-/* Reduced motion: a still bar across the track */
+/* Reduced motion: a still bar across the track. Moving, both motions are transforms (the bar slides, the gradient inside it flows), so the
+   compositor keeps them running while the main thread is busy starting .NET; background-position would stop with it */
 .flox-splash-bar {
+    position: relative;
     width: 100%;
     height: 100%;
+    overflow: hidden;
     border-radius: 2px;
-    background: linear-gradient(90deg, #6a040f 0%, #9d0208 10%, #d00000 22%, #dc2f02 34%, #e85d04 44%, #f48c06 52%, #faa307 58%, #f48c06 64%, #e85d04 72%, #dc2f02 82%, #d00000 90%, #9d0208 96%, #6a040f 100%);
+}
+
+.flox-splash-bar::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 600%;
+    background: linear-gradient(90deg, #6a040f 0%, #9d0208 10%, #d00000 22%, #dc2f02 34%, #e85d04 44%, #f48c06 52%, #faa307 58%, #f48c06 64%, #e85d04 72%, #dc2f02 82%, #d00000 90%, #9d0208 96%, #6a040f 100%) 0 0 / 50% 100% repeat-x;
 }
 
 @media (prefers-reduced-motion: no-preference) {
     .flox-splash-bar {
         width: 40%;
-        background-size: 300% 100%;
-        animation: flox-splash-slide 1.5s infinite ease-in-out, flox-splash-flow 3s infinite linear;
+        will-change: transform;
+        animation: flox-splash-slide 1.5s infinite ease-in-out;
+    }
+
+    .flox-splash-bar::before {
+        will-change: transform;
+        animation: flox-splash-flow 3s infinite linear;
     }
 }
 
@@ -63,7 +78,8 @@ body:has(.flox-splash-live, [data-app-ready]) .flox-splash-early {
     to { transform: translateX(450%); }
 }
 
+/* The gradient is three bars wide (two periods in the layer), one period per turn: the loop has no seam */
 @keyframes flox-splash-flow {
-    from { background-position: 0 0; }
-    to { background-position: 300% 0; }
+    from { transform: translateX(-50%); }
+    to { transform: translateX(0); }
 }

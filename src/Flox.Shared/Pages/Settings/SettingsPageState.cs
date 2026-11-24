@@ -60,10 +60,13 @@ public class SettingsPageState : State
     {
         var modified = Sections.Where(section => section.IsModified)
                                .ToList();
-        if (modified.Any(section => !section.EditContext.Validate()))
+        foreach (var section in modified)
         {
-            NotifyChanged();
-            return;
+            if (!await section.EditContext.ValidateAsync())
+            {
+                NotifyChanged();
+                return;
+            }
         }
 
         var saved = await RunAsync(async () =>

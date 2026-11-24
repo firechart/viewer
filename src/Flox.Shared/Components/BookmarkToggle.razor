@@ -1,9 +1,12 @@
-@* A real button (focus, Enter and Space, its name and state for a screen reader); inside the link of a row it neither follows the link nor reaches the row *@
-<button type="button" class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-inherit hover:bg-hover"
-        title=@Caption aria-label=@Caption aria-pressed=@(Bookmarked ? "true" : "false")
-        @onclick=@OnToggle @onclick:stopPropagation @onclick:preventDefault>
-    <Bookmark Bookmarked=@Bookmarked/>
-</button>
+@using BlazorBlueprint.Components
+@* The toggle of a bookmark: a quiet icon button like the other commands (FilterButton); its name and state for a screen reader. Inside the link of
+   a row a click neither follows the link nor reaches the row: the span around it stops it *@
+<span class="contents" @onclick:stopPropagation @onclick:preventDefault>
+    <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Caption AriaLabel=@Caption aria-pressed=@(Bookmarked ? "true" : "false")
+              OnClick=@(() => OnToggle.InvokeAsync())>
+        <Bookmark Bookmarked=@Bookmarked/>
+    </Button>
+</span>
 
 @code {
 

@@ -33,12 +33,13 @@ export function attach(scroller, probe, dotnet, bottomGap, initialTop) {
 
     const fit = () => {
         const available = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-        const height = Math.max(160, available - scroller.getBoundingClientRect().top - bottomGap);
+        const height = Math.max(160, Math.floor(available - scroller.getBoundingClientRect().top - bottomGap));
         scroller.style.height = height + "px";
 
-        // What still sticks out of the page (its own padding, the border of the list) comes off the list: the page itself must not scroll
-        const page = scroller.parentElement.closest(".rz-body") ?? document.scrollingElement;
-        const over = page.scrollHeight - page.clientHeight;
+        // What still sticks out of the page (its own padding, the border of the list) comes off the list: the page itself must not scroll. A part of a
+        // pixel counts too (the scroll bar of the page shows for it), and scrollHeight is rounded
+        const page = document.scrollingElement;
+        const over = Math.max(page.scrollHeight - page.clientHeight, Math.ceil(page.getBoundingClientRect().height - page.clientHeight));
         if (over > 0) {
             scroller.style.height = Math.max(160, height - over) + "px";
         }

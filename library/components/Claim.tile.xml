@@ -1,0 +1,17 @@
+<!-- A claim in a list: its type (else its use), when it was created; the total and the status at the end -->
+<Component name="Claim.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.type.exists(), %record.type, iif(%record.use.exists(), 'Claim (' &amp; %record.use &amp; ')', %record.id))}}" patient="{{%record.patient}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.created}}"/>
+        <Value value="{{%record.provider}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Value value="{{%record.total}}"/>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

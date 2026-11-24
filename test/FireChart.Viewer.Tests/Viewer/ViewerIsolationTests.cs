@@ -8,7 +8,7 @@ namespace FireChart.Viewer.Tests.Viewer;
 // FireChart except its texts. It is also the boundary of the public part: the allowed names are exactly the public projects
 public class ViewerIsolationTests
 {
-    private static readonly Assembly[] s_viewer = [typeof(FhirRenderer).Assembly, typeof(VendorTemplates).Assembly, typeof(FireChart.Viewer.ViewerSession).Assembly];
+    private static readonly Assembly[] s_viewer = [typeof(FireChart.Viewer.Core.Reports.ViewerComponentCheck).Assembly, typeof(VendorLibrary).Assembly, typeof(FireChart.Viewer.ViewerSession).Assembly];
 
     // The libraries of Flox that are public, the only ones the Viewer may use
     private static readonly HashSet<string> s_publicFlox = new(StringComparer.Ordinal)

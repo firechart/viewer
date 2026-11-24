@@ -101,7 +101,8 @@ public sealed class ForbiddenExceptionFilter
 }
 
 /// <summary>
-/// Data conditions the user can understand and act on (missing or duplicate record): the message is written for users.
+/// Data conditions the user can understand and act on (a missing or duplicate record, a conflict, a value the server refused): the message is
+/// written for users.
 /// </summary>
 [FloxService(typeof(IUiExceptionFilter), Multiple = true)]
 public sealed class DataExceptionFilter
@@ -121,7 +122,7 @@ public sealed class DataExceptionFilter
     /// <inheritdoc />
     public ValueTask HandleAsync(UiExceptionContext context)
     {
-        if (context.Exception is NotFoundException or DuplicateException or ConcurrentUpdateException)
+        if (context.Exception is NotFoundException or DuplicateException or ConcurrentUpdateException or ConflictException or FluentValidation.ValidationException)
         {
             context.Handled = true;
             context.LogLevel = LogLevel.Warning;

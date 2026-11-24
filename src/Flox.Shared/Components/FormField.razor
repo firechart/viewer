@@ -1,0 +1,74 @@
+@using BlazorBlueprint.Components
+
+@* A field of a form (a BbField of Blazor Blueprint): the label (with a mark when required), the control, a hint under it and the messages of the
+   validation, whose element is the one the control names in its aria-describedby while it is invalid. Horizontal puts a switch or a check box
+   before its label *@
+<BbField Orientation=@(Horizontal ? FieldOrientation.Horizontal : FieldOrientation.Vertical) IsInvalid=@Invalid Class=@Class>
+    @if (Horizontal)
+    {
+        @ChildContent
+        <BbFieldContent>
+            @Label
+            @Hint
+        </BbFieldContent>
+    }
+    else
+    {
+        @Label
+        @ChildContent
+        @Hint
+    }
+    <div id=@MessagesId class="text-sm text-danger empty:hidden" aria-live="polite">@Messages</div>
+</BbField>
+
+@code {
+
+    /// <summary>The label of the field.</summary>
+    [Parameter]
+    public string? Text { get; set; }
+
+    /// <summary>The id of the control the label is for.</summary>
+    [Parameter]
+    public string? For { get; set; }
+
+    /// <summary>A value is required: the label carries a mark.</summary>
+    [Parameter]
+    public bool Required { get; set; }
+
+    /// <summary>A hint under the control.</summary>
+    [Parameter]
+    public string? Description { get; set; }
+
+    /// <summary>The id of the element of the messages, for the aria-describedby of the control.</summary>
+    [Parameter]
+    public string? MessagesId { get; set; }
+
+    /// <summary>The messages of the validation (a ValidationMessage).</summary>
+    [Parameter]
+    public RenderFragment? Messages { get; set; }
+
+    /// <summary>The field is invalid: the label turns red.</summary>
+    [Parameter]
+    public bool Invalid { get; set; }
+
+    /// <summary>The control before its label, on one line (a switch, a check box).</summary>
+    [Parameter]
+    public bool Horizontal { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    /// <summary>The control.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private RenderFragment? Label => string.IsNullOrEmpty(Text)
+        ? null
+        : @<BbFieldLabel For=@For Class=@(Horizontal ? "font-normal" : null)>@Text@if (Required)
+                                                                                    {
+                                                                                        <span aria-hidden="true" class="text-danger"> *</span>
+                                                                                    }</BbFieldLabel>;
+
+    private RenderFragment? Hint => string.IsNullOrEmpty(Description) ? null : @<BbFieldDescription>@Description</BbFieldDescription>;
+
+}

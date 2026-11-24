@@ -1,0 +1,27 @@
+<!-- The page of a device use: when, the device, body site, when recorded, source and reason, then its notes -->
+<Component name="DeviceUseStatement.view">
+  <Param name="record" required="true"/>
+
+  <If test="{{%record.timing.exists() or %record.device.exists() or %record.bodySite.exists() or %record.recordedOn.exists() or %record.source.exists() or %record.reasonCode.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.When}}" value="{{%record.timing}}"/>
+      <Field label="{{%strings.Device}}">
+        <Link value="{{%record.device}}"/>
+      </Field>
+      <Field label="{{%strings.BodySite}}" value="{{%record.bodySite}}"/>
+      <Field label="{{%strings.Recorded}}" value="{{%record.recordedOn}}"/>
+      <Field label="{{%strings.Source}}">
+        <Link value="{{%record.source}}"/>
+      </Field>
+      <Field label="{{%strings.Reason}}" value="{{%record.reasonCode}}"/>
+    </Section>
+  </If>
+
+  <If test="{{%record.note.exists()}}">
+    <Section title="{{%strings.Notes}}">
+      <Repeat each="{{%record.note}}" as="note">
+        <Row main="{{%note.text}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

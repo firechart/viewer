@@ -1,3 +1,4 @@
+@using BlazorBlueprint.Components
 @attribute [Route("/diagnostics/editors")]
 
 @inherits StatelessWidget
@@ -6,22 +7,22 @@
 
 <Breadcrumbs Items=@Breadcrumbs/>
 
-<ListSection Caption="Fixed layout: the parent sets the height, the editor scrolls">
-    <div class="flex h-72 flex-col rz-p-3">
+<ListSection Title="Fixed layout: the parent sets the height, the editor scrolls">
+    <div class="flex h-72 flex-col p-3">
         <CodeEditor Value=@_json WordWrap=@_wrap/>
     </div>
 </ListSection>
 
-<ListSection Caption="Auto height: grows with the text, the page scrolls">
-    <div class="rz-p-3">
+<ListSection Title="Auto height: grows with the text, the page scrolls">
+    <div class="p-3">
         <CodeEditor AutoHeight Language=@CodeEditor.CodeLanguage.Xml Value=@_xml/>
     </div>
 </ListSection>
 
-<ListSection Caption="Options">
+<ListSection Title="Options">
     <ListTile TitleText="Word wrap" SubtitleText="Applies to the first editor" OnSelected=@(() => _wrap = !_wrap)>
         <Trailing>
-            <RadzenSwitch Value=@_wrap/>
+            <Switch Checked=@_wrap AriaLabel="Word wrap"/>
         </Trailing>
     </ListTile>
 </ListSection>

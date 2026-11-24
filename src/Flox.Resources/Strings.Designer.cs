@@ -203,6 +203,15 @@ namespace Flox.Resources {
                 return ResourceManager.GetString("Caption_More", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path.
+        /// </summary>
+        public static string Caption_Path {
+            get {
+                return ResourceManager.GetString("Caption_Path", resourceCulture);
+            }
+        }
 
         /// <summary>
         ///   Looks up a localized string similar to Bookmarks.
@@ -462,6 +471,59 @@ namespace Flox.Resources {
         public static string Caption_LicensePerpetual {
             get {
                 return ResourceManager.GetString("Caption_LicensePerpetual", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Product.
+        /// </summary>
+        public static string Caption_LicenseProduct {
+            get {
+                return ResourceManager.GetString("Caption_LicenseProduct", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mode.
+        /// </summary>
+        public static string Caption_LicenseMode {
+            get {
+                return ResourceManager.GetString("Caption_LicenseMode", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Demonstration.
+        /// </summary>
+        public static string LicenseMode_Demo {
+            get {
+                return ResourceManager.GetString("LicenseMode_Demo", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Trial.
+        /// </summary>
+        public static string LicenseMode_Trial {
+            get {
+                return ResourceManager.GetString("LicenseMode_Trial", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Seats.
+        /// </summary>
+        public static string Caption_LicenseSeats {
+            get {
+                return ResourceManager.GetString("Caption_LicenseSeats", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No limit.
+        /// </summary>
+        public static string Caption_LicenseSeatsUnlimited {
+            get {
+                return ResourceManager.GetString("Caption_LicenseSeatsUnlimited", resourceCulture);
             }
         }
         
@@ -1115,15 +1177,6 @@ namespace Flox.Resources {
             }
         }
 
-        /// <summary>
-        ///   Looks up a localized string similar to Total: {0}.
-        /// </summary>
-        public static string Caption_TotalCount {
-            get {
-                return ResourceManager.GetString("Caption_TotalCount", resourceCulture);
-            }
-        }
-
 
 
         /// <summary>
@@ -1414,6 +1467,15 @@ namespace Flox.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Refresh.
+        /// </summary>
+        public static string Caption_Refresh {
+            get {
+                return ResourceManager.GetString("Caption_Refresh", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clear.
         /// </summary>
         public static string Caption_Clear {
@@ -1464,6 +1526,184 @@ namespace Flox.Resources {
         public static string Caption_SelectItem {
             get {
                 return ResourceManager.GetString("Caption_SelectItem", resourceCulture);
+            }
+        }
+            /// <summary>
+        ///   Looks up a localized string similar to Access….
+        /// </summary>
+        public static string Access_Button {
+            get {
+                return ResourceManager.GetString("Access_Button", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Access to {0}.
+        /// </summary>
+        public static string Access_TitleOf {
+            get {
+                return ResourceManager.GetString("Access_TitleOf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Who.
+        /// </summary>
+        public static string Access_Subject {
+            get {
+                return ResourceManager.GetString("Access_Subject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Owner.
+        /// </summary>
+        public static string Access_Owner {
+            get {
+                return ResourceManager.GetString("Access_Owner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Owner ({0}).
+        /// </summary>
+        public static string Access_OwnerOf {
+            get {
+                return ResourceManager.GetString("Access_OwnerOf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Everyone.
+        /// </summary>
+        public static string Access_Everyone {
+            get {
+                return ResourceManager.GetString("Access_Everyone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Signed-in users.
+        /// </summary>
+        public static string Access_Authenticated {
+            get {
+                return ResourceManager.GetString("Access_Authenticated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Role {0}.
+        /// </summary>
+        public static string Access_Role {
+            get {
+                return ResourceManager.GetString("Access_Role", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown user {0}.
+        /// </summary>
+        public static string Access_UnknownUser {
+            get {
+                return ResourceManager.GetString("Access_UnknownUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add a role or a user.
+        /// </summary>
+        public static string Access_AddSubject {
+            get {
+                return ResourceManager.GetString("Access_AddSubject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The permissions of {1} do not include {0}: this entry has no effect..
+        /// </summary>
+        public static string Access_Ineffective {
+            get {
+                return ResourceManager.GetString("Access_Ineffective", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A sensitive operation: an administrator needs an explicit entry too, and it is given to a role or a user only..
+        /// </summary>
+        public static string Access_Sensitive {
+            get {
+                return ResourceManager.GetString("Access_Sensitive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You give sensitive operations: {0}. The change is recorded in the audit trail..
+        /// </summary>
+        public static string Access_ConfirmSensitive {
+            get {
+                return ResourceManager.GetString("Access_ConfirmSensitive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some of them you give to yourself..
+        /// </summary>
+        public static string Access_ConfirmSelf {
+            get {
+                return ResourceManager.GetString("Access_ConfirmSelf", resourceCulture);
+            }
+        }
+            /// <summary>
+        ///   Looks up a localized string similar to Copy.
+        /// </summary>
+        public static string Caption_Copy {
+            get {
+                return ResourceManager.GetString("Caption_Copy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copied to the clipboard.
+        /// </summary>
+        public static string Message_Copied {
+            get {
+                return ResourceManager.GetString("Message_Copied", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show details.
+        /// </summary>
+        public static string Caption_ShowDetails {
+            get {
+                return ResourceManager.GetString("Caption_ShowDetails", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hide details.
+        /// </summary>
+        public static string Caption_HideDetails {
+            get {
+                return ResourceManager.GetString("Caption_HideDetails", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Share.
+        /// </summary>
+        public static string Caption_Share {
+            get {
+                return ResourceManager.GetString("Caption_Share", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The browser did not allow copying.
+        /// </summary>
+        public static string Message_NotCopied {
+            get {
+                return ResourceManager.GetString("Message_NotCopied", resourceCulture);
             }
         }
     }

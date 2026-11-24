@@ -1,0 +1,62 @@
+@using BlazorBlueprint.Components
+@using System.Reflection
+@inject IFloxBrandingProvider Branding
+@inject IFloxRuntime Runtime
+@inject Flox.Licensing.LicenseSummary License
+@inject NavigationManager Navigation
+@implements IDisposable
+
+@* The main menu: a column at the side of the page, a sheet over it on a narrow screen (Blazor Blueprint decides by the width); both start under the
+   app bar, which stays above them *@
+<BbSidebar id=@Id Class="top-[calc(var(--flox-header-height)+env(safe-area-inset-top))] h-[calc(100dvh-var(--flox-header-height)-env(safe-area-inset-top))] min-h-0 overflow-y-auto">
+    <BbSidebarHeader Class="items-center py-3 short:hidden">
+        <a href=@AppUrl.ToHref("/") class="block">
+            <img src=@Branding.App.Logo alt=@Branding.App.Title class="w-50" title=@s_buildVersion/>
+        </a>
+        @* The edition of the license of the server under the logo, with its mode (free, enterprise, enterprise trial, enterprise demo); a client
+           without a server (Lite, the Viewer app) has no license and shows none *@
+        @if (Runtime.HasServer)
+        {
+            <div class="text-xs font-medium text-muted" data-license-edition>@License.Title.ToLowerInvariant()</div>
+        }
+    </BbSidebarHeader>
+    <BbSidebarContent>
+        <nav aria-label=@Strings.Caption_MainNavigation>
+            <NavMenu/>
+        </nav>
+    </BbSidebarContent>
+</BbSidebar>
+
+@code {
+
+    /// <summary>The id of the menu, for the aria-controls of the button that opens it.</summary>
+    public const string Id = "app-sidebar";
+
+    // MinVer bakes the version of the build into AssemblyInformationalVersion; the title of the logo tells local builds apart
+    private static readonly string s_buildVersion = Assembly.GetExecutingAssembly()
+                                                            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                                                            ?.InformationalVersion ?? "unknown";
+
+    [CascadingParameter]
+    private SidebarContext? Sidebar { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    // On a narrow screen the menu is a sheet over the page: a choice closes it
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (Sidebar is { IsMobile: true, OpenMobile: true })
+        {
+            _ = InvokeAsync(() => Sidebar.SetOpenMobile(false));
+        }
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+
+}

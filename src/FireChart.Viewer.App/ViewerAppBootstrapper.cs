@@ -23,13 +23,15 @@ public sealed class ViewerAppBootstrapper : FloxBootstrapper
         Services.AddSingleton<IFloxRuntime>(sp => new ViewerAppRuntime(sp.GetRequiredService<IWebAssemblyHostEnvironment>()));
         Services.AddScoped<AuthenticationStateProvider, AnonymousAuthenticationStateProvider>();
         Services.AddScoped<IAuthenticationService, AnonymousAuthenticationService>();
-        Services.AddScoped<ITemplateRenderers, VendorTemplateRenderers>();
+        Services.AddScoped<IViewerStyle, ViewerStyle>();
 
-        // The bookmarks and the last searches of the Viewer, on the device: flox.sqlite of the pool of the application; the frames and the sandbox
-        // of one origin share them
+        // The bookmarks, the history, the last searches and the types chosen for a server of the Viewer, on the device: flox.sqlite of the pool of the
+        // application; the frames and the sandbox of one origin share them
         Services.AddBrowserSqlite(Pool)
                 .AddSqliteDocuments()
-                .AddLocalEntity<UserBookmark>();
+                .AddLocalEntity<UserBookmark>()
+                .AddLocalEntity<UserRecent>()
+                .AddLocalEntity<ResourceTypeVisibility>();
         Services.AddScoped<ViewerAppConfigLoader>();
         Services.AddScoped<Sandbox.DemoPresets>();
         AddModule(new FhirViewerCoreModule());
@@ -51,6 +53,8 @@ internal sealed class ViewerAppRuntime : FloxRuntime
     public override FloxPlatform Platform => FloxPlatform.Wasm;
 
     public override string EnvironmentName => _environment.Environment;
+
+    public override bool HasServer => false;
 }
 
 // Nobody signs in to the application itself; a FHIR server is signed in to by SMART, inside the Viewer

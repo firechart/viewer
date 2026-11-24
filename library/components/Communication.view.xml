@@ -1,0 +1,36 @@
+<!-- The page of a communication: when, from whom to whom and why, then the message and its notes -->
+<Component name="Communication.view">
+  <Param name="record" required="true"/>
+
+  <If test="{{%record.sent.exists() or %record.received.exists() or %record.sender.exists() or %record.recipient.exists() or %record.category.exists() or %record.medium.exists() or %record.reasonCode.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Sent}}" value="{{%record.sent}}"/>
+      <Field label="{{%strings.Received}}" value="{{%record.received}}"/>
+      <Field label="{{%strings.Sender}}">
+        <Link value="{{%record.sender}}"/>
+      </Field>
+      <Field label="{{%strings.Recipient}}">
+        <Link value="{{%record.recipient}}"/>
+      </Field>
+      <Field label="{{%strings.Category}}" value="{{%record.category}}"/>
+      <Field label="{{%strings.Medium}}" value="{{%record.medium}}"/>
+      <Field label="{{%strings.Reason}}" value="{{%record.reasonCode}}"/>
+    </Section>
+  </If>
+
+  <If test="{{%record.payload.exists()}}">
+    <Section title="{{%strings.Message}}">
+      <Repeat each="{{%record.payload}}" as="payload">
+        <Row main="{{%payload.content}}"/>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.note.exists()}}">
+    <Section title="{{%strings.Notes}}">
+      <Repeat each="{{%record.note}}" as="note">
+        <Row main="{{%note.text}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

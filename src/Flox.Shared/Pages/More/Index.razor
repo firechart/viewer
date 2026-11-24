@@ -3,14 +3,13 @@
 @inherits StatelessWidget
 
 @inject IFloxShell Shell
-@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IAuthorizationService AuthorizationService
 
 <AppBarTitle>@Strings.Caption_More</AppBarTitle>
 
 @foreach (var (menu, nodes) in _sections)
 {
-    <ListSection Caption=@menu.Text>
+    <ListSection Title=@menu.Text>
         @foreach (var node in nodes)
         {
             @* A group without a page of its own shows its children *@
@@ -24,16 +23,27 @@
 
 @if (_loaded && _sections.Count == 0)
 {
-    <RadzenText TextStyle="TextStyle.Body2" class="text-muted">@Strings.List_NoData</RadzenText>
+    <p class="m-0 text-sm text-muted">@Strings.List_NoData</p>
 }
 
 @code {
     private List<(IFloxMenu Menu, List<NavMenuNode> Nodes)> _sections = [];
     private bool _loaded;
+    private Task<AuthenticationState>? _builtFor;
 
-    protected override async Task OnInitializedAsync()
+    // The state cascades again when the user signs in or out: the menu is built for the new user
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationState { get; set; } = default!;
+
+    protected override async Task OnParametersSetAsync()
     {
-        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        if (ReferenceEquals(_builtFor, AuthenticationState))
+        {
+            return;
+        }
+
+        _builtFor = AuthenticationState;
+        var user = (await AuthenticationState).User;
         _sections = await MenuFilter.BuildAsync(Shell, AuthorizationService, user, FloxMenuPlacement.More);
         _loaded = true;
     }

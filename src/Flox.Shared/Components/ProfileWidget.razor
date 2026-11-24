@@ -1,3 +1,4 @@
+@using BlazorBlueprint.Components
 @inject IAuthenticationService AuthenticationService
 @inject FloxOidcOptions OidcOptions
 
@@ -5,11 +6,11 @@
 {
     <AuthorizeView>
         <Authorized>
-            <ListSection Caption=@Strings.Caption_User Definitions>
+            <ListSection Title=@Strings.Caption_User Definitions>
                 <PropertyTile Label=@Strings.Caption_Profile Value=@context.User.GetUserName()/>
             </ListSection>
 
-            <ListSection Caption=@Strings.Caption_Roles>
+            <ListSection Title=@Strings.Caption_Roles>
                 @{
                     var roles = context.User.GetRoles();
                 }
@@ -21,11 +22,11 @@
 
             @if (context.User.IsAuthenticated())
             {
-                <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Text=@Strings.Caption_Logout Click="LogoutAsync" class="rz-my-2"/>
+                <Button Variant="ButtonVariant.Outline" OnClick="LogoutAsync" Class="my-2">@Strings.Caption_Logout</Button>
             }
             else
             {
-                <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Text=@Strings.Caption_Login Click="LoginAsync" class="rz-my-2"/>
+                <Button OnClick="LoginAsync" Class="my-2">@Strings.Caption_Login</Button>
             }
         </Authorized>
     </AuthorizeView>

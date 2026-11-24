@@ -1,4 +1,5 @@
 using Flox.Core;
+using Flox.Core.Authorization;
 using Flox.Core.Data;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -181,8 +182,8 @@ public class LocalEntityStorageTests
         var missing = Guid.NewGuid();
 
         var capabilities = (await storage.GetCapabilitiesAsync([note.Uid, missing])).ToDictionary(row => row.Key);
-        Assert.That(capabilities[note.Uid], Is.EqualTo(new EntityCapability<Guid>(note.Uid, true, true, true)));
-        Assert.That(capabilities[missing], Is.EqualTo(new EntityCapability<Guid>(missing, false, false, false)));
+        Assert.That(capabilities[note.Uid].Operations, Is.EqualTo(new[] { EntityOperations.Read, EntityOperations.Update, EntityOperations.Delete }));
+        Assert.That(capabilities[missing].Operations, Is.Empty);
     }
 
     // The store of one tab, written by "another tab" behind its back (the documents of one base); Elsewhere tells it as a store that hears the other tabs would

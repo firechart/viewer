@@ -1,0 +1,56 @@
+<!-- The page of a care plan: its title, period, status and intent, then the details and the activities -->
+<Component name="CarePlan.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{iif(%record.title.exists(), %record.title, iif(%record.category.exists(), %record.category.first(), %record.id))}}">
+    <Field label="{{%strings.Period}}" value="{{%record.period}}"/>
+    <Field label="{{%strings.Created}}" value="{{%record.created}}"/>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.status}}"/>
+      <If test="{{%record.intent.exists()}}">
+        <Badge text="{{%record.intent}}"/>
+      </If>
+    </Field>
+  </Section>
+
+  <If test="{{%record.category.exists() or %record.description.exists() or %record.author.exists() or %record.contributor.exists() or %record.careTeam.exists() or %record.addresses.exists() or %record.goal.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Category}}">
+        <Value value="{{%record.category}}" separator=", "/>
+      </Field>
+      <Field label="{{%strings.Description}}" value="{{%record.description}}"/>
+      <Field label="{{%strings.Author}}">
+        <Link value="{{%record.author}}"/>
+      </Field>
+      <Field label="{{%strings.Contributors}}">
+        <Link value="{{%record.contributor}}"/>
+      </Field>
+      <Field label="{{%strings.CareTeam}}">
+        <Link value="{{%record.careTeam}}"/>
+      </Field>
+      <Field label="{{%strings.Addresses}}">
+        <Link value="{{%record.addresses}}"/>
+      </Field>
+      <Field label="{{%strings.Goals}}">
+        <Link value="{{%record.goal}}"/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.activity.exists()}}">
+    <Section title="{{%strings.Activities}}">
+      <Repeat each="{{%record.activity}}" as="activity">
+        <Row meta="{{%activity.detail.status}}">
+          <Main>
+            <If test="{{%activity.detail.exists()}}">
+              <Value value="{{%activity.detail.code}}"/>
+            </If>
+            <If test="{{%activity.detail.empty()}}">
+              <Link value="{{%activity.reference}}"/>
+            </If>
+          </Main>
+        </Row>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

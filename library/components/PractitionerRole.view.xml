@@ -1,0 +1,33 @@
+<!-- The page of a practitioner role: the practitioner and the period, then the role, where and for whom it is held -->
+<Component name="PractitionerRole.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{iif(%record.practitioner.exists(), %record.practitioner, %record.id)}}">
+    <Field label="{{%strings.Practitioner}}">
+      <Link value="{{%record.practitioner}}"/>
+    </Field>
+    <Field label="{{%strings.Period}}" value="{{%record.period}}"/>
+    <If test="{{%record.active = false}}">
+      <Field label="{{%strings.Status}}">
+        <Badge text="{{%strings.InactiveBadge}}" tone="danger"/>
+      </Field>
+    </If>
+  </Section>
+
+  <If test="{{%record.code.exists() or %record.specialty.exists() or %record.organization.exists() or %record.location.exists() or %record.healthcareService.exists() or %record.telecom.exists()}}">
+    <Section title="{{%strings.Role}}">
+      <Field label="{{%strings.Role}}" value="{{%record.code}}"/>
+      <Field label="{{%strings.Specialty}}" value="{{%record.specialty}}"/>
+      <Field label="{{%strings.Organization}}">
+        <Link value="{{%record.organization}}"/>
+      </Field>
+      <Field label="{{%strings.Location}}">
+        <Link value="{{%record.location}}"/>
+      </Field>
+      <Field label="{{%strings.Service}}">
+        <Link value="{{%record.healthcareService}}"/>
+      </Field>
+      <Field label="{{%strings.PhoneAndEmail}}" value="{{%record.telecom}}"/>
+    </Section>
+  </If>
+</Component>

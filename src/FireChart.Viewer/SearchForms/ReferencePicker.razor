@@ -1,0 +1,136 @@
+@using System.Globalization
+@using FireChart.Viewer.Core.Fhir
+@using FireChart.Viewer.Core.Forms
+@using FireChart.Viewer.Core.Search
+@using FireChart.Viewer.Library
+@inject Flox.Shared.Components.FloxDialogService Dialogs
+@inject IFhirServerReader Reader
+@inject IReleaseModels Models
+@inject IServerResourceTypeProvider Types
+@inject ViewerSearchForms SearchForms
+@inject FireChart.Viewer.Core.IViewerAssets LibraryAssets
+
+@* The list of a type to choose a record of a reference field from: its own search form, then the records it finds as tiles; a tap on one chooses it.
+   A sheet over the search form, the whole screen on a phone; Back returns to the form without a choice. Its own reference fields are plain text *@
+<CascadingValue Value=@Session IsFixed="true">
+    <div class="flex h-full flex-col gap-3" data-reference-picker=@ResourceType>
+        <div class="flex items-center gap-2">
+            <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@FloxStrings.Caption_Back AriaLabel=@FloxStrings.Caption_Back OnClick=@(() => Dialogs.Close(null))><FloxIcon Icon="arrow_back"/></Button>
+            <h6 class="m-0 text-sm font-semibold">@string.Format(CultureInfo.CurrentCulture, Strings.Caption_ChooseRecord, ResourceType)</h6>
+        </div>
+        @if (_form is null)
+        {
+            <CircularProgress Compact="true"/>
+        }
+        else if (_page is null)
+        {
+            <div class="min-h-0 flex-1">
+                <SearchFormView Definition=@_form Values=@_values Server=@Session.Server Nested="true" OnApply=@SearchAsync ApplyText=@FloxStrings.Caption_Search/>
+            </div>
+        }
+        else
+        {
+            <div class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
+                <Button Variant="ButtonVariant.Outline" OnClick=@(() => _page = null) IconName="filter_alt" Text=@Strings.Caption_ChangeFilter/>
+                @if (_page.Items.Count == 0)
+                {
+                    <p class="fx-muted">@Strings.Message_NothingFound</p>
+                }
+                @Tiles(_page)
+            </div>
+        }
+    </div>
+</CascadingValue>
+
+@code {
+
+    /// <summary>The record chosen: its reference (<c>Patient/123</c>) and its line of text.</summary>
+    /// <param name="Reference">The reference.</param>
+    /// <param name="Caption">The line of text.</param>
+    public sealed record PickedRecord(string Reference, string Caption);
+
+    private SearchFormDefinition? _form;
+    private IReadOnlyDictionary<string, SearchFieldValue>? _values;
+    private ResourcePage? _page;
+    private string? _release;
+
+    /// <summary>The session of the list: its server.</summary>
+    [Parameter, EditorRequired]
+    public ViewerSession Session { get; set; } = null!;
+
+    /// <summary>The type to choose a record of.</summary>
+    [Parameter, EditorRequired]
+    public string ResourceType { get; set; } = string.Empty;
+
+    /// <summary>Opens the list of a type over the search form and waits for a choice.</summary>
+    /// <param name="dialogs">The dialogs of Flox.</param>
+    /// <param name="session">The session of the list.</param>
+    /// <param name="resourceType">The type.</param>
+    /// <returns>The record chosen, or <see langword="null"/>.</returns>
+    public static async Task<PickedRecord?> ShowAsync(Flox.Shared.Components.FloxDialogService dialogs, ViewerSession session, string resourceType)
+    {
+        var options = Flox.Shared.Components.SheetOptions.Modal() with { ShowTitle = false };
+        return await dialogs.OpenAsync<ReferencePicker>(resourceType, new Dictionary<string, object?>
+        {
+            [nameof(Session)] = session,
+            [nameof(ResourceType)] = resourceType
+        }, options) as PickedRecord;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _release = (await Types.GetAsync(Session.Server)).Release;
+        _form = await SearchForms.FindAsync(new SearchFormKey(_release.ToLowerInvariant(), ResourceType)) ?? new SearchFormDefinition { Name = ResourceType };
+    }
+
+    private async Task SearchAsync(SearchFormDialogResult result)
+    {
+        _values = result.Values;
+        var search = SearchFormSearchMapping.Apply(FhirSearchState.Empty, SearchFormSearchMapping.Read(_form!, FhirSearchState.Empty), result.Conditions);
+        var library = new FireChart.Viewer.Core.Reports.ReportLibrary(LibraryAssets, VendorLibrary.UrlOf);
+        _page = await Reader.SearchAsync(Session.Server, ResourceType, search, await FireChart.Viewer.Core.Reports.ReportNeeds.OfTileAsync(library, ResourceType));
+    }
+
+    private const string PickClass = "block w-full cursor-pointer rounded-md border-0 bg-transparent p-0 text-start text-inherit hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+
+    // The tiles of the records, each a button that chooses it (ReportHost and RecordTile are internal: drawn by the builder)
+    private RenderFragment Tiles(ResourcePage page) => builder =>
+    {
+        RenderFragment rows = inner =>
+        {
+            foreach (var item in page.Items)
+            {
+                var reference = $"{item.ResourceType}/{item.Id}";
+                inner.OpenElement(0, "button");
+                inner.SetKey(reference);
+                inner.AddAttribute(1, "type", "button");
+                inner.AddAttribute(2, "class", PickClass);
+                inner.AddAttribute(3, "data-reference-pick", reference);
+                inner.AddAttribute(4, "onclick", EventCallback.Factory.Create(this, () => ChooseAsync(item)));
+                inner.OpenComponent<FireChart.Viewer.Reports.RecordTile>(5);
+                inner.AddComponentParameter(6, nameof(FireChart.Viewer.Reports.RecordTile.Item), item);
+                inner.CloseComponent();
+                inner.CloseElement();
+            }
+        };
+        builder.OpenComponent<FireChart.Viewer.Reports.ReportHost>(0);
+        builder.AddComponentParameter(1, nameof(FireChart.Viewer.Reports.ReportHost.Related), page.Related ?? []);
+        builder.AddComponentParameter(2, nameof(FireChart.Viewer.Reports.ReportHost.ChildContent), rows);
+        builder.CloseComponent();
+    };
+
+    private async Task ChooseAsync(ResourceSummary item)
+    {
+        var reference = $"{item.ResourceType}/{item.Id}";
+        var caption = reference;
+        if (item.Json is { } json)
+        {
+            var model = await Models.GetAsync(_release);
+            var text = FireChart.Viewer.Core.Reports.ReportText.TitleOf(FireChart.Viewer.Core.Reports.ReportExpressions.Parse(json, model), CultureInfo.CurrentCulture);
+            caption = string.IsNullOrWhiteSpace(text) ? reference : text;
+        }
+
+        Dialogs.Close(new PickedRecord(reference, caption));
+    }
+
+}

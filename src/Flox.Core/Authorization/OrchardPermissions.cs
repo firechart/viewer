@@ -6,11 +6,6 @@ namespace Flox.Core.Authorization;
 public static class OrchardPermissions
 {
     /// <summary>
-    /// Implies every other permission.
-    /// </summary>
-    public const string SITE_OWNER = "SiteOwner";
-
-    /// <summary>
     /// Entering the administration.
     /// </summary>
     public const string ACCESS_ADMIN_PANEL = "AccessAdminPanel";

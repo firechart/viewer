@@ -1,3 +1,4 @@
+@using BlazorBlueprint.Components
 @attribute [Route(SharedRoutes.TASK)]
 @attribute [Authorize(Policy = FloxPolicies.AUTHENTICATED)]
 
@@ -7,19 +8,22 @@
 
 <AppBarTitle>@Strings.Caption_BackgroundTask</AppBarTitle>
 
-<AppBarCommands>
-    <AppBarCommand Icon="delete" IconColor="var(--rz-danger)" Title=@Strings.Caption_Delete OnClick=@DeleteAsync/>
-</AppBarCommands>
-
 <Breadcrumbs Items=@Breadcrumbs/>
+
+<Heading>
+    <ChildContent>@(State.Item?.DisplayName ?? Strings.Caption_BackgroundTask)</ChildContent>
+    <Commands>
+        <AppBarCommand Icon="delete" IconColor="var(--destructive)" Title=@Strings.Caption_Delete Disabled=@(State.Item == null) OnClick=@DeleteAsync/>
+    </Commands>
+</Heading>
 
 @if (State.Item == null)
 {
-    <RadzenSkeleton/>
+    <BbSkeleton Class="h-4"/>
 }
 else
 {
-    <ListSection Caption=@Strings.Caption_Properties Definitions>
+    <ListSection Title=@Strings.Caption_Properties Definitions>
         <PropertyTile Label="Id" Value=@State.Item.Uid.ToString()/>
         <PropertyTile Label="Created at" Value=@State.Item.CreatedAt.ToString()/>
         <PropertyTile Label="Completed at" Value=@State.Item.CompletedAt?.ToString()/>
@@ -28,7 +32,7 @@ else
 
     @if (!string.IsNullOrEmpty(State.Item.Error))
     {
-        <RadzenAlert AlertStyle="Radzen.AlertStyle.Danger" Variant="Radzen.Variant.Flat" AllowClose="false" class="rz-mt-2">@State.Item.Error</RadzenAlert>
+        <Alert Kind="AlertKind.Danger" Class="mt-2">@State.Item.Error</Alert>
     }
 
     <BackgroundTaskLogs TaskId=@State.Item.Uid/>
@@ -52,12 +56,6 @@ else
         Breadcrumbs.Add(Strings.Caption_ImportTasks,
                         href: NavigationManager.Tasks()
                                                 .ToUrl());
-        if (State.Item != null)
-        {
-            Breadcrumbs.Add(Strings.Caption_ImportTask,
-                            href: NavigationManager.Task(State.Item.Uid)
-                                                    .ToUrl());
-        }
     }
 
     private async Task DeleteAsync()
@@ -67,10 +65,9 @@ else
             if (State.Item != null && await this.ConfirmAsync(Strings.Caption_ConfirmDelete))
             {
                 await State.DeleteAsync();
+                NavigationManager.Tasks()
+                                  .Navigate();
             }
-
-            NavigationManager.Tasks()
-                              .Navigate();
         }
         catch (Exception ex)
         {

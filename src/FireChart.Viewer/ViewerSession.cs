@@ -37,6 +37,7 @@ public sealed class ViewerSession
         Server = server;
         Location = location;
         SmartRedirectUri = smartRedirectUri;
+        Remember();
     }
 
     /// <summary>
@@ -79,6 +80,16 @@ public sealed class ViewerSession
     /// </code>
     /// </example>
     public bool Bookmarks { get; init; } = true;
+
+    /// <summary>
+    /// How the summary and a report load their records: the page size of their searches and whether they are shown only once everything has come.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var session = new ViewerSession(server, location) { Summary = new ViewerSummaryOptions { LoadAll = true } };
+    /// </code>
+    /// </example>
+    public ViewerSummaryOptions Summary { get; init; } = ViewerSummaryOptions.Default;
 
     /// <summary>
     /// A page of the Viewer as an <c>href</c> of the document.
@@ -159,6 +170,33 @@ public sealed class ViewerSession
         if (ViewerRoutes.Parse(Location.Location) is { Page: ViewerPage.Summary, Peek: null })
         {
             SheetPushed = false;
+        }
+
+        Remember();
+    }
+
+    private const int RecentCount = 20;
+
+    private readonly List<string> _recent = [];
+
+    // The records opened in this session, the last first, as references (Patient/123): a reference field offers them. In memory only, of this server
+    internal IReadOnlyList<string> RecentRecords => _recent;
+
+    private void Remember()
+    {
+        var route = ViewerRoutes.Parse(Location.Location);
+        foreach (var opened in new[] { route?.Peek, route })
+        {
+            if (opened is { Page: ViewerPage.Resource or ViewerPage.Summary, ResourceType: { } type, Id: { } id })
+            {
+                var reference = $"{type}/{id}";
+                _recent.Remove(reference);
+                _recent.Insert(0, reference);
+                if (_recent.Count > RecentCount)
+                {
+                    _recent.RemoveAt(_recent.Count - 1);
+                }
+            }
         }
     }
 }

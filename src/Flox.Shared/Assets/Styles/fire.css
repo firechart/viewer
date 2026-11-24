@@ -1,6 +1,6 @@
 /*
- * The fire palette (black - red - dark orange - orange - white): the colors of the roles of palette.css (the clients and the site) and of
- * the theme of the administration of the server, which imports this file; utilities bg-fire-*, text-fire-*. White text needs ember or darker (4.7:1 and up), orange and
+ * The fire palette (black - red - dark orange - orange - white): the colors of the theme of the administration (the clients take the
+ * recipe Sunset of Blazor Blueprint, wwwroot/theme.css) of the server, which imports this file; utilities bg-fire-*, text-fire-*. White text needs ember or darker (4.7:1 and up), orange and
  * amber carry black text (8:1 and up).
  */
 @theme {

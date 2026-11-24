@@ -61,8 +61,7 @@ public static class SharedMenuItems
     {
         Text = Strings.About,
         Href = SharedRoutes.ABOUT,
-        Icon = MaterialIcons.Help,
-        Placement = FloxMenuPlacement.More
+        Icon = MaterialIcons.Help
     };
 
     /// <summary>Entry of the list of background tasks.</summary>

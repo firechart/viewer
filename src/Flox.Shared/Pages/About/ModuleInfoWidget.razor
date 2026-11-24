@@ -5,16 +5,16 @@
     return;
 }
 
-<RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-xs)" class="rz-mt-4 rz-mb-6">
-    <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-md)">
-        <RadzenImage Path=@Branding.Icon class="size-16 shrink-0 rounded-lg object-contain" AlternateText=@Branding.Title/>
-        <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="text-accent-ink"><b>@Branding.Title</b></RadzenText>
-    </RadzenStack>
+<div class="flex flex-col items-center gap-1 mt-4 mb-6">
+    <div class="flex items-center gap-3">
+        <img class="size-16 shrink-0 rounded-lg object-contain" src=@Branding.Icon alt=@Branding.Title/>
+        <h2 class="m-0 text-base font-bold text-accent-ink">@Branding.Title</h2>
+    </div>
 
-    <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mt-2 rz-text-align-center">@Branding.Subtitle</RadzenText>
-</RadzenStack>
+    <h6 class="m-0 text-sm font-medium mt-2 text-center">@Branding.Subtitle</h6>
+</div>
 
-<ListSection Caption=@Strings.Caption_AboutThisApp>
+<ListSection Title=@Strings.Caption_AboutThisApp>
     @if (!string.IsNullOrEmpty(Branding.Version))
     {
         <ListTile TitleText=@Strings.Caption_Version SubtitleText=@Branding.Version/>
@@ -24,7 +24,7 @@
     {
         <ListTile TitleText=@Strings.Caption_SourceCode SubtitleText=@Branding.SourceCodeUrl OnClick="() => OpenPackageUrl(Branding.SourceCodeUrl)">
             <Trailing>
-                <FloxIcon Icon="open_in_new" Size="1.25rem" Color="var(--rz-text-secondary-color)"/>
+                <FloxIcon Icon="open_in_new" Size="1.25rem" Color="var(--muted-foreground)"/>
             </Trailing>
         </ListTile>
     }
@@ -32,7 +32,7 @@
         <Trailing>
             @if (!string.IsNullOrEmpty(Branding.LicenseUrl))
             {
-                <FloxIcon Icon="open_in_new" Size="1.25rem" Color="var(--rz-text-secondary-color)"/>
+                <FloxIcon Icon="open_in_new" Size="1.25rem" Color="var(--muted-foreground)"/>
             }
         </Trailing>
     </ListTile>

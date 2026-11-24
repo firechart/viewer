@@ -12,7 +12,13 @@ public enum ListRowKind
     Empty,
 
     /// <summary>The line that asks for the next page.</summary>
-    More
+    More,
+
+    /// <summary>The note that the list read as many records as it may: the rest is found with the filter.</summary>
+    Limit,
+
+    /// <summary>The tile in the place of <see cref="More"/> while the next page is read.</summary>
+    Loading
 }
 
 /// <summary>
@@ -20,5 +26,4 @@ public enum ListRowKind
 /// </summary>
 /// <param name="Kind">What the line is.</param>
 /// <param name="Item">The record of a <see cref="ListRowKind.Card"/>.</param>
-/// <param name="Tile">Its tile.</param>
-public sealed record ListRow(ListRowKind Kind, ResourceSummary? Item = null, TileModel? Tile = null);
+public sealed record ListRow(ListRowKind Kind, ResourceSummary? Item = null);

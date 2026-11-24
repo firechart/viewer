@@ -1,0 +1,119 @@
+/*
+ * The theme of Blazor Blueprint (shadcn/ui tokens): light on :root and dark under .dark (FloxThemeHost sets the class) or data-theme="dark" (the
+ * pages of the site). Linked before _content/BlazorBlueprint.Components/blazorblueprint.css by every host; the pages of the server import it into
+ * their Tailwind build.
+ *
+ * The light one is coffee with cream and of one white point: every neutral (the page, the cards, the popovers, the sidebar, the greys under a hover or a
+ * selection, the text, the borders) is a brown of the same family, hue 44 to 76 with a small chroma. A neutral grey or a pure white beside a warm
+ * page looks bluish and dirty, a cool text fights it: that is what made the earlier light theme tiring. A palette of five coffees (F7F0E7, E7D8C9,
+ * CFB59C, A38368, 5B3F2E): the page E7D8C9, the cards, the popovers and the sidebar F7F0E7, a hover or a selection between the page and CFB59C, the
+ * accent and the app bar 5B3F2E; the text darker than the palette (3B2A20, the secondary 6B4E3A), its A38368 is too light for text. The borders are
+ * the dark roast with transparency, so they are the same on any surface. The dark one is the recipe Sunset (zinc and orange)
+ */
+
+:root {
+    --radius: 0.65rem;
+    /* The weights of the light theme are a step lighter than those of Tailwind and Blueprint (500 and 600): dark medium text on the beige read
+       heavy. One rule for every heading, button, tab and badge, on the system font of any platform: where it has a weight axis (Windows 11, macOS
+       and iOS, recent Android) 450 and 550 are drawn as such, an older one rounds them to its nearest weights. The title of the app bar keeps 600 */
+    --font-weight-medium: 450;
+    --font-weight-semibold: 550;
+    --bb-font-weight-medium: 450;
+    --bb-font-weight-semibold: 550;
+    /* The caption of a section (Heading, ListSection): a touch heavier than the captions of the buttons beside it */
+    --flox-caption-weight: 500;
+    --background: #e7d8c9;
+    --foreground: #3b2a20;
+    --card: #f7f0e7;
+    --card-foreground: #3b2a20;
+    --popover: #f7f0e7;
+    --popover-foreground: #3b2a20;
+    --primary: #5b3f2e;
+    --primary-foreground: #f7f0e7;
+    --secondary: #dbc7b3;
+    --secondary-foreground: #3b2a20;
+    --muted: #e0cfbe;
+    --muted-foreground: #6b4e3a;
+    --accent: #dbc7b3;
+    --accent-foreground: #3b2a20;
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(1 0 0);
+    --border: rgb(91 63 46 / 0.2);
+    --input: rgb(91 63 46 / 0.4);
+    --ring: #a38368;
+    --chart-1: #cfb59c;
+    --chart-2: #a38368;
+    --chart-3: #5b3f2e;
+    --chart-4: #7a5c45;
+    --chart-5: #3b2a20;
+    --sidebar: #f7f0e7;
+    --sidebar-foreground: #3b2a20;
+    --sidebar-primary: #5b3f2e;
+    --sidebar-primary-foreground: #f7f0e7;
+    --sidebar-accent: #dbc7b3;
+    --sidebar-accent-foreground: #3b2a20;
+    --sidebar-border: rgb(91 63 46 / 0.2);
+    --sidebar-ring: #a38368;
+    /* The hover of a row of a list (ListTile): a shade of the caramel of the palette over the card (the espresso mixed in looked grey), the accent was too heavy for a whole row */
+    --row-hover: color-mix(in oklab, var(--card), #cfb59c 25%);
+}
+
+/* The app bar of the light theme is inverted, a dark roast over the cappuccino page: its tokens are redefined on it, so the buttons, their hover and
+   the title follow. The menus it opens are drawn in a portal and keep the light tokens. The dark theme leaves it as it is */
+:root:not(.dark, [data-theme="dark"]) .flox-app-bar {
+    color-scheme: dark;
+    --background: #5b3f2e;
+    --foreground: #f7f0e7;
+    --primary: #cfb59c;
+    --primary-foreground: #3b2a20;
+    --secondary: #6e4f3b;
+    --secondary-foreground: #f7f0e7;
+    --accent: #6e4f3b;
+    --accent-foreground: #f7f0e7;
+    --muted-foreground: #e7d8c9;
+    --border: rgb(59 42 32 / 0.6);
+    --input: rgb(247 240 231 / 0.3);
+    --ring: #cfb59c;
+}
+
+.dark,
+[data-theme="dark"] {
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --bb-font-weight-medium: 500;
+    --bb-font-weight-semibold: 600;
+    --flox-caption-weight: 600;
+    --background: oklch(0.141 0.005 285.823);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.21 0.006 285.885);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.21 0.006 285.885);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.705 0.213 47.604);
+    --primary-foreground: oklch(0.98 0.016 73.684);
+    --secondary: oklch(0.274 0.006 286.033);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.274 0.006 286.033);
+    --muted-foreground: oklch(0.705 0.015 286.067);
+    --accent: oklch(0.274 0.006 286.033);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --destructive-foreground: oklch(0.985 0 0);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.408 0.123 38.172);
+    --chart-1: oklch(0.837 0.128 66.29);
+    --chart-2: oklch(0.705 0.213 47.604);
+    --chart-3: oklch(0.646 0.222 41.116);
+    --chart-4: oklch(0.553 0.195 38.402);
+    --chart-5: oklch(0.47 0.157 37.304);
+    --sidebar: oklch(0.21 0.006 285.885);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.705 0.213 47.604);
+    --sidebar-primary-foreground: oklch(0.98 0.016 73.684);
+    --sidebar-accent: oklch(0.274 0.006 286.033);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.408 0.123 38.172);
+    --row-hover: var(--accent);
+}

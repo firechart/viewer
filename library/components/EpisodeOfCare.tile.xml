@@ -1,0 +1,16 @@
+<!-- An episode of care in a list: its type, its period and managing organization; its status at the end -->
+<Component name="EpisodeOfCare.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.type.exists(), %record.type.first(), %record.id)}}" patient="{{%record.patient}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.period}}"/>
+        <Value value="{{%record.managingOrganization}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

@@ -192,6 +192,27 @@ public partial class EntitySearchForm<TEntity>
         _values.Clear();
     }
 
+    // Any, then yes, then no, then any again
+    private static bool? NextBool(bool? value)
+    {
+        return value switch
+        {
+            null => true,
+            true => false,
+            false => null
+        };
+    }
+
+    private static string? NumberText(double? value)
+    {
+        return value?.ToString(System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    private static double? ParseNumber(string? text)
+    {
+        return double.TryParse(text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var value) ? value : null;
+    }
+
     private bool? GetBool(SearchFieldDescriptor field)
     {
         return _values.GetValueOrDefault(field.Field) as bool?;

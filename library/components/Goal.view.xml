@@ -1,0 +1,34 @@
+<!-- The page of a goal: its description, start and statuses, its details and its targets -->
+<Component name="Goal.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{%record.description}}">
+    <Field label="{{%strings.Start}}" value="{{%record.start}}"/>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.lifecycleStatus}}"/>
+      <Status value="{{%record.achievementStatus}}"/>
+    </Field>
+  </Section>
+
+  <If test="{{%record.category.exists() or %record.priority.exists() or %record.expressedBy.exists() or %record.addresses.exists() or %record.outcomeCode.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Category}}" value="{{%record.category}}"/>
+      <Field label="{{%strings.Priority}}" value="{{%record.priority}}"/>
+      <Field label="{{%strings.ExpressedBy}}">
+        <Link value="{{%record.expressedBy}}"/>
+      </Field>
+      <Field label="{{%strings.Addresses}}">
+        <Link value="{{%record.addresses}}"/>
+      </Field>
+      <Field label="{{%strings.Outcome}}" value="{{%record.outcomeCode}}"/>
+    </Section>
+  </If>
+
+  <If test="{{%record.target.exists()}}">
+    <Section title="{{%strings.Targets}}">
+      <Repeat each="{{%record.target}}" as="target">
+        <Row main="{{%target.measure}}" meta="{{iif(%target.due.exists(), 'due ', '')}}{{%target.due}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

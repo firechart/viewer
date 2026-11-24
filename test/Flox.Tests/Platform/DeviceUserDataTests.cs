@@ -30,6 +30,20 @@ public class DeviceUserDataTests
         return new LocalGuidEntityStorage<T>(store, NullLogger<LocalEntityStorage<Guid, T>>.Instance);
     }
 
+    // The transfer takes its storage from the services of the scope
+    private sealed class OneService(object service) : IServiceProvider
+    {
+        public object? GetService(Type serviceType)
+        {
+            return serviceType.IsInstanceOfType(service) ? service : null;
+        }
+    }
+
+    private static UserBookmarkTransfer TransferOver(IGuidEntityStorage<UserBookmark> storage)
+    {
+        return new UserBookmarkTransfer(new OneService(storage));
+    }
+
     private static UserBookmark ViewerBookmark(string location, string server = "https://fhir.test/r4/")
     {
         return new UserBookmark
@@ -52,11 +66,11 @@ public class DeviceUserDataTests
         var device = StorageOf<UserBookmark>(new InMemoryDocumentStore());
         await device.InsertAsync(ViewerBookmark("resources/Patient/1"));
         await device.InsertAsync(ViewerBookmark("resources/Patient?family=Smith"));
-        var file = await new UserBookmarkTransfer(device).ExportAsync();
+        var file = await TransferOver(device).ExportAsync();
 
         var other = StorageOf<UserBookmark>(new InMemoryDocumentStore());
         await other.InsertAsync(ViewerBookmark("resources/Patient/1", "https://fhir.test/r4"));
-        var transfer = new UserBookmarkTransfer(other);
+        var transfer = TransferOver(other);
         var first = await transfer.ImportAsync(new MemoryStream(file));
         var again = await transfer.ImportAsync(new MemoryStream(file));
 
@@ -69,7 +83,7 @@ public class DeviceUserDataTests
 
     private static async Task AFileThatIsNotAnExport_IsRefused()
     {
-        var transfer = new UserBookmarkTransfer(StorageOf<UserBookmark>(new InMemoryDocumentStore()));
+        var transfer = TransferOver(StorageOf<UserBookmark>(new InMemoryDocumentStore()));
         foreach (var text in new[] { "not json", "{\"format\":\"other\",\"version\":1,\"bookmarks\":[]}", "{\"format\":\"flox-bookmarks\",\"version\":99,\"bookmarks\":[]}" })
         {
             await Assert.ThatAsync(() => transfer.ImportAsync(new MemoryStream(Encoding.UTF8.GetBytes(text))), Throws.TypeOf<InvalidDataException>(), text);

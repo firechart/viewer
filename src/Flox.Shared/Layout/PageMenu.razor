@@ -1,86 +1,44 @@
-@implements IDisposable
-@inject NavigationManager Navigation
+@using BlazorBlueprint.Components
 
-@* The menu of a page: the button with the vertical ellipsis at the right of the app bar (or of the bar of SectionName) and a popup with what the page puts in it (any markup: a list
-   of the sections of the page, switches, commands); PageMenuItem and PageMenuSeparator give the rows the common look. A page without it has no button.
-   The content gets the menu as its context to close it after a choice of its own; the popup closes itself after a PageMenuItem, on a click outside,
-   on Escape (the focus goes back to the button) and when the page changes. A group of buttons, not role="menu": it has no keys of a menu
-   (arrows, roving focus), and its content may be any markup *@
-<SectionContent SectionName=@SectionName>
-    <RadzenButton @ref=_button Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" title=@(Title ?? Strings.Caption_More)
-                  aria-label=@(Title ?? Strings.Caption_More) aria-expanded=@(_open ? "true" : "false") Click=@ToggleAsync>
-        <FloxIcon Icon="more_vert"/>
-    </RadzenButton>
-    <RadzenPopup @ref=_popup Lazy="false" class="flox-page-menu" Style=@PopupStyle Open=@(() => SetOpen(true)) Close=@(() => SetOpen(false))>
-        <div role="group" aria-label=@(Title ?? Strings.Caption_More) @onkeydown=@OnKeyDownAsync>
-            <CascadingValue Value="this" IsFixed="true">
-                @ChildContent?.Invoke(this)
-            </CascadingValue>
-        </div>
-    </RadzenPopup>
-</SectionContent>
+@* A menu of commands (PageMenuItem, PageMenuSeparator) behind a button with an icon (the vertical ellipsis): in place, or in the outlet SectionName
+   (the menu of a page in the header of a component that has its own, the Viewer). The menu closes when a command is picked *@
+@if (SectionName is null)
+{
+    @Menu
+}
+else
+{
+    <SectionContent SectionName=@SectionName>@Menu</SectionContent>
+}
 
 @code {
-    private const string PopupStyle = "display: none; position: absolute; width: min(22rem, calc(100vw - 1rem)); max-height: min(70vh, 36rem); overflow-y: auto;"
-                                      + " padding: var(--rz-panel-padding, 0.5rem) 0; background-color: var(--rz-panel-background-color);"
-                                      + " border: var(--rz-panel-border); border-radius: var(--rz-border-radius); box-shadow: var(--rz-panel-shadow); z-index: 1001";
 
-    private RadzenButton? _button;
-    private RadzenPopup? _popup;
     private bool _open;
 
-    // Where the button goes: the app bar (appbar-menu) by default; a component that has its own bar (the Viewer) names its outlet
+    // The outlet of the menu; none: the menu stands where it is written
     [Parameter]
-    public string SectionName { get; set; } = "appbar-menu";
+    public string? SectionName { get; set; }
 
-    // The tooltip of the button; "More" when not given
+    [Parameter]
+    public string Icon { get; set; } = "more_vert";
+
+    // The tooltip and the name of the button; "More" when not given
     [Parameter]
     public string? Title { get; set; }
 
     [Parameter]
-    public RenderFragment<PageMenu>? ChildContent { get; set; }
+    public RenderFragment? ChildContent { get; set; }
 
-    public Task CloseAsync()
-    {
-        return _popup?.CloseAsync() ?? Task.CompletedTask;
-    }
+    private RenderFragment Menu => @<BbDropdownMenu @bind-Open=@_open>
+                                       <BbDropdownMenuTrigger>
+                                           <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@(Title ?? Strings.Caption_More) AriaLabel=@(Title ?? Strings.Caption_More)
+                                                   aria-haspopup="menu" aria-expanded=@(_open ? "true" : "false") data-page-menu>
+                                               <FloxIcon Icon=@Icon/>
+                                           </Button>
+                                       </BbDropdownMenuTrigger>
+                                       <BbDropdownMenuContent Align="BlazorBlueprint.Primitives.PopoverAlign.End" Class="max-h-[min(70vh,36rem)] min-w-56 overflow-y-auto print:hidden">
+                                           @ChildContent
+                                       </BbDropdownMenuContent>
+                                   </BbDropdownMenu>;
 
-    protected override void OnInitialized()
-    {
-        Navigation.LocationChanged += OnLocationChanged;
-    }
-
-    private Task ToggleAsync()
-    {
-        return _popup is not null && _button is not null ? _popup.ToggleAsync(_button.Element) : Task.CompletedTask;
-    }
-
-    private void SetOpen(bool open)
-    {
-        _open = open;
-    }
-
-    private async Task OnKeyDownAsync(KeyboardEventArgs args)
-    {
-        if (args.Key != "Escape")
-        {
-            return;
-        }
-
-        await CloseAsync();
-        if (_button is not null)
-        {
-            await _button.Element.FocusAsync();
-        }
-    }
-
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        _ = InvokeAsync(CloseAsync);
-    }
-
-    public void Dispose()
-    {
-        Navigation.LocationChanged -= OnLocationChanged;
-    }
 }

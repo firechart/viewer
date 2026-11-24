@@ -141,6 +141,19 @@ public static class SearchFormGenerator
         return words.Length == 0 ? code : char.ToUpperInvariant(words[0]) + words[1..];
     }
 
+    // The control of a parameter of a type: a date is a range, a number a range, a quantity a number with a unit, a reference a lookup
+    internal static SearchFieldControl ControlOf(SearchParameterType type)
+    {
+        return type switch
+        {
+            SearchParameterType.Date => SearchFieldControl.DateRange,
+            SearchParameterType.Number => SearchFieldControl.NumberRange,
+            SearchParameterType.Quantity => SearchFieldControl.Quantity,
+            SearchParameterType.Reference => SearchFieldControl.Reference,
+            _ => SearchFieldControl.Text
+        };
+    }
+
     private static SearchFormField FieldOf(SearchParameterMetadata parameter, string resourceType, int order, FhirReleaseMetadata metadata)
     {
         var field = new SearchFormField
@@ -152,14 +165,7 @@ public static class SearchFormGenerator
             Order = order,
             MultipleOr = parameter.MultipleOr ?? false,
             MultipleAnd = parameter.MultipleAnd ?? false,
-            Control = parameter.Type switch
-            {
-                SearchParameterType.Date => SearchFieldControl.DateRange,
-                SearchParameterType.Number => SearchFieldControl.NumberRange,
-                SearchParameterType.Quantity => SearchFieldControl.Quantity,
-                SearchParameterType.Reference => SearchFieldControl.Reference,
-                _ => SearchFieldControl.Text
-            },
+            Control = ControlOf(parameter.Type),
             Source = new FieldSource { ParameterUrl = parameter.Url, Expression = parameter.Expression }
         };
         field.Label.SetDefault(Humanize(parameter.Code));

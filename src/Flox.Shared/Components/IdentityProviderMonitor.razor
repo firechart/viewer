@@ -1,17 +1,15 @@
+@using BlazorBlueprint.Components
 @implements IDisposable
 @inject IServiceProvider Services
 
 @if (_status is { IsUnavailable: true })
 {
-    <RadzenAlert AlertStyle="Radzen.AlertStyle.Warning" Variant="Radzen.Variant.Flat" AllowClose="false"
-                 class="fixed inset-x-0 bottom-0 z-[9998] rz-border-radius-0">
-        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.Center"
-                     Wrap="Radzen.FlexWrap.Wrap" Gap="var(--gap-md)">
+    <Alert Kind="AlertKind.Warning" Class="fixed inset-x-0 bottom-0 z-[9998] rounded-none">
+        <div class="flex items-center justify-center flex-wrap gap-3">
             <span>@Strings.Identity_Unavailable</span>
-            <RadzenButton Variant="Radzen.Variant.Outlined" ButtonStyle="Radzen.ButtonStyle.Base" Size="Radzen.ButtonSize.Small"
-                          Text=@Strings.Caption_Retry Disabled=@_isRetrying Click=@RetryAsync/>
-        </RadzenStack>
-    </RadzenAlert>
+            <Button Variant="ButtonVariant.Outline" Disabled=@_isRetrying OnClick=@RetryAsync>@Strings.Caption_Retry</Button>
+        </div>
+    </Alert>
 }
 
 @code {

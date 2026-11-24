@@ -1,53 +1,33 @@
-@inject NavigationManager Navigation
-
+@using BlazorBlueprint.Components
 @if (Loading)
 {
     @* The crumbs are made when the page has loaded: a bar of the same height meanwhile, not the crumbs of the previous page *@
-    <RadzenSkeleton class="rz-my-1 rz-mx-2" Style="width: 16rem; max-width: 80%; height: 1.25rem"/>
+    <BbSkeleton Class="mx-3 my-px h-5 w-64 max-w-[80%]"/>
 }
-else if (Visible.Count > 0)
+else if (Items.Count > 0)
 {
-    <RadzenBreadCrumb class="fw-breadcrumbs rz-my-1 max-w-full overflow-x-auto rz-px-2 text-xs [&>.rz-breadcrumb-list]:flex-nowrap [&_.rz-breadcrumb-item]:shrink-0 [&_.rz-breadcrumb-item]:whitespace-nowrap" @attributes="UserAttributes">
-        @foreach (var item in Visible.Select((value, index) => (value, last: index == Visible.Count - 1)))
-        {
-            <RadzenBreadCrumbItem>
-                @if (item.last || string.IsNullOrEmpty(item.value.Href))
+    @* The crumbs of the pages above (Breadcrumb of Blueprint): the page itself is its title, not a crumb. A path wider than the page is swiped
+       sideways; a crumb is 28 px high for a finger *@
+    <BbBreadcrumb Class="-mt-1.5 overflow-x-auto overscroll-x-contain px-3 [scrollbar-width:none] [&>ol]:flex-nowrap" aria-label=@Strings.Caption_Path @attributes="UserAttributes">
+        @* The separators are placed here: AutoSeparator of Blueprint 4.2 draws an empty one (its default chevron is lost) *@
+        <BbBreadcrumbList>
+            @foreach (var (item, index) in Items.Select((item, index) => (item, index)))
+            {
+                @if (index > 0)
                 {
-                    <span class="inline-flex items-center gap-1">
-                        @if (item.value.Icon != FloxMenuItem.NullIcon)
-                        {
-                            <FloxIcon Icon=@item.value.Icon Size="1rem"/>
-                        }
-                        @item.value.Text
-                    </span>
+                    <BbBreadcrumbSeparator/>
                 }
-                else
-                {
-                    <a href=@AppUrl.ToHref(item.value.Href) class="inline-flex items-center gap-1 text-inherit no-underline">
-                        @if (item.value.Icon != FloxMenuItem.NullIcon)
-                        {
-                            <FloxIcon Icon=@item.value.Icon Size="1rem"/>
-                        }
-                        @item.value.Text
-                    </a>
-                }
-            </RadzenBreadCrumbItem>
-        }
-    </RadzenBreadCrumb>
+                <BbBreadcrumbItem Class="shrink-0 whitespace-nowrap" data-crumb>
+                    <BbBreadcrumbLink Href=@(string.IsNullOrEmpty(item.Href) ? null : AppUrl.ToHref(item.Href)) Class="inline-flex items-center gap-1 py-1.5">@Content(item)</BbBreadcrumbLink>
+                </BbBreadcrumbItem>
+            }
+        </BbBreadcrumbList>
+    </BbBreadcrumb>
 }
 
 @code {
 
-    // Inside a frame a crumb is shown when it leads to a page of the frame or is plain text (the name of the server, which the page must not hide)
-    private IReadOnlyList<IFloxMenuItem> Visible
-    {
-        get
-        {
-            var items = Items.ToList();
-            return Navigation.IsEmbedded() ? items.Where((item, index) => index == items.Count - 1 || string.IsNullOrEmpty(item.Href) || EmbeddedMode.IsEmbeddedRoute(item.Href)).ToList() : items;
-        }
-    }
-
+    // The pages above this one, the first is home; the page itself is its title, not a crumb
     [Parameter]
     [EditorRequired]
     public IReadOnlyCollection<IFloxMenuItem> Items { get; set; } = [];
@@ -58,5 +38,19 @@ else if (Visible.Count > 0)
 
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object?> UserAttributes { get; set; } = [];
+
+    private static RenderFragment Content(IFloxMenuItem item)
+    {
+        return @<text>
+                   @if (item.Icon != FloxMenuItem.NullIcon)
+                   {
+                       <FloxIcon Icon=@item.Icon Size="1rem"/>
+                   }
+                   @if (!string.IsNullOrEmpty(item.Text))
+                   {
+                       <span>@item.Text</span>
+                   }
+               </text>;
+    }
 
 }

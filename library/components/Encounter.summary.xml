@@ -1,0 +1,40 @@
+<!-- The summary of an encounter: the banners of the patient and of the encounter, then the records of the encounter, newest first. A server that
+     ignores the parameter encounter answers with every record of the patient: the Feeds keep only those that refer to the encounter -->
+<Component name="Encounter.summary">
+  <Show value="{{%context.subject}}" mode="banner"/>
+  <Show value="{{%context}}" mode="banner"/>
+
+  <Feed code="diagnoses" title="{{%strings.Diagnoses}}"
+        codes="http://hl7.org/fhir/sid/icd-10 http://hl7.org/fhir/sid/icd-10-cm http://id.who.int/icd/release/11/mms http://hl7.org/fhir/sid/icd-9-cm">
+    <Query type="Condition" sort="-recorded-date"/>
+  </Feed>
+
+  <Feed code="procedures" title="{{%strings.HistoryOfProcedures}}" hideIfEmpty="true">
+    <Query type="Procedure" sort="-date"/>
+  </Feed>
+
+  <Feed code="results" title="{{%strings.DiagnosticResults}}" hideIfEmpty="true" display="lab-results" decimals="2">
+    <Query type="Observation" params="category=laboratory,imaging" sort="-date"/>
+    <Query type="DiagnosticReport" sort="-date"/>
+  </Feed>
+
+  <Feed code="vital-signs" title="{{%strings.VitalSigns}}" hideIfEmpty="true" display="observation-trends" decimals="2">
+    <Query type="Observation" params="category=vital-signs" sort="-date"/>
+  </Feed>
+
+  <Feed code="medications" title="{{%strings.MedicationOrders}}" hideIfEmpty="true">
+    <Query type="MedicationRequest" sort="-authoredon"/>
+  </Feed>
+
+  <Feed code="orders" title="{{%strings.Orders}}" hideIfEmpty="true">
+    <Query type="ServiceRequest" sort="-authored"/>
+  </Feed>
+
+  <Feed code="documents" title="{{%strings.Documents}}" hideIfEmpty="true">
+    <Query type="DocumentReference" sort="-date"/>
+  </Feed>
+
+  <Feed code="plan-of-care" title="{{%strings.PlanOfCare}}" hideIfEmpty="true">
+    <Query type="CarePlan" sort="-date"/>
+  </Feed>
+</Component>

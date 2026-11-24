@@ -1,8 +1,9 @@
+@using BlazorBlueprint.Components
 @inject NavigationManager NavigationManager
 @inject INavigationHistoryService NavigationHistoryService
 
 <Center>
-    <RadzenCard Variant="Radzen.Variant.Outlined">
+    <BbCard Class="p-4">
         <IconTitle Icon=@(Icon ?? "info") IconColor=@IconColor Text=@(Caption ?? Strings.Caption_Information)/>
         @Message
         <DialogActions>
@@ -12,10 +13,10 @@
             }
             else
             {
-                <RadzenButton ButtonStyle="Radzen.ButtonStyle.Warning" Text="OK" Click=@HandleOkAsync/>
+                <Button OnClick=@HandleOkAsync>OK</Button>
             }
         </DialogActions>
-    </RadzenCard>
+    </BbCard>
 </Center>
 
 @code {

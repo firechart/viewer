@@ -1,0 +1,46 @@
+<!-- The page of an explanation of benefit: when, payment, use and outcome, its insurer, provider and claim, then its totals and items -->
+<Component name="ExplanationOfBenefit.view">
+  <Param name="record" required="true"/>
+
+  <If test="{{%record.created.exists() or %record.payment.amount.exists() or %record.use.exists() or %record.outcome.exists() or %record.insurer.exists() or %record.provider.exists() or %record.claim.exists() or %record.billablePeriod.exists() or %record.disposition.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Created}}" value="{{%record.created}}"/>
+      <Field label="{{%strings.Payment}}" value="{{%record.payment.amount}}"/>
+      <Field label="{{%strings.Use}}">
+        <If test="{{%record.use.exists()}}">
+          <Badge text="{{%record.use}}"/>
+        </If>
+      </Field>
+      <Field label="{{%strings.Outcome}}">
+        <Status value="{{%record.outcome}}"/>
+      </Field>
+      <Field label="{{%strings.Insurer}}">
+        <Link value="{{%record.insurer}}"/>
+      </Field>
+      <Field label="{{%strings.Provider}}">
+        <Link value="{{%record.provider}}"/>
+      </Field>
+      <Field label="{{%strings.Claim}}">
+        <Link value="{{%record.claim}}"/>
+      </Field>
+      <Field label="{{%strings.BillablePeriod}}" value="{{%record.billablePeriod}}"/>
+      <Field label="{{%strings.Disposition}}" value="{{%record.disposition}}"/>
+    </Section>
+  </If>
+
+  <If test="{{%record.total.exists()}}">
+    <Section title="{{%strings.Totals}}">
+      <Repeat each="{{%record.total}}" as="total">
+        <Row main="{{%total.category}}" meta="{{%total.amount}}"/>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.item.exists()}}">
+    <Section title="{{%strings.Items}}" count="{{%record.item.count()}}">
+      <Repeat each="{{%record.item}}" as="item">
+        <Row main="{{%item.productOrService}}" meta="{{%item.net}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

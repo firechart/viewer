@@ -8,6 +8,19 @@ let sqlite3;
 let pool;
 let next = 0;
 const handles = new Map();
+// The bases being imported, each with the AbortController of its download: not there for anyone until complete
+const importing = new Map();
+
+// A new file needs a free handle of the pool, and the journal of a write another: two are kept free, the pool grows by itself
+function reserve() {
+    return pool.reserveMinimumCapacity(pool.getFileCount() + 2);
+}
+
+function busy(name) {
+    if (importing.has(name)) {
+        throw Object.assign(new Error(`The base ${name} is being downloaded.`), { resultCode: 5 });
+    }
+}
 
 // Values across the boundary: a blob as {"b64"}, an integer beyond the safe range of JavaScript as {"i64"}
 function fromWire(value) {
@@ -68,16 +81,19 @@ const operations = {
         if (!pool) {
             sqlite3 = await sqlite3InitModule();
             pool = await sqlite3.installOpfsSAHPoolVfs({ name: poolName, initialCapacity: capacity });
-            if (pool.getCapacity() < capacity) {
-                await pool.addCapacity(capacity - pool.getCapacity());
-            }
+            await pool.reserveMinimumCapacity(Math.max(capacity, pool.getFileCount() + 2));
         }
         return sqlite3.version.libVersion;
     },
 
-    open(name, readOnly) {
-        if (readOnly && !pool.getFileNames().includes(fileName(name))) {
-            throw Object.assign(new Error(`The base ${name} does not exist.`), { resultCode: 14 });
+    async open(name, readOnly) {
+        busy(name);
+        if (!pool.getFileNames().includes(fileName(name))) {
+            if (readOnly) {
+                throw Object.assign(new Error(`The base ${name} does not exist.`), { resultCode: 14 });
+            }
+            await reserve();
+            busy(name);
         }
         const db = new pool.OpfsSAHPoolDb(fileName(name));
         if (readOnly) {
@@ -88,11 +104,12 @@ const operations = {
         return handle;
     },
 
-    // The rows as the text {"columns":[...],"rows":[[...],...]}
+    // The rows as the UTF-8 bytes of the text {"columns":[...],"rows":[[...],...]}: bytes cross the interop of Blazor as they are, a string
+    // would be escaped and parsed once more
     query(handle, sql, parametersJson) {
         const columns = [];
         const rows = database(handle).exec({ sql, bind: bind(parametersJson), rowMode: 'array', returnValue: 'resultRows', columnNames: columns });
-        return JSON.stringify({ columns, rows }, toWire);
+        return new TextEncoder().encode(JSON.stringify({ columns, rows }, toWire));
     },
 
     execute(handle, sql, parametersJson) {
@@ -124,52 +141,80 @@ const operations = {
     },
 
     exists(name) {
-        return pool.getFileNames().includes(fileName(name));
+        return !importing.has(name) && pool.getFileNames().includes(fileName(name));
     },
 
     list() {
         return pool.getFileNames()
             .filter(file => !/-(journal|wal|shm)$/.test(file))
             .map(file => file.replace(/^\//, ''))
+            .filter(name => !importing.has(name))
             .sort();
     },
 
     // A base compressed with gzip fetched and unpacked into the pool as it comes; a failure frees the file (importDb of SAHPool). The gzip stream
     // checks itself (CRC-32 and length): a cut or broken download fails. The progress is the compressed bytes received, posted every MB at most.
     // The file is named before the import: importDb takes a free handle of the pool without holding it, so a journal opened meanwhile by another
-    // base (a write of flox.sqlite) would take the same handle and free it, base and all, when it is deleted. A tab closed in the middle leaves a
-    // named file that does not open; the reader removes it
+    // base (a write of flox.sqlite) would take the same handle and free it, base and all, when it is deleted. For the same reason the
+    // name is held in importing from before the first await to the end: nobody sees, opens, removes or imports it meanwhile; cancelImport
+    // stops the download. A tab closed in
+    // the middle leaves a named file that does not open; the reader removes it
     async importGzip(id, name, url) {
+        busy(name);
         if (pool.getFileNames().includes(fileName(name))) {
             throw Object.assign(new Error(`The base ${name} exists.`), { resultCode: 19 });
         }
-        const response = await fetch(url, { cache: 'no-cache' });
-        if (!response.ok || !response.body) {
-            throw Object.assign(new Error(`${url}: ${response.status} ${response.statusText}`), { resultCode: 14 });
-        }
-        new pool.OpfsSAHPoolDb(fileName(name)).close();
-        let received = 0;
-        let reported = 0;
-        const counted = response.body.pipeThrough(new TransformStream({
-            transform(chunk, controller) {
-                received += chunk.byteLength;
-                if (received - reported >= 1048576) {
-                    reported = received;
-                    postMessage({ id, progress: received });
-                }
-                controller.enqueue(chunk);
+        const cancel = new AbortController();
+        importing.set(name, cancel);
+        try {
+            const response = await fetch(url, { cache: 'no-cache', signal: cancel.signal });
+            if (!response.ok || !response.body) {
+                throw Object.assign(new Error(`${url}: ${response.status} ${response.statusText}`), { resultCode: 14 });
             }
-        }));
-        const reader = counted.pipeThrough(new DecompressionStream('gzip')).getReader();
-        const written = await pool.importDb(fileName(name), async () => {
-            const { done, value } = await reader.read();
-            return done ? undefined : value;
-        });
-        postMessage({ id, progress: received });
-        return written;
+            await reserve();
+            cancel.signal.throwIfAborted();
+            new pool.OpfsSAHPoolDb(fileName(name)).close();
+            let received = 0;
+            let reported = 0;
+            const counted = response.body.pipeThrough(new TransformStream({
+                transform(chunk, controller) {
+                    received += chunk.byteLength;
+                    if (received - reported >= 1048576) {
+                        reported = received;
+                        postMessage({ id, progress: received });
+                    }
+                    controller.enqueue(chunk);
+                }
+            }));
+            const reader = counted.pipeThrough(new DecompressionStream('gzip')).getReader();
+            const written = await pool.importDb(fileName(name), async () => {
+                const { done, value } = await reader.read();
+                return done ? undefined : value;
+            });
+            postMessage({ id, progress: received });
+            return written;
+        } catch (error) {
+            // importDb frees the file when it fails; whatever else left it named goes too
+            if (pool.getFileNames().includes(fileName(name))) {
+                pool.unlink(fileName(name));
+            }
+            if (cancel.signal.aborted) {
+                throw Object.assign(new Error(`The download of ${name} was cancelled.`), { resultCode: 9 });
+            }
+            throw error;
+        } finally {
+            importing.delete(name);
+        }
+    },
+
+    // Stops the download of a base being imported; its importGzip fails with the code 9 and leaves nothing
+    cancelImport(name) {
+        importing.get(name)?.abort();
+        return true;
     },
 
     remove(name) {
+        busy(name);
         for (const entry of handles.values()) {
             if (entry.name === name) {
                 throw Object.assign(new Error(`The base ${name} is open.`), { resultCode: 5 });
@@ -184,7 +229,7 @@ onmessage = async (event) => {
     const { id, op, args } = event.data;
     try {
         const result = op === 'importGzip' ? await operations.importGzip(id, ...args) : await operations[op](...(args ?? []));
-        postMessage({ id, result });
+        postMessage({ id, result }, result instanceof Uint8Array ? [result.buffer] : []);
     } catch (error) {
         postMessage({ id, error: String(error?.message ?? error), code: error?.resultCode ?? 0 });
     }

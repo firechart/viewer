@@ -1,37 +1,50 @@
+@using BlazorBlueprint.Components
 @using System.Security.Claims
 @inject IFloxShell Shell
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IAuthorizationService AuthorizationService
 @inject Flox.Shared.Errors.IUiExceptionHandler Errors
+@inject IFloxRuntime Runtime
 @implements IDisposable
 
 @foreach ((var menu, var nodes) in _menus)
 {
-    @* A plain, non-collapsible heading - menus are always expanded, no toggle *@
-
-    @if (!string.IsNullOrEmpty(menu.Text))
+    @* A plain, non-collapsible heading - menus are always expanded, no toggle; a menu without a title is set apart from the one above by a line *@
+    @if (string.IsNullOrEmpty(menu.Text) && menu != _menus[0].Menu)
     {
-        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-px-4 rz-py-2 rz-text-nowrap">@menu.Text</RadzenText>
+        <BbSidebarSeparator/>
     }
-    <RadzenPanelMenu Multiple="true">
-        @foreach (var node in nodes)
+    <BbSidebarGroup>
+        @if (!string.IsNullOrEmpty(menu.Text))
         {
-            <NavMenuItem Node="node"/>
+            <BbSidebarGroupLabel>@menu.Text</BbSidebarGroupLabel>
         }
-    </RadzenPanelMenu>
+        <BbSidebarGroupContent>
+            <BbSidebarMenu>
+                @foreach (var node in nodes)
+                {
+                    <NavMenuItem Node="node"/>
+                }
+            </BbSidebarMenu>
+        </BbSidebarGroupContent>
+    </BbSidebarGroup>
 }
 
 @if (_hasMore)
 {
-    <RadzenPanelMenu>
-        <RadzenPanelMenuItem Path=@AppUrl.ToHref(SharedRoutes.MORE) Match="NavLinkMatch.All">
-            <Template>
-                <FloxIcon Icon="more_horiz"/>
-                <span class="rz-ms-2 rz-text-nowrap">@Strings.Caption_More</span>
-            </Template>
-        </RadzenPanelMenuItem>
-    </RadzenPanelMenu>
+    <BbSidebarGroup>
+        <BbSidebarGroupContent>
+            <BbSidebarMenu>
+                <BbSidebarMenuItem>
+                    <BbSidebarMenuButton Href=@AppUrl.ToHref(SharedRoutes.MORE) Match="NavLinkMatch.All">
+                        <FloxIcon Icon="more_horiz"/>
+                        <span>@Strings.Caption_More</span>
+                    </BbSidebarMenuButton>
+                </BbSidebarMenuItem>
+            </BbSidebarMenu>
+        </BbSidebarGroupContent>
+    </BbSidebarGroup>
 }
 
 @code {
@@ -68,8 +81,8 @@
     {
         _menus = await MenuFilter.BuildAsync(Shell, AuthorizationService, user, FloxMenuPlacement.Main);
 
-        // One entry for everything that is placed on the More page, and only when there is something on it
-        _hasMore = (await MenuFilter.BuildAsync(Shell, AuthorizationService, user, FloxMenuPlacement.More)).Count > 0;
+        // One entry for everything that is placed on the More page: in a debug build under development only, and when there is something on it
+        _hasMore = Flox.Shared.Host.SharedMenuSource.ShowsMore(Runtime) && (await MenuFilter.BuildAsync(Shell, AuthorizationService, user, FloxMenuPlacement.More)).Count > 0;
     }
 
 }

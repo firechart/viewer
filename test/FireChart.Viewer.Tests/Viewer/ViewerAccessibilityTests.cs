@@ -37,52 +37,20 @@ public class ViewerAccessibilityTests
     }
 
     [Test]
-    public void ARowWithAnAddress_IsALink_APlainClickStaysInThePage_ACtrlClickOpensAnotherTab()
-    {
-        var opened = 0;
-        using var context = new BunitContext();
-        context.JSInterop.SetupVoid("open", "resources/Observation/o1", "_blank", "noopener");
-
-        var tile = context.Render<Tile>(parameters => parameters.Add(component => component.Model, ResourceTiles.Plain(Obs("o1")))
-                                                                 .Add(component => component.Href, "resources/Observation/o1")
-                                                                 .Add(component => component.OnClick, () => opened++));
-
-        var link = tile.Find("a.fx-summary-row");
-        link.Click();
-        link.Click(new MouseEventArgs { CtrlKey = true });
-        Assert.Multiple(() =>
-        {
-            Assert.That(link.GetAttribute("href"), Is.EqualTo("resources/Observation/o1"));
-            Assert.That(opened, Is.EqualTo(1), "the ctrl-click does not open the record in the page");
-            Assert.That(context.JSInterop.VerifyInvoke("open").Arguments[0], Is.EqualTo("resources/Observation/o1"));
-            Assert.That(tile.FindAll("ul, li"), Is.Empty, "the row is no list of its own");
-        });
-    }
-
-    [Test]
-    public void ARowThatChooses_IsAToggleButton()
-    {
-        using var context = new BunitContext();
-
-        var tile = context.Render<Tile>(parameters => parameters.Add(component => component.Model, ResourceTiles.Plain(Obs("o1"))).Add(component => component.Pressed, true));
-
-        var button = tile.Find("button.fx-summary-row");
-        Assert.Multiple(() =>
-        {
-            Assert.That(button.GetAttribute("type"), Is.EqualTo("button"));
-            Assert.That(button.GetAttribute("aria-pressed"), Is.EqualTo("true"));
-        });
-    }
-
-    [Test]
     public void AResultOfTheLabTable_HasALink_TheTableIsNamedByItsGroup_AnEmptyColumnHasAHiddenName()
     {
         var section = new SummarySection(new SummaryFormSection { Code = "labs" }, [], "en");
-        section.LabGroups = [new LabGroup("day:2020-03-01", null, new DateOnly(2020, 3, 1), [Obs("o1")])];
         using var context = new BunitContext();
 
-        var view = context.Render<LabResultsView>(parameters => parameters.Add(component => component.Section, section)
-                                                                           .Add(component => component.HrefOf, item => "resources/Observation/" + item.Id));
+        context.JSInterop.Mode = JSRuntimeMode.Loose;
+        var view = context.Render<FireChart.Viewer.Reports.ReportLab>(parameters => parameters
+            .Add(component => component.Section, section)
+            .Add(component => component.Groups, [new LabGroup("day:2020-03-01", null, new DateOnly(2020, 3, 1), [Obs("o1")])])
+            .Add(component => component.Tile, (ResourceSummary item) => (Microsoft.AspNetCore.Components.RenderFragment)(builder => builder.AddContent(0, item.Id)))
+            .Add(component => component.Text, (ResourceSummary _, string cell) => cell == "test" ? "Potassium" : string.Empty)
+            .Add(component => component.Flag, (ResourceSummary _) => (Microsoft.AspNetCore.Components.RenderFragment)(_ => { }))
+            .Add(component => component.HasFlag, (ResourceSummary _) => false)
+            .Add(component => component.HrefOf, (ResourceSummary item) => "resources/Observation/" + item.Id));
 
         var table = view.Find("table.fx-lab-table");
         Assert.Multiple(() =>
@@ -98,6 +66,6 @@ public class ViewerAccessibilityTests
     [Test]
     public void TheTextOfASoftBadge_IsItsToneMixedTowardTheText()
     {
-        Assert.That(TestLibrary.Styles.Vendor, Does.Contain(".fx-root .fx-badge-soft {\n  color: color-mix(in oklab, var(--fx-badge-color, var(--color-base-content)) 50%, var(--fx-color-text));"));
+        Assert.That(TestLibrary.Styles.Vendor, Does.Contain("color: color-mix(in oklab, var(--fx-badge-color, var(--fx-color-text)) 50%, var(--fx-color-text));"));
     }
 }

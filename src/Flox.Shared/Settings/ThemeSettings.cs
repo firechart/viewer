@@ -13,6 +13,5 @@ public class ThemeSettings
 
     /// <summary>The color theme: light, dark or the system one.</summary>
     [Display(Name = nameof(Strings.Caption_Theme), ResourceType = typeof(Strings))]
-    [Setting(Control = SettingControl.RadioList)]
     public Theme Theme { get; set; } = DEFAULT_DARK ? Theme.Dark : Theme.Light;
 }

@@ -8,12 +8,12 @@
         @* A heading, so a reader goes from section to section; the toggle is a native button inside it (focus, Enter, Space), the rest stands beside it *@
         <h3 class=@(Empty ? "fx-summary-group fx-summary-heading fx-summary-group-empty" : "fx-summary-group fx-summary-heading")>
             <button type="button" class="fx-summary-toggle" aria-expanded=@(Section.Collapsed ? "false" : "true") aria-controls=@BodyId @onclick=@OnToggle>
-                <RadzenIcon Icon=@(Section.Collapsed ? "chevron_right" : "expand_more") class="rtl:-scale-x-100"/>
+                <FloxIcon Icon=@(Section.Collapsed ? "chevron_right" : "expand_more") Class="rtl:-scale-x-100"/>
                 <span class="fx-summary-icon"><IconResource ResourceType=@Section.IconType Autocolor/></span>
                 <span class="fx-summary-group-title">@Section.Title</span>
                 @if (Section.Failed)
                 {
-                    <span class="fx-summary-failed" role="img" title=@Strings.Caption_SectionFailed aria-label=@Strings.Caption_SectionFailed><RadzenIcon Icon="error"/></span>
+                    <span class="fx-summary-failed" role="img" title=@Strings.Caption_SectionFailed aria-label=@Strings.Caption_SectionFailed><FloxIcon Icon="error"/></span>
                 }
                 @if (Section.IsLoaded)
                 {
@@ -22,7 +22,7 @@
             </button>
             @if (Section.IsLoading)
             {
-                <CircularProgress Size="ProgressBarCircularSize.ExtraSmall"/>
+                <CircularProgress Compact="true"/>
             }
         </h3>
     </div>
@@ -32,7 +32,7 @@
         {
             @if (!Section.IsLoaded && !Section.Failed)
             {
-                <div class="fx-summary-section-row"><div class="fx-summary-note"><CircularProgress Size="ProgressBarCircularSize.Small"/></div></div>
+                <div class="fx-summary-section-row"><div class="fx-summary-note"><CircularProgress/></div></div>
             }
             else if (!Empty)
             {
@@ -43,13 +43,12 @@
                     {
                         @* Plain markup on the first load (the page says once how many sections failed); an alert only for the failure of a retry *@
                         <div class="fx-summary-error" role=@(_retried ? "alert" : null)>
-                            <RadzenIcon Icon="error" class="fx-summary-error-icon"/>
+                            <FloxIcon Icon="error" Class="fx-summary-error-icon"/>
                             <div class="fx-summary-error-text">
                                 <div class="fx-summary-error-title">@TitleOf(search.Failure!)</div>
                                 <div class="fx-summary-error-detail">@DetailOf(search)</div>
                             </div>
-                            <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_Retry
-                                          IsBusy=@Section.IsLoading Click=@RetryAsync/>
+                            <Button Variant="ButtonVariant.Outline" Loading=@Section.IsLoading OnClick=@RetryAsync>@FloxStrings.Caption_Retry</Button>
                         </div>
                     }
                 }
@@ -57,8 +56,7 @@
                 {
                     <div class="fx-summary-section-row">
                         <div class="fx-summary-note">
-                            <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_More
-                                          IsBusy=@Section.IsLoading Click=@OnMore/>
+                            <Button Variant="ButtonVariant.Outline" Loading=@Section.IsLoading OnClick=@OnMore>@FloxStrings.Caption_More</Button>
                         </div>
                     </div>
                 }
@@ -93,6 +91,7 @@
             SearchFailureKind.ServerError => Strings.Caption_SearchServerError,
             SearchFailureKind.Timeout => string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.Caption_SearchTimedOut, failure.TimeoutSeconds),
             SearchFailureKind.Unreachable => Strings.Message_FhirServerUnavailable,
+            SearchFailureKind.Cancelled => Strings.Caption_SearchCancelled,
             _ => Strings.Caption_SearchUnreadable,
         };
     }

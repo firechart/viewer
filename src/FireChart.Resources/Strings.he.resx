@@ -196,7 +196,7 @@
     <value>חיפוש של מקטע זה נכשל</value>
   </data>
   <data name="Caption_FhirServerRelease" xml:space="preserve">
-    <value>גרסת FHIR (אם /metadata אינו זמין)</value>
+    <value>גרסת FHIR (מזוהה אוטומטית אם ריק)</value>
   </data>
   <data name="Caption_FhirServerTerminologyUrl" xml:space="preserve">
     <value>כתובת שרת טרמינולוגיה (אופציונלי)</value>
@@ -213,8 +213,11 @@
   <data name="Message_InvalidSearch" xml:space="preserve">
     <value>החיפוש בכתובת אינו תקין.</value>
   </data>
-  <data name="Placeholder_SearchAllFields" xml:space="preserve">
-    <value>חיפוש בכל השדות</value>
+  <data name="Message_SearchRejected" xml:space="preserve">
+    <value>השרת לא קיבל את החיפוש.</value>
+  </data>
+  <data name="Caption_ClearSearch" xml:space="preserve">
+    <value>ניקוי החיפוש</value>
   </data>
   <data name="Caption_ShowAllFields" xml:space="preserve">
     <value>הצג את כל השדות</value>
@@ -369,6 +372,15 @@
   <data name="Home_DocumentationDescription" xml:space="preserve">
     <value>כיצד לעיין בחבילות FHIR ובשרתי FHIR</value>
   </data>
+  <data name="Caption_Installation" xml:space="preserve">
+    <value>התקנה</value>
+  </data>
+  <data name="Home_Install" xml:space="preserve">
+    <value>התקנה</value>
+  </data>
+  <data name="Home_InstallDescription" xml:space="preserve">
+    <value>כאפליקציה נפרדת, ממסך הבית או משולחן העבודה</value>
+  </data>
   <data name="Message_NoBookmarks" xml:space="preserve">
     <value>אין סימניות</value>
   </data>
@@ -522,6 +534,42 @@
   <data name="Caption_LoadAll" xml:space="preserve">
     <value>טען הכול</value>
   </data>
+  <data name="Caption_LoadingRecord" xml:space="preserve">
+    <value>טוען את הרשומה</value>
+  </data>
+  <data name="Message_LoadingProgress" xml:space="preserve">
+    <value>נטענו {0} מתוך {1} חלקים</value>
+  </data>
+  <data name="Message_LoadedRecords" xml:space="preserve">
+    <value>נטען: {0} ({1})</value>
+  </data>
+  <data name="Caption_AgeYears" xml:space="preserve">
+    <value>{0} ש'</value>
+  </data>
+  <data name="Caption_AgeMonths" xml:space="preserve">
+    <value>{0} ח'</value>
+  </data>
+  <data name="Caption_AgeDays" xml:space="preserve">
+    <value>{0} י'</value>
+  </data>
+  <data name="Message_RecordNotFound" xml:space="preserve">
+    <value>לא נמצא: {0}</value>
+  </data>
+  <data name="Message_LoadingCancelled" xml:space="preserve">
+    <value>הטעינה בוטלה: הרשומה המוצגת אינה מלאה.</value>
+  </data>
+  <data name="Caption_SearchCancelled" xml:space="preserve">
+    <value>לא נטען: הטעינה בוטלה</value>
+  </data>
+  <data name="Caption_PatientRecordSettings" xml:space="preserve">
+    <value>רשומת מטופל</value>
+  </data>
+  <data name="Caption_SummaryPageSize" xml:space="preserve">
+    <value>רשומות לבקשה</value>
+  </data>
+  <data name="Caption_SummaryLoadAll" xml:space="preserve">
+    <value>טען את כל הרשומה לפני ההצגה</value>
+  </data>
   <data name="Caption_Print" xml:space="preserve">
     <value>הדפסה</value>
   </data>
@@ -558,6 +606,9 @@
   <data name="PackageBase_Delete" xml:space="preserve">
     <value>מחיקה מהמכשיר</value>
   </data>
+  <data name="PackageBase_DeleteConfirm" xml:space="preserve">
+    <value>למחוק את {0} מהמכשיר? אפשר להוריד אותה שוב.</value>
+  </data>
   <data name="PackageBase_UpdateAvailable" xml:space="preserve">
     <value>גרסה חדשה יותר של החבילה זמינה ({0}).</value>
   </data>
@@ -566,5 +617,56 @@
   </data>
   <data name="PackageBase_Occupied" xml:space="preserve">
     <value>חבילות במכשיר: {0}, תופסות {1}</value>
+  </data>
+  <data name="Caption_FindRecord" xml:space="preserve">
+    <value>חיפוש…</value>
+  </data>
+  <data name="Caption_ChooseRecord" xml:space="preserve">
+    <value>בחירה: {0}</value>
+  </data>
+  <data name="Caption_RecentRecords" xml:space="preserve">
+    <value>נפתחו לאחרונה</value>
+  </data>
+  <data name="Caption_ChangeFilter" xml:space="preserve">
+    <value>שינוי הסינון</value>
+  </data>
+  <data name="Message_NothingFound" xml:space="preserve">
+    <value>לא נמצא דבר</value>
+  </data>
+  <data name="Placeholder_TypeToFind" xml:space="preserve">
+    <value>הקלידו לחיפוש</value>
+  </data>
+  <data name="Caption_RangeFrom" xml:space="preserve">
+    <value>{0}: מ־</value>
+  </data>
+  <data name="Caption_RangeTo" xml:space="preserve">
+    <value>עד</value>
+  </data>
+  <data name="Caption_IdentifierSystem" xml:space="preserve">
+    <value>מערכת</value>
+  </data>
+  <data name="Message_ListLimit" xml:space="preserve">
+    <value>מוצגות {0} הרשומות הראשונות. צמצמו את החיפוש בעזרת המסנן כדי למצוא את השאר.</value>
+  </data>
+  <data name="Message_ListLimitOf" xml:space="preserve">
+    <value>מוצגות {0} הרשומות הראשונות מתוך {1}. צמצמו את החיפוש בעזרת המסנן כדי למצוא את השאר.</value>
+  </data>
+  <data name="Caption_ConfigureView" xml:space="preserve">
+    <value>התאמת התצוגה</value>
+  </data>
+  <data name="Caption_Done" xml:space="preserve">
+    <value>סיום</value>
+  </data>
+  <data name="Caption_ShowAll" xml:space="preserve">
+    <value>הצג הכול</value>
+  </data>
+  <data name="Caption_HideAll" xml:space="preserve">
+    <value>הסתר הכול</value>
+  </data>
+  <data name="Caption_HideResourceType" xml:space="preserve">
+    <value>הסתר את {0}</value>
+  </data>
+  <data name="Caption_ShowResourceType" xml:space="preserve">
+    <value>הצג את {0}</value>
   </data>
 </root>

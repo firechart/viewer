@@ -7,9 +7,6 @@ public enum FloxPlatform
     /// <summary>The browser, through WebAssembly.</summary>
     Wasm = 1,
 
-    /// <summary>A MAUI application.</summary>
-    Maui = 2,
-
     /// <summary>The ASP.NET Core server.</summary>
     Server = 4,
 
@@ -20,7 +17,7 @@ public enum FloxPlatform
     Test = 16,
 
     /// <summary>Every platform.</summary>
-    All = Wasm | Maui | Server | Console | Test
+    All = Wasm | Server | Console | Test
 }
 
 /// <summary>The deployment environments.</summary>
@@ -39,25 +36,14 @@ public enum FloxEnvironment
     All = Development | Test | Production | Staging
 }
 
-/// <summary>The editions of the product.</summary>
-[Flags]
-public enum FloxEdition
-{
-    /// <summary>The offline edition.</summary>
-    Lite = 0,
-    /// <summary>The edition that runs on the server of the vendor.</summary>
-    Pro = 1,
-    /// <summary>The edition that runs on the server of the customer.</summary>
-    Enterprise = 2
-}
-
 /// <summary>Describes the host the code runs in.</summary>
 public interface IFloxRuntime
 {
     /// <summary>The kind of host.</summary>
     FloxPlatform Platform { get; }
-    /// <summary>The edition of the product.</summary>
-    FloxEdition Edition { get; set; }
+    /// <summary>Whether the application has a server of its own (sign-in, OData, access lists); false for a client without one (FireChart
+    /// Lite, the Viewer app). What the application may do by its license is a question of the license, not of the host.</summary>
+    bool HasServer { get; }
 
     /// <summary>Whether the environment is development.</summary>
     bool IsDevelopment { get; }
@@ -85,8 +71,14 @@ public abstract class FloxRuntime : IFloxRuntime
     /// <summary>The kind of host.</summary>
     public abstract FloxPlatform Platform { get; }
 
-    /// <summary>The edition of the product.</summary>
-    public virtual FloxEdition Edition { get; set; }
+    /// <summary>Whether the application has a server of its own; true unless a host says otherwise.</summary>
+    public virtual bool HasServer
+    {
+        get
+        {
+            return true;
+        }
+    }
 
     /// <summary>The folder of the running executable; null when there is none.</summary>
     public virtual string? StartupPath

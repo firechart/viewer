@@ -1,0 +1,16 @@
+<!-- A code system in a list: its name, canonical URL and version; the number of concepts, the content and status at the end -->
+<Component name="CodeSystem.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.name.exists(), %record.name, iif(%record.title.exists(), %record.title, %record.id))}}" subtitle="{{%record.url}}{{iif(%record.url.exists() and %record.version.exists(), ' · ', '')}}{{%record.version}}">
+    <Trailing>
+      <If test="{{%record.count.exists()}}">
+        <Value value="{{%record.count}} concepts"/>
+      </If>
+      <If test="{{%record.content.exists()}}">
+        <Badge text="{{%record.content}}"/>
+      </If>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

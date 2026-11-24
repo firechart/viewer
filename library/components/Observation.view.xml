@@ -1,0 +1,38 @@
+<!-- The page of an observation: what was measured and its result, then when, by whom, for whom, and the reference ranges -->
+<Component name="Observation.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{%record.code}}">
+    <Field label="{{%strings.Result}}">
+      <If test="{{%record.value.exists()}}">
+        <Value value="{{%record.value}}"/>
+      </If>
+      <Interpretation value="{{%record.interpretation.first()}}"/>
+      <Status value="{{%record.status}}"/>
+    </Field>
+    <Repeat each="{{%record.component}}" as="part">
+      <Field label="{{%part.code}}" value="{{%part.value}}"/>
+    </Repeat>
+    <Field label="{{%strings.Category}}" value="{{%record.category}}"/>
+    <Field label="{{%strings.When}}" value="{{%record.effective}}"/>
+    <Field label="{{%strings.Patient}}">
+      <Link value="{{%record.subject}}"/>
+    </Field>
+    <Field label="{{%strings.Encounter}}">
+      <Link value="{{%record.encounter}}"/>
+    </Field>
+    <Field label="{{%strings.Performer}}">
+      <Link value="{{%record.performer}}"/>
+    </Field>
+  </Section>
+
+  <If test="{{%record.referenceRange.exists()}}">
+    <Section title="{{%strings.ReferenceRanges}}">
+      <Table each="{{%record.referenceRange}}" as="range">
+        <Column title="{{%strings.Low}}" value="{{%range.low}}"/>
+        <Column title="{{%strings.High}}" value="{{%range.high}}"/>
+        <Column title="{{%strings.AppliesTo}}" value="{{%range.appliesTo}}"/>
+      </Table>
+    </Section>
+  </If>
+</Component>

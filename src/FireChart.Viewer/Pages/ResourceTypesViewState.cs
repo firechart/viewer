@@ -1,5 +1,6 @@
 using Flox.Shared.Components;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.JSInterop;
 
 namespace FireChart.Viewer.Pages;
 
@@ -23,9 +24,10 @@ public class ResourceTypesViewState : State
 
     private readonly IServerCredentialStore _credentials;
     private readonly IServerResourceTypeProvider _provider;
-    private readonly IResourceTiles _tiles;
+    private readonly IViewerStyle _style;
     private ViewerSession? _session;
     private IReadOnlyList<string> _types = [];
+    private HashSet<string> _hidden = new(StringComparer.Ordinal);
 
     /// <summary>
     /// Creates the state.
@@ -35,7 +37,7 @@ public class ResourceTypesViewState : State
     {
         _credentials = serviceProvider.GetRequiredService<IServerCredentialStore>();
         _provider = serviceProvider.GetRequiredService<IServerResourceTypeProvider>();
-        _tiles = serviceProvider.GetRequiredService<IResourceTiles>();
+        _style = serviceProvider.GetRequiredService<IViewerStyle>();
     }
 
     /// <summary>The server, once the state is activated.</summary>
@@ -61,6 +63,106 @@ public class ResourceTypesViewState : State
 
     /// <summary>The server did not accept the credentials that were given: the host asks again.</summary>
     public bool CredentialsRejected { get; private set; }
+
+    /// <summary>The host keeps the choice of the types on the device (<see cref="ResourceTypeVisibility"/>): the page offers to choose them.</summary>
+    public bool CanConfigure => ViewerTypeVisibility.Of(ServiceProvider) is not null;
+
+    /// <summary>The page is in its mode of choosing the types: every type is listed, a hidden one marked; the choice is saved when the mode ends.</summary>
+    public bool Configuring { get; private set; }
+
+    /// <summary>
+    /// Whether a type is hidden on the page.
+    /// </summary>
+    /// <param name="type">The resource type.</param>
+    /// <returns><see langword="true"/> when the type is not shown outside <see cref="Configuring"/>.</returns>
+    public bool IsHidden(string type)
+    {
+        return _hidden.Contains(type);
+    }
+
+    /// <summary>
+    /// Starts or ends the choosing of the types; at its end the choice is saved on the device.
+    /// </summary>
+    /// <returns>A task that completes when the choice is saved.</returns>
+    public async Task ToggleConfiguringAsync()
+    {
+        if (Configuring)
+        {
+            await EndConfiguringAsync();
+            return;
+        }
+
+        Configuring = CanConfigure;
+        Apply();
+        NotifyChanged();
+    }
+
+    /// <summary>
+    /// Ends the choosing of the types and saves the choice; nothing when it is not on.
+    /// </summary>
+    /// <returns>A task that completes when the choice is saved.</returns>
+    public async Task EndConfiguringAsync()
+    {
+        if (!Configuring)
+        {
+            return;
+        }
+
+        Configuring = false;
+        Apply();
+        NotifyChanged();
+        if (Server is not null && ViewerTypeVisibility.Of(ServiceProvider) is { } visibility)
+        {
+            await visibility.SaveAsync(Server, _types, _hidden);
+        }
+    }
+
+    /// <summary>
+    /// Hides a type or shows it again, while the types are chosen.
+    /// </summary>
+    /// <param name="type">The resource type.</param>
+    public void ToggleHidden(string type)
+    {
+        if (!Configuring || type == BookmarksEntry)
+        {
+            return;
+        }
+
+        if (!_hidden.Remove(type))
+        {
+            _hidden.Add(type);
+        }
+
+        Apply();
+        NotifyChanged();
+    }
+
+    /// <summary>
+    /// Shows or hides every type the filter leaves, while the types are chosen.
+    /// </summary>
+    /// <param name="hidden"><see langword="true"/> hides them, <see langword="false"/> shows them.</param>
+    public void SetAllHidden(bool hidden)
+    {
+        if (!Configuring)
+        {
+            return;
+        }
+
+        foreach (var type in Filtered())
+        {
+            if (hidden)
+            {
+                _hidden.Add(type);
+            }
+            else
+            {
+                _hidden.Remove(type);
+            }
+        }
+
+        Apply();
+        NotifyChanged();
+    }
 
     /// <summary>
     /// Filters the types.
@@ -102,11 +204,14 @@ public class ResourceTypesViewState : State
             CredentialsRejected = false;
             Release = string.Empty;
             _types = [];
+            _hidden = new HashSet<string>(StringComparer.Ordinal);
+            Configuring = false;
             Filter = null;
             Apply();
             if (Style.Length == 0)
             {
-                Style = await _tiles.StyleAsync();
+                Style = await _style.GetStyleAsync();
+                await KitStyleSheet.AdoptAsync(ServiceProvider.GetRequiredService<IJSRuntime>(), Style);
             }
 
             await ServiceProvider.GetRequiredService<ISmartAuthorizer>().RestoreAsync(session.Server);
@@ -119,6 +224,11 @@ public class ResourceTypesViewState : State
             try
             {
                 var result = await _provider.GetAsync(session.Server, refresh: true);
+                if (ViewerTypeVisibility.Of(ServiceProvider) is { } visibility)
+                {
+                    _hidden = await visibility.HiddenAsync(session.Server);
+                }
+
                 Release = result.Release;
                 _types = Sort(result.Types);
                 Apply();
@@ -149,11 +259,15 @@ public class ResourceTypesViewState : State
         ];
     }
 
+    private IEnumerable<string> Filtered()
+    {
+        return string.IsNullOrWhiteSpace(Filter) ? _types : _types.Where(row => row.Contains(Filter.Trim(), StringComparison.OrdinalIgnoreCase));
+    }
+
+    // A hidden type is listed only while the types are chosen
     private void Apply()
     {
-        IReadOnlyList<string> types = string.IsNullOrWhiteSpace(Filter)
-            ? _types
-            : [.. _types.Where(row => row.Contains(Filter.Trim(), StringComparison.OrdinalIgnoreCase))];
+        IReadOnlyList<string> types = [.. Filtered().Where(type => Configuring || !_hidden.Contains(type))];
         var bookmarks = ViewerBookmarks.AreAvailable(ServiceProvider) && (string.IsNullOrWhiteSpace(Filter) || FloxStrings.Caption_Bookmarks.Contains(Filter.Trim(), StringComparison.OrdinalIgnoreCase));
         Visible = [.. bookmarks ? [BookmarksEntry] : Array.Empty<string>(), .. types];
     }

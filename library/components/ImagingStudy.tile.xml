@@ -1,0 +1,22 @@
+<!-- An imaging study in a list: its description (else its modality), when it started; its status at the end -->
+<Component name="ImagingStudy.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.description.exists(), %record.description, iif(%record.modality.exists(), %record.modality.first(), %record.id))}}" patient="{{%record.subject}}" encounter="{{%record.encounter}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.modality.first()}}"/>
+        <Value value="{{%record.started}}"/>
+        <If test="{{%record.numberOfSeries.exists()}}">
+          <Text>{{%strings.SeriesCount(%record.numberOfSeries)}}</Text>
+        </If>
+        <If test="{{%record.numberOfInstances.exists()}}">
+          <Text>{{%strings.ImagesCount(%record.numberOfInstances)}}</Text>
+        </If>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

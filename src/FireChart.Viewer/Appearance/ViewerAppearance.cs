@@ -40,7 +40,7 @@ public sealed record ViewerFont(string Family, string Src, string Weight = "400"
 /// <summary>
 /// How the Viewer looks: from the safest to the riskiest, the light or dark theme, a style (a theme file of the library: the tokens <c>--fx-*</c>), the
 /// public variables, the rules of public selectors, the fonts and a free stylesheet. A style or a variable makes the Viewer its own: the tokens drive the
-/// content and, through <c>styles/fx.themed.css</c>, the Radzen components and the utilities around it, on the whole document. In a Flox application the
+/// content and, through <c>styles/fx.themed.css</c>, the components of Blazor Blueprint and the utilities around it, on the whole document. In a Flox application the
 /// host sets none and the Viewer inherits its palette.
 /// </summary>
 /// <remarks>
@@ -103,7 +103,7 @@ public sealed record AppearanceStylesheet(string Css, IReadOnlyList<ViewerConfig
 /// </summary>
 /// <remarks>
 /// The order: the fonts; the base of a theme (<see cref="FxThemeSheets.Base"/>: the vendor palette as values and the bridge from the tokens to the
-/// Radzen variables) when the appearance has a style or variables; the style in the layer <c>fx-custom</c>; the variables as tokens on
+/// tokens of Blazor Blueprint) when the appearance has a style or variables; the style in the layer <c>fx-custom</c>; the variables as tokens on
 /// <c>:root:root:root</c>, outside the layers, so they win over the style; the rules in <c>fx-custom</c>; the free stylesheet last, outside the layers.
 /// The order of the layers <c>fx, fx-custom</c> is declared first, so the vendor style of a page (<see cref="FxStyleSheets.Compose"/>) keeps it.
 /// </remarks>

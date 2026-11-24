@@ -196,7 +196,7 @@
     <value>Eine Suche dieses Abschnitts ist fehlgeschlagen</value>
   </data>
   <data name="Caption_FhirServerRelease" xml:space="preserve">
-    <value>FHIR-Release (falls /metadata nicht verfügbar)</value>
+    <value>FHIR-Release (wird erkannt, wenn leer)</value>
   </data>
   <data name="Caption_FhirServerTerminologyUrl" xml:space="preserve">
     <value>URL des Terminologieservers (optional)</value>
@@ -213,8 +213,11 @@
   <data name="Message_InvalidSearch" xml:space="preserve">
     <value>Die Suche in der Adresse ist ungültig.</value>
   </data>
-  <data name="Placeholder_SearchAllFields" xml:space="preserve">
-    <value>In allen Feldern suchen</value>
+  <data name="Message_SearchRejected" xml:space="preserve">
+    <value>Der Server hat die Suche nicht angenommen.</value>
+  </data>
+  <data name="Caption_ClearSearch" xml:space="preserve">
+    <value>Suche zurücksetzen</value>
   </data>
   <data name="Caption_ShowAllFields" xml:space="preserve">
     <value>Alle Felder anzeigen</value>
@@ -369,6 +372,15 @@
   <data name="Home_DocumentationDescription" xml:space="preserve">
     <value>So arbeiten Sie mit FHIR-Paketen und FHIR-Servern</value>
   </data>
+  <data name="Caption_Installation" xml:space="preserve">
+    <value>Installation</value>
+  </data>
+  <data name="Home_Install" xml:space="preserve">
+    <value>Installieren</value>
+  </data>
+  <data name="Home_InstallDescription" xml:space="preserve">
+    <value>Als eigene App, vom Startbildschirm oder Desktop</value>
+  </data>
   <data name="Message_NoBookmarks" xml:space="preserve">
     <value>Keine Lesezeichen</value>
   </data>
@@ -522,6 +534,42 @@
   <data name="Caption_LoadAll" xml:space="preserve">
     <value>Alle laden</value>
   </data>
+  <data name="Caption_LoadingRecord" xml:space="preserve">
+    <value>Datensatz wird geladen</value>
+  </data>
+  <data name="Message_LoadingProgress" xml:space="preserve">
+    <value>{0} von {1} Teilen geladen</value>
+  </data>
+  <data name="Message_LoadedRecords" xml:space="preserve">
+    <value>Geladen: {0} ({1})</value>
+  </data>
+  <data name="Caption_AgeYears" xml:space="preserve">
+    <value>{0} J.</value>
+  </data>
+  <data name="Caption_AgeMonths" xml:space="preserve">
+    <value>{0} Mon.</value>
+  </data>
+  <data name="Caption_AgeDays" xml:space="preserve">
+    <value>{0} T.</value>
+  </data>
+  <data name="Message_RecordNotFound" xml:space="preserve">
+    <value>{0} konnte nicht gefunden werden</value>
+  </data>
+  <data name="Message_LoadingCancelled" xml:space="preserve">
+    <value>Das Laden wurde abgebrochen: Der angezeigte Datensatz ist unvollständig.</value>
+  </data>
+  <data name="Caption_SearchCancelled" xml:space="preserve">
+    <value>Nicht geladen: Das Laden wurde abgebrochen</value>
+  </data>
+  <data name="Caption_PatientRecordSettings" xml:space="preserve">
+    <value>Patientenakte</value>
+  </data>
+  <data name="Caption_SummaryPageSize" xml:space="preserve">
+    <value>Datensätze pro Anfrage</value>
+  </data>
+  <data name="Caption_SummaryLoadAll" xml:space="preserve">
+    <value>Den ganzen Datensatz vor der Anzeige laden</value>
+  </data>
   <data name="Caption_Print" xml:space="preserve">
     <value>Drucken</value>
   </data>
@@ -558,6 +606,9 @@
   <data name="PackageBase_Delete" xml:space="preserve">
     <value>Vom Gerät löschen</value>
   </data>
+  <data name="PackageBase_DeleteConfirm" xml:space="preserve">
+    <value>{0} von diesem Gerät löschen? Das Paket kann erneut heruntergeladen werden.</value>
+  </data>
   <data name="PackageBase_UpdateAvailable" xml:space="preserve">
     <value>Eine neuere Version des Pakets ist verfügbar ({0}).</value>
   </data>
@@ -566,5 +617,56 @@
   </data>
   <data name="PackageBase_Occupied" xml:space="preserve">
     <value>Pakete auf dem Gerät: {0}, belegt {1}</value>
+  </data>
+  <data name="Caption_FindRecord" xml:space="preserve">
+    <value>Suchen…</value>
+  </data>
+  <data name="Caption_ChooseRecord" xml:space="preserve">
+    <value>Auswählen: {0}</value>
+  </data>
+  <data name="Caption_RecentRecords" xml:space="preserve">
+    <value>Zuletzt geöffnet</value>
+  </data>
+  <data name="Caption_ChangeFilter" xml:space="preserve">
+    <value>Filter ändern</value>
+  </data>
+  <data name="Message_NothingFound" xml:space="preserve">
+    <value>Nichts gefunden</value>
+  </data>
+  <data name="Placeholder_TypeToFind" xml:space="preserve">
+    <value>Zum Suchen tippen</value>
+  </data>
+  <data name="Caption_RangeFrom" xml:space="preserve">
+    <value>{0}: von</value>
+  </data>
+  <data name="Caption_RangeTo" xml:space="preserve">
+    <value>bis</value>
+  </data>
+  <data name="Caption_IdentifierSystem" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Message_ListLimit" xml:space="preserve">
+    <value>Die ersten {0} Datensätze werden angezeigt. Grenzen Sie die Suche mit dem Filter ein, um die übrigen zu finden.</value>
+  </data>
+  <data name="Message_ListLimitOf" xml:space="preserve">
+    <value>Die ersten {0} von {1} Datensätzen werden angezeigt. Grenzen Sie die Suche mit dem Filter ein, um die übrigen zu finden.</value>
+  </data>
+  <data name="Caption_ConfigureView" xml:space="preserve">
+    <value>Ansicht anpassen</value>
+  </data>
+  <data name="Caption_Done" xml:space="preserve">
+    <value>Fertig</value>
+  </data>
+  <data name="Caption_ShowAll" xml:space="preserve">
+    <value>Alle anzeigen</value>
+  </data>
+  <data name="Caption_HideAll" xml:space="preserve">
+    <value>Alle ausblenden</value>
+  </data>
+  <data name="Caption_HideResourceType" xml:space="preserve">
+    <value>{0} ausblenden</value>
+  </data>
+  <data name="Caption_ShowResourceType" xml:space="preserve">
+    <value>{0} anzeigen</value>
   </data>
 </root>

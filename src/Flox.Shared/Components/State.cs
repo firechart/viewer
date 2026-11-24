@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Flox.Shared.Errors;
 using Microsoft.JSInterop;
-using Radzen;
 
 namespace Flox.Shared.Components;
 
@@ -36,8 +35,8 @@ public abstract class State : IDisposable, IAsyncDisposable
         NavigationManager = serviceProvider.GetRequiredService<NavigationManager>();
         NavigationHistoryService = serviceProvider.GetRequiredService<INavigationHistoryService>();
         JSRuntime = serviceProvider.GetRequiredService<IJSRuntime>();
-        Notifications = serviceProvider.GetRequiredService<NotificationService>();
-        DialogService = serviceProvider.GetRequiredService<DialogService>();
+        Notifications = serviceProvider.GetRequiredService<FloxSnackbar>();
+        DialogService = serviceProvider.GetRequiredService<FloxDialogService>();
         AuthenticationService = serviceProvider.GetRequiredService<IAuthenticationService>();
         UiErrors = serviceProvider.GetRequiredService<IUiExceptionHandler>();
     }
@@ -88,7 +87,7 @@ public abstract class State : IDisposable, IAsyncDisposable
     /// The dialog service.
     /// </summary>
     [IgnoreDataMember]
-    public DialogService DialogService { get; }
+    public FloxDialogService DialogService { get; }
 
     /// <summary>
     /// Whether there is an error to show: a message for the user or an exception.
@@ -157,7 +156,7 @@ public abstract class State : IDisposable, IAsyncDisposable
     /// The notification service that shows snack messages.
     /// </summary>
     [IgnoreDataMember]
-    public NotificationService Notifications { get; }
+    public FloxSnackbar Notifications { get; }
 
     /// <summary>
     /// The handler that shows exceptions to the user.
@@ -334,6 +333,20 @@ public abstract class State : IDisposable, IAsyncDisposable
     /// Called when the page is shown again with the same key.
     /// </summary>
     protected virtual Task OnResumeAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// A pull down at the top of a touch screen refreshes what this state shows (<see cref="OnPullRefreshAsync"/>): a list does, a form never does.
+    /// </summary>
+    [IgnoreDataMember]
+    public virtual bool RefreshesOnPull => false;
+
+    /// <summary>
+    /// Refreshes what the state shows after a pull down, keeping the search and the selection; the page itself is not loaded again.
+    /// </summary>
+    public virtual Task OnPullRefreshAsync()
     {
         return Task.CompletedTask;
     }

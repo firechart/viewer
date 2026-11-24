@@ -1,22 +1,19 @@
 @using System.Globalization
-@using Radzen.Blazor
-@inject Radzen.DialogService Dialogs
+@inject Flox.Shared.Components.FloxDialogService Dialogs
 
-@* The form fills the dialog: only the fields scroll, the commands stay in view (SearchFormView.razor.css) *@
-<div class="form-layout">
-    <div class="form-body">
-        <RadzenStack Gap="var(--gap-lg)">
+@* The form is as high as its fields, up to the height of the dialog under its title (the whole screen on a phone): only the fields scroll, the
+   commands stay in view; Reset stands at the start, Cancel and OK at the end. The fields lie in an inset area from edge to edge of the dialog
+   (bg-sunken, over the padding of the dialog, which it keeps inside; up to the title of its own dialog, under the header of the list of a
+   reference), so the ring of a focused field is not cut either. It is a form: Enter in a text field applies it as OK does (the lists of a select,
+   a date and a reference choose with their own Enter, in their popups outside the form) *@
+<form class="m-0 flex h-full max-h-[calc(100dvh-12rem)] flex-col gap-4 max-sm:max-h-none" novalidate @onsubmit=@Apply @onsubmit:preventDefault>
+    <div class=@($"{(Nested ? null : "-mt-4")} {InsetClass}")>
+        <div class="flex flex-col gap-3">
             @if (Definition.IsGenerated)
             {
-                <RadzenAlert AlertStyle="Radzen.AlertStyle.Info" Variant="Radzen.Variant.Flat" AllowClose="false" Size="Radzen.AlertSize.Small">
+                <Alert Kind="AlertKind.Info">
                     @Strings.Message_SearchFormGenerated
-                </RadzenAlert>
-            }
-            @* The full-text search of the form (_content, else _text) is the box on top, not one of the fields; Enter applies the form *@
-            @if (_fullText is { } fullText)
-            {
-                <Search Value=@_values[fullText.QueryName].Text ValueChanged=@(text => _values[fullText.QueryName].Text = text) OnKeyDown=@OnSearchKey
-                        DebounceInterval="0" AutoFocus Placeholder=@Strings.Placeholder_SearchAllFields/>
+                </Alert>
             }
             @foreach (var section in _sections)
             {
@@ -26,28 +23,32 @@
                 }
                 else
                 {
-                    <RadzenFieldset Text=@section.Caption AllowCollapse="true" Collapsed=@section.Collapsed>
-                        @FieldGrid(section.Fields)
-                    </RadzenFieldset>
+                    <details class="rounded-lg border border-line px-3 py-2" open=@(!section.Collapsed)>
+                        <summary class="cursor-pointer text-sm font-medium">@section.Caption</summary>
+                        <div class="pt-2">@FieldGrid(section.Fields)</div>
+                    </details>
                 }
             }
-        </RadzenStack>
+        </div>
     </div>
-    <div class="form-footer">
-        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.End" Gap="var(--gap-sm)">
+    <div>
+        <div class="flex items-center justify-end gap-2">
             @if (HasHidden)
             {
-                <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Text=@(_showAll ? Strings.Caption_ShowFormFields : Strings.Caption_ShowAllFields)
-                              Click=@ToggleAll class="form-show-all"/>
+                <Button Variant="ButtonVariant.Outline" Class="form-show-all" OnClick=@ToggleAll>@(_showAll ? Strings.Caption_ShowFormFields : Strings.Caption_ShowAllFields)</Button>
             }
-            <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Text=@FloxStrings.Caption_Reset Click=@Reset class="form-reset"/>
-            <RadzenButton Variant="Radzen.Variant.Outlined" ButtonStyle="Radzen.ButtonStyle.Base" Text=@FloxStrings.Caption_Cancel Click=@_cancel/>
-            <RadzenButton Variant="Radzen.Variant.Filled" ButtonStyle="Radzen.ButtonStyle.Primary" Text=@FloxStrings.Caption_Ok Click=@Apply/>
-        </RadzenStack>
+            <Button Variant="ButtonVariant.Outline" Class="form-reset me-auto" OnClick=@Reset>@FloxStrings.Caption_Reset</Button>
+            <Button Variant="ButtonVariant.Outline" OnClick=@_cancel>@FloxStrings.Caption_Cancel</Button>
+            <Button Type="ButtonType.Submit">@(ApplyText ?? FloxStrings.Caption_Ok)</Button>
+        </div>
     </div>
-</div>
+</form>
 
 @code {
+
+    // The inset under the fields; on it the fields of Blueprint (marked by their border-input) take the foam of the cards in light, as the cells of a grouped list of
+    // iOS, and keep their tint in dark
+    private const string InsetClass = "-mx-6 min-h-0 flex-1 overflow-y-auto bg-sunken px-6 py-4 [&_[class*=border-input]]:bg-card dark:[&_[class*=border-input]]:bg-input/30";
 
     private sealed record Section
     (
@@ -59,7 +60,6 @@
     private readonly Dictionary<string, SearchFieldValue> _values = new Dictionary<string, SearchFieldValue>(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _errors = new Dictionary<string, string>(StringComparer.Ordinal);
     private readonly List<Section> _sections = [];
-    private SearchFormField? _fullText;
     private string _culture = CultureInfo.CurrentUICulture.Name;
     private SearchFormDefinition? _loadedForm;
     private IReadOnlyDictionary<string, SearchFieldValue>? _loadedValues;
@@ -75,6 +75,22 @@
     /// <summary>The FHIR server the search goes to: it expands the value sets of the coded fields; none: the option source of the host only.</summary>
     [Parameter]
     public IViewerServer? Server { get; set; }
+
+    /// <summary>The session of the list: a reference field offers the records opened in it and the list of its type to choose from.</summary>
+    [Parameter]
+    public ViewerSession? Session { get; set; }
+
+    /// <summary>The form of the list a reference is chosen in: its reference fields are plain text boxes.</summary>
+    [Parameter]
+    public bool Nested { get; set; }
+
+    /// <summary>Receives the conditions instead of closing the dialog (the form inside the list a reference is chosen in).</summary>
+    [Parameter]
+    public EventCallback<SearchFormDialogResult> OnApply { get; set; }
+
+    /// <summary>The text of the button that applies the form; none: OK.</summary>
+    [Parameter]
+    public string? ApplyText { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -108,9 +124,7 @@
                           .ToList();
         var known = Definition.Groups.Select(g => g.Code)
                            .ToHashSet(StringComparer.Ordinal);
-        _fullText = Definition.Fields.FirstOrDefault(f => f.QueryName == FullTextParameter) ?? Definition.Fields.FirstOrDefault(f => f.QueryName == NarrativeParameter);
         var ordered = Definition.Fields
-                           .Where(f => !ReferenceEquals(f, _fullText))
                            .OrderBy(f => f.Order)
                            .ToList();
 
@@ -146,34 +160,24 @@
         BuildLayout();
     }
 
-    // The full-text search of FHIR: the whole resource, else its narrative
-    private const string FullTextParameter = "_content";
-    private const string NarrativeParameter = "_text";
-
-    private void OnSearchKey(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
-    {
-        if (args.Key == "Enter")
-        {
-            Apply();
-        }
-    }
-
     private RenderFragment FieldGrid(List<SearchFormField> fields) =>
-        @<RadzenRow Gap="var(--gap-lg)">
+        @<div class="grid grid-cols-12 gap-2">
             @foreach (var field in fields)
             {
-                <RadzenColumn @key=field.QueryName Size="12" SizeMD=@(field.Span is > 0 and <= 12 ? field.Span.Value : 6)>
+                <div @key=field.QueryName class="col-span-12">
                     <SearchFieldEditor Field=@field
                                        Value=@_values[field.QueryName]
                                        Culture=@_culture
                                        Server=@Server
+                                       Session=@Session
+                                       Nested=@Nested
                                        Error=@_errors.GetValueOrDefault(field.QueryName)/>
-                </RadzenColumn>
+                </div>
             }
-        </RadzenRow>;
+        </div>;
 
     // The form as a list starts (its defaults), applied at once: the dialog closes and the list loads again
-    private void Reset()
+    private async Task Reset()
     {
         _errors.Clear();
         foreach (var field in Definition.Fields)
@@ -181,10 +185,10 @@
             _values[field.QueryName] = SearchFormEvaluator.NewValue(field);
         }
 
-        Apply();
+        await Apply();
     }
 
-    private void Apply()
+    private async Task Apply()
     {
         _errors.Clear();
         foreach (var field in Definition.Fields)
@@ -200,7 +204,14 @@
             return;
         }
 
-        Close(new SearchFormDialogResult(SearchFormEvaluator.Evaluate(Definition, _values), _values.ToDictionary(p => p.Key, p => p.Value.Clone(), StringComparer.Ordinal)));
+        var result = new SearchFormDialogResult(SearchFormEvaluator.Evaluate(Definition, _values), _values.ToDictionary(p => p.Key, p => p.Value.Clone(), StringComparer.Ordinal));
+        if (OnApply.HasDelegate)
+        {
+            await OnApply.InvokeAsync(result);
+            return;
+        }
+
+        Close(result);
     }
 
     // The receiver is not a component, so the form is not rendered again after the click: the dialog is going away

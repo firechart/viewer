@@ -1,0 +1,38 @@
+<!-- The page of an imaging study: its description, when it started, how many series and images, its status, its details and its series -->
+<Component name="ImagingStudy.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{iif(%record.description.exists(), %record.description, %record.id)}}">
+    <Field label="{{%strings.Started}}" value="{{%record.started}}"/>
+    <If test="{{%record.numberOfSeries.exists()}}">
+      <Field label="{{%strings.Size}}">
+        <Text>{{%strings.SeriesAndImages(%record.numberOfSeries, %record.numberOfInstances)}}</Text>
+      </Field>
+    </If>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.status}}"/>
+    </Field>
+  </Section>
+
+  <If test="{{%record.modality.exists() or %record.referrer.exists() or %record.interpreter.exists() or %record.procedureCode.exists() or %record.reasonCode.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Modality}}" value="{{%record.modality}}"/>
+      <Field label="{{%strings.Referrer}}">
+        <Link value="{{%record.referrer}}"/>
+      </Field>
+      <Field label="{{%strings.Interpreter}}">
+        <Link value="{{%record.interpreter}}"/>
+      </Field>
+      <Field label="{{%strings.Procedure}}" value="{{%record.procedureCode}}"/>
+      <Field label="{{%strings.Reason}}" value="{{%record.reasonCode}}"/>
+    </Section>
+  </If>
+
+  <If test="{{%record.series.exists()}}">
+    <Section title="{{%strings.Series}}">
+      <Repeat each="{{%record.series}}" as="series">
+        <Row main="{{%series.number}}. {{iif(%series.description.exists(), %series.description, %series.uid)}}" meta="{{%series.modality}} {{%series.numberOfInstances}} images"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

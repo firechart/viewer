@@ -1,0 +1,197 @@
+@using FireChart.Viewer.Pages
+@using FireChart.Viewer.Core
+@* The trends of a Feed (display="observation-trends"): the measures of the section, each the tile of its last record, and the chart of the history of
+   the chosen one (a line per value: blood pressure has two). Wide: the list and the chart side by side; narrow: the chart above the list. The tiles are
+   the components of the modes of the library *@
+
+<div class="fx-trends">
+    @* A row chooses the measure of the chart: a toggle button that says whether it is the one shown; as tall as the row, so the tile (height 100%) is
+       centred in it and its divider is the bottom of the row *@
+    <div class="fx-trends-list" role="list">
+        @foreach (var trend in Trends)
+        {
+            var latest = trend.Records[0];
+            var chosen = trend.Key == Selected;
+            <div class=@(chosen ? "fx-summary-section-row fx-trend-selected" : "fx-summary-section-row") role="listitem" @key=trend.Key>
+                <button type="button" class="fx-trend-choice" aria-pressed=@(chosen ? "true" : "false") @onclick=@(() => OnSelect.InvokeAsync(trend.Key))
+                        style="display:block;width:100%;height:100%;text-align:start;background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer">
+                    @Tile(latest)
+                </button>
+            </div>
+        }
+    </div>
+
+    @* Time runs left to right on the chart in every language; the texts around it keep the direction of the page *@
+    <div class="fx-trends-chart">
+        @if (Trends.FirstOrDefault(trend => trend.Key == Selected) is { } selected)
+        {
+            var latest = selected.Records[0];
+            var lines = ObservationTrends.SeriesOf(History.GetValueOrDefault(selected.Key) ?? selected.Records, TimeZoneInfo.Local);
+            <div class="fx-trends-head">
+                <span id=@TitleId class="fx-trends-title">@TitleOf(latest)</span>
+                @if (Loading)
+                {
+                    <CircularProgress Compact="true"/>
+                }
+                @if (HrefOf(latest) is { } href)
+                {
+                    <Button Href=@href Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Strings.Caption_TrendOpenLast AriaLabel=@Strings.Caption_TrendOpenLast>
+                        <FloxIcon Icon="open_in_new"/>
+                    </Button>
+                }
+            </div>
+            @if (lines.Count == 0)
+            {
+                <div class="fx-summary-note">@Strings.Caption_TrendNoValues</div>
+            }
+            else
+            {
+                @* The chart is a picture: its caption says what it shows, its values are a table for a reader, a printout and forced colours *@
+                <figure class="fx-trends-figure" aria-labelledby=@($"{TitleId} {CaptionId}") dir="ltr">
+                    @* A line per value (at most four), the days on the axis from the first to the last; a day without a value of a line leaves a gap *@
+                    <BbLineChart Data=@RowsOf(lines) Height="16rem" Class="fx-trends-plot">
+                        @* Room at both ends for the first and the last day of the axis *@
+                        <BbGrid Left="24" Right="32" Top="16" Bottom=@(lines.Count > 1 ? "40" : "8") ContainLabel="true"/>
+                        <BbXAxis DataKey=@nameof(TrendRow.Day) Type="AxisType.Category"/>
+                        <BbYAxis Type="AxisType.Value" ShowGrid="true" Scale="true"/>
+                        <BbChartTooltip/>
+                        @if (lines.Count > 1)
+                        {
+                            <BbChartLegend Position="BlazorBlueprint.Components.LegendPosition.Bottom"/>
+                        }
+                        @for (var index = 0; index < Math.Min(lines.Count, MaxLines); index++)
+                        {
+                            <BbLine DataKey=@($"V{index}") Name=@LineTitle(lines[index]) Color=@($"var(--chart-{index + 1})") ShowDots="true"/>
+                        }
+                    </BbLineChart>
+                    <figcaption id=@CaptionId class="fx-trends-caption" dir=@PageDirection>@CaptionOf(lines)</figcaption>
+                </figure>
+                <details class="fx-trends-values">
+                    <summary>@Strings.Caption_TrendValues</summary>
+                    <table class="fx-table fx-table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">@Strings.Caption_TrendDate</th>
+                                @foreach (var line in lines)
+                                {
+                                    <th scope="col">@LineTitle(line)</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var moment in lines.SelectMany(line => line.Points).Select(point => point.Moment).Distinct().OrderDescending())
+                            {
+                                <tr>
+                                    <th scope="row">@moment.ToString("g", System.Globalization.CultureInfo.CurrentCulture)</th>
+                                    @foreach (var line in lines)
+                                    {
+                                        <td>@ValueAt(line, moment)</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </details>
+            }
+        }
+    </div>
+</div>
+
+@code {
+
+    // The caption under the chart reads in the direction of the language, the chart above it left to right
+    private static string PageDirection => System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft ? "rtl" : "ltr";
+
+    // The section: the id of its element names the chart
+    [Parameter, EditorRequired]
+    public SummarySection Section { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<TrendGroup> Trends { get; set; } = [];
+
+    // The key of the measure whose chart is shown
+    [Parameter]
+    public string? Selected { get; set; }
+
+    // The history of a measure by its key; the records of the section until it has come
+    [Parameter]
+    public IReadOnlyDictionary<string, IReadOnlyList<ResourceSummary>> History { get; set; } = new Dictionary<string, IReadOnlyList<ResourceSummary>>();
+
+    [Parameter]
+    public bool Loading { get; set; }
+
+    // At most that many decimal places on the axis and in the table of the values
+    [Parameter]
+    public int? Decimals { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment<ResourceSummary> Tile { get; set; } = null!;
+
+    // The title of a measure: what its last record measured
+    [Parameter, EditorRequired]
+    public Func<ResourceSummary, string> TitleOf { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public Func<ResourceSummary, string?> HrefOf { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<string> OnSelect { get; set; }
+
+    // The lines a chart draws; a measure has one or two
+    private const int MaxLines = 4;
+
+    /// <summary>A day of the chart and the values of its lines on that day (the chart reads the values by the names of the properties).</summary>
+    /// <param name="Day">The day, as the culture writes it.</param>
+    /// <param name="V0">The value of the first line.</param>
+    /// <param name="V1">The value of the second line.</param>
+    /// <param name="V2">The value of the third line.</param>
+    /// <param name="V3">The value of the fourth line.</param>
+    public sealed record TrendRow(string Day, double? V0, double? V1, double? V2, double? V3);
+
+    private List<TrendRow> RowsOf(IReadOnlyList<TrendSeries> lines)
+    {
+        var culture = System.Globalization.CultureInfo.CurrentCulture;
+        double? At(int line, DateTime moment)
+        {
+            return line < lines.Count && lines[line].Points.FirstOrDefault(point => point.Moment == moment) is { } point ? Round(point.Value) : null;
+        }
+
+        return [.. lines.SelectMany(line => line.Points)
+                        .Select(point => point.Moment)
+                        .Distinct()
+                        .Order()
+                        .Select(moment => new TrendRow(moment.ToString("d", culture), At(0, moment), At(1, moment), At(2, moment), At(3, moment)))];
+    }
+
+    private double Round(double value)
+    {
+        return Decimals is { } places ? Math.Round(value, places) : value;
+    }
+
+    private string ValueFormat => Decimals is { } places ? "{0:0." + new string('#', places) + "}" : "{0}";
+
+    private string TitleId => Section.ElementId + "-trend-title";
+
+    private string CaptionId => Section.ElementId + "-trend-caption";
+
+    // How many values and the first and the last day
+    private static string CaptionOf(IReadOnlyList<TrendSeries> lines)
+    {
+        var moments = lines.SelectMany(line => line.Points).Select(point => point.Moment).Distinct().ToList();
+        var culture = System.Globalization.CultureInfo.CurrentCulture;
+        return string.Format(culture, Strings.Caption_TrendSummary, moments.Count, moments.Min().ToString("d", culture), moments.Max().ToString("d", culture));
+    }
+
+    private string ValueAt(TrendSeries line, DateTime moment)
+    {
+        return line.Points.FirstOrDefault(point => point.Moment == moment) is { } point
+            ? string.Format(System.Globalization.CultureInfo.CurrentCulture, ValueFormat, point.Value)
+            : string.Empty;
+    }
+
+    private static string LineTitle(TrendSeries line)
+    {
+        return string.IsNullOrEmpty(line.Unit) ? line.Name : $"{line.Name}, {line.Unit}";
+    }
+
+}

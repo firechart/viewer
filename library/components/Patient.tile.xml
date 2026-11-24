@@ -1,0 +1,20 @@
+<!-- A patient in a list: the name, the birth date with the age; the gender at the end -->
+<Component name="Patient.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.name.exists(), %record.name.first(), %record.id)}}">
+    <Leading icon="person"/>
+    <Subtitle>
+      <Parts separator=" · ">
+        <Value value="{{%record.birthDate}}"/>
+        <Age birth="{{%record.birthDate}}" at="{{%record.deceased}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Badge text="{{%record.gender}}"/>
+      <If test="{{%record.active = false}}">
+        <Badge text="{{%strings.InactiveBadge}}" tone="danger"/>
+      </If>
+    </Trailing>
+  </Tile>
+</Component>

@@ -1,0 +1,46 @@
+<!-- The page of an immunization: the vaccine, when and its status, then the details, the performers and the notes -->
+<Component name="Immunization.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{%record.vaccineCode}}">
+    <Field label="{{%strings.When}}" value="{{%record.occurrence}}"/>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.status}}"/>
+    </Field>
+  </Section>
+
+  <If test="{{%record.lotNumber.exists() or %record.expirationDate.exists() or %record.site.exists() or %record.route.exists() or %record.doseQuantity.exists() or %record.location.exists() or %record.manufacturer.exists() or %record.reasonCode.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Lot}}" value="{{%record.lotNumber}}"/>
+      <Field label="{{%strings.Expires}}" value="{{%record.expirationDate}}"/>
+      <Field label="{{%strings.Site}}" value="{{%record.site}}"/>
+      <Field label="{{%strings.Route}}" value="{{%record.route}}"/>
+      <Field label="{{%strings.Dose}}" value="{{%record.doseQuantity}}"/>
+      <Field label="{{%strings.Location}}">
+        <Link value="{{%record.location}}"/>
+      </Field>
+      <Field label="{{%strings.Manufacturer}}">
+        <Link value="{{%record.manufacturer}}"/>
+      </Field>
+      <Field label="{{%strings.Reason}}">
+        <Value value="{{%record.reasonCode}}" separator=", "/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.performer.exists()}}">
+    <Section title="{{%strings.Performers}}">
+      <Repeat each="{{%record.performer}}" as="performer">
+        <Row meta="{{%performer.function}}"><Main><Link value="{{%performer.actor}}"/></Main></Row>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.note.exists()}}">
+    <Section title="{{%strings.Notes}}">
+      <Repeat each="{{%record.note}}" as="note">
+        <Row main="{{%note.text}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

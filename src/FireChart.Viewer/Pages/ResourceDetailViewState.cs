@@ -29,10 +29,9 @@ public class ResourceDetailViewState : State
     private readonly IServerCredentialStore _credentials;
     private readonly IFhirServerReader _reader;
     private readonly IServerResourceTypeProvider _types;
-    private readonly IResourceViews _views;
-    private readonly ITerminologyResolver _terminology;
+    private readonly IReleaseModels _models;
     private ResourceDetailKey? _key;
-    private ShownResource? _shown;
+    private string? _release;
 
     /// <summary>
     /// Creates the state.
@@ -43,9 +42,7 @@ public class ResourceDetailViewState : State
         _credentials = serviceProvider.GetRequiredService<IServerCredentialStore>();
         _reader = serviceProvider.GetRequiredService<IFhirServerReader>();
         _types = serviceProvider.GetRequiredService<IServerResourceTypeProvider>();
-        _views = serviceProvider.GetRequiredService<IResourceViews>();
-        _terminology = serviceProvider.GetRequiredService<ITerminologyResolver>();
-        _terminology.Resolved += OnTerminologyResolved;
+        _models = serviceProvider.GetRequiredService<IReleaseModels>();
     }
 
     /// <summary>The server, once the state is activated.</summary>
@@ -54,8 +51,8 @@ public class ResourceDetailViewState : State
     /// <summary>The resource as the server sent it, indented.</summary>
     public string? Json { get; private set; }
 
-    /// <summary>The resource as its view template shows it; <see langword="null"/> when the type has none (the page shows the JSON).</summary>
-    public ResourceView? View { get; private set; }
+    /// <summary>The resource as the server sent it: the components of the page draw it (<c>{Type}.page</c>, else its banner and its view).</summary>
+    public string? Record { get; private set; }
 
     /// <summary>The last load failed.</summary>
     public bool Failed { get; private set; }
@@ -67,7 +64,7 @@ public class ResourceDetailViewState : State
     public bool CredentialsRejected { get; private set; }
 
     /// <summary>
-    /// The resource as a line of text (its <c>text</c> template): the title of a bookmark of the page.
+    /// The resource as a line of text (what it is about: a code, a name, a title): the title of a bookmark of the page.
     /// </summary>
     /// <returns>The text; <see langword="null"/> before the resource is read or when it has no text.</returns>
     /// <example>
@@ -77,13 +74,13 @@ public class ResourceDetailViewState : State
     /// </example>
     public async Task<string?> TextAsync()
     {
-        if (_shown is not { } shown || Server is null)
+        if (Record is not { } json)
         {
             return null;
         }
 
-        var text = await _views.RenderAsync(shown.Resource, shown.Related, shown.Release, Link, ViewerText.Mode, _key!.Session.TerminologyServer, Server);
-        return ViewerText.Plain(text?.Html);
+        var model = await _models.GetAsync(_release);
+        return FireChart.Viewer.Core.Reports.ReportText.TitleOf(FireChart.Viewer.Core.Reports.ReportExpressions.Parse(json, model), System.Globalization.CultureInfo.CurrentCulture);
     }
 
     /// <summary>
@@ -102,58 +99,6 @@ public class ResourceDetailViewState : State
         await LoadAsync();
     }
 
-    /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            _terminology.Resolved -= OnTerminologyResolved;
-        }
-
-        base.Dispose(disposing);
-    }
-
-    // The answers of the terminology server that came after the page was drawn: the page is drawn again with them
-    private void OnTerminologyResolved(object? sender, EventArgs e)
-    {
-        UiErrors.Fire(async () =>
-        {
-            if (_shown is not { } shown || Server is null)
-            {
-                return;
-            }
-
-            View = await _views.RenderAsync(shown.Resource, shown.Related, shown.Release, Link, IResourceViews.Mode, _key!.Session.TerminologyServer, Server);
-            NotifyChanged();
-        }, nameof(OnTerminologyResolved));
-    }
-
-    // "fhir:Type/id" in the HTML of a template: the address of the page of that resource in the Viewer
-    private string? Link(string link)
-    {
-        var parts = link[FxHtml.FhirScheme.Length..].Split('/');
-        return parts.Length == 2 && ViewerRoutes.Parse(new ViewerRoute(ViewerPage.Resource, parts[0], parts[1]).Location) is { } route ? _key!.Session.HrefOf(route) : null;
-    }
-
-    // The resource and what its view template asks to come with it (the patient, the encounter) in one request; a type without such a template is just read
-    private async Task<ReadResource> ReadAsync(IViewerServer server)
-    {
-        var needs = await _views.NeedsAsync(_key!.ResourceType);
-        if (!needs.IsEmpty)
-        {
-            var page = await _reader.SearchAsync(server, _key.ResourceType, FhirSearchState.Parse($"_id={Uri.EscapeDataString(_key.ResourceId)}"), needs);
-            if (page.Items.FirstOrDefault(item => item.Id == _key.ResourceId) is { } found)
-            {
-                return new ReadResource(found, page.Related ?? []);
-            }
-        }
-
-        return new ReadResource(new ResourceSummary(_key.ResourceId, _key.ResourceType, await _reader.ReadAsync(server, _key.ResourceType, _key.ResourceId)), []);
-    }
-
-    private sealed record ReadResource(ResourceSummary Resource, IReadOnlyList<RelatedResource> Related);
-
-    private sealed record ShownResource(ResourceSummary Resource, IReadOnlyList<RelatedResource> Related, string? Release);
 
     private async Task LoadAsync()
     {
@@ -164,8 +109,7 @@ public class ResourceDetailViewState : State
             Failed = false;
             CredentialsRejected = false;
             Json = null;
-            View = null;
-            _shown = null;
+            Record = null;
             Server = session.Server;
             await ServiceProvider.GetRequiredService<ISmartAuthorizer>().RestoreAsync(session.Server);
 
@@ -176,11 +120,10 @@ public class ResourceDetailViewState : State
 
             try
             {
-                var read = await ReadAsync(session.Server);
-                Json = JsonUtil.Beautify(read.Resource.Json!);
-                var release = await _types.ReleaseOfAsync(session.Server);
-                _shown = new ShownResource(read.Resource, read.Related, release);
-                View = await _views.RenderAsync(read.Resource, read.Related, release, Link, IResourceViews.Mode, session.TerminologyServer, session.Server);
+                var json = await _reader.ReadAsync(session.Server, _key.ResourceType, _key.ResourceId);
+                Json = JsonUtil.Beautify(json);
+                _release = await _types.ReleaseOfAsync(session.Server);
+                Record = json;
             }
             catch (HttpRequestException ex) when (ex.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.Gone)
             {

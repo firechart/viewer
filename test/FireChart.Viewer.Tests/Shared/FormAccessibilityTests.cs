@@ -4,7 +4,6 @@ using Bunit;
 using Flox.Shared.Components;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Radzen;
 
 namespace FireChart.Viewer.Tests.Shared;
 
@@ -25,7 +24,7 @@ public class FormAccessibilityTests
     private static Form RenderForm(BunitContext context, Server model)
     {
         context.JSInterop.Mode = JSRuntimeMode.Loose;
-        context.Services.AddRadzenComponents();
+        context.Services.AddFloxComponents();
         var focus = new FormFieldFocus();
         EditContext? editContext = null;
         var receiver = new object();
@@ -55,10 +54,29 @@ public class FormAccessibilityTests
         return new Form(component, editContext!, focus);
     }
 
-    [Test]
-    public void AFieldIsValidatedWhenLeft_ThenOnEveryKeyWhileInvalid_AndItsMessageDescribesTheInput()
+    // The input of Blazor Blueprint takes its value through its script: the test hands the value to the component, and reads when it would hand it
+    private static IRenderedComponent<BlazorBlueprint.Components.BbInput> Box(Form form)
     {
-        using var context = new BunitContext();
+        return form.Component.FindComponent<BlazorBlueprint.Components.BbInput>();
+    }
+
+    // What the script of the input reports: a change when the field is left, the text on every key
+    private static Task LeaveAsync(Form form, string value)
+    {
+        var box = Box(form);
+        return box.InvokeAsync(() => box.Instance.JsOnChange(value));
+    }
+
+    private static Task KeyAsync(Form form, string value)
+    {
+        var box = Box(form);
+        return box.InvokeAsync(() => box.Instance.JsOnInput(value));
+    }
+
+    [Test]
+    public async Task AFieldIsValidatedWhenLeft_ThenOnEveryKeyWhileInvalid_AndItsMessageDescribesTheInput()
+    {
+        await using var context = new BunitContext();
         var form = RenderForm(context, new Server());
 
         var input = form.Component.Find("input");
@@ -71,10 +89,10 @@ public class FormAccessibilityTests
             Assert.That(input.GetAttribute("spellcheck"), Is.EqualTo("false"));
             Assert.That(input.GetAttribute("autocapitalize"), Is.EqualTo("none"));
             Assert.That(form.Component.Find("label span[aria-hidden=true]").TextContent.Trim(), Is.EqualTo("*"));
-            Assert.Throws<MissingEventHandlerException>(() => input.Input("h"), "the first typing is not validated key by key");
+            Assert.That(Box(form).Instance.UpdateTiming, Is.EqualTo(BlazorBlueprint.Components.UpdateTiming.OnChange), "the first typing is not validated key by key");
         });
 
-        form.Component.Find("input").Change("h");
+        await LeaveAsync(form, "h");
 
         input = form.Component.Find("input");
         var messages = form.Component.Find("#" + input.GetAttribute("aria-describedby"));
@@ -82,9 +100,10 @@ public class FormAccessibilityTests
         {
             Assert.That(input.GetAttribute("aria-invalid"), Is.EqualTo("true"));
             Assert.That(messages.TextContent, Is.Not.Empty, "the input is described by its message");
+            Assert.That(Box(form).Instance.UpdateTiming, Is.EqualTo(BlazorBlueprint.Components.UpdateTiming.Immediate), "an invalid field is checked on every key");
         });
 
-        form.Component.Find("input").Input("https://example.org");
+        await KeyAsync(form, "https://example.org");
 
         input = form.Component.Find("input");
         Assert.Multiple(() =>
@@ -101,7 +120,7 @@ public class FormAccessibilityTests
         var form = RenderForm(context, new Server());
 
         var before = await form.Component.InvokeAsync(() => form.Focus.FocusFirstInvalidAsync(form.Context));
-        await form.Component.InvokeAsync(() => form.Context.Validate());
+        await form.Component.InvokeAsync(() => form.Context.ValidateAsync());
 
         var focused = await form.Component.InvokeAsync(() => form.Focus.FocusFirstInvalidAsync(form.Context));
 
@@ -116,7 +135,9 @@ public class FormAccessibilityTests
     [Test]
     public async Task ALoadThatLasts_IsToldInAStatusLineThatIsAlwaysThere()
     {
-        using var context = new BunitContext();
+        await using var context = new BunitContext();
+        context.JSInterop.Mode = JSRuntimeMode.Loose;
+        context.Services.AddFloxComponents();
 
         var indicator = context.Render<BusyIndicator>(parameters => parameters.Add(component => component.Visible, true));
 

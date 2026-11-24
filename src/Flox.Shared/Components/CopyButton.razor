@@ -1,0 +1,36 @@
+@using BlazorBlueprint.Components
+@using Flox.Shared.Services
+@inject ShareService Share
+@inject FloxSnackbar Notifications
+
+@* The button that copies a value to the clipboard: an icon with a tooltip, a short notice when it is copied *@
+<span @onclick:stopPropagation>
+    <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title="@(Title ?? Strings.Caption_Copy)"
+              AriaLabel="@(Title ?? Strings.Caption_Copy)" Disabled="@string.IsNullOrEmpty(Text)" OnClick="@CopyAsync" Class="copy-button">
+        <FloxIcon Icon="content_copy" Size="1rem"/>
+    </Button>
+</span>
+
+@code {
+
+    /// <summary>The value to copy.</summary>
+    [Parameter]
+    [EditorRequired]
+    public string? Text { get; set; }
+
+    /// <summary>The tooltip of the button, else Copy.</summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    private async Task CopyAsync()
+    {
+        if (string.IsNullOrEmpty(Text))
+        {
+            return;
+        }
+
+        var copied = await Share.CopyAsync(Text);
+        Notifications.Show(copied ? Strings.Message_Copied : Strings.Message_NotCopied, copied ? SnackSeverity.Info : SnackSeverity.Warning, 2000);
+    }
+
+}

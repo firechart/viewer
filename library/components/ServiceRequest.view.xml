@@ -1,0 +1,48 @@
+<!-- The page of a service request: what is requested, when, its status, intent and priority, its details and notes -->
+<Component name="ServiceRequest.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{%record.code}}">
+    <Field label="{{%strings.Authored}}" value="{{%record.authoredOn}}"/>
+    <Field label="{{%strings.When}}" value="{{%record.occurrence}}"/>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.status}}"/>
+      <If test="{{%record.intent.exists()}}">
+        <Badge text="{{%record.intent}}"/>
+      </If>
+      <If test="{{%record.priority.exists() and %record.priority != 'routine'}}">
+        <Status value="{{%record.priority}}"/>
+      </If>
+    </Field>
+  </Section>
+
+  <If test="{{%record.category.exists() or %record.requester.exists() or %record.performer.exists() or %record.reasonCode.exists() or %record.reasonReference.exists() or %record.specimen.exists() or %record.bodySite.exists() or %record.orderDetail.exists() or %record.patientInstruction.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Category}}" value="{{%record.category}}"/>
+      <Field label="{{%strings.Requester}}">
+        <Link value="{{%record.requester}}"/>
+      </Field>
+      <Field label="{{%strings.Performer}}">
+        <Link value="{{%record.performer}}"/>
+      </Field>
+      <Field label="{{%strings.Reason}}" value="{{%record.reasonCode}}"/>
+      <Field label="{{%strings.Reason}}">
+        <Link value="{{%record.reasonReference}}"/>
+      </Field>
+      <Field label="{{%strings.Specimen}}">
+        <Link value="{{%record.specimen}}"/>
+      </Field>
+      <Field label="{{%strings.BodySite}}" value="{{%record.bodySite}}"/>
+      <Field label="{{%strings.OrderDetails}}" value="{{%record.orderDetail}}"/>
+      <Field label="{{%strings.PatientInstruction}}" value="{{%record.patientInstruction}}"/>
+    </Section>
+  </If>
+
+  <If test="{{%record.note.exists()}}">
+    <Section title="{{%strings.Notes}}">
+      <Repeat each="{{%record.note}}" as="note">
+        <Row main="{{%note.text}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

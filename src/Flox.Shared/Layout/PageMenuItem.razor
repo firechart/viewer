@@ -1,24 +1,31 @@
-@* A row of the menu of a page: what stands first (an icon by name, or Leading), the text, a short note at the end (a count); the menu closes after the click *@
-<button type="button" class="page-menu-item" @onclick=@OnClickAsync>
-    @if (Leading is not null)
-    {
-        @Leading
-    }
-    else if (Icon is not null)
-    {
-        <FloxIcon Icon=@Icon/>
-    }
-    <span class="page-menu-item-text">@Text</span>
-    @if (!string.IsNullOrEmpty(Note))
-    {
-        <span class="page-menu-item-note">@Note</span>
-    }
-</button>
+@using BlazorBlueprint.Components
+
+@* A command of a PageMenu: an icon (by name, or Leading), the text and a short note at the end (a count) *@
+<BbDropdownMenuItem OnClick=@(() => OnClick.InvokeAsync()) Disabled=@Disabled @attributes=@Attributes>
+    <Icon>
+        @if (Leading is not null)
+        {
+            @Leading
+        }
+        else if (!string.IsNullOrEmpty(Icon))
+        {
+            <FloxIcon Icon=@Icon Size="1rem" Class="text-muted"/>
+        }
+    </Icon>
+    <ChildContent>
+        <span class="min-w-0 flex-1 truncate">@Text</span>
+        @if (!string.IsNullOrEmpty(Note))
+        {
+            <BbDropdownMenuShortcut Class="ps-3">@Note</BbDropdownMenuShortcut>
+        }
+    </ChildContent>
+</BbDropdownMenuItem>
 
 @code {
 
-    [CascadingParameter]
-    public PageMenu? Menu { get; set; }
+    [Parameter]
+    [EditorRequired]
+    public string Text { get; set; } = string.Empty;
 
     [Parameter]
     public string? Icon { get; set; }
@@ -27,22 +34,15 @@
     public RenderFragment? Leading { get; set; }
 
     [Parameter]
-    public string? Text { get; set; }
+    public string? Note { get; set; }
 
     [Parameter]
-    public string? Note { get; set; }
+    public bool Disabled { get; set; }
 
     [Parameter]
     public EventCallback OnClick { get; set; }
 
-    private async Task OnClickAsync()
-    {
-        if (Menu is not null)
-        {
-            await Menu.CloseAsync();
-        }
-
-        await OnClick.InvokeAsync();
-    }
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? Attributes { get; set; }
 
 }

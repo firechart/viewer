@@ -1,0 +1,16 @@
+<!-- A medication statement in a list: the medication, the dosage and when it was taken; its status at the end -->
+<Component name="MedicationStatement.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.medication.exists(), %record.medication, %record.id)}}" patient="{{%record.subject}}" encounter="{{(%record.context | %record.encounter).first()}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.dosage.first().text}}"/>
+        <Value value="{{%record.effective}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

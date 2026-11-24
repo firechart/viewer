@@ -1,3 +1,4 @@
+@using BlazorBlueprint.Components
 @using System.Globalization
 @using Flox.Core.Settings
 @implements IDisposable
@@ -5,68 +6,63 @@
 @switch (Field.Control)
 {
     case SettingControl.Switch:
-        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Gap="var(--gap-md)">
-            <RadzenSwitch Name=@Field.Name Value=@((bool)GetValue()!) ValueChanged="@((bool value) => SetValue(value))" @attributes=@Aria()/>
-            <RadzenLabel Text=@Field.Label Component=@Field.Name/>
-        </RadzenStack>
-        @Hint
+        <FormField Text=@Field.Label For=@Field.Name Description=@Field.Description Horizontal="true" MessagesId=@MessagesId Messages=@Messages Invalid=@Invalid>
+            <Switch Id=@Field.Name Checked=@((bool)GetValue()!) CheckedChanged="@((bool value) => SetValue(value))" @attributes=@Aria()/>
+        </FormField>
         break;
 
     case SettingControl.Slider:
-        <div class="fw-label" aria-hidden="true">@Field.Label</div>
-        <SliderWithDisplay T="int" Min=@((int)(Field.Minimum ?? 0)) Max=@((int)(Field.Maximum ?? 100)) Step=@(Math.Max(Field.Step, 1)) Value=@((int)GetValue()!) ValueChanged="@((int value) => SetValue(value))" Label=@Field.Label/>
-        @Hint
+        <FormField Text=@Field.Label Description=@Field.Description MessagesId=@MessagesId Messages=@Messages Invalid=@Invalid>
+            <SliderWithDisplay T="int" Min=@((int)(Field.Minimum ?? 0)) Max=@((int)(Field.Maximum ?? 100)) Step=@(Math.Max(Field.Step, 1)) Value=@((int)GetValue()!) ValueChanged="@((int value) => SetValue(value))" Label=@Field.Label/>
+        </FormField>
         break;
 
     case SettingControl.RadioList:
-        <div class="fw-label" id=@LabelId>@Field.Label</div>
-        <RadzenRadioButtonList TValue="object" Value=@GetValue() ValueChanged="@((object? value) => SetValue(value))" Data=@_options TextProperty="Text" ValueProperty="Value" AriaLabelledBy=@LabelId
-                               @attributes=@Aria()/>
-        @Hint
+        <FormField Text=@Field.Label Description=@Field.Description MessagesId=@MessagesId Messages=@Messages Invalid=@Invalid>
+            <BbRadioGroup TValue="object" Value=@(GetValue()!) ValueChanged="@((object value) => SetValue(value))" AriaLabel=@Field.Label @attributes=@Aria()>
+                @foreach (var option in _options)
+                {
+                    <BbRadioGroupItem TValue="object" Value=@(option.Value!) Label=@option.Text Id=@($"{Field.Name}-{option.Value}")/>
+                }
+            </BbRadioGroup>
+        </FormField>
         break;
 
     default:
-        <RadzenFormField Text=@Field.Label Variant="Radzen.Variant.Text" class="rz-w-100">
-            <ChildContent>
-                @switch (Field.Control)
-                {
-                    case SettingControl.Dropdown:
-                        <RadzenDropDown TValue="object" Name=@Field.Name Value=@GetValue() ValueChanged="@((object? value) => SetValue(value))" Data=@_options TextProperty="Text" ValueProperty="Value" @attributes=@Aria()/>
-                        break;
+        <FormField Text=@Field.Label For=@Field.Name Description=@Field.Description MessagesId=@MessagesId Messages=@Messages Invalid=@Invalid>
+            @switch (Field.Control)
+            {
+                case SettingControl.Dropdown:
+                    <BbSelect TValue="object" Value=@GetValue() ValueChanged="@((object? value) => SetValue(value))" Options=@_selectOptions AriaLabel=@Field.Label
+                              id=@Field.Name @attributes=@Aria()/>
+                    break;
 
-                    case SettingControl.Number:
-                        <RadzenNumeric TValue="decimal" Name=@Field.Name Value=@Convert.ToDecimal(GetValue()) ValueChanged="@((decimal value) => SetValue(value))" Min=@Field.Minimum Max=@Field.Maximum @attributes=@Aria(invalidAttribute: false)/>
-                        break;
+                case SettingControl.Number:
+                    <BbNumericInput TValue="decimal" Id=@Field.Name Name=@Field.Name Value=@Convert.ToDecimal(GetValue(), CultureInfo.InvariantCulture) ValueChanged="@((decimal value) => SetValue(value))"
+                                    Min=@Field.Minimum Max=@Field.Maximum AriaInvalid=@Invalid AriaDescribedBy=@(Invalid ? MessagesId : null)/>
+                    break;
 
-                    case SettingControl.Password:
-                        <RadzenPassword Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" Immediate="true" @attributes=@Aria()/>
-                        break;
+                case SettingControl.Password:
+                    <BbInput Type="InputType.Password" Id=@Field.Name Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" UpdateTiming="UpdateTiming.Immediate" @attributes=@Aria()/>
+                    break;
 
-                    case SettingControl.TextArea:
-                        <RadzenTextArea Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" Immediate="true" Rows="4" @attributes=@Aria()/>
-                        break;
+                case SettingControl.TextArea:
+                    <BbTextarea Id=@Field.Name Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" UpdateTiming="UpdateTiming.Immediate" rows="4" @attributes=@Aria()/>
+                    break;
 
-                    default:
-                        <RadzenTextBox Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" Immediate="true" @attributes=@Aria()/>
-                        break;
-                }
-            </ChildContent>
-            <Helper>@Field.Description</Helper>
-        </RadzenFormField>
+                default:
+                    <BbInput Id=@Field.Name Name=@Field.Name Value=@((string?)GetValue()) ValueChanged="@((string? value) => SetValue(value))" UpdateTiming="UpdateTiming.Immediate" @attributes=@Aria()/>
+                    break;
+            }
+        </FormField>
         break;
 }
-
-<div id=@MessagesId>
-    @foreach (var message in Context.GetValidationMessages(_identifier))
-    {
-        <RadzenText TextStyle="TextStyle.Caption" class="rz-color-danger">@message</RadzenText>
-    }
-</div>
 
 @code {
 
     private FieldIdentifier _identifier;
     private IReadOnlyList<SettingOption> _options = [];
+    private IReadOnlyList<BlazorBlueprint.Primitives.SelectOption<object>> _selectOptions = [];
     private SettingFieldDescriptor? _optionsField;
     private string? _optionsCulture;
     private EditContext? _renderedContext;
@@ -85,29 +81,29 @@
 
     private string MessagesId => $"{Field.Name}-messages";
 
-    // aria-invalid and, while invalid, the messages in aria-describedby; RadzenNumeric writes its own aria-invalid
+    // aria-invalid and, while invalid, the messages in aria-describedby
     private Dictionary<string, object> Aria(bool invalidAttribute = true)
     {
         return FieldAria.For(Context, _identifier, MessagesId, invalidAttribute);
     }
 
-    private RenderFragment? Hint
-    {
-        get
-        {
-            return string.IsNullOrEmpty(Field.Description) ? null : @<div class="fw-hint">@Field.Description</div>;
-        }
-    }
+    private bool Invalid => FieldAria.IsInvalid(Context, _identifier);
+
+    private RenderFragment Messages => @<text>@foreach (var message in Context.GetValidationMessages(_identifier))
+                                              {
+                                                  <div>@message</div>
+                                              }</text>;
 
     protected override void OnParametersSet()
     {
         _identifier = Context.Field(Field.Name);
 
-        // The options are rebuilt only for another field or another language: new lists make Radzen reprocess its data
+        // The options are rebuilt only for another field or another language
         var culture = CultureInfo.CurrentUICulture.Name;
         if (!ReferenceEquals(_optionsField, Field) || _optionsCulture != culture)
         {
             _options = Field.GetOptions();
+            _selectOptions = [.. _options.Select(option => new BlazorBlueprint.Primitives.SelectOption<object>(option.Value!, option.Text))];
             _optionsField = Field;
             _optionsCulture = culture;
         }

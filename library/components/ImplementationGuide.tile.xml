@@ -1,0 +1,10 @@
+<!-- An implementation guide in a list: its name, package, version and FHIR versions; its status at the end -->
+<Component name="ImplementationGuide.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.name.exists(), %record.name, iif(%record.title.exists(), %record.title, %record.id))}}" subtitle="{{%record.packageId}}{{iif(%record.packageId.exists() and %record.version.exists(), ' · ', '')}}{{%record.version}}{{iif((%record.packageId.exists() or %record.version.exists()) and %record.fhirVersion.exists(), ' · ', '')}}{{%record.fhirVersion}}">
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

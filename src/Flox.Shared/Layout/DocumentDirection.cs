@@ -5,7 +5,7 @@ namespace Flox.Shared.Layout;
 
 /// <summary>
 /// The language and the direction of the page (<c>lang</c>, <c>dir</c> of <c>&lt;html&gt;</c>) follow the culture of the application: Hebrew and the
-/// other right-to-left languages turn the page, Radzen and the logical properties of the CSS (margin-inline-start...) follow.
+/// other right-to-left languages turn the page, Blazor Blueprint and the logical properties of the CSS (margin-inline-start...) follow.
 /// </summary>
 public static class DocumentDirection
 {

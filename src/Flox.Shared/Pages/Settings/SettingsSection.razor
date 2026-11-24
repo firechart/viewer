@@ -1,33 +1,32 @@
+@using BlazorBlueprint.Components
 @using System.Globalization
 @using Flox.Core.Settings
 @implements IDisposable
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 
 <EditForm EditContext=@Section.EditContext>
     <DataAnnotationsValidator/>
-    @* daisyUI's fieldset: the title is the legend on top *@
-    <RadzenFieldset Text=@Section.Descriptor.Title>
-        <ChildContent>
-            <RadzenStack Gap="var(--gap-md)">
-                @if (!string.IsNullOrEmpty(Section.Descriptor.Description))
+    @* A section is a group of fields under a modest legend (FieldSet of Blueprint); a group of the section is a group under a label *@
+    <BbFieldSet>
+        <BbFieldLegend Class="text-base font-semibold">@Section.Descriptor.Title</BbFieldLegend>
+        @if (!string.IsNullOrEmpty(Section.Descriptor.Description))
+        {
+            <BbFieldDescription>@Section.Descriptor.Description</BbFieldDescription>
+        }
+        @foreach (var group in Groups)
+        {
+            <BbFieldGroup>
+                @if (group.Key is not null)
                 {
-                    <RadzenText TextStyle="TextStyle.Body2">@Section.Descriptor.Description</RadzenText>
+                    <BbFieldLegend Variant="FieldLegendVariant.Label" Class="text-muted">@group.Key</BbFieldLegend>
                 }
-
-                @foreach (var group in Groups)
+                @foreach (var setting in group)
                 {
-                    @if (group.Key is not null)
-                    {
-                        <Subtitle>@group.Key</Subtitle>
-                    }
-
-                    @foreach (var setting in group)
-                    {
-                        <SettingField Field=@setting Context=@Section.EditContext/>
-                    }
+                    <SettingField Field=@setting Context=@Section.EditContext/>
                 }
-            </RadzenStack>
-        </ChildContent>
-    </RadzenFieldset>
+            </BbFieldGroup>
+        }
+    </BbFieldSet>
 </EditForm>
 
 @code {
@@ -42,12 +41,12 @@
     [Parameter]
     public EventCallback OnModified { get; set; }
 
-    // Fields without a group come first, groups follow in the order of their first field
+    // Fields without a group come first, groups follow in the order of their first field; a field of a feature the application lacks is not shown
     private IEnumerable<IGrouping<string?, SettingFieldDescriptor>> Groups
     {
         get
         {
-            return Section.Descriptor.Fields.GroupBy(setting => setting.GroupName);
+            return Section.Descriptor.Fields.Where(setting => setting.IsShownWith(Configuration)).GroupBy(setting => setting.GroupName);
         }
     }
 

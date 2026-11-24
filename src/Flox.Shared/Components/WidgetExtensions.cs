@@ -1,5 +1,4 @@
 using System.Diagnostics.Tracing;
-using Radzen;
 
 namespace Flox.Shared.Components;
 
@@ -103,25 +102,17 @@ public static class WidgetExtensions
     /// <summary>
     /// Shows a snack message.
     /// </summary>
-    public static void ShowSnack(this StatelessWidget sender, string message, NotificationSeverity severity = NotificationSeverity.Info)
+    public static void ShowSnack(this StatelessWidget sender, string message, SnackSeverity severity = SnackSeverity.Info)
     {
-        sender.Notifications.Notify(new NotificationMessage
-        {
-            Severity = severity,
-            Summary = message
-        });
+        sender.Notifications.Show(message, severity);
     }
 
     /// <summary>
     /// Shows a snack message.
     /// </summary>
-    public static void ShowSnack(this State sender, string message, NotificationSeverity severity = NotificationSeverity.Info)
+    public static void ShowSnack(this State sender, string message, SnackSeverity severity = SnackSeverity.Info)
     {
-        sender.Notifications.Notify(new NotificationMessage
-        {
-            Severity = severity,
-            Summary = message
-        });
+        sender.Notifications.Show(message, severity);
     }
 
     #endregion ShowSnackAsync
@@ -129,7 +120,7 @@ public static class WidgetExtensions
     /// <summary>
     /// Opens the dialog component as a modal dialog and returns its result: the model on OK, a canceled result otherwise.
     /// </summary>
-    public static async Task<ModalDialogResult<TModel>> ShowDialogAsync<TDialog, TModel>(this StatelessWidget sender, ModalDialogMode mode, TModel? model = null, Dictionary<string, object?>? dialogParameters = null, Func<DialogOptions>? configureDialog = null, string? title = null) where TDialog : ModalDialogWidget<TModel>, IComponent where TModel : class
+    public static async Task<ModalDialogResult<TModel>> ShowDialogAsync<TDialog, TModel>(this StatelessWidget sender, ModalDialogMode mode, TModel? model = null, Dictionary<string, object?>? dialogParameters = null, Func<FloxDialogOptions>? configureDialog = null, string? title = null) where TDialog : ModalDialogWidget<TModel>, IComponent where TModel : class
     {
         dialogParameters ??= [];
         dialogParameters.TryAdd(nameof(ModalDialogWidget<TModel>.Mode), mode);
@@ -140,11 +131,11 @@ public static class WidgetExtensions
 
         var dialogOptions = configureDialog != null
             ? configureDialog()
-            : new DialogOptions
+            : new FloxDialogOptions
             {
                 Width = "960px",
                 ShowClose = true,
-                CloseDialogOnEsc = true
+                CloseOnEscape = true
             };
 
         object? data = await sender.DialogService.OpenAsync<TDialog>(title ?? string.Empty, dialogParameters, dialogOptions);

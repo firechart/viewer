@@ -4,7 +4,7 @@
        a base read only (SqliteStorage), and the engine of the browser: sqlite-wasm in a worker over OPFS (BrowserSqliteEngine, wwwroot). Files on .NET are
        Flox.Sqlite.Files (Microsoft.Data.Sqlite); no native SQLite here, Lite must never get one -->
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Microsoft.JSInterop" />
   </ItemGroup>
 

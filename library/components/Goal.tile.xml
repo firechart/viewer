@@ -1,0 +1,19 @@
+<!-- A goal in a list: its description, when it starts; its achievement and lifecycle status at the end -->
+<Component name="Goal.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.description.exists(), %record.description, %record.id)}}" patient="{{%record.subject}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.start}}"/>
+        <If test="{{%record.target.first().due.exists()}}">
+          <Text>{{%strings.DueInline}} <Value value="{{%record.target.first().due}}"/></Text>
+        </If>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Status value="{{%record.achievementStatus}}"/>
+      <Status value="{{%record.lifecycleStatus}}"/>
+    </Trailing>
+  </Tile>
+</Component>

@@ -22,7 +22,7 @@ public static class FieldAria
     /// <param name="context">The edit context of the form; no attributes without one.</param>
     /// <param name="field">The field the control edits.</param>
     /// <param name="messagesId">The id of the element that holds the messages of the field.</param>
-    /// <param name="invalidAttribute">Whether <c>aria-invalid</c> is written; false for a control that writes its own (RadzenNumeric).</param>
+    /// <param name="invalidAttribute">Whether <c>aria-invalid</c> is written; false for a control that writes its own.</param>
     /// <returns>The attributes; <c>aria-invalid</c> is "false" rather than missing while the field is valid.</returns>
     public static Dictionary<string, object> For(EditContext? context, FieldIdentifier field, string messagesId, bool invalidAttribute = true)
     {

@@ -1,5 +1,12 @@
-@* A group of rows framed as daisyUI's fieldset: the caption is the legend on top, the rows on the surface; the caption starts where the text of the rows does *@
-<RadzenFieldset Text=@Caption HeaderTemplate=@Commands class="[--rz-fieldset-padding:0] [--fw-fieldset-background:var(--rz-base-background-color)] [--fw-fieldset-legend-padding-block-end:calc(var(--spacing)*2)] [--fw-fieldset-legend-padding-inline:calc(var(--spacing)*3)] [--fw-fieldset-bare-padding-block-start:0]">
+@using BlazorBlueprint.Components
+@* A group of rows: the caption and the commands above, the rows in a framed card divided by lines, a note below in small gray text without a frame
+   (the footer of a group of iOS); the caption and the note start where the text of the rows does. A section right after another stands apart from it:
+   more room above its caption than between the caption and its rows *@
+<section class="flex flex-col gap-2 [section+&]:mt-6" aria-labelledby=@(string.IsNullOrEmpty(Title) ? null : _titleId)>
+    @if (!string.IsNullOrEmpty(Title) || Commands is not null)
+    {
+        <Heading Size="HeadingSize.Section" Id=@_titleId Tooltip=@Title Commands=@Commands>@Title</Heading>
+    }
     @if (Definitions)
     {
         <dl class=@($"{GetClass()} m-0")>
@@ -8,26 +15,29 @@
     }
     else
     {
-        <div class=@GetClass() role=@(List ? "list" : null)>
+        <BbItemGroup Class=@($"{GetClass()} gap-0") role=@(List ? "list" : null)>
             <CascadingValue Name=@ListTile.ListCascade Value=@List>
                 @ChildContent
             </CascadingValue>
-        </div>
+        </BbItemGroup>
     }
-</RadzenFieldset>
-
-@if (!string.IsNullOrEmpty(Footer))
-{
-    <Subtitle>@Footer</Subtitle>
-}
+    @if (Footer is not null)
+    {
+        @* Hidden when the note renders nothing (a component that has nothing to say) *@
+        <div class="px-[calc(1px+var(--spacing)*3)] text-xs text-muted empty:hidden">@Footer</div>
+    }
+</section>
 
 @code {
 
-    [Parameter]
-    public string? Caption { get; set; }
+    private readonly string _titleId = $"section-{Guid.NewGuid():N}";
 
     [Parameter]
-    public string? Footer { get; set; }
+    public string? Title { get; set; }
+
+    // A note under the rows: a text, a link, a command
+    [Parameter]
+    public RenderFragment? Footer { get; set; }
 
     [Parameter]
     public RenderFragment? Commands { get; set; }
@@ -55,7 +65,7 @@
 
     private string GetClass()
     {
-        var list = new List<string> { "overflow-hidden rounded-box" };
+        var list = new List<string> { "overflow-hidden rounded-xl border border-line bg-surface text-card-foreground shadow-xs" };
         if (Dividers)
         {
             list.Add("divide-y divide-line");

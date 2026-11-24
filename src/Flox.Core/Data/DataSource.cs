@@ -110,8 +110,8 @@ public interface IDataSource<TKey, TEntity> : IDataSourceEvents where TKey : not
     /// <summary>Sets the number of entities to skip.</summary>
     IDataSource<TKey, TEntity> SetSkip(int skip);
 
-    /// <summary>Changes who may read and write the entity; administrators only, see <see cref="IStorage{TKey, TEntity}.SetAccessAsync"/>.</summary>
-    Task<TEntity> SetAccessAsync(TKey key, AccessGrant readAccess, AccessGrant writeAccess, CancellationToken cancellationToken = default);
+    /// <summary>Replaces the access list of the entity and returns the stored one, see <see cref="IStorage{TKey, TEntity}.SetAccessAsync"/>.</summary>
+    Task<IReadOnlyList<AclEntry>> SetAccessAsync(TKey key, IReadOnlyCollection<AclEntry> acl, CancellationToken cancellationToken = default);
 
     /// <summary>Replaces the entity under the key and reloads the current page.</summary>
     Task<TEntity> UpdateAsync(TKey key, TEntity entity, CancellationToken cancellationToken = default);
@@ -517,11 +517,11 @@ public class DataSource<TKey, TEntity> : IDataSource<TKey, TEntity> where TKey :
     }
 
     /// <inheritdoc />
-    public virtual async Task<TEntity> SetAccessAsync(TKey key, AccessGrant readAccess, AccessGrant writeAccess, CancellationToken cancellationToken = default)
+    public virtual async Task<IReadOnlyList<AclEntry>> SetAccessAsync(TKey key, IReadOnlyCollection<AclEntry> acl, CancellationToken cancellationToken = default)
     {
         return await ExecuteAsync(async ct =>
                                   {
-                                      var result = await Storage.SetAccessAsync(key, readAccess, writeAccess, ct);
+                                      var result = await Storage.SetAccessAsync(key, acl, ct);
                                       await LoadAsync(ct);
                                       return result;
                                   },

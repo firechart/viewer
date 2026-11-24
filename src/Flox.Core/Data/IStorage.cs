@@ -42,21 +42,37 @@ public interface IStorage<TKey, TEntity> where TKey : notnull
     Task<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default);
 
     /// <remarks>
-    ///     What the caller may do with each document: read, change, delete. A document that does not exist or that the caller may not read
-    ///     is answered with false in all three. The answer is in the order of the keys
+    ///     What the caller may do with each document: the operations of the entity that the permissions of the table and the access list of
+    ///     the row allow. A document that does not exist or that the caller may not read is answered with no operations. The answer is in
+    ///     the order of the keys
     /// </remarks>
     Task<IReadOnlyList<EntityCapability<TKey>>> GetCapabilitiesAsync(IReadOnlyCollection<TKey> keys, CancellationToken cancellationToken = default)
     {
         throw new NotSupportedException($"{GetType().Name} does not tell what the caller may do with a document.");
     }
 
-    /// <remarks>
-    ///     The only way to change who may read and write a document: both fields are immutable for an ordinary update.
-    ///     Administrators only.
-    /// </remarks>
-    Task<TEntity> SetAccessAsync(TKey key, AccessGrant readAccess, AccessGrant writeAccess, CancellationToken cancellationToken = default)
+    /// <summary>Stores a new entity with an access list of the writer's instead of the default one; it needs the permission ManageAccess of the table.</summary>
+    Task<TEntity> InsertAsync(TEntity entity, IReadOnlyCollection<AclEntry> acl, CancellationToken cancellationToken = default)
     {
-        throw new NotSupportedException($"{GetType().Name} does not change the access of a document.");
+        throw new NotSupportedException($"{GetType().Name} keeps no access lists.");
+    }
+
+    /// <remarks>
+    ///     The access list of a document; it needs the operation ManageAccess on the document (the permission of the table and an entry of
+    ///     the list). A document the caller may not read is not found
+    /// </remarks>
+    Task<IReadOnlyList<AclEntry>> GetAccessAsync(TKey key, CancellationToken cancellationToken = default)
+    {
+        throw new NotSupportedException($"{GetType().Name} keeps no access lists.");
+    }
+
+    /// <remarks>
+    ///     The only way to change who may do what with a document: replaces its access list and returns the stored one. It needs the
+    ///     operation ManageAccess on the document; every operation of the list must be one of the entity
+    /// </remarks>
+    Task<IReadOnlyList<AclEntry>> SetAccessAsync(TKey key, IReadOnlyCollection<AclEntry> acl, CancellationToken cancellationToken = default)
+    {
+        throw new NotSupportedException($"{GetType().Name} keeps no access lists.");
     }
 
     /// <summary>Replaces the entity under the key and returns the stored one.</summary>
@@ -65,10 +81,5 @@ public interface IStorage<TKey, TEntity> where TKey : notnull
 
 /// <summary>A storage of <see cref="IGuidEntity"/> documents.</summary>
 public interface IGuidEntityStorage<TEntity> : IStorage<Guid, TEntity> where TEntity : IGuidEntity
-{
-}
-
-/// <summary>A storage of <see cref="IStringEntity"/> documents.</summary>
-public interface IStringEntityStorage<TEntity> : IStorage<string, TEntity> where TEntity : IStringEntity
 {
 }

@@ -1,0 +1,78 @@
+@using BlazorBlueprint.Components
+@using Flox.Shared.Services
+@inject FloxDialogService DialogService
+@inject IAccessListClient AccessLists
+
+<div class="flex flex-col gap-4 access-dialog">
+    @if (_error is not null)
+    {
+        <Alert Kind="AlertKind.Danger">@_error</Alert>
+    }
+
+    @if (_editor is null)
+    {
+        @if (_error is null)
+        {
+            <CircularProgress Compact="true"/>
+        }
+    }
+    else
+    {
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                <tr>
+                    <th class="text-start p-2">@Strings.Access_Subject</th>
+                    @foreach (var operation in _editor.Operations)
+                    {
+                        <th class="p-2 text-center" title="@(operation.Sensitive ? Strings.Access_Sensitive : null)">
+                            @operation.Name
+                            @if (operation.Sensitive)
+                            {
+                                <FloxIcon Icon="shield" Class="text-warning align-middle text-base"/>
+                            }
+                        </th>
+                    }
+                    <th class="p-2"></th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var row in _rows)
+                {
+                    <tr class="border-t" data-subject="@row.Subject.Key">
+                        <td class="p-2">@Label(row)</td>
+                        @foreach (var operation in _editor.Operations)
+                        {
+                            var name = operation.Name;
+                            <td class="p-2 text-center">
+                                <BbCheckbox Checked="@row.Checked.Contains(name)" Disabled="@(_busy || !MayGive(row, operation))"
+                                            CheckedChanged="@(value => Toggle(row, name, value))" AriaLabel="@($"{Label(row)}: {name}")" Class="access-check align-middle"/>
+                                @if (row.Checked.Contains(name) && !row.Granted.Contains(name))
+                                {
+                                    <FloxIcon Icon="warning" Class="text-warning align-middle text-base ineffective" Title="@Ineffective(row, name)"/>
+                                }
+                            </td>
+                        }
+                        <td class="p-2 text-end">
+                            @if (row.Subject.Kind != AclSubjectKind.Owner)
+                            {
+                                <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" Disabled="@_busy" title="@Strings.Caption_Delete" OnClick="@(() => _rows.Remove(row))"><FloxIcon Icon="close"/></Button>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        @* A subject to add: the list is searched on the server as the person types; a choice adds it at once *@
+        <BbCombobox TValue="string" Value="@_choice" ValueChanged="@ChooseAsync" Options="@ChoiceOptions" SearchQueryChanged="@SearchAsync"
+                    Placeholder="@Strings.Access_AddSubject" SearchPlaceholder="@Strings.Access_AddSubject" Disabled="@_busy" MatchTriggerWidth="true"
+                    Class="access-add w-full"/>
+    }
+
+    <DialogActions>
+        <Button Variant="ButtonVariant.Outline" OnClick="@(() => DialogService.Close(false))">@Strings.Caption_Cancel</Button>
+        <Button Class="access-ok" Disabled="@(_editor is null || _busy)" Loading="@_busy" OnClick="@SaveAsync">@Strings.Caption_Ok</Button>
+    </DialogActions>
+</div>

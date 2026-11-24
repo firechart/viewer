@@ -82,6 +82,21 @@
     [Parameter]
     public RenderFragment<TRow>? Sticky { get; set; }
 
+    /// <summary>
+    /// Told when the end of the list is a screen away from the window of the list, once for each length of the list: a list that reads its records page
+    /// by page reads the next one before the user scrolls to it. None: the list asks for nothing.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// &lt;SummaryList TRow="ListRow" Rows=@rows OnEnd=@state.LoadMoreAsync&gt;...&lt;/SummaryList&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public EventCallback OnEnd { get; set; }
+
+    // The length of the list the end was told for
+    private int _endTold = -1;
+
     // Where the list was scrolled to: restored when the list appears, updated while the user scrolls (the state of the page keeps it)
     [Parameter]
     public ScrollMemory? Memory { get; set; }
@@ -100,6 +115,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        // The rows drawn may already reach the end (a first page shorter than the screen, a page added while the end was in view)
+        await TellEndAsync();
         if (!firstRender)
         {
             return;
@@ -144,6 +161,18 @@
         _first = Math.Max(0, first);
         _visible = visible;
         StateHasChanged();
+    }
+
+    private async Task TellEndAsync()
+    {
+        // A screen ahead: the next page is there before the user scrolls to its place
+        if (!OnEnd.HasDelegate || Rows.Count == 0 || To + _visible < Rows.Count || _endTold == Rows.Count)
+        {
+            return;
+        }
+
+        _endTold = Rows.Count;
+        await OnEnd.InvokeAsync();
     }
 
     [JSInvokable]

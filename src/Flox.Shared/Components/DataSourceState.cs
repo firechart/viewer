@@ -22,6 +22,7 @@ where TEntity : class
     {
         DataSource = serviceProvider.GetRequiredService<IDataSource<TKey, TEntity>>();
         Selection = new SelectionModel<TKey, TEntity>(DataSource.GetKey);
+        ItemComparer = new KeyComparer(DataSource.GetKey);
         _appSettingsProvider = serviceProvider.GetService<IAppSettingsProvider<GeneralAppSettings>>();
         _appSettingsProvider?.SettingsChanged += OnAppSettingsChanged;
         Selection.Changed += (_, _) => NotifyChanged();
@@ -34,6 +35,24 @@ where TEntity : class
     }
 
     private readonly ILocalChangeNotifier? _local;
+
+    /// <summary>
+    /// Rows are the same row when their keys are equal: every range of a virtual list is loaded as new instances.
+    /// </summary>
+    public IEqualityComparer<TEntity> ItemComparer { get; }
+
+    private sealed class KeyComparer(Func<TEntity, TKey> keyOf) : IEqualityComparer<TEntity>
+    {
+        public bool Equals(TEntity? x, TEntity? y)
+        {
+            return ReferenceEquals(x, y) || (x is not null && y is not null && EqualityComparer<TKey>.Default.Equals(keyOf(x), keyOf(y)));
+        }
+
+        public int GetHashCode(TEntity obj)
+        {
+            return keyOf(obj).GetHashCode();
+        }
+    }
     private bool _loaded;
 
     // Another tab changed the rows: a list that was shown reads them again
@@ -243,6 +262,15 @@ where TEntity : class
         Logger.LogDebug("List of {Entity}: go to page {Page}", typeof(TEntity).Name, page);
         DataSource.SetPage(page);
         await RefreshAsync();
+    }
+
+    /// <inheritdoc />
+    public override bool RefreshesOnPull => true;
+
+    /// <inheritdoc />
+    public override Task OnPullRefreshAsync()
+    {
+        return RefreshAsync();
     }
 
     /// <summary>

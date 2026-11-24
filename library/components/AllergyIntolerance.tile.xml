@@ -1,0 +1,23 @@
+<!-- An allergy in a list: the substance, its onset, when recorded and its category; its risk and its clinical status at the end -->
+<Component name="AllergyIntolerance.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.code.exists(), %record.code, %record.id)}}" patient="{{%record.patient}}" encounter="{{%record.encounter}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.onset}}"/>
+        <Value value="{{%record.recordedDate}}"/>
+        <Value value="{{%record.category}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <If test="{{%record.criticality = 'high'}}">
+        <Badge text="{{%strings.HighRiskBadge}}" tone="danger"/>
+      </If>
+      <If test="{{%record.criticality = 'low'}}">
+        <Badge text="{{%strings.LowRiskBadge}}"/>
+      </If>
+      <Status value="{{%record.clinicalStatus}}"/>
+    </Trailing>
+  </Tile>
+</Component>

@@ -23,7 +23,8 @@ public interface ISqliteEngine
 
     /// <summary>
     /// Downloads a base from an absolute address, compressed with gzip, and writes it as a new name; the name is there only when the base is
-    /// complete, a failure leaves nothing. The progress counts the compressed bytes received. Returns the size of the base in bytes.
+    /// complete, a failure or a cancellation leaves nothing; until then the name cannot be opened, deleted or imported again. The progress counts
+    /// the compressed bytes received. Returns the size of the base in bytes.
     /// </summary>
     Task<long> ImportAsync(string name, Uri source, IProgress<long>? progress = null, CancellationToken cancellationToken = default);
 }
@@ -38,8 +39,11 @@ public enum SqliteAccess
 }
 
 /// <summary>
-/// An open base. The values of parameters and of rows are null, long, double, string or byte[]; a parameter is named with its prefix
-/// (<c>$name</c>).
+/// An open base. The values of rows are null, long, double, string or byte[]; a parameter is named with its prefix (<c>$name</c>) and its
+/// value is one of those or what <see cref="SqliteValues.Normalize"/> turns into one. A cancellation ends the wait of the caller, not a
+/// statement already sent: a cancelled write may have been done. In the browser a write is done at least once: when the tab that runs the
+/// bases closes before it answers, the statement is sent again to the next one, so a statement should bear being repeated (an upsert, a
+/// delete by key).
 /// </summary>
 public interface ISqliteDatabase : IAsyncDisposable
 {

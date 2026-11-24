@@ -7,9 +7,8 @@ namespace FireChart.Viewer.Core.Forms;
 /// The structure of a summary (of a patient, of an encounter: <see cref="Context"/>): which sections it has and what each one asks the FHIR server for.
 /// </summary>
 /// <remarks>
-/// A form is the file <c>summary-forms/{Type}.json</c> of the library, named by the type of the record it grows from (<see cref="Context"/>): a type
-/// with a form has a summary, the page of its record switches to it. A form of a customer with the name of a vendor form overrides it. The searches
-/// are ordinary FHIR searches, so a server without special profiles still fills the sections. It is read and written by <see cref="ViewerJson"/>.
+/// A summary is the component <c>{Type}.summary</c> of the library; each of its <c>Feed</c> blocks is read into a <see cref="SummaryFormSection"/>,
+/// which the Viewer loads a page at a time. The searches are ordinary FHIR searches, so a server without special profiles still fills the sections.
 /// </remarks>
 /// <example>
 /// <code>

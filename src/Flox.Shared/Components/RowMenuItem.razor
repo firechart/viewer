@@ -1,0 +1,31 @@
+@using BlazorBlueprint.Components
+@* A command of the menu of a row of a DataList (RowMenu): an icon and a text; a dangerous one is red *@
+<BbContextMenuItem OnClick=@OnClick Disabled=@Disabled Class=@(Danger ? "text-danger" : null)>
+    <Icon>
+        @if (!string.IsNullOrEmpty(Icon))
+        {
+            <FloxIcon Icon=@Icon Size="1rem" Class=@(Danger ? "text-danger" : "text-muted")/>
+        }
+    </Icon>
+    <ChildContent>@Text</ChildContent>
+</BbContextMenuItem>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public string Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public bool Danger { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+}

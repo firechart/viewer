@@ -1,7 +1,7 @@
 @inject IFloxBrandingProvider Branding
 
 @* Two instances: Early is rendered by the server (static SSR) and is on the screen before Blazor starts; MainLayout renders the live one
-   while the app initializes, which hides the early one; the early one stays hidden once the layout has set data-app-ready. Without a server host (MAUI) only the live one exists.
+   while the app initializes, which hides the early one; the early one stays hidden once the layout has set data-app-ready.
    The styles are _content/Flox.Shared/flox-splash.css, linked in the head of the host page *@
 
 <div class="flox-splash @(Early ? "flox-splash-early" : "flox-splash-live")">

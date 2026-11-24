@@ -1,6 +1,7 @@
+@using BlazorBlueprint.Components
 @inherits ModalDialogWidget<string>
 
 <CodeEditor Height="500px" Value=@Model/>
 <DialogActions>
-    <RadzenButton ButtonStyle="Radzen.ButtonStyle.Base" Text=@Strings.Caption_Close Click=@Cancel/>
+    <Button Variant="ButtonVariant.Secondary" OnClick=@Cancel>@Strings.Caption_Close</Button>
 </DialogActions>

@@ -5,28 +5,19 @@ namespace FireChart.Viewer.Tests.Rendering;
 // The style of the visualization: the vendor fx.css, the customer's over it, and what the customer's may contain
 public class FxStyleTests
 {
+    // The components (badge, list, table, ...) are in the layer kit inside the vendor layer, so a rule of fx.css outside it wins whatever its specificity
     [Test]
-    public void TheOlderToneDanger_UsesTheVariablesOfTheBadgeThatDaisyBuilds()
+    public void TheComponentsOfTheKit_AreInALayerUnderTheRestOfTheVendorStyle()
     {
-        Assert.Multiple(() =>
-        {
-            Assert.That(TestLibrary.Styles.Daisy, Does.Contain(".fx-badge-error{--fx-badge-color:var(--color-error)"), "the variable carries the prefix of the kit");
-            Assert.That(TestLibrary.Styles.Vendor, Does.Contain(".fx-badge-danger").And.Contain("--fx-badge-color: var(--color-error)"));
-        });
-    }
-
-    [Test]
-    public void TheDaisyComponents_ArePrefixed_ScopedToTheirClasses_AndPartOfTheVendorLayer()
-    {
-        var composed = TestLibrary.Styles.Compose(null);
+        var vendor = TestLibrary.Styles.Vendor;
+        var kit = vendor.IndexOf("@layer kit {", StringComparison.Ordinal);
 
         Assert.Multiple(() =>
         {
-            Assert.That(StyleChecks.CheckVendor(TestLibrary.Styles.Daisy), Is.Null, "the built file passes the checks of the vendor style");
-            Assert.That(TestLibrary.Styles.Daisy, Does.Contain(".fx-badge").And.Contain(".fx-list-row").And.Contain(".fx-stat"), "the components of the subset");
-            Assert.That(TestLibrary.Styles.Daisy, Does.Not.Contain(":root").And.Not.Contain("[data-theme"), "no rule reaches outside the classes of the kit");
-            Assert.That(System.Text.RegularExpressions.Regex.IsMatch(TestLibrary.Styles.Daisy, @"(?<![-.\w])(html|body)\s*\{"), Is.False, "no rule of the page itself");
-            Assert.That(composed.IndexOf(".fx-badge", StringComparison.Ordinal), Is.LessThan(composed.IndexOf(".fx-banner", StringComparison.Ordinal)), "fx.css comes after the components and wins");
+            Assert.That(kit, Is.GreaterThan(0));
+            Assert.That(vendor.IndexOf(".fx-badge-danger", StringComparison.Ordinal), Is.GreaterThan(kit), "the older name of the tone error is a badge of the kit");
+            Assert.That(vendor, Does.Contain(".fx-list .fx-list-row").And.Contain(".fx-table").And.Contain(".fx-stat").And.Contain(".fx-skeleton"));
+            Assert.That(vendor, Does.Not.Contain("--color-base").And.Not.Contain("daisy"), "no variable of daisyUI is left");
         });
     }
 

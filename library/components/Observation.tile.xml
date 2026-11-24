@@ -1,0 +1,16 @@
+<!-- An observation in a list: what was measured, when; the value (or the values of its components) and the interpretation at the end -->
+<Component name="Observation.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{%record.code}}" subtitle="{{%record.effective}}" patient="{{%record.subject}}" encounter="{{%record.encounter}}">
+    <Trailing>
+      <If test="{{%record.value.exists()}}">
+        <Value value="{{%record.value}}"/>
+      </If>
+      <If test="{{%record.value.empty()}}">
+        <Value value="{{%record.component.value}}" separator=" / "/>
+      </If>
+      <Interpretation value="{{%record.interpretation.first()}}"/>
+    </Trailing>
+  </Tile>
+</Component>

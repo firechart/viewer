@@ -1,15 +1,27 @@
-@* A RadzenAlert of Flox. OneTime: shown once on this device, then never again (the mark is kept by ILocalDocumentStore, SQLite; with no store, or
-   when it fails, the alert is shown every time). It is marked when it is shown, and has the close button *@
-@using Radzen
-@using Radzen.Blazor
+@* An alert of Flox over the BbAlert of Blazor Blueprint. OneTime: shown once on this device, then never again (the mark is kept by ILocalDocumentStore, SQLite; with no store, or
+   when it fails, the alert is shown every time). It is marked when it is shown, and has the close button. Plain: a grey plate without the colour of its
+   kind, for a note the user reads once *@
+@using BlazorBlueprint.Components
 @inject IServiceProvider Services
 
 @if (_visible)
 {
-    <RadzenAlert AlertStyle=@AlertStyle Variant=@Variant Size=@Size Shade=@Shade AllowClose=@(AllowClose || OneTime) Close=@CloseAsync Title=@Title Icon=@Icon ShowIcon=@ShowIcon
-                 class=@Class Style=@Style @attributes=@Attributes>
-        @ChildContent
-    </RadzenAlert>
+    <BbAlert Variant=@BbVariant Dismissible=@(AllowClose || OneTime) OnDismiss=@CloseAsync Class=@CssClass style=@Style @attributes=@Attributes>
+        <Icon>
+            @if (ShowIcon && !Plain)
+            {
+                @* Blueprint places an svg in the corner; the icon of the font is placed the same way *@
+                <FloxIcon Icon=@(Icon ?? DefaultIcon) Size="1rem" Class="absolute start-4 top-4"/>
+            }
+        </Icon>
+        <ChildContent>
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <BbAlertTitle>@Title</BbAlertTitle>
+            }
+            <BbAlertDescription>@ChildContent</BbAlertDescription>
+        </ChildContent>
+    </BbAlert>
 }
 
 @code {
@@ -24,16 +36,7 @@
     public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
-    public AlertStyle AlertStyle { get; set; } = AlertStyle.Info;
-
-    [Parameter]
-    public Variant Variant { get; set; } = Variant.Flat;
-
-    [Parameter]
-    public AlertSize Size { get; set; } = AlertSize.Medium;
-
-    [Parameter]
-    public Shade Shade { get; set; } = Shade.Default;
+    public AlertKind Kind { get; set; } = AlertKind.Info;
 
     [Parameter]
     public bool AllowClose { get; set; }
@@ -49,6 +52,28 @@
 
     [Parameter]
     public string? Class { get; set; }
+
+    // The grey plate of a note, without the colour of its style
+    [Parameter]
+    public bool Plain { get; set; }
+
+    private string? CssClass => Plain ? $"border-transparent bg-hover {Class}".Trim() : ShowIcon ? $"ps-11 {Class}".Trim() : Class;
+
+    private AlertVariant BbVariant => Plain ? AlertVariant.Default : Kind switch
+    {
+        AlertKind.Success => AlertVariant.Success,
+        AlertKind.Warning => AlertVariant.Warning,
+        AlertKind.Danger => AlertVariant.Danger,
+        _ => AlertVariant.Info
+    };
+
+    private string DefaultIcon => Kind switch
+    {
+        AlertKind.Success => "check_circle",
+        AlertKind.Warning => "warning",
+        AlertKind.Danger => "error",
+        _ => "info"
+    };
 
     [Parameter]
     public string? Style { get; set; }

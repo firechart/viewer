@@ -34,6 +34,6 @@ public interface IBootstrapper
     /// <summary>The base address of the host, if it has one.</summary>
     string? BaseAddress { get; }
 
-    /// <summary>The name of the hosting environment. Defaults to the process environment variable, which suits Server, MAUI and tests; a browser host has none and passes the value it receives from ASP.NET Core.</summary>
+    /// <summary>The name of the hosting environment. Defaults to the process environment variable, which suits the server and tests; a browser host has none and passes the value it receives from ASP.NET Core.</summary>
     string Environment { get; }
 }

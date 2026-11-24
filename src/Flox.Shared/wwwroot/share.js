@@ -28,27 +28,32 @@ async function copyToClipboard(text) {
     }
 }
 
-export async function share(title, text) {
-    // navigator.share requires a user gesture that Blazor WASM's async bridge
-    // consistently breaks on desktop — the Promise hangs forever.
-    // Restrict native share to touch devices where it actually works.
-    const isTouchDevice = navigator.maxTouchPoints > 0;
-    if (isTouchDevice && navigator.share && !_sharing) {
-        _sharing = true;
-        try {
-            await navigator.share({ title, text });
-            return 'shared';
-        } catch (e) {
-            if (e.name === 'AbortError') return 'cancelled';
-            // NotAllowedError, InvalidStateError — fall through to clipboard
-        } finally {
-            _sharing = false;
-        }
-    }
-    const copied = await copyToClipboard(text);
-    return copied ? 'copied' : 'unsupported';
+// The sharing dialog of the system for a text (Web Share): Safari, Chrome and Edge on Android, Windows, macOS and ChromeOS; not Firefox on a desktop
+export function canShare() {
+    return typeof navigator.share === 'function' && (typeof navigator.canShare !== 'function' || navigator.canShare({ text: 'x' }));
 }
 
-export function canShare() {
-    return !!(navigator.share || navigator.clipboard || document.execCommand);
+// Opens the sharing dialog; it needs the click of the user, so the module is loaded before (ShareService.PrepareAsync)
+export async function share(title, text) {
+    if (!canShare()) {
+        return 'unsupported';
+    }
+    if (_sharing) {
+        return 'cancelled';
+    }
+    _sharing = true;
+    try {
+        await navigator.share({ title, text });
+        return 'shared';
+    } catch (e) {
+        // AbortError: the user closed the dialog; NotAllowedError: no click of the user, or the dialog is not allowed here
+        return e.name === 'AbortError' ? 'cancelled' : 'failed';
+    } finally {
+        _sharing = false;
+    }
+}
+
+// Copies the text to the clipboard: true when it was copied
+export async function copy(text) {
+    return await copyToClipboard(text);
 }

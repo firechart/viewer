@@ -2,20 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
     <meta name="color-scheme" content="light dark" />
     <title>FireChart Viewer</title>
     <base href="/" />
     <link rel="icon" href="data:," />
     <link rel="preload" href="_content/Flox.Shared/fonts/FloxSymbols.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- The frame (/embed, inside another application) shows a quiet bar while the runtime downloads, the demo the splash of FireChart: told before
+         the body is drawn -->
+    <script>
+        if (/^\/embed(\/|$)/.test(location.pathname)) {
+            document.documentElement.classList.add('viewer-embed');
+        }
+    </script>
     <link rel="stylesheet" href="_content/Flox.Shared/app.css" />
+    <link rel="stylesheet" href="_content/Flox.Shared/flox-splash.css" />
+    <!-- Blazor Blueprint: its theme (the tokens of shadcn/ui), then its compiled styles -->
+    <link rel="stylesheet" href="_content/Flox.Shared/theme.css" />
+    <link rel="stylesheet" href="_content/BlazorBlueprint.Components/blazorblueprint.css" />
     <link rel="stylesheet" href="_content/Flox.Shared/css/Flox.Shared.Tailwind.css" />
     <link rel="stylesheet" href="_content/FireChart.Viewer/css/FireChart.Viewer.Tailwind.css" />
-    <link rel="stylesheet" href="FireChart.Viewer.App.styles.css" />
-    <script src="_content/Radzen.Blazor/Radzen.Blazor.min.js"></script>
+    <link rel="stylesheet" href="css/FireChart.Viewer.App.Tailwind.css" />
+    <style>
+        /* The bar of the frame: no brand and no background of its own (the page of the host shows through), the colour of the text */
+        .viewer-embed .flox-splash {
+            display: none;
+        }
+
+        /* flox-splash.css paints the page black under its splash */
+        html.viewer-embed:has(.flox-splash) {
+            background: transparent;
+        }
+
+        .viewer-start-bar {
+            display: none;
+        }
+
+        .viewer-embed .viewer-start-bar {
+            display: block;
+            position: fixed;
+            inset: 0 0 auto 0;
+            height: 3px;
+            overflow: hidden;
+        }
+
+        .viewer-start-bar::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: currentColor;
+            opacity: 0.35;
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            .viewer-start-bar::before {
+                inset: 0 auto 0 0;
+                width: 30%;
+                opacity: 0.5;
+                will-change: transform;
+                animation: viewer-start-slide 1.5s infinite ease-in-out;
+            }
+        }
+
+        @keyframes viewer-start-slide {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(340%); }
+        }
+    </style>
 </head>
 <body>
-    <div id="app"></div>
+    <!-- Blazor replaces both with the application: the splash of Flox.Shared (the demo) and the bar of the frame -->
+    <div id="app">
+        <div class="flox-splash flox-splash-early">
+            <img class="flox-splash-logo" src="img/firechart-logo.svg" alt="" />
+            <p class="flox-splash-message" role="status"></p>
+            <div class="flox-splash-progress" role="progressbar" aria-label="Loading">
+                <div class="flox-splash-bar"></div>
+            </div>
+        </div>
+        <div class="viewer-start-bar" role="progressbar" aria-label="Loading"></div>
+    </div>
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script>
         Blazor.start({ configureRuntime: builder => builder.withConfig({ loadAllSatelliteResources: true }) });

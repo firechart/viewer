@@ -46,7 +46,7 @@ public class Bootstrapper : IBootstrapper
         ConfigurationBuilder = configuration ?? throw new ArgumentNullException(nameof(configuration));
         LoggingBulder = loggingBuilder ?? throw new ArgumentNullException(nameof(loggingBuilder));
         BaseAddress = baseAddress;
-        // Constants.ENVIRONMENT reads a real OS env var - correct for Server/MAUI/Test, meaningless
+        // Constants.ENVIRONMENT reads a real OS env var - correct for Server/Test, meaningless
         // in a browser sandbox. Callers that have a real value from elsewhere (WASM's
         // builder.HostEnvironment.Environment) pass it explicitly; everyone else keeps the old
         // env-var-based default.
@@ -118,7 +118,7 @@ public class Bootstrapper : IBootstrapper
         // references it renders, by which point DI registration already happened and it's too
         // late (confirmed: exactly this gap, reproduced via a real Release publish). Walk the
         // reference graph from the entry assembly and force-load everything, same intent as the
-        // directory scan below for Server/MAUI, just driven by compile-time reference metadata
+        // directory scan below for the server, just driven by compile-time reference metadata
         // (GetReferencedAssemblies) since there's no directory to list in a browser sandbox.
         if (OperatingSystem.IsBrowser())
         {

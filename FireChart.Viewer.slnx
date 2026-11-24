@@ -1,9 +1,14 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path="README.md" />
+    <File Path="CHANGELOG.md" />
     <File Path="Dockerfile" />
     <File Path="docker-compose.yml" />
     <File Path=".dockerignore" />
+    <File Path="docker/nginx.conf" />
+    <File Path="docker/smoke.sh" />
+    <File Path=".github/workflows/build.yml" />
+    <File Path=".github/workflows/image.yml" />
   </Folder>
   <Folder Name="/FireChart/">
     <Project Path="src/FireChart.Resources/FireChart.Resources.csproj" />
@@ -11,6 +16,7 @@
     <Project Path="src/FireChart.Viewer.Library/FireChart.Viewer.Library.csproj" />
     <Project Path="src/FireChart.Viewer/FireChart.Viewer.csproj" />
     <Project Path="src/FireChart.Viewer.App/FireChart.Viewer.App.csproj" />
+    <Project Path="src/FireChart.FhirMetadata/FireChart.FhirMetadata.csproj" />
   </Folder>
   <Folder Name="/Flox/">
     <Project Path="src/Flox.Core/Flox.Core.csproj" />
@@ -19,9 +25,6 @@
     <Project Path="src/Flox.Shared/Flox.Shared.csproj" />
     <Project Path="src/Flox.Sqlite/Flox.Sqlite.csproj" />
     <Project Path="src/Flox.Sqlite.Files/Flox.Sqlite.Files.csproj" />
-  </Folder>
-  <Folder Name="/Tools/">
-    <Project Path="tools/FireChart.FhirMetadata/FireChart.FhirMetadata.csproj" />
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="test/FireChart.Viewer.Tests/FireChart.Viewer.Tests.csproj" />

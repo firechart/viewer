@@ -1,25 +1,12 @@
 <Project>
 
-    <!--
-      .NET MAUI mobile workloads (Android/iOS/MacCatalyst) override $(Version) from
-      $(ApplicationDisplayVersion) after MinVer has already set it (MinVer's own target runs earlier
-      in the SDK's target import chain than Directory.Build.targets) - see
-      Microsoft.Android.Sdk.DefaultProperties.targets / Xamarin.Shared.Sdk.targets - while
-      net10.0-windows keeps MinVer's value untouched. That makes $(Version) (and the
-      $(PackageVersion) NuGet derives from it) differ across target frameworks within the same
-      multi-targeted project, which fails restore under Central Package Management with NU1105.
-      Re-assert a single, consistent value here, since Directory.Build.targets is imported last and
-      therefore wins over every SDK/workload override - read MinVer's own $(MinVerVersion) property
-      rather than $(Version) itself, since MAUI's SDK has no idea that property exists and never
-      touches it.
-    -->
-    <PropertyGroup>
-        <Version Condition="'$(MinVerVersion)' != ''">$(MinVerVersion)</Version>
-        <PackageVersion Condition="'$(MinVerVersion)' != ''">$(MinVerVersion)</PackageVersion>
+    <!-- The Tailwind CLI (about 100 MB from GitHub) with retries: one broken download of a plain curl failed a release (Lombiq.Tailwind.Targets) -->
+    <PropertyGroup Condition="'$(TailwindCliOs)' != 'windows'">
+        <TailwindDownloadCommand>curl -fsSL --retry 5 --retry-all-errors --retry-delay 10 -o &quot;$(TailwindCliTempPath)&quot; &quot;$(TailwindCliDownloadUrl)&quot;</TailwindDownloadCommand>
     </PropertyGroup>
 
     <!--
-      The vendor library (public/library, a package of the designer: templates, locales, forms, styles, samples) is static content of the
+      The vendor library (library, a package of the designer: templates, locales, forms, styles, samples) is static content of the
       application that sets FireChartLibrary, served at library/ in development and published as the folder wwwroot/library. No code project
       carries it. Its manifest gets the version of the release (the one in git is 0.0.0-dev); the environments of the designer stay out.
       The assets are defined with their own content root, as the SDK does with its own (a linked Content item would be looked for in wwwroot)
@@ -28,7 +15,7 @@
         <FireChartLibrarySource>$(MSBuildThisFileDirectory)library\</FireChartLibrarySource>
         <FireChartLibraryStamped>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/$(BaseIntermediateOutputPath)library/'))</FireChartLibraryStamped>
         <!-- FireChartLibraryCopy: the files are copied into obj first. A static web asset is known by the path of its file, so two applications of
-             one host (Pro and Lite of the server) cannot both declare the files of public/library -->
+             one host (Pro and Lite of the server) cannot both declare the files of library -->
         <FireChartLibraryRoot Condition="'$(FireChartLibraryCopy)' != 'true'">$(FireChartLibrarySource)</FireChartLibraryRoot>
         <FireChartLibraryRoot Condition="'$(FireChartLibraryCopy)' == 'true'">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/$(BaseIntermediateOutputPath)library-copy/'))</FireChartLibraryRoot>
     </PropertyGroup>

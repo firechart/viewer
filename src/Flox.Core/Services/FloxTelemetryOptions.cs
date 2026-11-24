@@ -3,6 +3,9 @@ namespace Flox.Core.Services;
 /// <summary>Settings of the telemetry export, bound to the <c>Flox:OpenTelemetry</c> section.</summary>
 public class FloxTelemetryOptions
 {
+    /// <summary>The key of the configuration that switches telemetry on.</summary>
+    public const string EnabledKey = "Flox:OpenTelemetry:Enabled";
+
     /// <summary>Whether telemetry is exported.</summary>
     public bool Enabled { get; set; }
     /// <summary>The address of the OTLP collector.</summary>

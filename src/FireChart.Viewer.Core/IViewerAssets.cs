@@ -13,7 +13,7 @@ namespace FireChart.Viewer.Core;
 /// </remarks>
 /// <example>
 /// <code>
-/// var text = await assets.ReadTextAsync("library/search-forms/r4/Patient.json?v=1.2.0", cancellationToken);
+/// var text = await assets.ReadTextAsync("library/components/Patient.search.xml?v=1.2.0", cancellationToken);
 /// if (text is not null)
 /// {
 ///     var form = ViewerJson.Read&lt;SearchFormDefinition&gt;(text);

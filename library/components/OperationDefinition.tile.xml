@@ -1,0 +1,13 @@
+<!-- An operation definition in a list: its name, $code and resources; its kind and status at the end -->
+<Component name="OperationDefinition.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.name.exists(), %record.name, iif(%record.title.exists(), %record.title, %record.id))}}" subtitle="{{iif(%record.code.exists(), '$' &amp; %record.code, '')}}{{iif(%record.code.exists() and %record.resource.exists(), ' · ', '')}}{{%record.resource}}">
+    <Trailing>
+      <If test="{{%record.kind.exists()}}">
+        <Badge text="{{%record.kind}}"/>
+      </If>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

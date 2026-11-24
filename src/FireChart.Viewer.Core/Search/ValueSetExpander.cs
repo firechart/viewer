@@ -165,6 +165,7 @@ public interface IValueSetExpander
 /// <param name="httpClientFactory">Makes the client <see cref="FhirServerHttp.HttpClientName"/>.</param>
 /// <param name="credentials">The <c>Authorization</c> of the servers.</param>
 /// <param name="logger">Logs a refusal (the server and the value set, no patient data).</param>
+/// <param name="clock">The time of the pause after a failed expansion; <see cref="TimeProvider.System"/> when <see langword="null"/> (a test gives its own).</param>
 /// <example>
 /// <code>
 /// var expander = new ValueSetExpander(httpClientFactory, credentials, logger);
@@ -172,7 +173,8 @@ public interface IValueSetExpander
 /// </code>
 /// </example>
 [FloxService(typeof(IValueSetExpander), ServiceLifetime.Singleton)]
-public sealed class ValueSetExpander(IHttpClientFactory httpClientFactory, IServerCredentialStore credentials, ILogger<ValueSetExpander> logger) : IValueSetExpander
+public sealed class ValueSetExpander(IHttpClientFactory httpClientFactory, IServerCredentialStore credentials, ILogger<ValueSetExpander> logger, TimeProvider? clock = null)
+    : IValueSetExpander
 {
     /// <summary>
     /// The most codes asked for and kept: a larger value set is searched on the server as the user types.
@@ -181,7 +183,14 @@ public sealed class ValueSetExpander(IHttpClientFactory httpClientFactory, IServ
 
     private readonly ConcurrentDictionary<string, ValueSetExpansion> _whole = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, byte> _refused = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, DateTimeOffset> _failed = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, Lazy<Task<ValueSetExpansion?>>> _asking = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, string> _displays = new(StringComparer.Ordinal);
+
+    private DateTimeOffset Now => (clock ?? TimeProvider.System).GetUtcNow();
+
+    // How long a server error is believed: the value set is not asked for again meanwhile (a server that fails on it fails every time)
+    private static readonly TimeSpan s_failure = TimeSpan.FromMinutes(5);
 
     /// <inheritdoc/>
     public string? DisplayOf(IViewerServer server, string valueSetUrl, string? version, string token)
@@ -214,7 +223,7 @@ public sealed class ValueSetExpander(IHttpClientFactory httpClientFactory, IServ
         var language = CultureInfo.CurrentUICulture.Name;
         var key = KeyOf(server, valueSetUrl, version);
         var text = string.IsNullOrWhiteSpace(filter) ? null : filter.Trim();
-        if (_refused.ContainsKey(key))
+        if (_refused.ContainsKey(key) || (_failed.TryGetValue(key, out var failed) && Now - failed < s_failure))
         {
             return null;
         }
@@ -224,6 +233,29 @@ public sealed class ValueSetExpander(IHttpClientFactory httpClientFactory, IServ
             return text is null ? known : known with { Options = known.Matching(text) };
         }
 
+        // The whole value set asked for by several fields at once is one request
+        if (text is null)
+        {
+            var asking = _asking.GetOrAdd(key, _ => new Lazy<Task<ValueSetExpansion?>>(() => AskAsync(server, valueSetUrl, version, null, language, key, CancellationToken.None)));
+            try
+            {
+                return await asking.Value.WaitAsync(cancellationToken);
+            }
+            finally
+            {
+                if (asking.Value.IsCompleted)
+                {
+                    _asking.TryRemove(new KeyValuePair<string, Lazy<Task<ValueSetExpansion?>>>(key, asking));
+                }
+            }
+        }
+
+        return await AskAsync(server, valueSetUrl, version, text, language, key, cancellationToken);
+    }
+
+    private async Task<ValueSetExpansion?> AskAsync(IViewerServer server, string valueSetUrl, string? version, string? text, string language, string key,
+                                                    CancellationToken cancellationToken)
+    {
         var url = $"{server.BaseUrl.TrimEnd('/')}/ValueSet/$expand?url={Uri.EscapeDataString(valueSetUrl)}"
                   + (string.IsNullOrWhiteSpace(version) ? string.Empty : $"&valueSetVersion={Uri.EscapeDataString(version)}")
                   + (text is null ? string.Empty : $"&filter={Uri.EscapeDataString(text)}")
@@ -247,6 +279,10 @@ public sealed class ValueSetExpander(IHttpClientFactory httpClientFactory, IServ
             if (ex is not HttpRequestException { StatusCode: null or >= HttpStatusCode.InternalServerError and not HttpStatusCode.NotImplemented } and not TimeoutException)
             {
                 _refused[key] = 0;
+            }
+            else if (text is null)
+            {
+                _failed[key] = Now;
             }
 
             logger.LogInformation("{Server} does not expand the value set {ValueSet}: {Error}", server.BaseUrl, valueSetUrl, ex.Message);

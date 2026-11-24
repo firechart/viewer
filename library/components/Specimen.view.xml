@@ -1,0 +1,46 @@
+<!-- The page of a specimen: its type, when it was collected and received, its status, its details, containers and notes -->
+<Component name="Specimen.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{%record.type}}">
+    <Field label="{{%strings.Collected}}" value="{{%record.collection.collected}}"/>
+    <Field label="{{%strings.Received}}" value="{{%record.receivedTime}}"/>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.status}}"/>
+    </Field>
+  </Section>
+
+  <If test="{{%record.accessionIdentifier.exists() or %record.collection.collector.exists() or %record.collection.method.exists() or %record.collection.bodySite.exists() or %record.collection.quantity.exists() or %record.request.exists() or %record.parent.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Accession}}" value="{{%record.accessionIdentifier}}"/>
+      <Field label="{{%strings.Collector}}">
+        <Link value="{{%record.collection.collector}}"/>
+      </Field>
+      <Field label="{{%strings.Method}}" value="{{%record.collection.method}}"/>
+      <Field label="{{%strings.BodySite}}" value="{{%record.collection.bodySite}}"/>
+      <Field label="{{%strings.Quantity}}" value="{{%record.collection.quantity}}"/>
+      <Field label="{{%strings.Request}}">
+        <Link value="{{%record.request}}"/>
+      </Field>
+      <Field label="{{%strings.Parent}}">
+        <Link value="{{%record.parent}}"/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.container.exists()}}">
+    <Section title="{{%strings.Containers}}">
+      <Repeat each="{{%record.container}}" as="container">
+        <Row main="{{%container.type}}" meta="{{%container.capacity}}"/>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.note.exists()}}">
+    <Section title="{{%strings.Notes}}">
+      <Repeat each="{{%record.note}}" as="note">
+        <Row main="{{%note.text}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

@@ -1,7 +1,7 @@
 # FireChart.Viewer
 
 FireChart Viewer: a Blazor component that browses the data of a FHIR server from the client (resource types, lists, resources, the patient summary of
-a patient). It talks to the FHIR server directly, renders resources with the Liquid templates of `FireChart.Viewer.Library`, and is built on the client
+a patient). It talks to the FHIR server directly, draws resources with the components of the library (`components/{Name}.xml`, `FireChart.Viewer.Library`), and is built on the client
 side of Flox (`Flox.Core`, `Flox.Shared`).
 
 **Client side only.** It runs on Blazor WebAssembly (`blazor.webassembly.js`) and on Blazor Hybrid (MAUI, `blazor.webview.js`); the data of a patient and the
@@ -30,16 +30,18 @@ The Viewer has no styles of its own beyond its utilities: it takes the look of t
 
 ```html
 <link rel="stylesheet" href="_content/Flox.Shared/app.css" />
+<link rel="stylesheet" href="_content/Flox.Shared/theme.css" />
+<link rel="stylesheet" href="_content/BlazorBlueprint.Components/blazorblueprint.css" />
 <link rel="stylesheet" href="_content/Flox.Shared/css/Flox.Shared.Tailwind.css" />
 <link rel="stylesheet" href="_content/FireChart.Viewer/css/FireChart.Viewer.Tailwind.css" />
 <link rel="stylesheet" href="{YourApp}.styles.css" />
-<script src="_content/Radzen.Blazor/Radzen.Blazor.min.js"></script>
 ```
 
-and put `<RadzenTheme Theme="standard"/>` and `<RadzenComponents/>` into the root component. `FireChart.Viewer.App` (in the repository) is a complete example of such a host.
+register the components with `services.AddFloxComponents()` and put `<BbPortalHost/>`, `<BbDialogProvider/>` and `<BbToastProvider/>` of Blazor
+Blueprint into the root component. `FireChart.Viewer.App` (in the repository) is a complete example of such a host.
 
-`Appearance` with a theme (`Light`, `Dark`, `Auto`) makes the Viewer the owner of the theme of the document: it sets `data-theme` on `<html>` and switches the
-base theme of Radzen (`standard` or `standard-dark`) through Radzen's `ThemeService`, so the `RadzenTheme` of the host must be there. Leave the theme
+`Appearance` with a theme (`Light`, `Dark`, `Auto`) makes the Viewer the owner of the theme of the document: it sets `data-theme` and the class `dark` on `<html>`
+(the dark tokens of `theme.css`). Leave the theme
 `Inherit` (the default) when the host switches the theme itself, as FireChart does.
 
 ## SMART sign-in
@@ -73,20 +75,6 @@ The same with the popup. `SmartRedirectUri` stays: it is the way out when the wi
 
 `SmartPopupRedirectUri` sets the return page of the window; by default it is `_content/FireChart.Viewer/smart-callback.html` below the base address of
 the application (`<base href>`), a static page of this package. It must be on the origin of the Viewer.
-
-FireChart turns the popup on for its embedded pages (`/app/embed/...`) with a setting of the server; its own pages always use the redirect:
-
-```json
-{
-  "FireChart": {
-    "Embedding": {
-      "SmartFlow": "Popup"
-    }
-  }
-}
-```
-
-or the environment variable `FireChart__Embedding__SmartFlow=Popup`. Any other value, or none, is `Redirect`.
 
 ### Registration at the authorization server
 
@@ -185,8 +173,7 @@ the host page; and the console of the window before it closes (Chrome DevTools: 
 ### Test matrix
 
 Run it on each platform you support, with the SMART App Launcher (`https://launch.smarthealthit.org/v/r4/fhir`, any client id, extra parameters
-`launch=e30`) and the test page of FireChart (`https://127.0.0.1:7270/embed-test` with the Viewer from `https://localhost:7270`,
-`FireChart:Embedding:SmartFlow` = `Popup`):
+`launch=e30`) and a host page on another origin that frames the Viewer app (`samples`), with `SmartFlow.Popup`:
 
 1. **Sign in** in the frame: a window (a tab on phones) opens with the sign-in of the launcher.
 2. Pick a provider and a patient: the window closes and the frame shows the patient summary of that patient.

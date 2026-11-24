@@ -1,0 +1,51 @@
+<!-- The page of a medication statement: the medication, when and its status, then the details, the dosage and the notes -->
+<Component name="MedicationStatement.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{%record.medication}}">
+    <Field label="{{%strings.Medication}}">
+      <Link value="{{%record.medication}}"/>
+    </Field>
+    <Field label="{{%strings.When}}" value="{{%record.effective}}"/>
+    <Field label="{{%strings.Asserted}}" value="{{%record.dateAsserted}}"/>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.status}}"/>
+    </Field>
+  </Section>
+
+  <If test="{{%record.informationSource.exists() or %record.category.exists() or %record.reasonCode.exists() or %record.reasonReference.exists() or %record.basedOn.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Source}}">
+        <Link value="{{%record.informationSource}}"/>
+      </Field>
+      <Field label="{{%strings.Category}}">
+        <Value value="{{%record.category}}" separator=", "/>
+      </Field>
+      <Field label="{{%strings.Reason}}">
+        <Value value="{{%record.reasonCode}}" separator=", "/>
+      </Field>
+      <Field label="{{%strings.Reason}}">
+        <Link value="{{%record.reasonReference}}"/>
+      </Field>
+      <Field label="{{%strings.BasedOn}}">
+        <Link value="{{%record.basedOn}}"/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.dosage.exists()}}">
+    <Section title="{{%strings.Dosage}}">
+      <Repeat each="{{%record.dosage}}" as="dose">
+        <Row main="{{%dose.text}}"/>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.note.exists()}}">
+    <Section title="{{%strings.Notes}}">
+      <Repeat each="{{%record.note}}" as="note">
+        <Row main="{{%note.text}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

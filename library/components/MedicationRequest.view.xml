@@ -1,0 +1,56 @@
+<!-- The page of a prescription: the medication, when and its status, then the details, the dosage and the notes -->
+<Component name="MedicationRequest.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{%record.medication}}">
+    <Field label="{{%strings.Medication}}">
+      <Link value="{{%record.medication}}"/>
+    </Field>
+    <Field label="{{%strings.Authored}}" value="{{%record.authoredOn}}"/>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.status}}"/>
+      <If test="{{%record.intent.exists()}}">
+        <Badge text="{{%record.intent}}"/>
+      </If>
+      <If test="{{%record.priority.exists() and %record.priority != 'routine'}}">
+        <Status value="{{%record.priority}}"/>
+      </If>
+    </Field>
+  </Section>
+
+  <If test="{{%record.requester.exists() or %record.category.exists() or %record.reasonCode.exists() or %record.reasonReference.exists() or %record.basedOn.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Requester}}">
+        <Link value="{{%record.requester}}"/>
+      </Field>
+      <Field label="{{%strings.Category}}">
+        <Value value="{{%record.category}}" separator=", "/>
+      </Field>
+      <Field label="{{%strings.Reason}}">
+        <Value value="{{%record.reasonCode}}" separator=", "/>
+      </Field>
+      <Field label="{{%strings.Reason}}">
+        <Link value="{{%record.reasonReference}}"/>
+      </Field>
+      <Field label="{{%strings.BasedOn}}">
+        <Link value="{{%record.basedOn}}"/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.dosageInstruction.exists()}}">
+    <Section title="{{%strings.Dosage}}">
+      <Repeat each="{{%record.dosageInstruction}}" as="dose">
+        <Row main="{{%dose.text}}" meta="{{%dose.route}}"/>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.note.exists()}}">
+    <Section title="{{%strings.Notes}}">
+      <Repeat each="{{%record.note}}" as="note">
+        <Row main="{{%note.text}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

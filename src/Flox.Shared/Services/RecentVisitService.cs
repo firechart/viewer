@@ -34,7 +34,8 @@ public sealed class RecentVisitService(NavigationManager navigation, IServicePro
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(displayName))
+            // An application without the history records nothing
+            if (string.IsNullOrWhiteSpace(displayName) || !serviceProvider.HasStorage<UserRecent>())
             {
                 return;
             }
@@ -83,6 +84,11 @@ public sealed class RecentVisitService(NavigationManager navigation, IServicePro
     /// <inheritdoc />
     public async Task<IReadOnlyList<UserRecent>> GetRecentAsync(int count, CancellationToken cancellationToken = default)
     {
+        if (!serviceProvider.HasStorage<UserRecent>())
+        {
+            return [];
+        }
+
         var list = serviceProvider.GetRequiredService<IGuidDataSource<UserRecent>>();
         list.SetPageSize(count)
             .SetCount(false)

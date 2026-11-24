@@ -1,0 +1,13 @@
+<!-- A search parameter in a list: its name, code and base resources; its type and status at the end -->
+<Component name="SearchParameter.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.name.exists(), %record.name, iif(%record.title.exists(), %record.title, %record.id))}}" subtitle="{{%record.code}}{{iif(%record.code.exists() and %record.base.exists(), ' · ', '')}}{{%record.base}}">
+    <Trailing>
+      <If test="{{%record.type.exists()}}">
+        <Badge text="{{%record.type}}"/>
+      </If>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

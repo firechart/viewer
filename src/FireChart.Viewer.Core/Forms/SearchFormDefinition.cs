@@ -7,8 +7,8 @@ namespace FireChart.Viewer.Core.Forms;
 /// </summary>
 /// <remarks>
 /// <para>
-/// The vendor library holds one form per release and resource type as <c>search-forms/{release}/{type}.json</c> (<c>search-forms/R4/Patient.json</c>);
-/// a customer may override a form by a layer of their own. A form holds no codes: a coded field names its value set
+/// The form of a list is the component <c>components/{Type}.search.xml</c> of the library, one for every release, over the form generated from the
+/// metadata of the release (<see cref="SearchFormGenerator"/>); a customer overrides it by a layer of their own. A form holds no codes: a coded field names its value set
 /// (<see cref="SearchFormField.ValueSetUrl"/>) and the Viewer asks the FHIR server of the search for its codes (<c>ValueSet/$expand</c>).
 /// </para>
 /// <para>
@@ -20,24 +20,12 @@ namespace FireChart.Viewer.Core.Forms;
 /// var form = new SearchFormDefinition { Name = "default", FhirRelease = "R4" };
 /// form.Title.SetDefault("Find patients");
 /// form.Fields.Add(new SearchFormField { QueryName = "family", ParameterType = SearchParameterType.String, Order = 1 });
-/// File.WriteAllText("search-forms/R4/Patient.json", ViewerJson.Write(form));
+/// var text = ViewerJson.Write(form);
 /// </code>
 /// </example>
 [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
 public sealed class SearchFormDefinition
 {
-    /// <summary>
-    /// The version of the format of the form this code writes. It goes up only with a change an older Viewer would read wrong (a property that changes
-    /// its meaning or goes away), never for a new optional property; <see cref="SearchFormReader.Upgrade"/> brings an older form up to it. 2 (2026-11-13):
-    /// <see cref="SearchFormField.Hidden"/> instead of <c>included</c>, <see cref="FhirRelease"/> instead of <c>authoredForVersion</c>.
-    /// </summary>
-    public const int CurrentFormatVersion = 2;
-
-    /// <summary>
-    /// The version of the format of the form; <see cref="CurrentFormatVersion"/> for a new form.
-    /// </summary>
-    public int FormatVersion { get; set; } = CurrentFormatVersion;
-
     /// <summary>
     /// The technical name of the form (<c>default</c>).
     /// </summary>

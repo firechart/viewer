@@ -1,0 +1,10 @@
+<!-- A titled section with a count, around whatever the caller puts in it (the default slot) -->
+<Component name="ListPanel">
+  <Param name="title" required="true"/>
+  <Param name="count"/>
+  <Slot/>
+
+  <Section title="{{%title}}" count="{{%count}}">
+    <SlotOutlet/>
+  </Section>
+</Component>

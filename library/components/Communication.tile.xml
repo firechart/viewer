@@ -1,0 +1,16 @@
+<!-- A communication in a list: its topic, when it was sent and who sent it; its status at the end -->
+<Component name="Communication.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.topic.exists(), %record.topic, iif(%record.category.exists(), %record.category.first(), %record.id))}}" patient="{{%record.subject}}" encounter="{{%record.encounter}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.sent}}"/>
+        <Value value="{{%record.sender}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

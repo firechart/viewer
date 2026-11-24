@@ -1,0 +1,24 @@
+<!-- The head of a patient: the name, then the gender, the birth date with the age (at death for a deceased patient) and the first identifier;
+     deceased and inactive as flags -->
+<Component name="Patient.banner">
+  <Param name="record" required="true"/>
+
+  <Banner title="{{iif(%record.name.exists(), %record.name.first(), %record.id)}}">
+    <Facts>
+      <Value value="{{%record.gender}}"/>
+      <Value value="{{%record.birthDate}}"/>
+      <Age birth="{{%record.birthDate}}" at="{{%record.deceased}}"/>
+      <If test="{{%record.identifier.exists()}}">
+        <Text>{{%strings.Id}} <Value value="{{%record.identifier.first()}}"/></Text>
+      </If>
+    </Facts>
+    <Flags>
+      <If test="{{%record.deceased.exists() and %record.deceased != false}}">
+        <Badge text="{{%strings.Deceased}}" tone="danger"/>
+      </If>
+      <If test="{{%record.active = false}}">
+        <Badge text="{{%strings.Inactive}}" tone="warning"/>
+      </If>
+    </Flags>
+  </Banner>
+</Component>

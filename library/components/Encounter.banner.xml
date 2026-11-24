@@ -1,0 +1,16 @@
+<!-- The head of an encounter: its type (else its class), then its period and its class; its status as a flag -->
+<Component name="Encounter.banner">
+  <Param name="record" required="true"/>
+
+  <Banner title="{{%strings.EncounterOf(iif(%record.type.exists(), %record.type.first(), %record.class.first()))}}">
+    <Facts>
+      <Value value="{{(%record.period | %record.actualPeriod).first()}}"/>
+      <If test="{{%record.type.exists() and %record.class.exists()}}">
+        <Value value="{{%record.class.first()}}"/>
+      </If>
+    </Facts>
+    <Flags>
+      <Status value="{{%record.status}}"/>
+    </Flags>
+  </Banner>
+</Component>

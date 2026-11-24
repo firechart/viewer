@@ -14,8 +14,8 @@ public interface IEventsConsumerService
     bool IsConnected { get; }
 
     /// <summary>
-    /// (Re)opens the connection for the current user and closes it when the user is not authenticated.
-    /// Call again after the authentication state changes.
+    /// Opens the connection for the current user (none when the user is not authenticated) and from then
+    /// on follows the authentication state: signing in connects, signing out closes.
     /// </summary>
     Task SubscribeAsync(CancellationToken cancellationToken = default);
 }

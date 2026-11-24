@@ -44,42 +44,56 @@ public class LabResultsTests
         }));
     }
 
-    [Test]
-    public async System.Threading.Tasks.Task TheCellsOfARow_AreTheTestTheValueOfTheFormatTheRangeAndTheFlag()
-    {
-        const string json = """
-            { "resourceType": "Observation", "id": "o", "status": "final", "code": { "text": "Potassium" },
-              "valueQuantity": { "value": 4.51196, "unit": "mmol/L" }, "interpretation": [ { "coding": [ { "code": "H", "display": "High" } ] } ],
-              "referenceRange": [ { "low": { "value": 3.5, "unit": "mmol/L" }, "high": { "value": 5.1, "unit": "mmol/L" } } ] }
-            """;
-
-        var cells = await new FhirRenderer([TestLibrary.Vendor]).RenderSlotsAsync(json, LabResults.RowTemplate, context: new TileContext([], TileOptions.Default, new ValueFormat { Decimals = 2 }));
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(FxHtml.PlainText(cells["test"]), Is.EqualTo("Potassium"));
-            Assert.That(FxHtml.PlainText(cells["value"]), Is.EqualTo("4.51 mmol/L"));
-            Assert.That(FxHtml.PlainText(cells["range"]), Is.EqualTo("3.5 - 5.1 mmol/L"));
-            Assert.That(cells["flag"], Does.Contain("High").And.Contain("fx-badge-warning"));
-        });
-    }
-
-    // A row without the cell "test" (its template failed) shows its id, which comes from the server unchecked: as text, never as markup
+    // A row without the name of its test shows its id, which comes from the server unchecked: as text, never as markup
     [Test]
     public void ARowWithoutItsTestCell_ShowsTheIdOfTheServerAsText()
     {
         const string id = "<img src=x onerror=alert(1)>";
         var section = new SummarySection(new SummaryFormSection { Code = "labs" }, [], "en");
-        section.LabGroups = [new LabGroup("day:2020-03-01", null, new DateOnly(2020, 3, 1), [Obs(id, "2020-03-01T08:00:00Z")])];
         using var context = new BunitContext();
 
-        var view = context.Render<LabResultsView>(parameters => parameters.Add(component => component.Section, section));
+        context.JSInterop.Mode = JSRuntimeMode.Loose;
+        var view = context.Render<FireChart.Viewer.Reports.ReportLab>(parameters => parameters
+            .Add(component => component.Section, section)
+            .Add(component => component.Groups, [new LabGroup("day:2020-03-01", null, new DateOnly(2020, 3, 1), [Obs(id, "2020-03-01T08:00:00Z")])])
+            .Add(component => component.Tile, (ResourceSummary item) => (Microsoft.AspNetCore.Components.RenderFragment)(builder => builder.AddContent(0, item.Id)))
+            .Add(component => component.Text, (ResourceSummary _, string _) => string.Empty)
+            .Add(component => component.Flag, (ResourceSummary _) => (Microsoft.AspNetCore.Components.RenderFragment)(_ => { }))
+            .Add(component => component.HasFlag, (ResourceSummary _) => false)
+            .Add(component => component.HrefOf, (ResourceSummary _) => null));
 
         var cell = view.Find("td.fx-lab-test");
         Assert.Multiple(() =>
         {
             Assert.That(cell.QuerySelector("img"), Is.Null);
             Assert.That(cell.TextContent.Trim(), Is.EqualTo(id));
+        });
+    }
+
+    // A narrow section draws the tiles of the results and no table, a wide one the table and no tile of a result: only the form the width shows
+    [Test]
+    public async Task OnlyTheFormTheWidthShows_IsDrawn()
+    {
+        var section = new SummarySection(new SummaryFormSection { Code = "labs" }, [], "en");
+        using var context = new BunitContext();
+        context.JSInterop.Mode = JSRuntimeMode.Loose;
+        var view = context.Render<FireChart.Viewer.Reports.ReportLab>(parameters => parameters
+            .Add(component => component.Section, section)
+            .Add(component => component.Groups, [new LabGroup("day:2020-03-01", null, new DateOnly(2020, 3, 1), [Obs("o1", "2020-03-01T08:00:00Z")])])
+            .Add(component => component.Tile, (ResourceSummary item) => (Microsoft.AspNetCore.Components.RenderFragment)(builder => builder.AddContent(0, "tile " + item.Id)))
+            .Add(component => component.Text, (ResourceSummary _, string _) => string.Empty)
+            .Add(component => component.Flag, (ResourceSummary _) => (Microsoft.AspNetCore.Components.RenderFragment)(_ => { }))
+            .Add(component => component.HasFlag, (ResourceSummary _) => false)
+            .Add(component => component.HrefOf, (ResourceSummary _) => null));
+        var wide = (view.FindAll("table.fx-lab-table").Count, view.FindAll(".fx-lab-narrow").Count);
+
+        await view.InvokeAsync(() => view.Instance.OnWidth(true));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(wide, Is.EqualTo((1, 0)), "the table until the width is known");
+            Assert.That(view.FindAll("table.fx-lab-table"), Is.Empty);
+            Assert.That(view.Find(".fx-lab-narrow.fx-lab-chosen").TextContent.Trim(), Is.EqualTo("tile o1"));
         });
     }
 }

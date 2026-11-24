@@ -1,22 +1,25 @@
-@using Radzen
-@inject DialogService DialogService
+@using BlazorBlueprint.Components
+@inject FloxDialogService DialogService
 
-<RadzenStack>
-    <RadzenText class="whitespace-pre-line">@Message</RadzenText>
+<div class="flex flex-col gap-6">
+    <p class="m-0 text-sm whitespace-pre-line text-muted">@Message</p>
     <DialogActions>
         @if (!string.IsNullOrEmpty(CancelText))
         {
-            <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Text=@CancelText Click=@(() => DialogService.Close(null))/>
+            <Button Variant="ButtonVariant.Outline" OnClick=@(() => Close(null))>@CancelText</Button>
         }
         @if (!string.IsNullOrEmpty(NoText))
         {
-            <RadzenButton Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Text=@NoText Click=@(() => DialogService.Close(false))/>
+            <Button Variant="ButtonVariant.Outline" OnClick=@(() => Close(false))>@NoText</Button>
         }
-        <RadzenButton ButtonStyle="ButtonStyle.Primary" Text=@YesText Click=@(() => DialogService.Close(true))/>
+        <Button OnClick=@(() => Close(true))>@YesText</Button>
     </DialogActions>
-</RadzenStack>
+</div>
 
 @code {
+
+    [CascadingParameter]
+    private FloxDialog? Dialog { get; set; }
 
     [Parameter]
     public string? Message { get; set; }
@@ -29,5 +32,17 @@
 
     [Parameter]
     public string? CancelText { get; set; }
+
+    private void Close(bool? answer)
+    {
+        if (Dialog is not null)
+        {
+            DialogService.CloseDialog(Dialog, answer);
+        }
+        else
+        {
+            DialogService.Close(answer);
+        }
+    }
 
 }

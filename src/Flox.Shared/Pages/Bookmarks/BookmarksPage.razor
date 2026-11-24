@@ -1,22 +1,22 @@
+@using BlazorBlueprint.Components
 @attribute [Route(SharedRoutes.BOOKMARKS)]
 
 @using Flox.Core.Models
 @using Flox.Shared.Services
-@using Radzen
 
 @inherits StatefulWidget<BookmarksState>
 @inject BookmarkLinks Links
 
 @* The bookmarks of this device: no sign-in, never on a server *@
-<ListPage Title=@Strings.Caption_Bookmarks Breadcrumbs=@Breadcrumbs OnRefresh=@State.RefreshAsync>
+<ListPage Title=@Strings.Caption_Bookmarks Breadcrumbs=@Breadcrumbs>
     <Commands>
         <BookmarkTransfer OnImported=@State.RefreshAsync/>
     </Commands>
     <ChildContent>
-        <Alert OneTime Key=@BookmarksOnDeviceAlert Size="AlertSize.Small" data-bookmarks="device">
+        <Alert OneTime Plain Key=@BookmarksOnDeviceAlert data-bookmarks="device">
             @Strings.Notice_BookmarksOnDevice
         </Alert>
-        <DataList State=@State Selectable>
+        <DataList State=@State Selectable ShowRefresh>
             <ItemTemplate Context="row">
                 <ListTile Row=@row TitleText=@row.Item.DisplayName SubtitleText=@SubtitleOf(row.Item) OnClick=@(() => OpenAsync(row.Item))>
                     <Leading>
@@ -25,10 +25,10 @@
                 </ListTile>
             </ItemTemplate>
             <RowMenu Context="menu">
-                <RadzenMenuItem Text=@Strings.Caption_Delete Icon="delete" IconColor="var(--rz-danger)" Click=@(() => DeleteAsync(menu.Targets))/>
+                <RowMenuItem Text=@Strings.Caption_Delete Icon="delete" OnClick=@(() => DeleteAsync(menu.Targets)) Danger="true"/>
             </RowMenu>
             <SelectionActions Context="selected">
-                <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Danger" Icon="delete" Click=@(() => DeleteAsync([.. selected]))/>
+                <Button Variant="BlazorBlueprint.Components.ButtonVariant.Ghost" Size="BlazorBlueprint.Components.ButtonSize.Icon" Class="text-danger" title=@Strings.Caption_Delete AriaLabel=@Strings.Caption_Delete OnClick=@(() => DeleteAsync([.. selected]))><FloxIcon Icon="delete"/></Button>
             </SelectionActions>
         </DataList>
     </ChildContent>
@@ -56,14 +56,6 @@
         {
             await TryAsync(() => State.DeleteRowsAsync(bookmarks));
         }
-    }
-
-    protected override void InitBreadcrumbs()
-    {
-        base.InitBreadcrumbs();
-        Breadcrumbs.Add(Strings.Caption_Bookmarks,
-                        href: NavigationManager.Bookmarks()
-                                                .ToUrl());
     }
 
 }

@@ -1,14 +1,17 @@
 @* The resources of a type as tiles, with the search of the address; also the list of the patients that leads to the patient summary *@
 @inherits StatefulWidget<ResourceListViewState>
+@inject BlazorBlueprint.Primitives.Services.IKeyboardShortcutService Shortcuts
 
-<BusyOverlay Busy=@State.IsBusy Concealed=@State.Activating>
+@* One indicator until the page is whole: the search, then the tiles with what they read (ReportHost shows its content once all of it has come) *@
+<BusyOverlay Busy=@(State.IsBusy || (State.Page is not null && !_ready)) Concealed=@State.Activating>
+    @* No <style> here: the kit is one sheet in the head (KitStyleSheet), a sheet of the page lost the icons on iOS *@
     @if (State.Server is not null)
     {
         @if (State.Access == ServerAccess.NotSupported)
         {
-            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+            <Alert Kind="AlertKind.Warning" Class="mt-4">
                 @Strings.Message_FhirServerAuthenticationNotSupported
-            </RadzenAlert>
+            </Alert>
         }
         else if (State.Access is ServerAccess.NeedsAuthorization or ServerAccess.NeedsCredentials)
         {
@@ -16,62 +19,73 @@
         }
         else if (State.InvalidSearch)
         {
-            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+            <Alert Kind="AlertKind.Warning" Class="mt-4">
                 @Strings.Message_InvalidSearch
-            </RadzenAlert>
+            </Alert>
         }
         else if (State.Failed)
         {
-            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+            <Alert Kind="AlertKind.Warning" Class="mt-4">
                 @Strings.Message_FhirServerUnavailable
-                <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Text=@FloxStrings.Caption_Retry Click=@State.RetryAsync/>
-            </RadzenAlert>
+                <Button Variant="ButtonVariant.Outline" OnClick=@State.RetryAsync>@FloxStrings.Caption_Retry</Button>
+            </Alert>
         }
         else
         {
-            <RadzenStack Gap="var(--gap-sm)">
+            @Hosted(@<div class="flex flex-col gap-2">
                 @if (State.ActiveFilters.Count > 0)
                 {
-                    <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="var(--gap-sm)">
+                    <div class="flex flex-wrap gap-2">
                         @foreach (var filter in State.ActiveFilters)
                         {
-                            <RadzenChip Size="ChipSize.Small" Text=@($"{filter.Caption}: {filter.Text}") RemoveChipTitle=@FloxStrings.Caption_Delete Close=@(() => State.RemoveFilterAsync(filter))/>
+                            <BbChip Variant="ChipVariant.Secondary" Size="ChipSize.Small" Dismissible="true" DismissLabel=@FloxStrings.Caption_Delete
+                                    OnDismiss=@(() => State.RemoveFilterAsync(filter))>@($"{filter.Caption}: {filter.Text}")</BbChip>
                         }
-                    </RadzenStack>
+                    </div>
                 }
 
-                <style>@State.Style</style>
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="var(--gap-sm)">
-                    @* Only the links of the Bundle: FHIR has no page numbers, and Last is missing on many servers *@
-                    @if (State.Page?.Total is { } total)
+                @* The commands of the list are the commands of the page: its filter beside the bookmark, in the header *@
+                <SectionContent SectionName=@FhirViewer.PageCommandsSection>
+                    @if (State.CanFilter)
                     {
-                        <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.Span" class="rz-m-0">@string.Format(System.Globalization.CultureInfo.CurrentCulture, FloxStrings.Caption_TotalCount, total.ToString("N0", System.Globalization.CultureInfo.CurrentCulture))</RadzenText>
+                        <FilterButton Count=@State.FilterCount OnClick=@FilterCallback KeyShortcuts="Control+F /"/>
                     }
-                    else
-                    {
-                        <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_ShowTotal IsBusy=@State.Counting Click=@State.ShowTotalAsync/>
-                    }
-                    <SectionContent SectionName=@FhirViewer.PageCommandsSection>
-                        <BookmarkStar Route=@SearchRoute Title=@SearchTitleAsync Category=@ResourceType/>
-                    </SectionContent>
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="var(--gap-xs)">
-                        @if (State.CanFilter)
-                        {
-                            <FilterButton Count=@State.FilterCount OnClick=@FilterCallback/>
-                        }
-                    </RadzenStack>
-                </RadzenStack>
-
-                <div class="fx-root fx-summary">
-                    @* A list draws only the rows in view: its printout is never the whole list *@
-                    <p class="fx-print-incomplete" role="note">@Strings.Message_PrintIncomplete</p>
-                    <div class="fx-summary-list">
-                        <SummaryList TRow="ListRow" Rows=@State.Rows Memory=@Scroll IsItem=@(row => row.Kind == ListRowKind.Card) SetSize=@SetSize>
-                            <Row Context="row">@RowOf(row)</Row>
-                        </SummaryList>
+                    <BookmarkStar Route=@SearchRoute Title=@SearchTitleAsync Category=@ResourceType/>
+                </SectionContent>
+                @* A search the server refused keeps its chips and the filter, so the user changes it or starts again without it *@
+                @if (State.Rejection is { } rejection)
+                {
+                    <Alert Kind="AlertKind.Warning" Class="mt-2" data-search-rejected>
+                        <div class="flex flex-col gap-2">
+                            <span>@Strings.Message_SearchRejected</span>
+                            @if (rejection.Length > 0)
+                            {
+                                <span class="text-sm text-muted">@rejection</span>
+                            }
+                            <div>
+                                <Button Variant="ButtonVariant.Outline" OnClick=@State.ClearSearchAsync>@Strings.Caption_ClearSearch</Button>
+                            </div>
+                        </div>
+                    </Alert>
+                }
+                else
+                {
+                    @* The next page being read, told to a reader (the tiles in its place are not read out) *@
+                    <span role="status" class="sr-only">@(State.LoadingMore ? FloxStrings.Caption_Loading : null)</span>
+                    <div class="fx-root fx-summary">
+                        @* A list draws only the rows in view: its printout is never the whole list *@
+                        <p class="fx-print-incomplete" role="note">@Strings.Message_PrintIncomplete</p>
+                        <div class="fx-summary-list">
+                            @* The rows are the tiles of their types (components of the library), drawn in the host of the page *@
+                            @* The next page is read as its end comes into view, up to the limit of the list; More stays for the keyboard and after a failure *@
+                            <SummaryList TRow="ListRow" Rows=@State.Rows Memory=@Scroll IsItem=@(row => row.Kind == ListRowKind.Card) SetSize=@SetSize
+                                         OnEnd=@State.LoadMoreAsync>
+                                <Row Context="row">@RowOf(row)</Row>
+                            </SummaryList>
+                        </div>
                     </div>
-                </div>
-            </RadzenStack>
+                }
+            </div>)
         }
     }
 </BusyOverlay>
@@ -103,6 +117,66 @@
     // The search of the list is in the address: a change of it (the form, the back button, a link) loads the list again
     protected override object? ActivationKey => new ResourceListKey(Session, ResourceType, Query);
 
+    // Ctrl+F (Cmd+F) and / open the search form of a list that has one: the browser finds only the rows in view of a virtual list, so its own find
+    // is of no use here; elsewhere, and while the form is open, the keys are the browser's or do nothing
+    private readonly List<IDisposable> _shortcuts = [];
+    private bool _filtering;
+    private bool _gone;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (_shortcuts.Count == 0 && State.CanFilter && !_gone)
+        {
+            _shortcuts.Add(await Shortcuts.RegisterAsync("Ctrl+F", FilterFromKeyAsync, allowInEditable: true));
+            _shortcuts.Add(await Shortcuts.RegisterAsync("/", FilterFromKeyAsync));
+            // The page may have gone while they were registered
+            if (_gone)
+            {
+                ReleaseShortcuts();
+            }
+        }
+    }
+
+    private async Task FilterFromKeyAsync()
+    {
+        if (_filtering || !State.CanFilter)
+        {
+            return;
+        }
+
+        _filtering = true;
+        try
+        {
+            await InvokeAsync(State.OpenFilterAsync);
+        }
+        finally
+        {
+            _filtering = false;
+        }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _gone = true;
+            ReleaseShortcuts();
+        }
+
+        base.Dispose(disposing);
+    }
+
+    private void ReleaseShortcuts()
+    {
+        foreach (var shortcut in _shortcuts)
+        {
+            shortcut.Dispose();
+        }
+
+        _shortcuts.Clear();
+    }
+
     // The filter button is there when the type has a search form
     private EventCallback FilterCallback => State.CanFilter ? EventCallback.Factory.Create(this, State.OpenFilterAsync) : default;
 
@@ -110,12 +184,57 @@
     {
         return row.Kind switch
         {
-            ListRowKind.Card => @<Tile Model=@(row.Tile!) ResourceType=@row.Item!.ResourceType Href=@HrefOf(row.Item!) OnClick=@(() => Open(row.Item!))/>,
+            ListRowKind.Card => TileOf(row.Item!),
             ListRowKind.Empty => @<div class="fx-summary-note">@FloxStrings.List_NoData</div>,
+            ListRowKind.Limit => @<div class="fx-summary-note flex h-full items-center gap-2" role="note" data-list-limit>
+                                     @* The note fits the height of a row: two lines at most, the whole text its title *@
+                                     <span class="line-clamp-2 min-w-0 flex-1 text-sm" title=@LimitText>@LimitText</span>
+                                     @if (State.CanFilter)
+                                     {
+                                         <Button Variant="ButtonVariant.Outline" Class="shrink-0" OnClick=@FilterCallback IconName="filter_alt" Text=@FloxStrings.Caption_Filter/>
+                                     }
+                                 </div>,
+            ListRowKind.Loading => @<div class="flex h-full items-center" aria-hidden="true" data-list-loading>
+                                       <ListTileSkeleton Lines="2"/>
+                                   </div>,
             _ => @<div class="fx-summary-note">
-                     <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" Text=@FloxStrings.Caption_More
-                                   IsBusy=@State.LoadingMore Click=@State.LoadMoreAsync/>
+                     <Button Variant="ButtonVariant.Outline" OnClick=@State.LoadMoreAsync>@FloxStrings.Caption_More</Button>
                  </div>
+        };
+    }
+
+    // "The first 500 of 3,412 records are shown": the total when the server gave it
+    private string LimitText => State.Page?.Total is { } total
+        ? string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.Message_ListLimitOf, ResourceListViewState.MaxRecords, total)
+        : string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.Message_ListLimit, ResourceListViewState.MaxRecords);
+
+    // The page is shown: its tiles have what they wait for
+    private bool _ready;
+
+    // The components of the rows: internal blocks of the engine, so built here rather than written as tags. The host keeps the page hidden while
+    // the search runs and its tiles load
+    private RenderFragment Hosted(RenderFragment content)
+    {
+        return builder =>
+        {
+            builder.OpenComponent<FireChart.Viewer.Reports.ReportHost>(0);
+            builder.AddComponentParameter(1, nameof(FireChart.Viewer.Reports.ReportHost.Related), State.Related);
+            builder.AddComponentParameter(2, nameof(FireChart.Viewer.Reports.ReportHost.ChildContent), content);
+            builder.AddComponentParameter(3, nameof(FireChart.Viewer.Reports.ReportHost.Waiting), State.IsBusy || (State.Page is null && State.Rejection is null));
+            builder.AddComponentParameter(4, nameof(FireChart.Viewer.Reports.ReportHost.OnReady), EventCallback.Factory.Create<bool>(this, ready => _ready = ready));
+            builder.AddComponentParameter(5, nameof(FireChart.Viewer.Reports.ReportHost.Library), State.Library);
+            builder.CloseComponent();
+        };
+    }
+
+    private RenderFragment TileOf(ResourceSummary item)
+    {
+        return builder =>
+        {
+            builder.OpenComponent<FireChart.Viewer.Reports.RecordTile>(0);
+            builder.AddComponentParameter(1, nameof(FireChart.Viewer.Reports.RecordTile.Item), item);
+            builder.AddComponentParameter(2, nameof(FireChart.Viewer.Reports.RecordTile.Href), HrefOf(item));
+            builder.CloseComponent();
         };
     }
 
@@ -133,7 +252,7 @@
 
     // The size of the list a reader is told: the total of the server when it is known, unknown while there are more pages, else the rows
     private int SetSize => State.Page?.Total is { } total ? (int)Math.Min(total, int.MaxValue)
-        : State.Rows.Any(row => row.Kind == ListRowKind.More) ? -1
+        : State.Rows.Any(row => row.Kind is ListRowKind.More or ListRowKind.Loading) ? -1
         : State.Rows.Count(row => row.Kind == ListRowKind.Card);
 
 }

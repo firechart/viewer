@@ -59,19 +59,16 @@ public class ReleaseModelsTests
     }
 
     [Test]
-    public async Task ATileOfAnR5Resource_IsRenderedWithTheModelOfR5()
+    public async Task AnR5Resource_IsReadWithTheModelOfR5()
     {
-        var overrides = new MemoryTemplateSource(new Dictionary<string, string>
+        var r5 = FireChart.Viewer.Core.Reports.ReportExpressions.Parse(Encounter, await Models().GetAsync("R5"));
+
+        Assert.Multiple(() =>
         {
-            ["Encounter@tile"] = "{% slot \"title\" %}{% for c in self.class %}{{ c.coding[0].code }}{% endfor %}{% endslot %}{% slot \"subtitle\" %}{{ self.actualPeriod.start }}{% endslot %}"
+            Assert.That(FireChart.Viewer.Core.Reports.ReportText.Children(r5, "class").Select(node => node.Poco.TypeName), Is.EqualTo(new[] { "CodeableConcept" }),
+                        "class is a list of CodeableConcept in R5");
+            Assert.That(FireChart.Viewer.Core.Reports.ReportText.Children(r5, "actualPeriod").Any(), Is.True, "an element of R5 only");
         });
-        var renderer = new FhirRenderer([overrides]);
-
-        var r5 = await renderer.RenderTileAsync(Encounter, model: await Models().GetAsync("R5"));
-        var r4 = await renderer.RenderTileAsync(Encounter);
-
-        Assert.That(r5.Text, Does.StartWith("AMB 2026-01-02"), "class is a list of CodeableConcept in R5");
-        Assert.That(r4.Text, Is.EqualTo("e-1 Encounter"), "the model of R4 does not read it: the row shows the id and the type");
     }
 
     private sealed class CountingLoader : IReleaseAssemblyLoader

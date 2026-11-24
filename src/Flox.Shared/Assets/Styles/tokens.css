@@ -1,35 +1,85 @@
 /*
- * FloxWind design tokens for Tailwind: the layer order, the theme and utilities imports, custom variants and
- * the semantic colors (bg-surface, text-muted, border-line, ...) that follow the active light/dark theme.
+ * The design tokens for Tailwind: the layer order, the theme and utilities imports, custom variants and
+ * the semantic colors (bg-surface, text-muted, border-line, ...) that follow the theme of Blazor Blueprint (light/dark).
  *
  * Every project that builds its own Assets/Styles/site.css imports this file and adds @source lines for its
- * own folders, so utilities used in its Razor files are generated into its own stylesheet. The Radzen
- * overlay itself lives only in Flox.Shared's site.css.
+ * own folders, so utilities used in its Razor files are generated into its own stylesheet.
  */
 
 @layer theme, base, components, utilities;
 
 @import "tailwindcss/theme.css" layer(theme);
-/* important: Radzen's own rules are not layered and would otherwise beat every utility used on its components */
+/* important: a utility on a component of Blazor Blueprint wins over the classes the component writes itself */
 @import "tailwindcss/utilities.css" layer(utilities) source(none) important;
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* A button shows the hand: the base of Tailwind 4 (and of Blueprint) gives it the arrow. Every button and anything that acts as one (tabs, toggles,
+   the triggers of selects and menus, the inner buttons of Blueprint); a disabled one keeps the arrow. Outside the layers, so the base of Blueprint,
+   a sheet of its own, does not win */
+button:not(:disabled), [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+}
+
+/* One height for the controls of a row, 36 px as in shadcn/ui: the buttons are small (h-9, the facade Button), the fields of Blueprint (an input,
+   the trigger of a select, a combobox, a date picker) are h-10 and have no size of their own */
+:is(input, select, button, [role="combobox"]).bb\:h-10 {
+    height: 2.25rem;
+}
+
+input.bb\:h-10 {
+    padding-block: 0.25rem;
+}
+
+/* The breakpoints of Tailwind with the weight of one more class (:is(:root *)): every project builds a sheet of its own, so a plain utility of a sheet
+   linked later (col-span-12, hidden) would beat a responsive one of an earlier sheet on the same element (lg:col-span-6, md:grid) */
+@custom-variant sm {
+    @media (width >= 40rem) {
+        &:is(:root *) {
+            @slot;
+        }
+    }
+}
+
+@custom-variant md {
+    @media (width >= 48rem) {
+        &:is(:root *) {
+            @slot;
+        }
+    }
+}
+
+@custom-variant lg {
+    @media (width >= 64rem) {
+        &:is(:root *) {
+            @slot;
+        }
+    }
+}
+
+@custom-variant xl {
+    @media (width >= 80rem) {
+        &:is(:root *) {
+            @slot;
+        }
+    }
+}
+
+@custom-variant 2xl {
+    @media (width >= 96rem) {
+        &:is(:root *) {
+            @slot;
+        }
+    }
+}
 
 /* Short viewports (landscape phones): hide what crowds out the content */
 @custom-variant short (@media (max-height: 480px));
 
 /* The font faces are declared in app.css: see the note there */
 
-/* The shape of daisyUI 5: fields (buttons, inputs), boxes (cards, dialogs, alerts), selectors (badges, check boxes, toggles); utilities rounded-field, rounded-box, rounded-selector */
 @theme {
-    --radius-field: 0.25rem;
-    --radius-box: 0.5rem;
-    --radius-selector: 0.5rem;
-}
-
-@theme {
-    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-        "Segoe UI Symbol", "Noto Color Emoji";
+    --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 /* The busy overlay (BusyOverlay) appears after 150 ms so a quick load does not flash it; the wait cursor over it comes with it. The hidden start is
@@ -51,20 +101,54 @@
 
 @import "./fire.css";
 
-/* Semantic colors for utilities; the values switch with the theme */
+/* The tokens of the Blazor Blueprint theme (theme.css) as utilities, by the names of shadcn/ui: bg-primary, text-muted-foreground, border-border, ...;
+   muted and accent keep the meanings of FloxWind below (muted text, the accent colour); the grey of shadcn is bg-hover */
 @theme inline {
-    --color-canvas: var(--rz-body-background-color);
-    --color-surface: var(--rz-base-background-color);
-    --color-line: var(--rz-border-color);
-    --color-ink: var(--rz-text-color);
-    --color-muted: var(--rz-text-secondary-color);
-    --color-subtle: var(--rz-text-tertiary-color);
-    /* A tint of the text color works in both modes (Tailwind: bg-black/5, dark:bg-white/5) */
-    --color-hover: color-mix(in oklab, var(--rz-text-color) 5%, transparent);
-    --color-accent: var(--rz-primary);
-    --color-accent-ink: var(--rz-link-color);
-    --color-accent-soft: var(--rz-primary-lighter);
-    --color-danger: var(--rz-danger);
-    --color-success: var(--rz-success);
-    --color-warning: var(--rz-warning);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+
+    /* The radii follow --radius of the theme, as those of Blueprint do */
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* Semantic colors for utilities: the tokens of the Blazor Blueprint theme (theme.css), so they switch with it */
+@theme inline {
+    --color-canvas: var(--background);
+    --color-surface: var(--card);
+    --color-line: var(--border);
+    --color-ink: var(--foreground);
+    --color-muted: var(--muted-foreground);
+    --color-subtle: color-mix(in oklab, var(--muted-foreground) 70%, transparent);
+    --color-hover: var(--accent);
+    /* An inset area under fields (bg-muted of shadcn/ui): a little greyer than the dialog in light, a little lighter in dark */
+    --color-sunken: var(--muted);
+    --color-accent: var(--primary);
+    --color-accent-ink: var(--primary);
+    --color-row-hover: var(--row-hover);
+    --color-accent-soft: color-mix(in oklab, var(--primary) 8%, transparent);
+    --color-danger: var(--destructive);
+    --color-success: var(--color-green-600);
+    --color-warning: var(--color-amber-500);
 }

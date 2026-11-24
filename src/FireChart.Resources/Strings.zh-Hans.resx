@@ -196,7 +196,7 @@
     <value>此部分的搜索失败</value>
   </data>
   <data name="Caption_FhirServerRelease" xml:space="preserve">
-    <value>FHIR 版本（/metadata 不可用时）</value>
+    <value>FHIR 版本（留空时自动检测）</value>
   </data>
   <data name="Caption_FhirServerTerminologyUrl" xml:space="preserve">
     <value>术语服务器 URL（可选）</value>
@@ -213,8 +213,11 @@
   <data name="Message_InvalidSearch" xml:space="preserve">
     <value>地址中的搜索无效。</value>
   </data>
-  <data name="Placeholder_SearchAllFields" xml:space="preserve">
-    <value>在所有字段中搜索</value>
+  <data name="Message_SearchRejected" xml:space="preserve">
+    <value>服务器未接受此搜索。</value>
+  </data>
+  <data name="Caption_ClearSearch" xml:space="preserve">
+    <value>清除搜索</value>
   </data>
   <data name="Caption_ShowAllFields" xml:space="preserve">
     <value>显示所有字段</value>
@@ -369,6 +372,15 @@
   <data name="Home_DocumentationDescription" xml:space="preserve">
     <value>如何浏览 FHIR 包和 FHIR 服务器</value>
   </data>
+  <data name="Caption_Installation" xml:space="preserve">
+    <value>安装</value>
+  </data>
+  <data name="Home_Install" xml:space="preserve">
+    <value>安装</value>
+  </data>
+  <data name="Home_InstallDescription" xml:space="preserve">
+    <value>作为独立应用，从主屏幕或桌面打开</value>
+  </data>
   <data name="Message_NoBookmarks" xml:space="preserve">
     <value>没有书签</value>
   </data>
@@ -522,6 +534,42 @@
   <data name="Caption_LoadAll" xml:space="preserve">
     <value>全部加载</value>
   </data>
+  <data name="Caption_LoadingRecord" xml:space="preserve">
+    <value>正在加载记录</value>
+  </data>
+  <data name="Message_LoadingProgress" xml:space="preserve">
+    <value>已加载 {0}/{1} 部分</value>
+  </data>
+  <data name="Message_LoadedRecords" xml:space="preserve">
+    <value>已加载：{0}（{1}）</value>
+  </data>
+  <data name="Caption_AgeYears" xml:space="preserve">
+    <value>{0} 岁</value>
+  </data>
+  <data name="Caption_AgeMonths" xml:space="preserve">
+    <value>{0} 个月</value>
+  </data>
+  <data name="Caption_AgeDays" xml:space="preserve">
+    <value>{0} 天</value>
+  </data>
+  <data name="Message_RecordNotFound" xml:space="preserve">
+    <value>找不到：{0}</value>
+  </data>
+  <data name="Message_LoadingCancelled" xml:space="preserve">
+    <value>加载已取消：显示的记录不完整。</value>
+  </data>
+  <data name="Caption_SearchCancelled" xml:space="preserve">
+    <value>未加载：加载已取消</value>
+  </data>
+  <data name="Caption_PatientRecordSettings" xml:space="preserve">
+    <value>患者记录</value>
+  </data>
+  <data name="Caption_SummaryPageSize" xml:space="preserve">
+    <value>每次请求的记录数</value>
+  </data>
+  <data name="Caption_SummaryLoadAll" xml:space="preserve">
+    <value>显示前加载完整记录</value>
+  </data>
   <data name="Caption_Print" xml:space="preserve">
     <value>打印</value>
   </data>
@@ -558,6 +606,9 @@
   <data name="PackageBase_Delete" xml:space="preserve">
     <value>从设备删除</value>
   </data>
+  <data name="PackageBase_DeleteConfirm" xml:space="preserve">
+    <value>从此设备删除 {0}？之后可以重新下载。</value>
+  </data>
   <data name="PackageBase_UpdateAvailable" xml:space="preserve">
     <value>此包有更新版本可用（{0}）。</value>
   </data>
@@ -566,5 +617,56 @@
   </data>
   <data name="PackageBase_Occupied" xml:space="preserve">
     <value>设备上的包：{0} 个，占用 {1}</value>
+  </data>
+  <data name="Caption_FindRecord" xml:space="preserve">
+    <value>查找…</value>
+  </data>
+  <data name="Caption_ChooseRecord" xml:space="preserve">
+    <value>选择：{0}</value>
+  </data>
+  <data name="Caption_RecentRecords" xml:space="preserve">
+    <value>最近打开</value>
+  </data>
+  <data name="Caption_ChangeFilter" xml:space="preserve">
+    <value>更改筛选</value>
+  </data>
+  <data name="Message_NothingFound" xml:space="preserve">
+    <value>未找到任何内容</value>
+  </data>
+  <data name="Placeholder_TypeToFind" xml:space="preserve">
+    <value>输入以查找</value>
+  </data>
+  <data name="Caption_RangeFrom" xml:space="preserve">
+    <value>{0}：从</value>
+  </data>
+  <data name="Caption_RangeTo" xml:space="preserve">
+    <value>至</value>
+  </data>
+  <data name="Caption_IdentifierSystem" xml:space="preserve">
+    <value>系统</value>
+  </data>
+  <data name="Message_ListLimit" xml:space="preserve">
+    <value>仅显示前 {0} 条记录。请使用筛选缩小搜索范围以查找其余记录。</value>
+  </data>
+  <data name="Message_ListLimitOf" xml:space="preserve">
+    <value>仅显示 {1} 条记录中的前 {0} 条。请使用筛选缩小搜索范围以查找其余记录。</value>
+  </data>
+  <data name="Caption_ConfigureView" xml:space="preserve">
+    <value>配置视图</value>
+  </data>
+  <data name="Caption_Done" xml:space="preserve">
+    <value>完成</value>
+  </data>
+  <data name="Caption_ShowAll" xml:space="preserve">
+    <value>全部显示</value>
+  </data>
+  <data name="Caption_HideAll" xml:space="preserve">
+    <value>全部隐藏</value>
+  </data>
+  <data name="Caption_HideResourceType" xml:space="preserve">
+    <value>隐藏 {0}</value>
+  </data>
+  <data name="Caption_ShowResourceType" xml:space="preserve">
+    <value>显示 {0}</value>
   </data>
 </root>

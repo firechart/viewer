@@ -11,11 +11,11 @@
     throw new InvalidOperationException("Demo: rendering failed");
 }
 
-<RadzenText TextStyle="TextStyle.Caption" class="rz-mb-2">
+<span class="m-0 text-xs text-muted mb-2">
     Every row throws on purpose. See the "Client error handling" article for how each case is handled.
-</RadzenText>
+</span>
 
-<ListSection Caption="Event handlers (the page stays alive)">
+<ListSection Title="Event handlers (the page stays alive)">
     <ListTile TitleText="Unexpected error" SubtitleText="Standard message with a reference" OnSelected=@ThrowUnexpected/>
     <ListTile TitleText="Unexpected error in an async handler" SubtitleText="Thrown after an await" OnSelected=@ThrowUnexpectedAsync/>
     <ListTile TitleText="Record not found" SubtitleText="Expected: a warning with the message" OnSelected=@ThrowNotFound/>
@@ -24,7 +24,7 @@
     <ListTile TitleText="Custom message" SubtitleText="Own text plus the reference" OnSelected=@ThrowWithMessage/>
 </ListSection>
 
-<ListSection Caption="Outside event handlers">
+<ListSection Title="Outside event handlers">
     <ListTile TitleText="Fire and forget" SubtitleText="Replacement for async void" OnSelected=@FireAndForget/>
     <ListTile TitleText="TryAsync" SubtitleText="Handled in place, the result is returned" OnSelected=@UseTryAsync/>
     <ListTile TitleText="Break rendering" SubtitleText="Reaches the error boundary: error page with a reference" OnSelected=@BreakRendering/>
@@ -79,7 +79,7 @@
         var completed = await TryAsync(() => throw new InvalidOperationException("Demo: TryAsync error"));
         if (!completed)
         {
-            Notifications.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Info, Summary = "TryAsync returned false" });
+            Notifications.Show("TryAsync returned false");
         }
     }
 

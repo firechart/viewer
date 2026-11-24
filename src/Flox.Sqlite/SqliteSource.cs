@@ -4,6 +4,8 @@ namespace Flox.Sqlite;
 /// <summary>
 /// A base of the <see cref="ISqliteEngine"/> that the storages read, opened read only at the first need and checked once (PRAGMA user_version). The name is asked
 /// for at every opening: a base that is not there (none chosen, not downloaded yet) reads as empty; <see cref="ResetAsync"/> closes it, so a replaced base is opened again.
+/// A reader that holds the base while it is closed gets an <see cref="ObjectDisposedException"/> from its next call and asks for the base again
+/// (<see cref="SqliteStorage{T}"/> does); a source that is disposed has no base.
 /// </summary>
 /// <param name="engine">The engine that holds the bases.</param>
 /// <param name="name">Gives the name of the base to open, or null when none is chosen.</param>
@@ -15,7 +17,9 @@ public sealed class SqliteSource(ISqliteEngine engine, Func<CancellationToken, T
     /// </summary>
     public const int OtherSchema = -1;
 
+#pragma warning disable CA2213 // kept after DisposeAsync: a late reader waits on it and finds no base
     private readonly SemaphoreSlim _gate = new(1, 1);
+#pragma warning restore CA2213
     private ISqliteDatabase? _database;
     private bool _disposed;
 
@@ -44,7 +48,7 @@ public sealed class SqliteSource(ISqliteEngine engine, Func<CancellationToken, T
         await _gate.WaitAsync(cancellationToken);
         try
         {
-            if (_database is null && await name(cancellationToken) is { } current && await engine.ExistsAsync(current, cancellationToken))
+            if (!_disposed && _database is null && await name(cancellationToken) is { } current && await engine.ExistsAsync(current, cancellationToken))
             {
                 var database = await engine.OpenAsync(current, SqliteAccess.ReadOnly, cancellationToken);
                 var version = Convert.ToInt32((await database.QueryAsync("PRAGMA user_version", null, cancellationToken)).Scalar(), System.Globalization.CultureInfo.InvariantCulture);
@@ -93,8 +97,8 @@ public sealed class SqliteSource(ISqliteEngine engine, Func<CancellationToken, T
             return;
         }
 
-        await ResetAsync();
+        // The gate is kept: a reader that comes later finds no base, not a disposed semaphore
         _disposed = true;
-        _gate.Dispose();
+        await ResetAsync();
     }
 }

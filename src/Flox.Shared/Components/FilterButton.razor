@@ -1,11 +1,12 @@
-@* The filter of a list: a quiet button with a funnel; the number of conditions is a small badge next to it *@
-<RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" title=@Strings.Caption_Filter Click=@OnClick>
+@using BlazorBlueprint.Components
+@* The filter of a list: a quiet button with a funnel; the number of conditions is a small badge on it *@
+<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Title AriaLabel=@Strings.Caption_Filter aria-keyshortcuts=@KeyShortcuts OnClick=@(() => OnClick.InvokeAsync()) Class="relative">
     <FloxIcon Icon="filter_alt"/>
     @if (Count > 0)
     {
-        <RadzenBadge BadgeStyle="Radzen.BadgeStyle.Primary" Text=@Count.ToString(System.Globalization.CultureInfo.CurrentCulture)/>
+        <BbBadge Class="absolute -end-1 -top-1 h-4 min-w-4 justify-center rounded-full px-1 text-[10px] leading-none">@Count.ToString(System.Globalization.CultureInfo.CurrentCulture)</BbBadge>
     }
-</RadzenButton>
+</Button>
 
 @code {
 
@@ -14,5 +15,11 @@
 
     [Parameter]
     public EventCallback OnClick { get; set; }
+
+    // The keys that open the filter too, shown in the tooltip (as aria-keyshortcuts: "Control+F /")
+    [Parameter]
+    public string? KeyShortcuts { get; set; }
+
+    private string Title => string.IsNullOrEmpty(KeyShortcuts) ? Strings.Caption_Filter : $"{Strings.Caption_Filter} ({KeyShortcuts.Replace("Control", "Ctrl", StringComparison.Ordinal).Replace(" ", ", ", StringComparison.Ordinal)})";
 
 }

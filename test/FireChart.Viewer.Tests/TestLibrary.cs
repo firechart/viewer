@@ -2,31 +2,18 @@ using FireChart.Viewer.Library;
 
 namespace FireChart.Viewer.Tests;
 
-// The vendor library as the project has it: the files of its wwwroot, read once (a client loads them one by one, WebVendorTemplates)
+// The vendor library as the project has it: the files of its wwwroot
 internal static class TestLibrary
 {
-    private static readonly Lazy<VendorTemplates> s_vendor = new(() => VendorTemplates.FromFolder(WebRoot()));
-
-    public static VendorTemplates Vendor => s_vendor.Value;
-
     public static FxStyleSheets Styles => FxStyle.ReadFolder(WebRoot());
 
     // The static files of the library read from the folder, as a client reads them from its host
     public static FolderAssets Assets => new(WebRoot());
 
-    // The vendor summary form of a patient, a new instance at every call
-    public static FireChart.Viewer.Core.Forms.SummaryFormDefinition SummaryDefault =>
-        FireChart.Viewer.Core.ViewerJson.Read<FireChart.Viewer.Core.Forms.SummaryFormDefinition>(VendorSummaryForms.ReadFolder(WebRoot())["Patient"]);
 
     public static string WebRoot()
     {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "FireChart.Viewer.slnx")))
-        {
-            directory = directory.Parent;
-        }
-
-        return Path.Combine(directory!.FullName, "library");
+        return TestRepository.Path("library");
     }
 }
 

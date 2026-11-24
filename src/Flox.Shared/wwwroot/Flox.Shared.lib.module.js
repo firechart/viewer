@@ -1,6 +1,9 @@
 // Blazor JS Initializer for Flox.Shared RCL (.NET 10).
 // Detected and imported automatically by Blazor — no <script> tags needed in index.html.
 // Docs: https://learn.microsoft.com/aspnet/core/blazor/fundamentals/startup?view=aspnetcore-10.0
+import { installEnterKey } from './flox-enter-key.js';
+import { installIosRepaint } from './flox-ios-repaint.js';
+
 function loadScript(src) {
     return new Promise((resolve, reject) => {
         if (document.querySelector(`script[src="${src}"]`)) {
@@ -31,18 +34,22 @@ async function loadPostStartScripts() {
     // application has the file, and the page of an application without it answered service-worker.js with HTML
 }
 
-// Standalone WASM / Blazor Server / MAUI Hybrid
+// Standalone WASM / Blazor Server
 export async function beforeStart(_options, _extensions) {
+    installEnterKey();
 }
 
 export async function afterStarted(_blazor) {
+    installIosRepaint();
     await loadPostStartScripts();
 }
 
 // WASM
 export async function beforeWebAssemblyStart(_options, _extensions) {
+    installEnterKey();
 }
 
 export async function afterWebAssemblyStarted(_blazor) {
+    installIosRepaint();
     await loadPostStartScripts();
 }

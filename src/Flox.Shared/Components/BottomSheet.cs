@@ -14,12 +14,13 @@ public class BottomSheet : SheetBase
     /// <inheritdoc />
     protected override async Task ShowAsync()
     {
-        await Dialogs.OpenSideAsync<SheetHost>(TitleText, HostParameters, SheetOptions.Bottom(Height, !string.IsNullOrEmpty(TitleText), ShowCloseButton));
+        Shown = Dialogs.OpenSideAsync<SheetHost>(TitleText, HostParameters, SheetOptions.Bottom(Height, !string.IsNullOrEmpty(TitleText), ShowCloseButton));
+        await Shown;
     }
 
     /// <inheritdoc />
     protected override void CloseDialog()
     {
-        Dialogs.CloseSide();
+        Dialogs.Close();
     }
 }

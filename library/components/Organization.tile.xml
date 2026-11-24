@@ -1,0 +1,19 @@
+<!-- An organization in a list: its name, its kind; inactive at the end when it is -->
+<Component name="Organization.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.name.exists(), %record.name, %record.id)}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.type.first()}}"/>
+        <Value value="{{%record.address.first().city}}"/>
+        <Value value="{{%record.identifier.value.first()}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <If test="{{%record.active = false}}">
+        <Badge text="{{%strings.InactiveBadge}}" tone="danger"/>
+      </If>
+    </Trailing>
+  </Tile>
+</Component>

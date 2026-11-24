@@ -1,7 +1,8 @@
-<Center Gap="var(--gap-lg)" Class="rz-text-align-center">
-    <RadzenText TextStyle="TextStyle.H1" TagName="TagName.H2">404</RadzenText>
-    <RadzenText>@(Message ?? Strings.NotFound_Message)</RadzenText>
-    <RadzenLink Path=@AppUrl.ToHref("/") Text=@Strings.Nav_Home/>
+@using BlazorBlueprint.Components
+<Center>
+    <BbEmpty Title="404" Description=@(Message ?? Strings.NotFound_Message) Size="EmptySize.Large">
+        <Button Variant="ButtonVariant.Outline" Href=@AppUrl.ToHref("/")>@Strings.Nav_Home</Button>
+    </BbEmpty>
 </Center>
 
 @code {

@@ -15,10 +15,10 @@ Contents: [Before you start](#before-you-start) · [Plain HTML](#plain-html) · 
    docker run -d -p 8080:8080 \
      -v "$PWD/viewer.json:/usr/share/nginx/html/viewer.json:ro" \
      -v "$PWD/host.json:/usr/share/nginx/html/host.json:ro" \
-     firechart-viewer:local
+     ghcr.io/firechart/viewer:<version>
    ```
 
-   The image is built from the sources (`docker compose up --build` in the folder of `FireChart.Viewer.slnx`). `host.json` lists the origins of
+   `host.json` lists the origins of
    your pages, `{ "frameAncestors": ["'self'", "https://app.example.org"] }` (for a try: `http://localhost:3000`, the dev server of your
    application): the frame takes commands only from them.
 

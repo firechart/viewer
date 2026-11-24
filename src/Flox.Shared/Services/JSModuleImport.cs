@@ -3,9 +3,11 @@ using Microsoft.JSInterop;
 namespace Flox.Services;
 
 /// <summary>
-/// Imports the JavaScript modules of the components and services. Now and then the interop answers an import with nothing (null) although the
-/// browser loaded the module: seen with and without browser extensions (2026-11), not reproduced at will; a later import succeeded. An import is
-/// tried again a few times before it fails with a clear message.
+/// Imports the JavaScript modules of the components and services. Now and then the interop of Blazor WebAssembly answers an import with null
+/// although the browser loaded the module: seen with a browser extension (Urban VPN Proxy), under the debugger of Visual Studio and without either
+/// (2026-11), never reproduced at will, and the same import made again succeeded. An import may run twice (the browser loads a module once), so it
+/// is tried again: 4 attempts, 100, 200 and 300 ms apart, then an error that names the likely cause. The same is done for the open of a base of
+/// SQLite (BrowserSqliteEngine).
 /// </summary>
 public static class JSModuleImport
 {

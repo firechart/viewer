@@ -1,0 +1,16 @@
+<!-- A location in a list: its name, its kind (else its physical type); its status at the end -->
+<Component name="Location.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.name.exists(), %record.name, %record.id)}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{iif(%record.type.exists(), %record.type.first(), %record.physicalType)}}"/>
+        <Value value="{{%record.address.first().city}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

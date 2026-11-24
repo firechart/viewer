@@ -1,6 +1,8 @@
-<RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.End" Gap="var(--gap-sm)" class="rz-mt-4">
+@* The commands at the end of a dialog or a form: on the right, the main one last, in one row on a phone too (stacked across the whole width they
+   looked like two more fields) *@
+<div class="mt-2 flex flex-wrap justify-end gap-2">
     @ChildContent
-</RadzenStack>
+</div>
 
 @code {
 

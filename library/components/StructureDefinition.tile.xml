@@ -1,0 +1,13 @@
+<!-- A structure definition in a list: its name, kind, type and derivation; abstract and its status at the end -->
+<Component name="StructureDefinition.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.name.exists(), %record.name, iif(%record.title.exists(), %record.title, %record.id))}}" subtitle="{{%record.kind}}{{iif(%record.kind.exists() and %record.type.exists(), ' · ', '')}}{{%record.type}}{{iif((%record.kind.exists() or %record.type.exists()) and %record.derivation.exists(), ' · ', '')}}{{%record.derivation}}">
+    <Trailing>
+      <If test="{{%record.abstract = true}}">
+        <Badge text="{{%strings.AbstractBadge}}"/>
+      </If>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

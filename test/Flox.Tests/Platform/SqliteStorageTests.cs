@@ -122,7 +122,7 @@ public class SqliteStorageTests
     [Test]
     public async Task What_is_not_SQL_is_done_in_memory_with_the_same_answer()
     {
-        var expression = await TitlesAsync(r => r.Filters.Add(new Filter { Expression = (System.Linq.Expressions.Expression<Func<Note, bool>>)(n => n.Title.EndsWith('a')) }));
+        var expression = await TitlesAsync(r => r.Filters.Add(new Filter { Expression = (System.Linq.Expressions.Expression<Func<Note, bool>>)(n => n.Title.EndsWith('a', StringComparison.Ordinal)) }));
         var sorted = await TitlesAsync(r => r.Sorts.Add(new Sort { Field = nameof(Note.Body) }));
         var search = await TitlesAsync(r => r.FullTextSearchString = "not");
         var count = await _storage.CountAsync(n => n.Size > 2);
@@ -152,6 +152,142 @@ public class SqliteStorageTests
             Assert.That(again?.Shelf, Is.EqualTo("work"));
             Assert.That(async () => await _storage.InsertAsync(new Note()), Throws.TypeOf<NotSupportedException>());
         });
+    }
+
+    [Test]
+    public async Task Text_is_sorted_and_compared_without_the_case_the_same_in_SQL_and_in_memory()
+    {
+        await using (var db = await _engine.OpenAsync("words.sqlite", SqliteAccess.ReadWrite))
+        {
+            await db.ExecuteAsync("PRAGMA user_version = 3");
+            await db.ExecuteBatchAsync([
+                new SqliteStatement("CREATE TABLE note (id INTEGER PRIMARY KEY, shelf TEXT NOT NULL, title TEXT NOT NULL, size INTEGER NOT NULL, pinned INTEGER NOT NULL, body TEXT NOT NULL)"),
+                new SqliteStatement("CREATE VIRTUAL TABLE note_fts USING fts5 (title, body, content = 'note', content_rowid = 'id')"),
+                .. new[] { "Zebra", "\u0451\u0436", "apple", "\u0401\u043b\u043a\u0430", "Banana" }
+                    .Select(title => new SqliteStatement("INSERT INTO note (shelf, title, size, pinned, body) VALUES ('x', $t, 0, 0, $t)", new Dictionary<string, object?> { ["$t"] = title }))
+            ]);
+        }
+
+        await using var source = new SqliteSource(_engine, "words.sqlite", 3);
+        var storage = new SqliteStorage<Note>(source, s_notes);
+        async Task<List<string>> Titles(Action<PagedRequest<Note>> build)
+        {
+            var request = new PagedRequest<Note> { PageSize = 0 };
+            build(request);
+            return [.. (await storage.FindAsync(request)).Items.Select(n => n.Title)];
+        }
+
+        var expected = new[] { "apple", "Banana", "Zebra", "\u0401\u043b\u043a\u0430", "\u0451\u0436" };
+        await Assert.MultipleAsync(async () =>
+        {
+            Assert.That(await Titles(r => r.Sorts.Add(new Sort { Field = nameof(Note.Title) })), Is.EqualTo(expected), "a column, sorted by SQL");
+            Assert.That(await Titles(r => r.Sorts.Add(new Sort { Field = nameof(Note.Body) })), Is.EqualTo(expected), "no column, sorted in memory");
+            Assert.That(await Titles(r => r.Filters.SetValue(nameof(Note.Title), "\u0451", FilterOperator.StartsWithIgnoreCase)),
+                        Is.EquivalentTo(new[] { "\u0451\u0436", "\u0401\u043b\u043a\u0430" }), "letters SQLite does not fold");
+            Assert.That(await Titles(r => r.Filters.SetValue(nameof(Note.Title), "\u0401\u0416", FilterOperator.EqualsIgnoreCase)), Is.EqualTo(new[] { "\u0451\u0436" }));
+            Assert.That(await Titles(r => r.Filters.SetValue(nameof(Note.Title), "\u0451\u041b*", FilterOperator.Like)), Is.EqualTo(new[] { "\u0401\u043b\u043a\u0430" }));
+        });
+    }
+
+    [Test]
+    public async Task A_base_closed_under_a_request_is_asked_for_again_and_a_disposed_source_has_none()
+    {
+        SqliteSource? source = null;
+        var closing = new ClosingEngine(_engine, () => source!.ResetAsync());
+        source = new SqliteSource(closing, "notes.sqlite", 3);
+        var storage = new SqliteStorage<Note>(source, s_notes);
+
+        var found = await storage.FindAsync(new PagedRequest<Note> { PageSize = 0, ReturnTotal = true });
+        Assert.That(found.Total, Is.EqualTo(5), "the base was closed before the first query of the request and opened again");
+        Assert.That(closing.Closed, Is.EqualTo(1));
+
+        await source.DisposeAsync();
+        Assert.That((await storage.FindAsync(new PagedRequest<Note> { PageSize = 0 })).Items, Is.Empty);
+        Assert.That(await storage.GetByIdAsync(SqliteKeys.Of(7, 1)), Is.Null);
+    }
+
+    [Test]
+    public void A_value_of_NET_becomes_one_of_SQLite_or_is_refused()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(SqliteValues.Normalize((short)5), Is.EqualTo(5L));
+            Assert.That(SqliteValues.Normalize(true), Is.EqualTo(1L));
+            Assert.That(SqliteValues.Normalize(1.5m), Is.EqualTo(1.5d));
+            Assert.That(SqliteValues.Normalize(FilterOperator.Like), Is.EqualTo("Like"));
+            Assert.That(SqliteValues.Normalize(new DateTimeOffset(2026, 11, 18, 12, 0, 0, TimeSpan.FromHours(3))), Is.EqualTo("2026-11-18T09:00:00.0000000+00:00"));
+            Assert.That(SqliteValues.Normalize(new DateOnly(2026, 11, 18)), Is.EqualTo("2026-11-18"));
+            Assert.That(() => SqliteValues.Normalize(TimeSpan.FromSeconds(1)), Throws.ArgumentException);
+        });
+    }
+
+    // Closes the base of the source before the first query of a database it opened
+    private sealed class ClosingEngine(ISqliteEngine inner, Func<Task> close) : ISqliteEngine
+    {
+        public int Closed { get; private set; }
+
+        public async Task<ISqliteDatabase> OpenAsync(string name, SqliteAccess access, CancellationToken cancellationToken = default)
+        {
+            var database = await inner.OpenAsync(name, access, cancellationToken);
+            return Closed == 0 ? new ClosingDatabase(database, this, close) : database;
+        }
+
+        public Task<bool> ExistsAsync(string name, CancellationToken cancellationToken = default)
+        {
+            return inner.ExistsAsync(name, cancellationToken);
+        }
+
+        public Task DeleteAsync(string name, CancellationToken cancellationToken = default)
+        {
+            return inner.DeleteAsync(name, cancellationToken);
+        }
+
+        public Task<IReadOnlyList<string>> ListAsync(CancellationToken cancellationToken = default)
+        {
+            return inner.ListAsync(cancellationToken);
+        }
+
+        public Task<long> ImportAsync(string name, Uri source, IProgress<long>? progress = null, CancellationToken cancellationToken = default)
+        {
+            return inner.ImportAsync(name, source, progress, cancellationToken);
+        }
+
+        private sealed class ClosingDatabase(ISqliteDatabase database, ClosingEngine engine, Func<Task> close) : ISqliteDatabase
+        {
+            private bool _versionRead;
+
+            public string Name => database.Name;
+
+            public SqliteAccess Access => database.Access;
+
+            public async Task<SqliteRows> QueryAsync(string sql, IReadOnlyDictionary<string, object?>? parameters = null, CancellationToken cancellationToken = default)
+            {
+                // The source reads the version first; the next query is the request
+                if (_versionRead && engine.Closed == 0)
+                {
+                    engine.Closed++;
+                    await close();
+                }
+
+                _versionRead = true;
+                return await database.QueryAsync(sql, parameters, cancellationToken);
+            }
+
+            public Task<int> ExecuteAsync(string sql, IReadOnlyDictionary<string, object?>? parameters = null, CancellationToken cancellationToken = default)
+            {
+                return database.ExecuteAsync(sql, parameters, cancellationToken);
+            }
+
+            public Task<IReadOnlyList<int>> ExecuteBatchAsync(IReadOnlyList<SqliteStatement> statements, CancellationToken cancellationToken = default)
+            {
+                return database.ExecuteBatchAsync(statements, cancellationToken);
+            }
+
+            public ValueTask DisposeAsync()
+            {
+                return database.DisposeAsync();
+            }
+        }
     }
 
     [Test]

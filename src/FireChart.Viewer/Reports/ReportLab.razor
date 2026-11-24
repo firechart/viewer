@@ -1,0 +1,193 @@
+@using FireChart.Viewer.Pages
+@using FireChart.Viewer.Core
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@* The laboratory of a Feed (display="lab-results"): a group per report (its tile as the header, then its results in the order of the report) or per
+   day; a table in a wide section, the tiles of the results in a narrow one. Only the form the width shows is drawn (a tile of every result is the
+   costly part of a long section): the script tells the width of the rows, the table until it has; the chosen form is shown whatever the container
+   query says. The tiles are the components of the modes of the library, the cells are written by the Feed *@
+
+<div @ref=_root class="fx-lab" data-lab-form=@(_narrow ? "narrow" : "wide")>
+@foreach (var group in Groups)
+{
+    var head = HeadIdOf(group);
+    <div class="fx-lab-group" @key=group.Key>
+        @if (group.Report is { } report)
+        {
+            <div id=@head class="fx-summary-section-row fx-lab-head">@Tile(report)</div>
+        }
+        else
+        {
+            <div id=@head class="fx-lab-day">@DayOf(group)</div>
+        }
+
+        @if (group.Rows.Count > 0 && !_narrow)
+        {
+            var range = group.Rows.Any(row => Text(row, "range").Length > 0);
+            var flag = group.Rows.Any(HasFlag);
+            <div class="fx-lab-wide fx-lab-chosen">
+                <table class="fx-table fx-table-sm fx-lab-table" aria-labelledby=@head>
+                    <colgroup>
+                        <col class="fx-lab-col-test"/>
+                        <col class="fx-lab-col-value"/>
+                        <col class=@(range ? "fx-lab-col-range" : "fx-lab-col-none")/>
+                        <col class=@(flag ? "fx-lab-col-flag" : "fx-lab-col-none")/>
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>@Strings.Caption_LabTest</th>
+                            <th>@Strings.Caption_LabResult</th>
+                            @* An empty column keeps its place and its name, which only a reader hears *@
+                            <th><span class=@(range ? null : "fx-visually-hidden")>@Strings.Caption_LabReferenceRange</span></th>
+                            <th><span class=@(flag ? null : "fx-visually-hidden")>@Strings.Caption_LabFlag</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in group.Rows)
+                        {
+                            var href = HrefOf(row);
+                            var test = Text(row, "test") is { Length: > 0 } name ? name : row.Id;
+                            <tr @key=row>
+                                <td class="fx-lab-test">
+                                    @if (href is not null)
+                                    {
+                                        <a href=@href class="fx-link">@test</a>
+                                    }
+                                    else
+                                    {
+                                        @test
+                                    }
+                                </td>
+                                @* A value and a range read left to right in every language: 3.82 10*3/uL *@
+                                <td class="fx-lab-value"><bdi dir="ltr">@Text(row, "value")</bdi></td>
+                                <td class="fx-lab-range"><bdi dir="ltr">@Text(row, "range")</bdi></td>
+                                <td class="fx-lab-flag">@Flag(row)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else if (group.Rows.Count > 0)
+        {
+            <div class="fx-lab-narrow fx-lab-chosen" role="list" aria-labelledby=@head>
+                @foreach (var row in group.Rows)
+                {
+                    <div class="fx-summary-section-row" role="listitem" @key=row>@Tile(row)</div>
+                }
+            </div>
+        }
+    </div>
+}
+</div>
+
+@code {
+
+    private ElementReference _root;
+    private bool _narrow;
+    private IJSObjectReference? _module;
+    private IJSObjectReference? _width;
+    private DotNetObjectReference<ReportLab>? _self;
+    private bool _disposed;
+
+    // The section: the id of its element names the heads of its groups
+    [Parameter, EditorRequired]
+    public SummarySection Section { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<LabGroup> Groups { get; set; } = [];
+
+    // The tile of a record (a report, a result in the narrow form)
+    [Parameter, EditorRequired]
+    public RenderFragment<ResourceSummary> Tile { get; set; } = null!;
+
+    // A cell of a result as text: test, value, range
+    [Parameter, EditorRequired]
+    public Func<ResourceSummary, string, string> Text { get; set; } = null!;
+
+    // The flags of a result (its interpretations as badges), and whether it has any
+    [Parameter, EditorRequired]
+    public RenderFragment<ResourceSummary> Flag { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public Func<ResourceSummary, bool> HasFlag { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public Func<ResourceSummary, string?> HrefOf { get; set; } = null!;
+
+    // The id of the head of a group (its report or its day): the name of its table and of its list
+    private string HeadIdOf(LabGroup group)
+    {
+        return Section.ElementId + "-lab-" + string.Concat(group.Key.Select(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '_' ? c : '-'));
+    }
+
+    // The day in the format of the culture; results without a moment have none
+    private static string DayOf(LabGroup group)
+    {
+        return group.Day is { } day ? day.ToString("d", System.Globalization.CultureInfo.CurrentCulture) : "—";
+    }
+
+
+    /// <inheritdoc/>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _module = await JS.ImportModuleAsync("./_content/FireChart.Viewer/Reports/ReportLab.razor.js");
+        if (_disposed)
+        {
+            await _module.DisposeAsync();
+            return;
+        }
+
+        _self = DotNetObjectReference.Create(this);
+        _width = await _module.InvokeAsync<IJSObjectReference?>("observe", _root, _self);
+        if (_disposed && _width is not null)
+        {
+            await _width.InvokeVoidAsync("dispose");
+            await _width.DisposeAsync();
+            _width = null;
+        }
+    }
+
+    /// <summary>Called by the script when the rows of the section become narrow or wide.</summary>
+    /// <param name="narrow">Whether the rows are narrower than 36rem.</param>
+    [JSInvokable]
+    public void OnWidth(bool narrow)
+    {
+        if (narrow != _narrow)
+        {
+            _narrow = narrow;
+            StateHasChanged();
+        }
+    }
+
+    /// <inheritdoc/>
+    public async ValueTask DisposeAsync()
+    {
+        _disposed = true;
+        try
+        {
+            if (_width is not null)
+            {
+                await _width.InvokeVoidAsync("dispose");
+                await _width.DisposeAsync();
+            }
+
+            if (_module is not null)
+            {
+                await _module.DisposeAsync();
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+            // the circuit is gone with the page
+        }
+
+        _self?.Dispose();
+    }
+
+}

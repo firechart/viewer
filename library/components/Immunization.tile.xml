@@ -1,0 +1,18 @@
+<!-- An immunization in a list: the vaccine, when it was given and its lot; its status at the end -->
+<Component name="Immunization.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.vaccineCode.exists(), %record.vaccineCode, %record.id)}}" patient="{{%record.patient}}" encounter="{{%record.encounter}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.occurrence}}"/>
+        <If test="{{%record.lotNumber.exists()}}">
+          <Text>{{%strings.LotInline}} <Value value="{{%record.lotNumber}}"/></Text>
+        </If>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

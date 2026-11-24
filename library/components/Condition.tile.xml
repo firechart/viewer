@@ -1,0 +1,10 @@
+<!-- A condition in a list: what, since when; its clinical status at the end -->
+<Component name="Condition.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{%record.code}}" subtitle="{{iif(%record.onset.exists(), %record.onset, %record.recordedDate)}}" patient="{{%record.subject}}" encounter="{{%record.encounter}}">
+    <Trailing>
+      <Status value="{{%record.clinicalStatus}}"/>
+    </Trailing>
+  </Tile>
+</Component>

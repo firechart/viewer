@@ -89,6 +89,12 @@ internal static class CodeSnippets
             code.AppendLine().Append(CultureInfo.InvariantCulture, $"            TerminologyServer=\"{terminology}\"");
         }
 
+        if (setup.Summary != ViewerSummaryOptions.Default)
+        {
+            var size = setup.Summary.PageSize is { } pageSize ? $"PageSize = {pageSize.ToString(CultureInfo.InvariantCulture)}, " : string.Empty;
+            code.AppendLine().Append(CultureInfo.InvariantCulture, $"            Summary=@(new ViewerSummaryOptions {{ {size}LoadAll = {(setup.Summary.LoadAll ? "true" : "false")} }})");
+        }
+
         var appearance = setup.Appearance;
         var hasAppearance = config["appearance"] is JsonObject;
         if (hasAppearance)

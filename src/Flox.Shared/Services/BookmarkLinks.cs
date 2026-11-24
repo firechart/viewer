@@ -3,7 +3,6 @@ using Flox.Core.Host;
 using Flox.Core.Models;
 using Flox.Resources;
 using Flox.Shared.Extensions;
-using Radzen;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Flox.Shared.Services;
@@ -38,7 +37,7 @@ public sealed class BookmarkLinks(IEnumerable<IBookmarkLinkResolver> resolvers)
     }
 
     /// <summary>Opens the bookmark, or tells the user that its source is not here.</summary>
-    public async Task OpenAsync(UserBookmark bookmark, NavigationManager navigation, NotificationService notifications, CancellationToken cancellationToken = default)
+    public async Task OpenAsync(UserBookmark bookmark, NavigationManager navigation, FloxSnackbar notifications, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(navigation);
         ArgumentNullException.ThrowIfNull(notifications);
@@ -49,10 +48,6 @@ public sealed class BookmarkLinks(IEnumerable<IBookmarkLinkResolver> resolvers)
             return;
         }
 
-        notifications.Notify(new NotificationMessage
-        {
-            Severity = NotificationSeverity.Warning,
-            Summary = string.Format(CultureInfo.CurrentCulture, Strings.Message_BookmarkSourceMissing, bookmark.SourceName ?? bookmark.SourceAddress)
-        });
+        notifications.Show(string.Format(CultureInfo.CurrentCulture, Strings.Message_BookmarkSourceMissing, bookmark.SourceName ?? bookmark.SourceAddress), SnackSeverity.Warning);
     }
 }

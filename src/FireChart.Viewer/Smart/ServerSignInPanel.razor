@@ -6,35 +6,35 @@
 @* The sign-in to a server with OAuth2 (SMART). Redirect: the page leaves for the sign-in page of the server and the callback route of the host brings the
    user back. Popup: the sign-in page opens in a window of its own, the page stays (a Viewer in a frame whose authorization server refuses to be framed);
    a blocked or lost window falls back to the redirect *@
-<RadzenStack Gap="var(--gap-lg)" class="max-w-md rz-mt-4">
-    <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0">@Strings.Message_FhirServerSignInAsked</RadzenText>
+<div class="flex flex-col gap-4 max-w-md mt-4">
+    <p class="m-0 text-sm">@Strings.Message_FhirServerSignInAsked</p>
     @if (Rejected)
     {
-        <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" Size="AlertSize.Small">
+        <Alert Kind="AlertKind.Warning">
             @Strings.Message_CredentialsRejected
-        </RadzenAlert>
+        </Alert>
     }
 
     @if (_failure is not null)
     {
-        <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" Size="AlertSize.Small">
+        <Alert Kind="AlertKind.Warning">
             @_failure
-        </RadzenAlert>
+        </Alert>
     }
 
     @if (_waiting)
     {
-        <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0">@Strings.Message_SmartPopupWaiting</RadzenText>
+        <p class="m-0 text-sm">@Strings.Message_SmartPopupWaiting</p>
     }
 
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="var(--gap-sm)" Wrap="FlexWrap.Wrap">
-        <RadzenButton ButtonStyle="ButtonStyle.Primary" Text=@(_offerFallback ? Strings.Caption_SmartOpenSignInWindow : FloxStrings.Caption_SignIn) Disabled=@_going Click=@SignInAsync/>
+    <div class="flex flex-wrap gap-2">
+        <Button Disabled=@_going OnClick=@SignInAsync>@(_offerFallback ? Strings.Caption_SmartOpenSignInWindow : FloxStrings.Caption_SignIn)</Button>
         @if (_offerFallback)
         {
-            <RadzenButton ButtonStyle="ButtonStyle.Base" Variant="Variant.Outlined" Text=@Strings.Caption_SmartSignInHere Disabled=@_going Click=@RedirectAsync/>
+            <Button Variant="ButtonVariant.Outline" Disabled=@_going OnClick=@RedirectAsync>@Strings.Caption_SmartSignInHere</Button>
         }
-    </RadzenStack>
-</RadzenStack>
+    </div>
+</div>
 
 @code {
 

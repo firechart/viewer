@@ -3,11 +3,11 @@
 @inherits StatefulWidget<BackgroundTaskLogState>
 
 <Subtitle>Logs</Subtitle>
-<DataList State=@State Layout="ListLayout.Content" ShowSearch="false" PullToRefresh="false">
+<DataList State=@State Layout="ListLayout.Content" ShowSearch="false">
     <ItemTemplate Context="row">
         <ListTile Dense SubtitleText=@($"{row.Item.DateTime.ToLocalTime():HH:mm:ss} · {row.Item.LogLevel}")>
             <Title>
-                <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.Div" class="break-words">@row.Item.Message</RadzenText>
+                <div class="m-0 text-sm break-words">@row.Item.Message</div>
             </Title>
         </ListTile>
     </ItemTemplate>

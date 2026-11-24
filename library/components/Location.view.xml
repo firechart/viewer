@@ -1,0 +1,26 @@
+<!-- The page of a location: its name, kind and status, then where it is and who manages it -->
+<Component name="Location.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{iif(%record.name.exists(), %record.name, %record.id)}}">
+    <Field label="{{%strings.Type}}" value="{{%record.type}}"/>
+    <Field label="{{%strings.PhysicalType}}" value="{{%record.physicalType}}"/>
+    <Field label="{{%strings.Status}}">
+      <Status value="{{%record.status}}"/>
+    </Field>
+  </Section>
+
+  <If test="{{%record.address.exists() or %record.managingOrganization.exists() or %record.partOf.exists() or %record.telecom.exists() or %record.description.exists()}}">
+    <Section title="{{%strings.Where}}">
+      <Field label="{{%strings.Address}}" value="{{%record.address}}"/>
+      <Field label="{{%strings.ManagingOrganization}}">
+        <Link value="{{%record.managingOrganization}}"/>
+      </Field>
+      <Field label="{{%strings.PartOf}}">
+        <Link value="{{%record.partOf}}"/>
+      </Field>
+      <Field label="{{%strings.PhoneAndEmail}}" value="{{%record.telecom}}"/>
+      <Field label="{{%strings.Description}}" value="{{%record.description}}"/>
+    </Section>
+  </If>
+</Component>

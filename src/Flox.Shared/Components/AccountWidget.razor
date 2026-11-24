@@ -1,16 +1,17 @@
+@using BlazorBlueprint.Components
 @inject IAuthenticationService AuthenticationService
 @inject NavigationManager NavigationManager
 
 <AuthorizeView>
     <Authorized>
-        <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" title=@context.User?.GetUserName() Click="ProfileAsync">
+        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@context.User?.GetUserName() AriaLabel=@context.User?.GetUserName() OnClick="ProfileAsync">
             <FloxIcon Icon="verified_user"/>
-        </RadzenButton>
+        </Button>
     </Authorized>
     <NotAuthorized>
-        <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Click="LoginAsync">
+        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Strings.Caption_Login AriaLabel=@Strings.Caption_Login OnClick="LoginAsync">
             <FloxIcon Icon="login"/>
-        </RadzenButton>
+        </Button>
     </NotAuthorized>
 </AuthorizeView>
 

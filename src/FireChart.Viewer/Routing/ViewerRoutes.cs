@@ -23,7 +23,20 @@ public enum ViewerPage
     Summary,
 
     /// <summary>The bookmarks of the Viewer on this device (<c>bookmarks</c>), of every server.</summary>
-    Bookmarks
+    Bookmarks,
+
+    /// <summary>
+    /// A report of components over a record (<c>report/Patient/123</c>): the component <c>{Type}Report</c> of the library with the record as
+    /// <c>%context</c>. A prototype.
+    /// </summary>
+    Report,
+
+    /// <summary>
+    /// The preview of a component of a mode for the designer (<c>preview/Observation?mode=tile&amp;patient=123</c>): the component
+    /// <c>{Type}.{mode}</c> over records of the type (of the patient when the query names one); <see cref="ViewerRoute.Id"/> chooses the record of a
+    /// mode that shows one.
+    /// </summary>
+    Preview
 }
 
 /// <summary>
@@ -54,6 +67,10 @@ public sealed record ViewerRoute(ViewerPage Page, string? ResourceType = null, s
                 ViewerPage.Bookmarks => ViewerRoutes.Bookmarks,
                 ViewerPage.ResourceList => $"{ViewerRoutes.Resources}/{Uri.EscapeDataString(ResourceType ?? string.Empty)}",
                 ViewerPage.Resource => $"{ViewerRoutes.Resources}/{Uri.EscapeDataString(ResourceType ?? string.Empty)}/{Uri.EscapeDataString(Id ?? string.Empty)}",
+                ViewerPage.Report => $"{ViewerRoutes.Report}/{Uri.EscapeDataString(ResourceType ?? string.Empty)}/{Uri.EscapeDataString(Id ?? string.Empty)}",
+                ViewerPage.Preview => Id is null
+                    ? $"{ViewerRoutes.Preview}/{Uri.EscapeDataString(ResourceType ?? string.Empty)}"
+                    : $"{ViewerRoutes.Preview}/{Uri.EscapeDataString(ResourceType ?? string.Empty)}/{Uri.EscapeDataString(Id)}",
                 _ => Id is null ? ViewerRoutes.Summary : $"{ViewerRoutes.Summary}/{Uri.EscapeDataString(ResourceType ?? ViewerRoutes.PatientContext)}/{Uri.EscapeDataString(Id)}"
             };
             return string.IsNullOrEmpty(Query) ? path : $"{path}?{Query}";
@@ -65,6 +82,17 @@ public sealed record ViewerRoute(ViewerPage Page, string? ResourceType = null, s
     /// <see langword="null"/> for no sheet, a value that is not a record, or another page.
     /// </summary>
     public ViewerRoute? Peek => Page == ViewerPage.Summary && Id is not null ? ViewerRoutes.PeekOf(Query) : null;
+
+    /// <summary>
+    /// The page of a record shows its JSON rather than its components (<c>resources/Patient/123?view=source</c>).
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var source = ViewerRoutes.SourceOf("Patient", "123"); // resources/Patient/123?view=source
+    /// Console.WriteLine(source.ShowsSource);                // True
+    /// </code>
+    /// </example>
+    public bool ShowsSource => Page == ViewerPage.Resource && Query.Split('&').Contains($"{ViewerRoutes.ViewParameter}={ViewerRoutes.SourceView}");
 
     /// <summary>
     /// The same page with a record in a sheet over it, or without the sheet.
@@ -115,8 +143,36 @@ public static partial class ViewerRoutes
     /// <summary>The page of the bookmarks: <c>bookmarks</c>.</summary>
     public const string Bookmarks = "bookmarks";
 
+    /// <summary>The first segment of a report of components: <c>report</c> (<c>report/Patient/123</c>).</summary>
+    public const string Report = "report";
+
+    /// <summary>The first segment of the preview of a component: <c>preview</c> (<c>preview/Observation?mode=tile</c>).</summary>
+    public const string Preview = "preview";
+
     /// <summary>The parameter of the query of the patient summary that holds the record of the sheet over it (<c>peek=Observation/o1</c>).</summary>
     public const string PeekParameter = "peek";
+
+    /// <summary>The parameter of the query of the page of a record that chooses what it shows (<c>view=source</c>).</summary>
+    public const string ViewParameter = "view";
+
+    /// <summary>The value of <see cref="ViewParameter"/> that shows the JSON of the record: <c>source</c>.</summary>
+    public const string SourceView = "source";
+
+    /// <summary>
+    /// The page of a record that shows its JSON.
+    /// </summary>
+    /// <param name="resourceType">The type of the record.</param>
+    /// <param name="id">The id of the record.</param>
+    /// <returns>The route <c>resources/{type}/{id}?view=source</c>.</returns>
+    /// <example>
+    /// <code>
+    /// session.Navigate(ViewerRoutes.SourceOf("Observation", "o1"));
+    /// </code>
+    /// </example>
+    public static ViewerRoute SourceOf(string resourceType, string id)
+    {
+        return new ViewerRoute(ViewerPage.Resource, resourceType, id, $"{ViewParameter}={SourceView}");
+    }
 
     [GeneratedRegex("^[A-Za-z]{1,64}$", RegexOptions.CultureInvariant)]
     private static partial Regex ResourceTypePattern();
@@ -149,6 +205,9 @@ public static partial class ViewerRoutes
             // The list of the patients that led to the patient summary is the list of the patients now
             [Summary] => new ViewerRoute(ViewerPage.ResourceList, PatientContext, Query: query),
             [Bookmarks] => new ViewerRoute(ViewerPage.Bookmarks),
+            [Preview, var type] when ResourceTypePattern().IsMatch(type) => new ViewerRoute(ViewerPage.Preview, type, Query: query),
+            [Preview, var type, var id] when ResourceTypePattern().IsMatch(type) && IdPattern().IsMatch(id) => new ViewerRoute(ViewerPage.Preview, type, id, query),
+            [Report, var type, var id] when ResourceTypePattern().IsMatch(type) && IdPattern().IsMatch(id) => new ViewerRoute(ViewerPage.Report, type, id, query),
             [Summary, var type, var id] when ResourceTypePattern().IsMatch(type) && IdPattern().IsMatch(id) => new ViewerRoute(ViewerPage.Summary, type, id, query),
             [Summary, var patient] when IdPattern().IsMatch(patient) => new ViewerRoute(ViewerPage.Summary, PatientContext, patient, query),
             _ => null
@@ -172,7 +231,7 @@ public static partial class ViewerRoutes
     {
         ArgumentNullException.ThrowIfNull(location);
         var path = location.Split('?', 2)[0];
-        return !path.StartsWith('/')
+        return !path.StartsWith('/', StringComparison.Ordinal)
                && !path.Contains("//", StringComparison.Ordinal)
                && !path.Contains('\\', StringComparison.Ordinal)
                && !path.Contains(':', StringComparison.Ordinal)

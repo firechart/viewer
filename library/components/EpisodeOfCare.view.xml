@@ -1,0 +1,30 @@
+<!-- The page of an episode of care: its period, managing organization, care manager, team and referrals, then its diagnoses -->
+<Component name="EpisodeOfCare.view">
+  <Param name="record" required="true"/>
+
+  <If test="{{%record.period.exists() or %record.managingOrganization.exists() or %record.careManager.exists() or %record.team.exists() or %record.referralRequest.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Period}}" value="{{%record.period}}"/>
+      <Field label="{{%strings.ManagingOrganization}}">
+        <Link value="{{%record.managingOrganization}}"/>
+      </Field>
+      <Field label="{{%strings.CareManager}}">
+        <Link value="{{%record.careManager}}"/>
+      </Field>
+      <Field label="{{%strings.CareTeam}}">
+        <Link value="{{%record.team}}"/>
+      </Field>
+      <Field label="{{%strings.Referral}}">
+        <Link value="{{%record.referralRequest}}"/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.diagnosis.exists()}}">
+    <Section title="{{%strings.Diagnoses}}" count="{{%record.diagnosis.count()}}">
+      <Repeat each="{{%record.diagnosis}}" as="diagnosis">
+        <Row meta="{{%diagnosis.role}}"><Main><Link value="{{%diagnosis.condition}}"/></Main></Row>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

@@ -1,0 +1,16 @@
+<!-- An account in a list: its name (else its type), the service period; its status at the end -->
+<Component name="Account.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.name.exists(), %record.name, iif(%record.type.exists(), %record.type, %record.id))}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.servicePeriod}}"/>
+        <Value value="{{%record.owner}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

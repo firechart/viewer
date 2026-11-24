@@ -1,6 +1,6 @@
 {
   "name": "firechart-vendor",
   "version": "0.0.0-dev",
-  "description": "The vendor library of FireChart Viewer: Liquid templates of FHIR resources and datatypes, their translations, search forms, summary forms, the fx-* style kit and synthetic samples. The build writes the version of the release.",
+  "description": "The vendor library of FireChart Viewer: the components that show FHIR resources, search forms, summary forms, the fx-* style kit and synthetic samples. The build writes the version of the release.",
   "engine": 1
 }

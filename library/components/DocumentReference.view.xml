@@ -1,0 +1,33 @@
+<!-- The page of a document: when and its document status, its type, category, authors, custodian and security, then its contents -->
+<Component name="DocumentReference.view">
+  <Param name="record" required="true"/>
+
+  <If test="{{%record.date.exists() or %record.docStatus.exists() or %record.type.exists() or %record.category.exists() or %record.author.exists() or %record.authenticator.exists() or %record.custodian.exists() or %record.securityLabel.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Date}}" value="{{%record.date}}"/>
+      <Field label="{{%strings.DocumentStatus}}">
+        <Status value="{{%record.docStatus}}"/>
+      </Field>
+      <Field label="{{%strings.Type}}" value="{{%record.type}}"/>
+      <Field label="{{%strings.Category}}" value="{{%record.category}}"/>
+      <Field label="{{%strings.Author}}">
+        <Link value="{{%record.author}}"/>
+      </Field>
+      <Field label="{{%strings.Authenticator}}">
+        <Link value="{{%record.authenticator}}"/>
+      </Field>
+      <Field label="{{%strings.Custodian}}">
+        <Link value="{{%record.custodian}}"/>
+      </Field>
+      <Field label="{{%strings.Security}}" value="{{%record.securityLabel}}"/>
+    </Section>
+  </If>
+
+  <If test="{{%record.content.exists()}}">
+    <Section title="{{%strings.Content}}">
+      <Repeat each="{{%record.content}}" as="content">
+        <Row main="{{iif(%content.attachment.title.exists(), %content.attachment.title, iif(%content.attachment.url.exists(), %content.attachment.url, 'document'))}}" meta="{{%content.attachment.contentType}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

@@ -35,11 +35,22 @@ public class ValueSetExpanderTests
         }
     }
 
-    private static ValueSetExpander Expander(FakeHandler handler)
+    private static ValueSetExpander Expander(FakeHandler handler, TimeProvider? clock = null)
     {
         var services = new ServiceCollection();
         services.AddHttpClient(FhirServerHttp.HttpClientName).ConfigurePrimaryHttpMessageHandler(() => handler);
-        return new ValueSetExpander(services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>(), new ServerCredentialStore(), NullLogger<ValueSetExpander>.Instance);
+        return new ValueSetExpander(services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>(), new ServerCredentialStore(), NullLogger<ValueSetExpander>.Instance, clock);
+    }
+
+    // A clock the test moves
+    private sealed class Clock : TimeProvider
+    {
+        public DateTimeOffset Now { get; set; } = new(2026, 11, 18, 12, 0, 0, TimeSpan.Zero);
+
+        public override DateTimeOffset GetUtcNow()
+        {
+            return Now;
+        }
     }
 
     private const string Status = """
@@ -126,16 +137,24 @@ public class ValueSetExpanderTests
     }
 
     [Test]
-    public async Task A_failing_server_gives_no_codes_but_is_asked_again()
+    public async Task A_failing_server_gives_no_codes_and_is_asked_again_only_after_a_while()
     {
         var handler = new FakeHandler(HttpStatusCode.ServiceUnavailable, "down");
-        var expander = Expander(handler);
+        var clock = new Clock();
+        var expander = Expander(handler, clock);
         var server = new Server("https://fhir.example.test/r4");
 
         await expander.ExpandAsync(server, "http://hl7.org/fhir/ValueSet/administrative-gender", null, null);
-        var again = await expander.ExpandAsync(server, "http://hl7.org/fhir/ValueSet/administrative-gender", null, null);
+        var soon = await expander.ExpandAsync(server, "http://hl7.org/fhir/ValueSet/administrative-gender", null, null);
+        var asked = handler.Requested.Count;
+        clock.Now += TimeSpan.FromMinutes(6);
+        await expander.ExpandAsync(server, "http://hl7.org/fhir/ValueSet/administrative-gender", null, null);
 
-        Assert.That(again, Is.Null);
-        Assert.That(handler.Requested, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(soon, Is.Null);
+            Assert.That(asked, Is.EqualTo(1), "a server error is believed for a while");
+            Assert.That(handler.Requested, Has.Count.EqualTo(2), "then the server is asked again");
+        });
     }
 }

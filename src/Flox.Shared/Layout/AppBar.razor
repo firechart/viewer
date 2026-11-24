@@ -1,50 +1,32 @@
+@using BlazorBlueprint.Components
 @using Microsoft.AspNetCore.Components.Sections
-@using System.Reflection
-@using Microsoft.Extensions.Logging
-
-
-@inject IFloxRuntime Runtime
-
-@inject IFloxBrandingProvider Branding
-
 @inject INavigationHistoryService NavigationHistory
-
-@inject NavigationManager Navigation
-
-@inject IJSRuntime JS
-
-@inject ILogger<AppBar> Logger
-
 @implements IDisposable
 
-<RadzenHeader class="flex items-center gap-2 px-2" role="banner">
-    <RadzenButton Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Click=@OnLeadingButtonClick
-                  aria-label=@(_showBackButton ? Strings.Caption_Back : Strings.Caption_Menu)
-                  aria-expanded=@(_showBackButton ? null : _drawerOpen ? "true" : "false") aria-controls=@(_showBackButton ? null : SidebarId)>
-        <FloxIcon Icon=@(_showBackButton ? "arrow_back" : "menu") Class="rtl:-scale-x-100"/>
-    </RadzenButton>
+@* The bar on top of the page, across its whole width: back (or the main menu), the title, the commands and the menu of the page. As the navigation
+   bar of iOS the title stands in the middle of the bar whatever is on its sides: the two sides are columns of one width; a title too long for the
+   room between them is cut with an ellipsis *@
+@* Above the overlay of the menu sheet (z-50): the button that opened it closes it *@
+<header class="flox-app-bar sticky top-0 z-[60] grid h-[var(--flox-header-height)] shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-1 border-b border-line bg-background px-2 text-foreground" role="banner">
+    <div class="flex items-center justify-start">
+        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" OnClick=@OnLeadingButtonClick
+                AriaLabel=@(_showBackButton ? Strings.Caption_Back : Strings.Caption_Menu)
+                aria-expanded=@(_showBackButton ? null : MenuOpen ? "true" : "false") aria-controls=@(_showBackButton ? null : AppSidebar.Id)>
+            <FloxIcon Icon=@(_showBackButton ? "arrow_back" : "menu") Class="rtl:-scale-x-100"/>
+        </Button>
+    </div>
 
-    <div class="min-w-0 flex-1 rz-text-align-center">
+    <div class="min-w-0 truncate text-center">
         <SectionOutlet SectionName="appbar-title"/>
     </div>
 
-    <SectionOutlet SectionName="appbar-commands"/>
+    <div class="flex items-center justify-end gap-1">
+        <SectionOutlet SectionName="appbar-commands"/>
 
-    @* The menu of the page (PageMenu); the account is the first item of the main menu *@
-    <SectionOutlet SectionName="appbar-menu"/>
-</RadzenHeader>
-
-<RadzenSidebar @bind-Expanded=@_drawerOpen Responsive="true" id=@SidebarId class="max-md:fixed! max-md:top-(--rz-header-min-height) max-md:shadow-lg">
-    <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-py-3 short:hidden">
-        <RadzenLink Path=@AppUrl.ToHref("/")>
-            <RadzenImage Path=@Branding.App.Logo AlternateText=@Branding.App.Title class="w-50" title=@_buildVersion/>
-        </RadzenLink>
-    </RadzenStack>
-
-    <nav aria-label=@Strings.Caption_MainNavigation>
-        <NavMenu/>
-    </nav>
-</RadzenSidebar>
+        @* The menu of the page (PageMenu); the account is the first item of the main menu *@
+        <SectionOutlet SectionName="appbar-menu"/>
+    </div>
+</header>
 
 @code {
 
@@ -54,30 +36,16 @@
     [Parameter]
     public EventCallback BackRequested { get; set; }
 
-    private const string SidebarId = "app-sidebar";
-
-    bool _drawerOpen = true;
     bool _showBackButton;
-    IJSObjectReference? _module;
 
-    // MinVer bakes the git-tag-derived build version into AssemblyInformationalVersion - see
-    // Directory.Build.props/version.props. Debug-only: not meant for end users, just for telling
-    // apart local builds during development. The fields themselves must exist in every build
-    // configuration for the markup above to compile - #if around a value inside an @code block is
-    // reliable C#, #if around markup outside @code is not.
-    private static readonly string? _buildVersion = Assembly.GetExecutingAssembly()
-                                                             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                                                             ?.InformationalVersion ?? "unknown";
+    [CascadingParameter]
+    private SidebarContext? Sidebar { get; set; }
 
-    // MinVer's InformationalVersion includes the full 40-char commit sha after "+" - too long for
-    // this drawer's width. Show everything before it; the full string is still one hover away via
-    // the title attribute above.
-    private static readonly string? _buildVersionShort = _buildVersion?.Split('+')[0];
+    private bool MenuOpen => Sidebar is not null && (Sidebar.IsMobile ? Sidebar.OpenMobile : Sidebar.Open);
 
     protected override void OnInitialized()
     {
         NavigationHistory.HistoryChanged += OnHistoryChanged;
-        Navigation.LocationChanged += OnLocationChanged;
         UpdateBackButtonVisibility();
         base.OnInitialized();
     }
@@ -86,37 +54,6 @@
     {
         UpdateBackButtonVisibility();
         InvokeAsync(StateHasChanged);
-    }
-
-    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        if (!_drawerOpen)
-        {
-            return;
-        }
-
-        try
-        {
-            // null: seen with a browser extension that wraps the page's functions; the next navigation asks again
-            _module ??= await JS.ImportModuleAsync("./_content/Flox.Shared/Layout/AppBar.razor.js");
-            if (_module is not null && await _module.InvokeAsync<bool>("isNarrow"))
-            {
-                _drawerOpen = false;
-                await InvokeAsync(StateHasChanged);
-            }
-        }
-        catch (JSException)
-        {
-            // the sidebar just stays open
-        }
-        catch (ObjectDisposedException)
-        {
-        }
-        catch (Exception ex)
-        {
-            // async void: an exception that leaves it stops the .NET runtime of the page
-            Logger.LogWarning(ex, "The width of the window could not be checked, the sidebar stays open");
-        }
     }
 
     private void UpdateBackButtonVisibility()
@@ -138,14 +75,12 @@
 
     void DrawerToggle()
     {
-        _drawerOpen = !_drawerOpen;
+        Sidebar?.ToggleSidebar();
     }
 
     public void Dispose()
     {
         NavigationHistory.HistoryChanged -= OnHistoryChanged;
-        Navigation.LocationChanged -= OnLocationChanged;
-        _module?.DisposeAsync();
     }
 
 }

@@ -1,0 +1,11 @@
+<!-- A consent in a list: its scope, when it was signed; the type of its provision (permit, deny) and its status at the end -->
+<Component name="Consent.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.scope.exists(), %record.scope, iif(%record.category.exists(), %record.category.first(), %record.id))}}" subtitle="{{%record.dateTime}}" patient="{{%record.patient}}">
+    <Trailing>
+      <Status value="{{%record.provision.type}}"/>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

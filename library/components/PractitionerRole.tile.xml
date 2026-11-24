@@ -1,0 +1,18 @@
+<!-- A practitioner role in a list: the practitioner, the role (else the specialty); inactive at the end when it is -->
+<Component name="PractitionerRole.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.practitioner.exists(), %record.practitioner, %record.id)}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{iif(%record.code.exists(), %record.code.first(), %record.specialty.first())}}"/>
+        <Value value="{{%record.organization}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <If test="{{%record.active = false}}">
+        <Badge text="{{%strings.InactiveBadge}}" tone="danger"/>
+      </If>
+    </Trailing>
+  </Tile>
+</Component>

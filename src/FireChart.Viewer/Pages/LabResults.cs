@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace FireChart.Viewer.Pages;
@@ -31,6 +32,11 @@ public static class LabResults
     private const string Observation = "Observation";
     private const string DiagnosticReport = "DiagnosticReport";
 
+    // What a JSON text gives, read once: a section groups all its records again at every page it loads, and a record keeps its instance (its row
+    // is not drawn again)
+    private static readonly ConditionalWeakTable<string, List<string>> s_results = new();
+    private static readonly ConditionalWeakTable<string, StrongBox<ResourceSummary?>> s_observations = new();
+
     /// <summary>
     /// Groups the records of a section.
     /// </summary>
@@ -61,7 +67,7 @@ public static class LabResults
             var rows = new List<ResourceSummary>();
             foreach (var reference in ResultsOf(report.Json))
             {
-                if (ResourcePool.KeyOf(reference) is { } key && results.TryGetValue(key, out var result) && used.Add(key))
+                if (KeyOf(reference) is { } key && results.TryGetValue(key, out var result) && used.Add(key))
                 {
                     rows.Add(result);
                 }
@@ -101,32 +107,40 @@ public static class LabResults
         var result = new List<ResourceSummary>();
         foreach (var resource in related)
         {
-            try
+            if (s_observations.GetValue(resource.Json, json => new StrongBox<ResourceSummary?>(ObservationOf(json))).Value is { } observation)
             {
-                using var document = JsonDocument.Parse(resource.Json);
-                var root = document.RootElement;
-                if (root.TryGetProperty("resourceType", out var type) && type.GetString() == Observation && root.TryGetProperty("id", out var id) && id.GetString() is { Length: > 0 } text)
-                {
-                    result.Add(new ResourceSummary(text, Observation, resource.Json));
-                }
-            }
-            catch (JsonException)
-            {
-                // not a resource: nothing to group
+                result.Add(observation);
             }
         }
 
         return result;
     }
 
+    private static ResourceSummary? ObservationOf(string json)
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(json);
+            var root = document.RootElement;
+            return root.TryGetProperty("resourceType", out var type) && type.GetString() == Observation && root.TryGetProperty("id", out var id) && id.GetString() is { Length: > 0 } text
+                ? new ResourceSummary(text, Observation, json)
+                : null;
+        }
+        catch (JsonException)
+        {
+            // not a resource: nothing to group
+            return null;
+        }
+    }
+
     private static List<string> ResultsOf(string? json)
     {
-        var references = new List<string>();
-        if (json is null)
-        {
-            return references;
-        }
+        return json is null ? [] : s_results.GetValue(json, ReadResults);
+    }
 
+    private static List<string> ReadResults(string json)
+    {
+        var references = new List<string>();
         try
         {
             using var document = JsonDocument.Parse(json);
@@ -147,5 +161,23 @@ public static class LabResults
         }
 
         return references;
+    }
+
+    // Type/id of a reference (relative, absolute or versioned); none for a contained one
+    private static string? KeyOf(string? reference)
+    {
+        if (string.IsNullOrWhiteSpace(reference) || reference.StartsWith('#', StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        var segments = reference.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var end = Array.IndexOf(segments, "_history");
+        if (end < 0)
+        {
+            end = segments.Length;
+        }
+
+        return end >= 2 ? $"{segments[end - 2]}/{segments[end - 1]}" : null;
     }
 }

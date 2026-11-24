@@ -1,0 +1,19 @@
+<!-- A service request in a list: what is requested, when it was authored; a priority above routine and the status at the end -->
+<Component name="ServiceRequest.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.code.exists(), %record.code, %record.id)}}" patient="{{%record.subject}}" encounter="{{%record.encounter}}">
+    <Subtitle>
+      <Parts separator=" - ">
+        <Value value="{{%record.authoredOn}}"/>
+        <Value value="{{%record.requester}}"/>
+      </Parts>
+    </Subtitle>
+    <Trailing>
+      <If test="{{%record.priority.exists() and %record.priority != 'routine'}}">
+        <Status value="{{%record.priority}}"/>
+      </If>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

@@ -2,15 +2,14 @@
 @inherits StatefulWidget<ResourceTypesViewState>
 
 <BusyOverlay Busy=@State.IsBusy Concealed=@State.Activating>
-    @* The tokens of the colours of the types *@
-    <style>@State.Style</style>
+    @* No <style> here: the kit is one sheet in the head (KitStyleSheet), a sheet of the page lost the icons on iOS *@
     @if (State.Server is not null)
     {
         @if (State.Access == ServerAccess.NotSupported)
         {
-            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+            <Alert Kind="AlertKind.Warning" Class="mt-4">
                 @Strings.Message_FhirServerAuthenticationNotSupported
-            </RadzenAlert>
+            </Alert>
         }
         else if (State.Access is ServerAccess.NeedsAuthorization or ServerAccess.NeedsCredentials)
         {
@@ -18,41 +17,87 @@
         }
         else if (State.Failed)
         {
-            <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false" class="rz-mt-4">
+            <Alert Kind="AlertKind.Warning" Class="mt-4">
                 @Strings.Message_FhirServerUnavailable
-                <RadzenButton Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Text=@FloxStrings.Caption_Retry Click=@State.RetryAsync/>
-            </RadzenAlert>
+                <Button Variant="ButtonVariant.Outline" OnClick=@State.RetryAsync>@FloxStrings.Caption_Retry</Button>
+            </Alert>
         }
         else
         {
-            <RadzenStack Gap="var(--gap-sm)">
-                <Search Value=@State.Filter ValueChanged=@(text => State.SetFilter(text)) Placeholder=@FloxStrings.Caption_Search/>
-                @if (!string.IsNullOrEmpty(State.Release))
-                {
-                    <RadzenText TextStyle="TextStyle.Caption" TagName="TagName.Div" class="rz-m-0">FHIR @State.Release</RadzenText>
-                }
-                <DataList TItem="string" Items=@State.Visible Layout="ListLayout.Content" ShowSearch="false" PullToRefresh="false"
-                          OnRowClick=@Open>
-                    <ItemTemplate Context="row">
-                        @if (row.Item == ResourceTypesViewState.BookmarksEntry)
-                        {
-                            <ListTile Row=@row TitleText=@FloxStrings.Caption_Bookmarks Chevron>
-                                <Leading>
-                                    <FloxIcon Icon="bookmarks" Title=@FloxStrings.Caption_Bookmarks/>
-                                </Leading>
-                            </ListTile>
-                        }
-                        else
-                        {
-                            <ListTile Row=@row TitleText=@row.Item Chevron>
-                                <Leading>
-                                    <IconResource ResourceType=@row.Item Autocolor/>
-                                </Leading>
-                            </ListTile>
-                        }
-                    </ItemTemplate>
-                </DataList>
-            </RadzenStack>
+            @if (!string.IsNullOrEmpty(State.Release))
+            {
+                <SectionContent SectionName=@FhirViewer.PageTitleSection>
+                    <BbBadge Variant="BadgeVariant.Secondary" Class="ms-2 align-middle" data-viewer="release">@($"FHIR {State.Release}")</BbBadge>
+                </SectionContent>
+            }
+            @* The choice of the types, as the edit mode of a list of iOS: Edit in the header opens it, Done closes it and keeps it; meanwhile every type has
+               a round mark at its end, filled with a check when the type is shown, and a tap on the row turns it *@
+            @if (State.CanConfigure)
+            {
+                <SectionContent SectionName=@FhirViewer.PageCommandsSection>
+                    @if (State.Configuring)
+                    {
+                        <Button Variant="ButtonVariant.Outline" OnClick=@(() => State.SetAllHidden(false)) data-viewer="show-all-types">@Strings.Caption_ShowAll</Button>
+                        <Button Variant="ButtonVariant.Outline" OnClick=@(() => State.SetAllHidden(true)) data-viewer="hide-all-types">@Strings.Caption_HideAll</Button>
+                    }
+                    @* As on iOS: Edit opens the choice of the types, Done (a word, in the accent colour) closes it and keeps it *@
+                    @if (State.Configuring)
+                    {
+                        <Button Variant="ButtonVariant.Outline" Class="font-semibold text-primary" OnClick=@State.ToggleConfiguringAsync data-viewer="configure-types">@Strings.Caption_Done</Button>
+                    }
+                    else
+                    {
+                        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Strings.Caption_ConfigureView AriaLabel=@Strings.Caption_ConfigureView
+                                OnClick=@State.ToggleConfiguringAsync data-viewer="configure-types">
+                            <FloxIcon Icon="edit"/>
+                        </Button>
+                    }
+                </SectionContent>
+            }
+            @* The state filters the types itself: the list only shows its search field *@
+            <DataList TItem="string" Items=@State.Visible Layout="ListLayout.Content" SearchText=@State.Filter SearchTextChanged=@(text => State.SetFilter(text))
+                      OnRowClick=@Open>
+                <ItemTemplate Context="row">
+                    @if (row.Item == ResourceTypesViewState.BookmarksEntry)
+                    {
+                        <ListTile Row=@row TitleText=@FloxStrings.Caption_Bookmarks Chevron>
+                            <Leading>
+                                <FloxIcon Icon="bookmarks" Title=@FloxStrings.Caption_Bookmarks/>
+                            </Leading>
+                        </ListTile>
+                    }
+                    else
+                    {
+                        var hidden = State.IsHidden(row.Item);
+                        <ListTile Row=@row TitleText=@row.Item Chevron=@(!State.Configuring)>
+                            <Leading>
+                                <IconResource ResourceType=@row.Item Autocolor/>
+                            </Leading>
+                            <Trailing>
+                                @if (State.Configuring)
+                                {
+                                    var caption = string.Format(System.Globalization.CultureInfo.CurrentCulture, hidden ? Strings.Caption_ShowResourceType : Strings.Caption_HideResourceType, row.Item);
+                                    <span class="contents" @onclick:stopPropagation @onclick:preventDefault>
+                                        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@caption AriaLabel=@caption role="checkbox" aria-checked=@(hidden ? "false" : "true")
+                                                data-viewer="hide-type" OnClick=@(() => State.ToggleHidden(row.Item))>
+                                            @if (hidden)
+                                            {
+                                                <span class="size-5 rounded-full border-2 border-muted/60" aria-hidden="true"></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="flex size-5 items-center justify-center rounded-full bg-accent text-primary-foreground" aria-hidden="true">
+                                                    <FloxIcon Icon="check" Size="0.875rem"/>
+                                                </span>
+                                            }
+                                        </Button>
+                                    </span>
+                                }
+                            </Trailing>
+                        </ListTile>
+                    }
+                </ItemTemplate>
+            </DataList>
         }
     }
 </BusyOverlay>
@@ -66,8 +111,37 @@
 
     protected override object? ActivationKey => Session;
 
+    // The page left while the types are chosen: the choice is saved as when the mode ends
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing && State.Configuring)
+        {
+            _ = SaveAsync();
+        }
+
+        base.Dispose(disposing);
+    }
+
+    private async Task SaveAsync()
+    {
+        try
+        {
+            await State.EndConfiguringAsync();
+        }
+        catch (Exception ex) when (ex is Flox.Core.FloxException or InvalidOperationException or ObjectDisposedException or JSException)
+        {
+            // the choice of this visit is lost; the one saved before stays
+        }
+    }
+
     private void Open(string type)
     {
+        if (State.Configuring)
+        {
+            State.ToggleHidden(type);
+            return;
+        }
+
         Session.Navigate(type switch
         {
             ResourceTypesViewState.BookmarksEntry => new ViewerRoute(ViewerPage.Bookmarks),

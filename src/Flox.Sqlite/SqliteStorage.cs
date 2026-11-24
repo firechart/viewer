@@ -10,7 +10,9 @@ namespace Flox.Sqlite;
 /// IStorage over a base of an ISqliteEngine, read only, by a mapping. A request is SQL as far as it goes: the filters of the columns (=, &lt;&gt;, IN, &lt;, >,
 /// starts with, contains, ignoring the case, wildcards) are the WHERE, the full-text search is FTS5, the sorts of the columns are the ORDER BY and the
 /// window is LIMIT/OFFSET. What is not SQL (an expression, a property without a column) is done in memory over the rows the SQL found, with the rules
-/// of the other storages (PagedRequestTranslator). A base that is not there reads as empty.
+/// of the other storages (PagedRequestTranslator). Text is compared without the case where the request says so and sorted without it, the same
+/// in SQL and in memory; SQLite folds the case of ASCII only, so a filter without the case whose value has other letters is done in memory.
+/// A base that is not there reads as empty; one closed under a request (replaced, removed) is asked for again once.
 /// </summary>
 /// <typeparam name="T">The entity type.</typeparam>
 public sealed class SqliteStorage<T> : IGuidEntityStorage<T> where T : class, IGuidEntity
@@ -36,11 +38,33 @@ public sealed class SqliteStorage<T> : IGuidEntityStorage<T> where T : class, IG
     }
 
     // countOnly: the total alone, no row read when SQL can count
-    private async Task<PagedResult<T>> FindAsync(PagedRequest<T> request, bool countOnly, CancellationToken cancellationToken)
+    private Task<PagedResult<T>> FindAsync(PagedRequest<T> request, bool countOnly, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+        return ReadAsync(database => FindAsync(database, request, countOnly, cancellationToken), cancellationToken);
+    }
+
+    // The base of the source for one request; when it is closed in the middle (replaced, removed), the request is done again over the new one
+    private async Task<TResult> ReadAsync<TResult>(Func<ISqliteDatabase?, Task<TResult>> read, CancellationToken cancellationToken)
+    {
+        for (var attempt = 1; ; attempt++)
+        {
+            var database = await _source.DatabaseAsync(cancellationToken);
+            try
+            {
+                return await read(database);
+            }
+            catch (ObjectDisposedException) when (attempt == 1)
+            {
+                // closed by ResetAsync after this request took it
+            }
+        }
+    }
+
+    private async Task<PagedResult<T>> FindAsync(ISqliteDatabase? database, PagedRequest<T> request, bool countOnly, CancellationToken cancellationToken)
+    {
         var result = new PagedResult<T>();
-        if (await _source.DatabaseAsync(cancellationToken) is not { } database)
+        if (database is null)
         {
             result.Total = request.ReturnTotal ? 0 : null;
             return result;
@@ -96,17 +120,28 @@ public sealed class SqliteStorage<T> : IGuidEntityStorage<T> where T : class, IG
     }
 
     /// <inheritdoc />
-    public async Task<T?> GetByIdAsync(Guid key, CancellationToken cancellationToken = default)
+    /// <remarks>
+    /// The key says which of several bases of one schema holds the row (<see cref="SqliteKey.Base"/>), the storage reads the one base of its
+    /// source: the caller that has several picks the storage by it.
+    /// </remarks>
+    public Task<T?> GetByIdAsync(Guid key, CancellationToken cancellationToken = default)
     {
-        if (!_table.Addressable || SqliteKeys.Parse(key) is not { } parsed || parsed.Table != _table.Table
-            || await _source.DatabaseAsync(cancellationToken) is not { } database)
+        if (!_table.Addressable || SqliteKeys.Parse(key) is not { } parsed || parsed.Table != _table.Table)
         {
-            return null;
+            return Task.FromResult<T?>(null);
         }
 
-        var rows = await database.QueryAsync($"SELECT {_table.Select} FROM {_table.From} WHERE {_table.RowId} = $key",
-                                             new Dictionary<string, object?> { ["$key"] = parsed.RowId }, cancellationToken);
-        return rows.Count == 0 ? null : _table.Read(rows[0], new SqliteRead(true));
+        return ReadAsync(async database =>
+        {
+            if (database is null)
+            {
+                return null;
+            }
+
+            var rows = await database.QueryAsync($"SELECT {_table.Select} FROM {_table.From} WHERE {_table.RowId} = $key",
+                                                 new Dictionary<string, object?> { ["$key"] = parsed.RowId }, cancellationToken);
+            return rows.Count == 0 ? null : _table.Read(rows[0], new SqliteRead(true));
+        }, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -142,7 +177,7 @@ public sealed class SqliteStorage<T> : IGuidEntityStorage<T> where T : class, IG
     public Task<IReadOnlyList<EntityCapability<Guid>>> GetCapabilitiesAsync(IReadOnlyCollection<Guid> keys, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(keys);
-        return Task.FromResult<IReadOnlyList<EntityCapability<Guid>>>([.. keys.Distinct().Select(key => new EntityCapability<Guid>(key, false, false, false))]);
+        return Task.FromResult<IReadOnlyList<EntityCapability<Guid>>>([.. keys.Distinct().Select(key => EntityCapability<Guid>.None(key))]);
     }
 
     /// <inheritdoc />
@@ -207,8 +242,9 @@ public sealed class SqliteStorage<T> : IGuidEntityStorage<T> where T : class, IG
             FilterOperator.Eq or FilterOperator.Ne => true,
             FilterOperator.Gt or FilterOperator.Gte or FilterOperator.Lt or FilterOperator.Lte => filter.Value is not null,
             FilterOperator.In => filter.Value is IEnumerable and not string,
-            FilterOperator.Contains or FilterOperator.StartsWith or FilterOperator.StartsWithIgnoreCase or FilterOperator.EqualsIgnoreCase or FilterOperator.Like
-                => filter.Value is string,
+            FilterOperator.Contains or FilterOperator.StartsWith => filter.Value is string,
+            // lower() and LIKE of SQLite fold the case of ASCII only: other letters are compared in memory
+            FilterOperator.StartsWithIgnoreCase or FilterOperator.EqualsIgnoreCase or FilterOperator.Like => filter.Value is string text && Ascii.IsValid(text),
             _ => false
         };
     }
@@ -237,7 +273,8 @@ public sealed class SqliteStorage<T> : IGuidEntityStorage<T> where T : class, IG
 
     private string Order(IReadOnlyList<Sort> sorts)
     {
-        var parts = sorts.Select(sort => $"{_table.Columns[sort.Field].Sql} {(sort.Ascending ? "ASC" : "DESC")}").Append(_table.RowId);
+        // Text without the case, as SortInMemory; the collation leaves numbers as they are
+        var parts = sorts.Select(sort => $"{_table.Columns[sort.Field].Sql} COLLATE NOCASE {(sort.Ascending ? "ASC" : "DESC")}").Append(_table.RowId);
         return "ORDER BY " + string.Join(", ", parts);
     }
 
@@ -299,7 +336,7 @@ public sealed class SqliteStorage<T> : IGuidEntityStorage<T> where T : class, IG
                     body.Append(c is '%' or '_' or '\\' ? "\\" + c : c.ToString());
                 }
 
-                return $"{sql} LIKE {Parameter((pattern.StartsWith('*') ? "%" : string.Empty) + body + (pattern.EndsWith('*') ? "%" : string.Empty))} ESCAPE '\\'";
+                return $"{sql} LIKE {Parameter((pattern.StartsWith('*', StringComparison.Ordinal) ? "%" : string.Empty) + body + (pattern.EndsWith('*', StringComparison.Ordinal) ? "%" : string.Empty))} ESCAPE '\\'";
             default:
                 throw new InvalidOperationException($"The filter {filter.Operator} is not SQL.");
         }
@@ -319,7 +356,8 @@ public sealed class SqliteStorage<T> : IGuidEntityStorage<T> where T : class, IG
     }
 
     /// <summary>
-    /// Sorts rows in memory by the sorts of a request (the rows of several bases, what SQL could not sort).
+    /// Sorts rows in memory by the sorts of a request (the rows of several bases, what SQL could not sort): text without the case, as the
+    /// ORDER BY of the storage.
     /// </summary>
     public static IOrderedEnumerable<T> SortInMemory(IEnumerable<T> rows, IReadOnlyList<Sort> sorts)
     {
@@ -333,11 +371,42 @@ public sealed class SqliteStorage<T> : IGuidEntityStorage<T> where T : class, IG
             }
 
             ordered = ordered is null
-                ? (sort.Ascending ? rows.OrderBy(Key, Comparer<object?>.Default) : rows.OrderByDescending(Key, Comparer<object?>.Default))
-                : (sort.Ascending ? ordered.ThenBy(Key, Comparer<object?>.Default) : ordered.ThenByDescending(Key, Comparer<object?>.Default));
+                ? (sort.Ascending ? rows.OrderBy(Key, ValueOrder.Instance) : rows.OrderByDescending(Key, ValueOrder.Instance))
+                : (sort.Ascending ? ordered.ThenBy(Key, ValueOrder.Instance) : ordered.ThenByDescending(Key, ValueOrder.Instance));
         }
 
         return ordered!;
+    }
+
+    // The order of COLLATE NOCASE for text (the case of ASCII folded, the rest by code), the natural one for the rest; null first
+    private sealed class ValueOrder : IComparer<object?>
+    {
+        public static ValueOrder Instance { get; } = new();
+
+        public int Compare(object? x, object? y)
+        {
+            if (x is not string left || y is not string right)
+            {
+                return Comparer<object?>.Default.Compare(x, y);
+            }
+
+            var common = Math.Min(left.Length, right.Length);
+            for (var i = 0; i < common; i++)
+            {
+                var difference = Fold(left[i]) - Fold(right[i]);
+                if (difference != 0)
+                {
+                    return difference;
+                }
+            }
+
+            return left.Length - right.Length;
+        }
+
+        private static char Fold(char c)
+        {
+            return c is >= 'A' and <= 'Z' ? (char)(c + 32) : c;
+        }
     }
 
     private sealed record QueryPlan(List<Filter> Sql, List<Filter> Residual, string? FullText, bool SortsInSql);

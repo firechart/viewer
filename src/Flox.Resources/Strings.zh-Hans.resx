@@ -222,6 +222,9 @@
   <data name="Caption_More" xml:space="preserve">
     <value>更多</value>
   </data>
+  <data name="Caption_Path" xml:space="preserve">
+    <value>路径</value>
+  </data>
   <data name="Caption_Bookmarks" xml:space="preserve">
     <value>书签</value>
   </data>
@@ -396,9 +399,6 @@
   <data name="Caption_ShowTotal" xml:space="preserve">
     <value>显示总数</value>
   </data>
-  <data name="Caption_TotalCount" xml:space="preserve">
-    <value>总计：{0}</value>
-  </data>
   <data name="Caption_Connect" xml:space="preserve">
     <value>连接</value>
   </data>
@@ -519,6 +519,24 @@
   <data name="Caption_LicensePerpetual" xml:space="preserve">
     <value>永久</value>
   </data>
+  <data name="Caption_LicenseProduct" xml:space="preserve">
+    <value>产品</value>
+  </data>
+  <data name="Caption_LicenseMode" xml:space="preserve">
+    <value>模式</value>
+  </data>
+  <data name="LicenseMode_Demo" xml:space="preserve">
+    <value>演示</value>
+  </data>
+  <data name="LicenseMode_Trial" xml:space="preserve">
+    <value>试用</value>
+  </data>
+  <data name="Caption_LicenseSeats" xml:space="preserve">
+    <value>席位</value>
+  </data>
+  <data name="Caption_LicenseSeatsUnlimited" xml:space="preserve">
+    <value>不限</value>
+  </data>
   <data name="LicenseState_None" xml:space="preserve">
     <value>无许可证：免费版</value>
   </data>
@@ -563,5 +581,68 @@
   </data>
   <data name="Caption_SelectItem" xml:space="preserve">
     <value>选择 {0}</value>
+  </data>
+  <data name="Caption_Refresh" xml:space="preserve">
+    <value>刷新</value>
+  </data>
+  <data name="Access_Button" xml:space="preserve">
+    <value>访问权限…</value>
+  </data>
+  <data name="Access_TitleOf" xml:space="preserve">
+    <value>{0} 的访问权限</value>
+  </data>
+  <data name="Access_Subject" xml:space="preserve">
+    <value>对象</value>
+  </data>
+  <data name="Access_Owner" xml:space="preserve">
+    <value>所有者</value>
+  </data>
+  <data name="Access_OwnerOf" xml:space="preserve">
+    <value>所有者（{0}）</value>
+  </data>
+  <data name="Access_Everyone" xml:space="preserve">
+    <value>所有人</value>
+  </data>
+  <data name="Access_Authenticated" xml:space="preserve">
+    <value>已登录用户</value>
+  </data>
+  <data name="Access_Role" xml:space="preserve">
+    <value>角色 {0}</value>
+  </data>
+  <data name="Access_UnknownUser" xml:space="preserve">
+    <value>未知用户 {0}</value>
+  </data>
+  <data name="Access_AddSubject" xml:space="preserve">
+    <value>添加角色或用户</value>
+  </data>
+  <data name="Access_Ineffective" xml:space="preserve">
+    <value>{1} 的权限不包括 {0}：此条目无效。</value>
+  </data>
+  <data name="Access_Sensitive" xml:space="preserve">
+    <value>敏感操作：管理员也需要明确的条目，且只能授予角色或用户。</value>
+  </data>
+  <data name="Access_ConfirmSensitive" xml:space="preserve">
+    <value>您正在授予敏感操作：{0}。此更改会记录在审计日志中。</value>
+  </data>
+  <data name="Access_ConfirmSelf" xml:space="preserve">
+    <value>其中一些是授予您自己的。</value>
+  </data>
+  <data name="Caption_Copy" xml:space="preserve">
+    <value>复制</value>
+  </data>
+  <data name="Message_Copied" xml:space="preserve">
+    <value>已复制到剪贴板</value>
+  </data>
+  <data name="Caption_ShowDetails" xml:space="preserve">
+    <value>显示详细信息</value>
+  </data>
+  <data name="Caption_HideDetails" xml:space="preserve">
+    <value>隐藏详细信息</value>
+  </data>
+  <data name="Caption_Share" xml:space="preserve">
+    <value>分享</value>
+  </data>
+  <data name="Message_NotCopied" xml:space="preserve">
+    <value>浏览器不允许复制</value>
   </data>
 </root>

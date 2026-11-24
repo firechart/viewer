@@ -1,0 +1,14 @@
+<!-- The search form of patients: the name and the birth date first; the other parameters of the release are in the form, hidden -->
+<Component name="Patient.search">
+  <SearchForm title="{{%strings.Filter}}">
+    <Filter param="name" label="{{%strings.Name}}"/>
+    <Filter param="family" label="{{%strings.FamilyName}}"/>
+    <Filter param="given" label="{{%strings.GivenName}}"/>
+    <Filter param="birthdate" label="{{%strings.BirthDate}}"/>
+    <Filter param="gender" label="{{%strings.Gender}}"/>
+    <Filter param="identifier" label="{{%strings.Identifier}}"/>
+    <Filter param="phone" label="{{%strings.Phone}}"/>
+    <Filter param="address" label="{{%strings.Address}}"/>
+    <Filter param="general-practitioner" label="{{%strings.GeneralPractitioner}}"/>
+  </SearchForm>
+</Component>

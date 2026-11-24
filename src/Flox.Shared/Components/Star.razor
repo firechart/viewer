@@ -1,9 +1,7 @@
-<RadzenButton Variant="Radzen.Variant.Text"
-              ButtonStyle="Radzen.ButtonStyle.Base"
-              Size="Radzen.ButtonSize.Small"
-              Click=NotifyStarredChangingAsync>
-    <FloxIcon Icon="star" Filled=@Starred Color="var(--rz-primary)"/>
-</RadzenButton>
+@using BlazorBlueprint.Components
+<Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" OnClick=NotifyStarredChangingAsync aria-pressed=@(Starred ? "true" : "false")>
+    <FloxIcon Icon="star" Filled=@Starred Class="text-warning"/>
+</Button>
 
 @code {
 

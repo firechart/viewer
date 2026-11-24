@@ -1,25 +1,25 @@
 /* The vendor style of the FHIR visualization (fx-*). Do not edit it in an installation. The tokens below (--fx-*) are the public contract of the look:
-   a theme (styles/themes/{name}.css, in the layer fx-custom) sets them on :root, and fx.themed.css passes them on to the Viewer around the content (Radzen,
-   Tailwind). Without a theme they follow the palette of the application (the Radzen variables), light or dark. */
+   a theme (styles/themes/{name}.css, in the layer fx-custom) sets them on :root, and fx.themed.css passes them on to the Viewer around the content (Blazor
+   Blueprint, Tailwind). Without a theme they follow the palette of the application (the tokens of shadcn/ui of Blazor Blueprint), light or dark. */
 
 :root {
-  --fx-font: var(--rz-text-font-family, system-ui, sans-serif);
+  --fx-font: var(--font-sans, system-ui, sans-serif);
   --fx-font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
-  --fx-color-background: var(--rz-body-background-color, #f5f5f4);
-  --fx-color-text: var(--rz-text-color, #1f2933);
-  --fx-color-muted: var(--rz-text-secondary-color, #5f6b7a);
-  --fx-color-surface: var(--rz-base-background-color, #ffffff);
+  --fx-color-background: var(--background, #f5f5f4);
+  --fx-color-text: var(--foreground, #1f2933);
+  --fx-color-muted: var(--muted-foreground, #5f6b7a);
+  --fx-color-surface: var(--card, #ffffff);
   --fx-color-surface-alt: color-mix(in oklab, var(--fx-color-text) 6%, var(--fx-color-surface));
   --fx-color-border: color-mix(in oklab, var(--fx-color-text) 18%, var(--fx-color-surface));
-  --fx-color-neutral: var(--rz-base-500, #78716c);
-  --fx-color-accent: var(--rz-primary, #1565c0);
-  --fx-color-on-accent: var(--rz-on-primary, #ffffff);
-  --fx-color-link: var(--rz-link-color, var(--fx-color-accent));
-  --fx-color-info: var(--rz-info, #0277bd);
-  --fx-color-success: var(--rz-success, #2e7d32);
-  --fx-color-warning: var(--rz-warning, #b26a00);
-  --fx-color-on-warning: var(--rz-on-warning, #1c1917);
-  --fx-color-danger: var(--rz-danger, #c62828);
+  --fx-color-neutral: var(--muted-foreground, #78716c);
+  --fx-color-accent: var(--primary, #1565c0);
+  --fx-color-on-accent: var(--primary-foreground, #ffffff);
+  --fx-color-link: var(--fx-color-accent);
+  --fx-color-info: #0277bd;
+  --fx-color-success: #2e7d32;
+  --fx-color-warning: #b26a00;
+  --fx-color-on-warning: #1c1917;
+  --fx-color-danger: var(--destructive, #c62828);
   --fx-radius: 6px;
   --fx-gap: 0.75rem;
   --fx-gap-lg: 1.25rem;
@@ -90,36 +90,394 @@
   line-height: inherit;
 }
 
-/* The colours of the daisyUI components (fx.daisy.css has no theme of its own) come from the tokens above, so they follow the theme of the application */
-.fx-root {
-  --color-base-100: var(--fx-color-surface);
-  --color-base-200: var(--fx-color-surface-alt);
-  --color-base-300: color-mix(in oklab, var(--fx-color-text) 14%, var(--fx-color-surface));
-  --color-base-content: var(--fx-color-text);
-  --color-primary: var(--fx-color-accent);
-  --color-primary-content: oklch(98% 0 0);
-  --color-secondary: var(--fx-color-muted);
-  --color-secondary-content: oklch(98% 0 0);
-  --color-accent: var(--fx-color-accent);
-  --color-accent-content: oklch(98% 0 0);
-  --color-neutral: var(--fx-color-text);
-  --color-neutral-content: var(--fx-color-surface);
-  --color-info: var(--fx-color-info);
-  --color-info-content: oklch(98% 0 0);
-  --color-success: var(--fx-color-success);
-  --color-success-content: oklch(98% 0 0);
-  --color-warning: var(--fx-color-warning);
-  --color-warning-content: var(--fx-color-on-warning);
-  --color-error: var(--fx-color-danger);
-  --color-error-content: oklch(98% 0 0);
-  --radius-selector: 999px;
-  --radius-field: var(--fx-radius);
-  --radius-box: var(--fx-radius);
-  --size-selector: 0.25rem;
-  --size-field: 0.25rem;
-  --border: 1px;
-  --depth: 0;
-  --noise: 0;
+/* The components of the kit: badge, card, list, table, stat, status, skeleton, kbd, divider, alert. Their colours are the tokens above, so they follow
+   the theme. They are in a layer under the rules of this file: a rule below (a summary tile, print) wins over a component whatever its specificity */
+@layer kit {
+  .fx-root {
+    --fx-on-tone: oklch(98% 0 0);
+  }
+
+  /* Badge: a pill; a tone sets --fx-badge-color (and the text on it), soft is the tint of the tone, outline and dash its line */
+  .fx-badge {
+    --fx-badge-size: 1.5rem;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: fit-content;
+    height: var(--fx-badge-size);
+    padding-inline: calc(var(--fx-badge-size) / 2 - 1px);
+    border: 1px solid var(--fx-badge-color, var(--fx-color-surface-alt));
+    border-radius: 999px;
+    background-color: var(--fx-badge-bg, var(--fx-badge-color, var(--fx-color-surface)));
+    color: var(--fx-badge-fg, var(--fx-color-text));
+    font-size: 0.875rem;
+    vertical-align: middle;
+  }
+
+  .fx-badge-xs { --fx-badge-size: 1rem; font-size: 0.625rem; }
+  .fx-badge-sm { --fx-badge-size: 1.25rem; font-size: 0.75rem; }
+  .fx-badge-md { --fx-badge-size: 1.5rem; font-size: 0.875rem; }
+  .fx-badge-lg { --fx-badge-size: 1.75rem; font-size: 1rem; }
+  .fx-badge-xl { --fx-badge-size: 2rem; font-size: 1.125rem; }
+
+  .fx-badge-neutral { --fx-badge-color: var(--fx-color-text); --fx-badge-fg: var(--fx-color-surface); }
+  .fx-badge-primary,
+  .fx-badge-accent { --fx-badge-color: var(--fx-color-accent); --fx-badge-fg: var(--fx-color-on-accent); }
+  .fx-badge-secondary { --fx-badge-color: var(--fx-color-muted); --fx-badge-fg: var(--fx-on-tone); }
+  .fx-badge-info { --fx-badge-color: var(--fx-color-info); --fx-badge-fg: var(--fx-on-tone); }
+  .fx-badge-success { --fx-badge-color: var(--fx-color-success); --fx-badge-fg: var(--fx-on-tone); }
+  .fx-badge-warning { --fx-badge-color: var(--fx-color-warning); --fx-badge-fg: var(--fx-color-on-warning); }
+  /* "danger" is the older name of the tone "error" */
+  .fx-badge-error,
+  .fx-badge-danger { --fx-badge-color: var(--fx-color-danger); --fx-badge-fg: var(--fx-on-tone); }
+
+  /* The text of a soft badge (a status, a flag H/L) in the tone mixed toward the text: the tone alone (amber, green) on its own tint is under 4.5:1 */
+  .fx-badge-soft {
+    border-color: color-mix(in oklab, var(--fx-badge-color, var(--fx-color-text)) 10%, var(--fx-color-surface));
+    background-color: color-mix(in oklab, var(--fx-badge-color, var(--fx-color-text)) 8%, var(--fx-color-surface));
+    color: color-mix(in oklab, var(--fx-badge-color, var(--fx-color-text)) 50%, var(--fx-color-text));
+  }
+
+  .fx-badge-outline,
+  .fx-badge-dash {
+    --fx-badge-bg: transparent;
+    border-color: currentColor;
+    color: var(--fx-badge-color, var(--fx-color-text));
+  }
+
+  .fx-badge-dash {
+    border-style: dashed;
+  }
+
+  .fx-badge-ghost {
+    border-color: var(--fx-color-surface-alt);
+    background-color: var(--fx-color-surface-alt);
+    color: var(--fx-color-text);
+  }
+
+  /* Card: a box with a body, a title and actions; the size sets the padding and the text */
+  .fx-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--fx-radius);
+  }
+
+  .fx-card-border { border: 1px solid var(--fx-color-border); }
+  .fx-card-dash { border: 1px dashed var(--fx-color-border); }
+  .fx-card-side { flex-direction: row; align-items: stretch; }
+
+  .fx-card-body {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: var(--fx-card-padding, 1.5rem);
+    font-size: var(--fx-card-text, 0.875rem);
+  }
+
+  .fx-card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--fx-card-title, 1.125rem);
+    font-weight: 600;
+  }
+
+  .fx-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .fx-card-xs { --fx-card-padding: 0.5rem; --fx-card-text: 0.6875rem; --fx-card-title: 0.875rem; }
+  .fx-card-sm { --fx-card-padding: 1rem; --fx-card-text: 0.75rem; --fx-card-title: 1rem; }
+  .fx-card-md { --fx-card-padding: 1.5rem; --fx-card-text: 0.875rem; --fx-card-title: 1.125rem; }
+  .fx-card-lg { --fx-card-padding: 2rem; --fx-card-text: 1rem; --fx-card-title: 1.25rem; }
+  .fx-card-xl { --fx-card-padding: 2.5rem; --fx-card-text: 1.125rem; --fx-card-title: 1.375rem; }
+
+  /* List: rows of columns, the column fx-list-col-grow takes the rest of the width, fx-list-col-wrap goes on a line of its own; a hairline between rows */
+  .fx-list {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.875rem;
+  }
+
+  .fx-list .fx-list-row {
+    --fx-list-columns: minmax(0, auto) 1fr;
+    position: relative;
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: var(--fx-list-columns);
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: var(--fx-radius);
+    word-break: break-word;
+  }
+
+  .fx-list .fx-list-row > * { grid-row-start: 1; }
+  .fx-list .fx-list-row > .fx-list-col-wrap { grid-row-start: 2; }
+  .fx-list .fx-list-row:has(> .fx-list-col-grow:first-child) { --fx-list-columns: 1fr; }
+  .fx-list .fx-list-row:has(> .fx-list-col-grow:nth-child(3)) { --fx-list-columns: repeat(2, minmax(0, auto)) 1fr; }
+  .fx-list .fx-list-row:has(> .fx-list-col-grow:nth-child(4)) { --fx-list-columns: repeat(3, minmax(0, auto)) 1fr; }
+  .fx-list .fx-list-row:has(> .fx-list-col-grow:nth-child(5)) { --fx-list-columns: repeat(4, minmax(0, auto)) 1fr; }
+  .fx-list .fx-list-row:has(> .fx-list-col-grow:nth-child(6)) { --fx-list-columns: repeat(5, minmax(0, auto)) 1fr; }
+
+  :is(.fx-list > :not(:last-child).fx-list-row, .fx-list > :not(:last-child) .fx-list-row)::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    inset-inline: var(--fx-radius);
+    border-bottom: 1px solid var(--fx-color-divider);
+  }
+
+  /* Table: hairlines between the rows, the head quieter than the body; the size sets the padding and the text */
+  .fx-table {
+    position: relative;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--fx-radius);
+    font-size: 0.875rem;
+    text-align: start;
+  }
+
+  .fx-table :where(th, td) {
+    padding: var(--fx-table-padding, 0.75rem 1rem);
+    vertical-align: middle;
+  }
+
+  .fx-table :where(thead, tfoot) {
+    color: color-mix(in oklab, var(--fx-color-text) 60%, transparent);
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .fx-table :where(thead tr :is(td, th), tbody tr:not(:last-child) :is(td, th)) {
+    border-bottom: 1px solid var(--fx-color-divider);
+  }
+
+  .fx-table :where(tfoot tr:first-child :is(td, th)) {
+    border-top: 1px solid var(--fx-color-divider);
+  }
+
+  .fx-table :where(tbody tr) { font-size: var(--fx-table-text, inherit); }
+  .fx-table-xs { --fx-table-padding: 0.25rem 0.5rem; --fx-table-text: 0.6875rem; }
+  .fx-table-sm { --fx-table-padding: 0.5rem 0.75rem; --fx-table-text: 0.75rem; }
+  .fx-table-md { --fx-table-padding: 0.75rem 1rem; --fx-table-text: 0.875rem; }
+  .fx-table-lg { --fx-table-padding: 1rem 1.25rem; --fx-table-text: 1.125rem; }
+  .fx-table-xl { --fx-table-padding: 1.25rem 1.5rem; --fx-table-text: 1.375rem; }
+
+  .fx-table-zebra tbody tr:nth-child(2n) { background-color: var(--fx-color-surface-alt); }
+
+  .fx-table-pin-rows :is(thead, tfoot) {
+    position: sticky;
+    z-index: 1;
+    background-color: var(--fx-color-surface);
+  }
+
+  .fx-table-pin-rows thead { top: 0; }
+  .fx-table-pin-rows tfoot { bottom: 0; }
+
+  .fx-table-pin-cols tr th {
+    position: sticky;
+    inset-inline-start: 0;
+    background-color: var(--fx-color-surface);
+  }
+
+  /* Stat: a figure with its title and a description, side by side in fx-stats */
+  .fx-stats {
+    display: inline-grid;
+    grid-auto-flow: column;
+    overflow-x: auto;
+    border-radius: var(--fx-radius);
+  }
+
+  .fx-stats-vertical { grid-auto-flow: row; overflow-y: auto; }
+
+  .fx-stat {
+    display: inline-grid;
+    grid-template-columns: repeat(1, 1fr);
+    column-gap: 1rem;
+    width: 100%;
+    padding: 1rem 1.5rem;
+  }
+
+  .fx-stats > .fx-stat:not(:last-child) { border-inline-end: 1px dashed var(--fx-color-divider); }
+  .fx-stats-vertical > .fx-stat:not(:last-child) { border-inline-end: none; border-bottom: 1px dashed var(--fx-color-divider); }
+  .fx-stat-figure { grid-row: 1 / span 3; grid-column-start: 2; place-self: center end; }
+  .fx-stat-title { grid-column-start: 1; color: var(--fx-color-muted); font-size: 0.75rem; white-space: nowrap; }
+  .fx-stat-value { grid-column-start: 1; font-size: 2rem; font-weight: 800; white-space: nowrap; }
+  .fx-stat-desc { grid-column-start: 1; color: var(--fx-color-muted); font-size: 0.75rem; white-space: nowrap; }
+  .fx-stat-actions { grid-column-start: 1; white-space: nowrap; }
+
+  /* Status: a dot in a tone */
+  .fx-status {
+    display: inline-block;
+    width: var(--fx-status-size, 0.5rem);
+    height: var(--fx-status-size, 0.5rem);
+    border-radius: 999px;
+    background-color: var(--fx-status-color, var(--fx-color-border));
+    vertical-align: middle;
+  }
+
+  .fx-status-xs { --fx-status-size: 0.125rem; }
+  .fx-status-sm { --fx-status-size: 0.25rem; }
+  .fx-status-md { --fx-status-size: 0.5rem; }
+  .fx-status-lg { --fx-status-size: 0.75rem; }
+  .fx-status-xl { --fx-status-size: 1rem; }
+  .fx-status-neutral { --fx-status-color: var(--fx-color-text); }
+  .fx-status-primary,
+  .fx-status-accent { --fx-status-color: var(--fx-color-accent); }
+  .fx-status-secondary { --fx-status-color: var(--fx-color-muted); }
+  .fx-status-info { --fx-status-color: var(--fx-color-info); }
+  .fx-status-success { --fx-status-color: var(--fx-color-success); }
+  .fx-status-warning { --fx-status-color: var(--fx-color-warning); }
+  .fx-status-error { --fx-status-color: var(--fx-color-danger); }
+
+  /* Skeleton: a placeholder while the data loads, a light sweeping over it (none when motion is reduced) */
+  .fx-skeleton {
+    border-radius: var(--fx-radius);
+    background-color: color-mix(in oklab, var(--fx-color-text) 14%, var(--fx-color-surface));
+    background-image: linear-gradient(105deg, transparent 0% 40%, var(--fx-color-surface) 50%, transparent 60% 100%);
+    background-size: 200% auto;
+    background-position-x: -50%;
+  }
+
+  .fx-skeleton-text {
+    color: transparent;
+    background-image: linear-gradient(105deg, color-mix(in oklab, var(--fx-color-text) 20%, transparent) 0% 40%, var(--fx-color-text) 50%,
+      color-mix(in oklab, var(--fx-color-text) 20%, transparent) 60% 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .fx-skeleton {
+      animation: fx-skeleton 1.8s ease-in-out infinite;
+    }
+
+    .fx-skeleton:dir(rtl) {
+      animation-direction: reverse;
+    }
+  }
+
+  @keyframes fx-skeleton {
+    0% { background-position-x: 150%; }
+    100% { background-position-x: -50%; }
+  }
+
+  /* Kbd: a key of the keyboard */
+  .fx-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--fx-kbd-size, 1.5rem);
+    height: var(--fx-kbd-size, 1.5rem);
+    padding-inline: 0.5em;
+    border: 1px solid var(--fx-color-border);
+    border-bottom-width: 2px;
+    border-radius: var(--fx-radius);
+    background-color: var(--fx-color-surface-alt);
+    font-size: var(--fx-kbd-text, 0.875rem);
+    vertical-align: middle;
+  }
+
+  .fx-kbd-xs { --fx-kbd-size: 1rem; --fx-kbd-text: 0.625rem; }
+  .fx-kbd-sm { --fx-kbd-size: 1.25rem; --fx-kbd-text: 0.75rem; }
+  .fx-kbd-md { --fx-kbd-size: 1.5rem; --fx-kbd-text: 0.875rem; }
+  .fx-kbd-lg { --fx-kbd-size: 1.75rem; --fx-kbd-text: 1rem; }
+  .fx-kbd-xl { --fx-kbd-size: 2rem; --fx-kbd-text: 1.125rem; }
+
+  /* Divider: a line with an optional text in it; horizontal stands between columns */
+  .fx-divider {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-self: stretch;
+    gap: 1rem;
+    height: 1rem;
+    margin: 1rem 0;
+    white-space: nowrap;
+  }
+
+  .fx-divider::before,
+  .fx-divider::after {
+    content: "";
+    flex-grow: 1;
+    height: 1px;
+    background-color: var(--fx-divider-color, var(--fx-color-divider));
+  }
+
+  .fx-divider:not(:has(*)):empty { gap: 0; }
+  .fx-divider-start::before,
+  .fx-divider-end::after { display: none; }
+
+  .fx-divider-horizontal {
+    flex-direction: column;
+    width: 1rem;
+    height: auto;
+    margin: 0 1rem;
+  }
+
+  .fx-divider-horizontal::before,
+  .fx-divider-horizontal::after {
+    width: 1px;
+    height: auto;
+  }
+
+  .fx-divider-neutral { --fx-divider-color: var(--fx-color-text); }
+  .fx-divider-primary,
+  .fx-divider-accent { --fx-divider-color: var(--fx-color-accent); }
+  .fx-divider-secondary { --fx-divider-color: var(--fx-color-muted); }
+  .fx-divider-info { --fx-divider-color: var(--fx-color-info); }
+  .fx-divider-success { --fx-divider-color: var(--fx-color-success); }
+  .fx-divider-warning { --fx-divider-color: var(--fx-color-warning); }
+  .fx-divider-error { --fx-divider-color: var(--fx-color-danger); }
+
+  /* Alert: a message in a box, an icon before the text; a tone colours it, soft is the tint of the tone, outline and dash its line */
+  .fx-alert {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: auto minmax(auto, 1fr);
+    align-items: center;
+    justify-items: start;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--fx-alert-color, var(--fx-color-border));
+    border-radius: var(--fx-radius);
+    background-color: var(--fx-alert-bg, var(--fx-alert-color, var(--fx-color-surface-alt)));
+    color: var(--fx-alert-fg, var(--fx-color-text));
+    font-size: 0.875rem;
+    text-align: start;
+  }
+
+  .fx-alert-vertical { grid-auto-flow: row; grid-template-columns: auto; justify-items: center; text-align: center; }
+  .fx-alert-horizontal { grid-auto-flow: column; grid-template-columns: auto minmax(auto, 1fr); justify-items: start; text-align: start; }
+  .fx-alert-info { --fx-alert-color: var(--fx-color-info); --fx-alert-fg: var(--fx-on-tone); }
+  .fx-alert-success { --fx-alert-color: var(--fx-color-success); --fx-alert-fg: var(--fx-on-tone); }
+  .fx-alert-warning { --fx-alert-color: var(--fx-color-warning); --fx-alert-fg: var(--fx-color-on-warning); }
+  .fx-alert-error { --fx-alert-color: var(--fx-color-danger); --fx-alert-fg: var(--fx-on-tone); }
+
+  .fx-alert-soft {
+    border-color: color-mix(in oklab, var(--fx-alert-color, var(--fx-color-text)) 10%, var(--fx-color-surface));
+    background-color: color-mix(in oklab, var(--fx-alert-color, var(--fx-color-text)) 8%, var(--fx-color-surface));
+    color: color-mix(in oklab, var(--fx-alert-color, var(--fx-color-text)) 50%, var(--fx-color-text));
+  }
+
+  .fx-alert-outline,
+  .fx-alert-dash {
+    --fx-alert-bg: transparent;
+    color: var(--fx-alert-color, var(--fx-color-text));
+  }
+
+  .fx-alert-dash {
+    border-style: dashed;
+  }
 }
 
 .fx-root *,
@@ -142,8 +500,9 @@
   margin-bottom: var(--fx-gap-lg);
 }
 
+/* The name is the text of the page, bold: a large one beside the title bar of the host was too loud */
 .fx-banner-title {
-  font-size: var(--fx-size-title);
+  font-size: var(--fx-size-body);
   font-weight: 600;
   margin: 0;
 }
@@ -169,10 +528,6 @@
   margin-bottom: var(--fx-gap);
   padding-top: calc(var(--fx-gap) / 2);
   padding-bottom: calc(var(--fx-gap) / 2);
-}
-
-.fx-banner-sub .fx-banner-title {
-  font-size: 1.05rem;
 }
 
 /* The title of the resource itself under the banners */
@@ -311,18 +666,6 @@
 .fx-empty {
   color: var(--fx-color-muted);
   font-style: italic;
-}
-
-/* Badge and the other components of the kit come from daisyUI (fx.daisy.css, classes with the prefix fx-: fx-badge, fx-badge-soft, fx-badge-success...).
-   "danger" is the older name of the tone that daisyUI calls "error" */
-.fx-badge-danger {
-  --fx-badge-color: var(--color-error);
-  --fx-badge-fg: var(--color-error-content);
-}
-
-/* The text of a soft badge (a status, a flag H/L) in the tone mixed toward the text: the tone alone (amber, green) on its own tint is under 4.5:1 */
-.fx-root .fx-badge-soft {
-  color: color-mix(in oklab, var(--fx-badge-color, var(--color-base-content)) 50%, var(--fx-color-text));
 }
 
 /* The width of the view, not of the window: the same view is a page, a sheet, a side panel of a host, a frame */
@@ -641,6 +984,13 @@
   }
 }
 
+/* The Viewer draws only the form the width shows (ReportLab.razor.js, the same 36rem): that form stays shown at the edge, where the script and the
+   container query may round apart */
+.fx-lab-wide.fx-lab-chosen,
+.fx-lab-narrow.fx-lab-chosen {
+  display: block;
+}
+
 /* Loaded and empty: a muted title (a colour of the theme, so it keeps its contrast); the icon and the count stay as they are */
 .fx-summary-group-empty .fx-summary-group-title {
   color: var(--fx-color-muted);
@@ -730,6 +1080,7 @@
   }
 }
 
+/* The icon of a row in a square with a hairline, as the media of an Item of Blazor Blueprint (the rows of the application) */
 .fx-summary-icon {
   display: flex;
   flex-shrink: 0;
@@ -737,6 +1088,8 @@
   justify-content: center;
   width: 2rem;
   height: 2rem;
+  border: 1px solid var(--fx-color-border);
+  border-radius: var(--fx-radius);
 }
 
 /* No preflight in the kit: a list has no bullets and no margins of the browser */
@@ -751,7 +1104,7 @@
   min-width: 0;
 }
 
-/* The row of a list (the mode tile): a daisyUI list row of one line of height; a row of a summary has its own padding */
+/* The row of a list (the mode tile): a list row of the kit of one line of height; a row of a summary has its own padding */
 .fx-summary-tile .fx-list-row {
   gap: 0.5rem;
   padding: 0;
@@ -769,8 +1122,10 @@
   white-space: nowrap;
 }
 
+/* The name of a row is set apart by colour and size more than by weight: 350, lighter than the text, a heavier one looks bold in the dark theme on
+   Windows (architecture.md, the look of the lists) */
 .fx-tile-title {
-  font-weight: 500;
+  font-weight: 350;
 }
 
 .fx-tile-code {
@@ -961,7 +1316,7 @@
     font-weight: 600;
   }
 
-  .fx-root .rz-button {
+  .fx-root button {
     display: none !important;
   }
 

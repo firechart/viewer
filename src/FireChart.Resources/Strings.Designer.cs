@@ -457,7 +457,7 @@ namespace FireChart.Resources {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to FHIR release (if /metadata is unavailable).
+        ///   Looks up a localized string similar to FHIR release (detected when empty).
         /// </summary>
         public static string Caption_FhirServerRelease {
             get {
@@ -997,6 +997,33 @@ namespace FireChart.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Installation.
+        /// </summary>
+        public static string Caption_Installation {
+            get {
+                return ResourceManager.GetString("Caption_Installation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install.
+        /// </summary>
+        public static string Home_Install {
+            get {
+                return ResourceManager.GetString("Home_Install", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to As an application of its own, from the home screen or the desktop.
+        /// </summary>
+        public static string Home_InstallDescription {
+            get {
+                return ResourceManager.GetString("Home_InstallDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The server did not accept these credentials..
         /// </summary>
         public static string Message_CredentialsRejected {
@@ -1029,6 +1056,24 @@ namespace FireChart.Resources {
         public static string Message_FhirServerUnavailable {
             get {
                 return ResourceManager.GetString("Message_FhirServerUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The server did not accept the search..
+        /// </summary>
+        public static string Message_SearchRejected {
+            get {
+                return ResourceManager.GetString("Message_SearchRejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear search.
+        /// </summary>
+        public static string Caption_ClearSearch {
+            get {
+                return ResourceManager.GetString("Caption_ClearSearch", resourceCulture);
             }
         }
         
@@ -1074,15 +1119,6 @@ namespace FireChart.Resources {
         public static string Message_NoRecentPages {
             get {
                 return ResourceManager.GetString("Message_NoRecentPages", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Search all fields.
-        /// </summary>
-        public static string Placeholder_SearchAllFields {
-            get {
-                return ResourceManager.GetString("Placeholder_SearchAllFields", resourceCulture);
             }
         }
         
@@ -1292,6 +1328,114 @@ namespace FireChart.Resources {
                 return ResourceManager.GetString("Caption_LoadAll", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading the record.
+        /// </summary>
+        public static string Caption_LoadingRecord {
+            get {
+                return ResourceManager.GetString("Caption_LoadingRecord", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} of {1} parts loaded.
+        /// </summary>
+        public static string Message_LoadingProgress {
+            get {
+                return ResourceManager.GetString("Message_LoadingProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loaded: {0} ({1}).
+        /// </summary>
+        public static string Message_LoadedRecords {
+            get {
+                return ResourceManager.GetString("Message_LoadedRecords", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} y.
+        /// </summary>
+        public static string Caption_AgeYears {
+            get {
+                return ResourceManager.GetString("Caption_AgeYears", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} mo.
+        /// </summary>
+        public static string Caption_AgeMonths {
+            get {
+                return ResourceManager.GetString("Caption_AgeMonths", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} d.
+        /// </summary>
+        public static string Caption_AgeDays {
+            get {
+                return ResourceManager.GetString("Caption_AgeDays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} could not be found.
+        /// </summary>
+        public static string Message_RecordNotFound {
+            get {
+                return ResourceManager.GetString("Message_RecordNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The loading was cancelled: the record shown is not complete..
+        /// </summary>
+        public static string Message_LoadingCancelled {
+            get {
+                return ResourceManager.GetString("Message_LoadingCancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not loaded: the loading was cancelled.
+        /// </summary>
+        public static string Caption_SearchCancelled {
+            get {
+                return ResourceManager.GetString("Caption_SearchCancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Patient record.
+        /// </summary>
+        public static string Caption_PatientRecordSettings {
+            get {
+                return ResourceManager.GetString("Caption_PatientRecordSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Records per request.
+        /// </summary>
+        public static string Caption_SummaryPageSize {
+            get {
+                return ResourceManager.GetString("Caption_SummaryPageSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load the whole record before showing it.
+        /// </summary>
+        public static string Caption_SummaryLoadAll {
+            get {
+                return ResourceManager.GetString("Caption_SummaryLoadAll", resourceCulture);
+            }
+        }
 
         /// <summary>
         ///   Looks up a localized string similar to Print.
@@ -1385,6 +1529,15 @@ namespace FireChart.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete {0} from this device? It can be downloaded again..
+        /// </summary>
+        public static string PackageBase_DeleteConfirm {
+            get {
+                return ResourceManager.GetString("PackageBase_DeleteConfirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A newer version of the package is available ({0})..
         /// </summary>
         public static string PackageBase_UpdateAvailable {
@@ -1410,5 +1563,158 @@ namespace FireChart.Resources {
                 return ResourceManager.GetString("PackageBase_Occupied", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Find….
+        /// </summary>
+        public static string Caption_FindRecord {
+            get {
+                return ResourceManager.GetString("Caption_FindRecord", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose: {0}.
+        /// </summary>
+        public static string Caption_ChooseRecord {
+            get {
+                return ResourceManager.GetString("Caption_ChooseRecord", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opened recently.
+        /// </summary>
+        public static string Caption_RecentRecords {
+            get {
+                return ResourceManager.GetString("Caption_RecentRecords", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change the filter.
+        /// </summary>
+        public static string Caption_ChangeFilter {
+            get {
+                return ResourceManager.GetString("Caption_ChangeFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nothing found.
+        /// </summary>
+        public static string Message_NothingFound {
+            get {
+                return ResourceManager.GetString("Message_NothingFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type to find.
+        /// </summary>
+        public static string Placeholder_TypeToFind {
+            get {
+                return ResourceManager.GetString("Placeholder_TypeToFind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: from.
+        /// </summary>
+        public static string Caption_RangeFrom {
+            get {
+                return ResourceManager.GetString("Caption_RangeFrom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to to.
+        /// </summary>
+        public static string Caption_RangeTo {
+            get {
+                return ResourceManager.GetString("Caption_RangeTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System.
+        /// </summary>
+        public static string Caption_IdentifierSystem {
+            get {
+                return ResourceManager.GetString("Caption_IdentifierSystem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The first {0} records are shown. Narrow the search with the filter to find the others.
+        /// </summary>
+        public static string Message_ListLimit {
+            get {
+                return ResourceManager.GetString("Message_ListLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The first {0} of {1} records are shown. Narrow the search with the filter to find the others.
+        /// </summary>
+        public static string Message_ListLimitOf {
+            get {
+                return ResourceManager.GetString("Message_ListLimitOf", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Configure view.
+        /// </summary>
+        public static string Caption_ConfigureView {
+            get {
+                return ResourceManager.GetString("Caption_ConfigureView", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Done.
+        /// </summary>
+        public static string Caption_Done {
+            get {
+                return ResourceManager.GetString("Caption_Done", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show all.
+        /// </summary>
+        public static string Caption_ShowAll {
+            get {
+                return ResourceManager.GetString("Caption_ShowAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide all.
+        /// </summary>
+        public static string Caption_HideAll {
+            get {
+                return ResourceManager.GetString("Caption_HideAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide {0}.
+        /// </summary>
+        public static string Caption_HideResourceType {
+            get {
+                return ResourceManager.GetString("Caption_HideResourceType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show {0}.
+        /// </summary>
+        public static string Caption_ShowResourceType {
+            get {
+                return ResourceManager.GetString("Caption_ShowResourceType", resourceCulture);
+            }
+        }
+        
     }
 }

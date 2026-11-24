@@ -1,3 +1,0 @@
-{%- assign name = self.name | first -%}
-{%- if name %}{% apply name mode: "text" %}{% else %}{{ self.id }}{% endif -%}
-{%- if self.birthDate %}, {{ self.birthDate | fhir_date }}{% endif -%}

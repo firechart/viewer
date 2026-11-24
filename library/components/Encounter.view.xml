@@ -1,0 +1,82 @@
+<!-- The page of an encounter: its reasons and diagnoses, the visit, the participants, the locations and the identifiers -->
+<Component name="Encounter.view">
+  <Param name="record" required="true"/>
+
+  <If test="{{%record.reasonCode.exists() or %record.reason.exists() or %record.reasonReference.exists() or %record.diagnosis.exists()}}">
+    <Section title="{{%strings.ReasonAndDiagnoses}}" count="{{%record.reasonCode.count() + %record.reason.count() + %record.reasonReference.count() + %record.diagnosis.count()}}">
+      <Repeat each="{{%record.reasonCode}}" as="code">
+        <Row main="{{%code}}" meta="Reason"/>
+      </Repeat>
+      <Repeat each="{{%record.reasonReference}}" as="reference">
+        <Row meta="Reason"><Main><Link value="{{%reference}}"/></Main></Row>
+      </Repeat>
+      <Repeat each="{{%record.reason}}" as="reason">
+        <Row meta="Reason">
+          <Main>
+            <Parts separator=", ">
+              <Value value="{{%reason.value.concept}}"/>
+              <Link value="{{%reason.value.reference}}"/>
+            </Parts>
+          </Main>
+        </Row>
+      </Repeat>
+      <Repeat each="{{%record.diagnosis}}" as="diagnosis">
+        <Row>
+          <Main>
+            <Parts separator=", ">
+              <Value value="{{%diagnosis.condition.concept}}"/>
+              <Link value="{{%diagnosis.condition.ofType(Reference) | %diagnosis.condition.reference.ofType(Reference)}}"/>
+            </Parts>
+          </Main>
+          <Value value="{{%diagnosis.use}}"/>
+        </Row>
+      </Repeat>
+    </Section>
+  </If>
+
+  <Section title="{{%strings.Visit}}">
+    <Field label="{{%strings.Period}}" value="{{(%record.period | %record.actualPeriod).first()}}"/>
+    <Field label="{{%strings.Length}}" value="{{%record.length}}"/>
+    <Field label="{{%strings.Class}}">
+      <Value value="{{%record.class}}" separator=", "/>
+    </Field>
+    <Field label="{{%strings.Type}}">
+      <Value value="{{%record.type}}" separator=", "/>
+    </Field>
+    <Field label="{{%strings.ServiceType}}">
+      <Value value="{{%record.serviceType}}" separator=", "/>
+    </Field>
+    <Field label="{{%strings.Priority}}" value="{{%record.priority}}"/>
+    <Field label="{{%strings.Outcome}}" value="{{(%record.hospitalization.dischargeDisposition | %record.admission.dischargeDisposition).first()}}"/>
+    <Field label="{{%strings.ServiceProvider}}">
+      <Link value="{{%record.serviceProvider}}"/>
+    </Field>
+  </Section>
+
+  <If test="{{%record.participant.exists()}}">
+    <Section title="{{%strings.Participants}}" count="{{%record.participant.count()}}">
+      <Repeat each="{{%record.participant}}" as="participant">
+        <Row>
+          <Main><Link value="{{%participant.individual | %participant.actor}}"/></Main>
+          <Value value="{{%participant.type}}"/>
+        </Row>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.location.exists()}}">
+    <Section title="{{%strings.Locations}}" count="{{%record.location.count()}}">
+      <Repeat each="{{%record.location}}" as="location">
+        <Row meta="{{%location.status}}"><Main><Link value="{{%location.location}}"/></Main></Row>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.identifier.exists()}}">
+    <Section title="{{%strings.Identifiers}}" count="{{%record.identifier.count()}}">
+      <Repeat each="{{%record.identifier}}" as="identifier">
+        <Row main="{{%identifier.value}}" meta="{{%identifier.system}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

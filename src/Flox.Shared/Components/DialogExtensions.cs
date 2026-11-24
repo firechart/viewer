@@ -1,5 +1,3 @@
-using Radzen;
-
 namespace Flox.Shared.Components;
 
 /// <summary>
@@ -7,9 +5,13 @@ namespace Flox.Shared.Components;
 /// </summary>
 public static class DialogExtensions
 {
+    /// <summary>
+    /// Shows a message with up to three answers.
+    /// </summary>
     /// <returns><c>true</c> for yes/OK, <c>false</c> for no, <c>null</c> for cancel or a dismissed dialog.</returns>
-    public static async Task<bool?> ShowMessageBoxAsync(this DialogService dialogs, string? title, string message, string yesText = "OK", string? noText = null, string? cancelText = null)
+    public static async Task<bool?> ShowMessageBoxAsync(this FloxDialogService dialogs, string? title, string message, string yesText = "OK", string? noText = null, string? cancelText = null)
     {
+        ArgumentNullException.ThrowIfNull(dialogs);
         var parameters = new Dictionary<string, object?>
         {
             [nameof(MessageDialog.Message)] = message,
@@ -26,50 +28,15 @@ public static class DialogExtensions
             parameters[nameof(MessageDialog.CancelText)] = cancelText;
         }
 
-        var opened = dialogs.OpenAsync<MessageDialog>(title ?? string.Empty,
-                                                      parameters,
-                                                      new DialogOptions
-                                                      {
-                                                          Width = "420px",
-                                                          ShowClose = false,
-                                                          CloseDialogOnEsc = false,
-                                                          CloseDialogOnOverlayClick = false
-                                                      });
-
-        // While the user reads the question
-        await Task.Delay(100);
-        DynamicBinderWarmup.Run();
-
-        var result = await opened;
+        var result = await dialogs.OpenAsync<MessageDialog>(title ?? string.Empty,
+                                                            parameters,
+                                                            new FloxDialogOptions
+                                                            {
+                                                                Width = "420px",
+                                                                ShowClose = false,
+                                                                CloseOnEscape = false,
+                                                                CloseOnOverlayClick = false
+                                                            });
         return result as bool?;
-    }
-}
-
-/// <summary>
-/// Starts the C# runtime binder ahead of time: Radzen closes a dialog through dynamic calls, and the first one in a session takes hundreds of milliseconds in the browser and froze the page on the "Yes" click.
-/// </summary>
-public static class DynamicBinderWarmup
-{
-    private static bool s_done;
-
-    /// <summary>
-    /// Warms up the dynamic binder once per session; later calls do nothing.
-    /// </summary>
-    public static void Run()
-    {
-        if (s_done)
-        {
-            return;
-        }
-
-        s_done = true;
-        dynamic value = true;
-        dynamic task = Echo(value);
-        task.ConfigureAwait(false);
-    }
-
-    private static Task Echo(dynamic value)
-    {
-        return Task.CompletedTask;
     }
 }

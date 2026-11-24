@@ -25,9 +25,9 @@ namespace FireChart.Viewer.Core;
 /// </remarks>
 /// <example>
 /// <code>
-/// var form = ViewerJson.Read&lt;SearchFormDefinition&gt;(File.ReadAllText("search-forms/R4/Patient.json"));
+/// var form = ViewerJson.Read&lt;SearchFormDefinition&gt;(File.ReadAllText("form.json"));
 /// form.Fields[0].Order = 5;
-/// File.WriteAllText("search-forms/R4/Patient.json", ViewerJson.Write(form));
+/// File.WriteAllText("form.json", ViewerJson.Write(form));
 /// </code>
 /// </example>
 public static class ViewerJson
@@ -40,7 +40,7 @@ public static class ViewerJson
     /// <summary>
     /// Reads a file of the Viewer.
     /// </summary>
-    /// <typeparam name="T">The model: <see cref="SearchFormDefinition"/> or <see cref="SummaryFormDefinition"/>.</typeparam>
+    /// <typeparam name="T">The model: <see cref="SearchFormDefinition"/>.</typeparam>
     /// <param name="json">The text of the file.</param>
     /// <returns>The model.</returns>
     /// <exception cref="JsonException">The text is not JSON, or breaks a rule of reading (an unknown property, a forbidden <see langword="null"/>, a missing
@@ -53,7 +53,7 @@ public static class ViewerJson
     /// <summary>
     /// Writes a file of the Viewer in the canonical form.
     /// </summary>
-    /// <typeparam name="T">The model: <see cref="SearchFormDefinition"/> or <see cref="SummaryFormDefinition"/>.</typeparam>
+    /// <typeparam name="T">The model: <see cref="SearchFormDefinition"/>.</typeparam>
     /// <param name="value">The model.</param>
     /// <returns>The text of the file, with a final line end.</returns>
     public static string Write<T>(T value)
@@ -63,9 +63,9 @@ public static class ViewerJson
 
     /// <summary>
     /// The JSON Schema of a file of the Viewer, made from the model: the strict rules of authoring (no other property, the values of the enumerations,
-    /// the required properties), for the editors and the checks; the run time reads laxly (<see cref="Forms.SearchFormReader"/>).
+    /// the required properties), for the editors and the checks; the files of the Viewer are read strictly (<see cref="Read{T}"/>).
     /// </summary>
-    /// <typeparam name="T">The model: <see cref="SearchFormDefinition"/> or <see cref="SummaryFormDefinition"/>.</typeparam>
+    /// <typeparam name="T">The model: <see cref="SearchFormDefinition"/>.</typeparam>
     /// <param name="id">The <c>$id</c> of the schema.</param>
     /// <param name="title">Its title.</param>
     /// <returns>The schema (draft 2020-12), with a final line end.</returns>
@@ -116,6 +116,5 @@ public static class ViewerJson
     RespectNullableAnnotations = true,
     RespectRequiredConstructorParameters = true)]
 [JsonSerializable(typeof(SearchFormDefinition))]
-[JsonSerializable(typeof(SummaryFormDefinition))]
 [JsonSerializable(typeof(TilesOptions))]
 internal sealed partial class ViewerJsonContext : JsonSerializerContext;

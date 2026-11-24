@@ -1,6 +1,9 @@
 @* The static application of the Viewer: the sandbox at /, the frame at /embed, the way back of a SMART sign-in at /smart/callback *@
-<RadzenTheme Theme="standard"/>
-<RadzenComponents/>
+@* The overlays of Blazor Blueprint (dialogs, popovers, menus), its programmatic dialogs and its toasts *@
+<BlazorBlueprint.Primitives.BbPortalHost/>
+<BlazorBlueprint.Components.BbDialogProvider/>
+<BlazorBlueprint.Components.BbToastProvider Position="BlazorBlueprint.Components.ToastPosition.BottomCenter"/>
+<Flox.Shared.Components.FloxDialogHost/>
 
 <Router AppAssembly="typeof(App).Assembly">
     <Found Context="routeData">
@@ -8,6 +11,6 @@
     </Found>
     <NotFound>
         <PageTitle>FireChart Viewer</PageTitle>
-        <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" AllowClose="false">Nothing at this address.</RadzenAlert>
+        <Alert Kind="AlertKind.Warning">Nothing at this address.</Alert>
     </NotFound>
 </Router>

@@ -196,7 +196,7 @@
     <value>Поиск в этом разделе не удался</value>
   </data>
   <data name="Caption_FhirServerRelease" xml:space="preserve">
-    <value>Релиз FHIR (если /metadata недоступен)</value>
+    <value>Релиз FHIR (определяется, если не указан)</value>
   </data>
   <data name="Caption_FhirServerTerminologyUrl" xml:space="preserve">
     <value>URL сервера терминологии (необязательно)</value>
@@ -213,8 +213,11 @@
   <data name="Message_InvalidSearch" xml:space="preserve">
     <value>Поиск в адресе страницы недопустим.</value>
   </data>
-  <data name="Placeholder_SearchAllFields" xml:space="preserve">
-    <value>Поиск по всем полям</value>
+  <data name="Message_SearchRejected" xml:space="preserve">
+    <value>Сервер не принял поиск.</value>
+  </data>
+  <data name="Caption_ClearSearch" xml:space="preserve">
+    <value>Сбросить поиск</value>
   </data>
   <data name="Caption_ShowAllFields" xml:space="preserve">
     <value>Показать все поля</value>
@@ -369,6 +372,15 @@
   <data name="Home_DocumentationDescription" xml:space="preserve">
     <value>Как работать с пакетами и серверами FHIR</value>
   </data>
+  <data name="Caption_Installation" xml:space="preserve">
+    <value>Установка</value>
+  </data>
+  <data name="Home_Install" xml:space="preserve">
+    <value>Установить</value>
+  </data>
+  <data name="Home_InstallDescription" xml:space="preserve">
+    <value>Как отдельное приложение, с главного экрана или рабочего стола</value>
+  </data>
   <data name="Message_NoBookmarks" xml:space="preserve">
     <value>Нет закладок</value>
   </data>
@@ -522,6 +534,42 @@
   <data name="Caption_LoadAll" xml:space="preserve">
     <value>Загрузить все</value>
   </data>
+  <data name="Caption_LoadingRecord" xml:space="preserve">
+    <value>Загрузка карты</value>
+  </data>
+  <data name="Message_LoadingProgress" xml:space="preserve">
+    <value>Загружено частей: {0} из {1}</value>
+  </data>
+  <data name="Message_LoadedRecords" xml:space="preserve">
+    <value>Загружено: {0} ({1})</value>
+  </data>
+  <data name="Caption_AgeYears" xml:space="preserve">
+    <value>{0} г.</value>
+  </data>
+  <data name="Caption_AgeMonths" xml:space="preserve">
+    <value>{0} мес.</value>
+  </data>
+  <data name="Caption_AgeDays" xml:space="preserve">
+    <value>{0} дн.</value>
+  </data>
+  <data name="Message_RecordNotFound" xml:space="preserve">
+    <value>Не удалось найти: {0}</value>
+  </data>
+  <data name="Message_LoadingCancelled" xml:space="preserve">
+    <value>Загрузка отменена: карта показана не полностью.</value>
+  </data>
+  <data name="Caption_SearchCancelled" xml:space="preserve">
+    <value>Не загружено: загрузка отменена</value>
+  </data>
+  <data name="Caption_PatientRecordSettings" xml:space="preserve">
+    <value>Карта пациента</value>
+  </data>
+  <data name="Caption_SummaryPageSize" xml:space="preserve">
+    <value>Записей в одном запросе</value>
+  </data>
+  <data name="Caption_SummaryLoadAll" xml:space="preserve">
+    <value>Загружать карту целиком перед показом</value>
+  </data>
   <data name="Caption_Print" xml:space="preserve">
     <value>Печать</value>
   </data>
@@ -558,6 +606,9 @@
   <data name="PackageBase_Delete" xml:space="preserve">
     <value>Удалить с устройства</value>
   </data>
+  <data name="PackageBase_DeleteConfirm" xml:space="preserve">
+    <value>Удалить {0} с этого устройства? Его можно будет скачать снова.</value>
+  </data>
   <data name="PackageBase_UpdateAvailable" xml:space="preserve">
     <value>Доступна новая версия пакета ({0}).</value>
   </data>
@@ -566,5 +617,56 @@
   </data>
   <data name="PackageBase_Occupied" xml:space="preserve">
     <value>Пакетов на устройстве: {0}, занято {1}</value>
+  </data>
+  <data name="Caption_FindRecord" xml:space="preserve">
+    <value>Найти…</value>
+  </data>
+  <data name="Caption_ChooseRecord" xml:space="preserve">
+    <value>Выбор: {0}</value>
+  </data>
+  <data name="Caption_RecentRecords" xml:space="preserve">
+    <value>Недавно открытые</value>
+  </data>
+  <data name="Caption_ChangeFilter" xml:space="preserve">
+    <value>Изменить фильтр</value>
+  </data>
+  <data name="Message_NothingFound" xml:space="preserve">
+    <value>Ничего не найдено</value>
+  </data>
+  <data name="Placeholder_TypeToFind" xml:space="preserve">
+    <value>Начните вводить для поиска</value>
+  </data>
+  <data name="Caption_RangeFrom" xml:space="preserve">
+    <value>{0}: с</value>
+  </data>
+  <data name="Caption_RangeTo" xml:space="preserve">
+    <value>по</value>
+  </data>
+  <data name="Caption_IdentifierSystem" xml:space="preserve">
+    <value>Система</value>
+  </data>
+  <data name="Message_ListLimit" xml:space="preserve">
+    <value>Показаны первые {0} записей. Уточните поиск фильтром, чтобы найти остальные.</value>
+  </data>
+  <data name="Message_ListLimitOf" xml:space="preserve">
+    <value>Показаны первые {0} из {1} записей. Уточните поиск фильтром, чтобы найти остальные.</value>
+  </data>
+  <data name="Caption_ConfigureView" xml:space="preserve">
+    <value>Настройка представления</value>
+  </data>
+  <data name="Caption_Done" xml:space="preserve">
+    <value>Готово</value>
+  </data>
+  <data name="Caption_ShowAll" xml:space="preserve">
+    <value>Показать всё</value>
+  </data>
+  <data name="Caption_HideAll" xml:space="preserve">
+    <value>Скрыть всё</value>
+  </data>
+  <data name="Caption_HideResourceType" xml:space="preserve">
+    <value>Скрыть {0}</value>
+  </data>
+  <data name="Caption_ShowResourceType" xml:space="preserve">
+    <value>Показать {0}</value>
   </data>
 </root>

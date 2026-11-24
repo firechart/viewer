@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Flox.Core.Authorization;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 
@@ -26,6 +27,9 @@ public class LocalEntityStorage<TKey, TEntity> : IStorage<TKey, TEntity>, ILocal
     };
 
     private static readonly TextSearch s_search = new();
+
+    // The one user of the device may do everything with its documents
+    private static readonly IReadOnlyList<string> s_deviceOperations = [EntityOperations.Read, EntityOperations.Update, EntityOperations.Delete];
 
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly ILogger _logger;
@@ -79,13 +83,13 @@ public class LocalEntityStorage<TKey, TEntity> : IStorage<TKey, TEntity>, ILocal
     public async Task<IReadOnlyList<EntityCapability<TKey>>> GetCapabilitiesAsync(IReadOnlyCollection<TKey> keys, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(keys);
-        return await ReadAsync(rows => (IReadOnlyList<EntityCapability<TKey>>)[.. keys.Distinct().Select(key => rows.ContainsKey(key) ? new EntityCapability<TKey>(key, true, true, true) : new EntityCapability<TKey>(key, false, false, false))], cancellationToken);
+        return await ReadAsync(rows => (IReadOnlyList<EntityCapability<TKey>>)[.. keys.Distinct().Select(key => rows.ContainsKey(key) ? new EntityCapability<TKey>(key, s_deviceOperations) : EntityCapability<TKey>.None(key))], cancellationToken);
     }
 
-    /// <summary>Not supported: the documents of one user have no access to change.</summary>
-    public Task<TEntity> SetAccessAsync(TKey key, AccessGrant readAccess, AccessGrant writeAccess, CancellationToken cancellationToken = default)
+    /// <summary>Not supported: the documents of one user have no access lists.</summary>
+    public Task<IReadOnlyList<AclEntry>> SetAccessAsync(TKey key, IReadOnlyCollection<AclEntry> acl, CancellationToken cancellationToken = default)
     {
-        throw new NotSupportedException($"{GetType().Name} keeps the documents of one user: they have no access to change.");
+        throw new NotSupportedException($"{GetType().Name} keeps the documents of one user: they have no access lists.");
     }
 
     /// <inheritdoc />
@@ -454,16 +458,3 @@ public class LocalGuidEntityStorage<TEntity>
     IValidator<TEntity>? validator = null,
     string? collection = null
 ) : LocalEntityStorage<Guid, TEntity>(store, logger, validator, collection), IGuidEntityStorage<TEntity> where TEntity : class, IGuidEntity;
-
-/// <summary>A local storage of <see cref="IStringEntity"/> documents.</summary>
-/// <param name="store">The document store of the device.</param>
-/// <param name="logger">The logger.</param>
-/// <param name="validator">Validates an entity before it is written, if given.</param>
-/// <param name="collection">The name of the collection; the name of the entity class when empty.</param>
-public class LocalStringEntityStorage<TEntity>
-(
-    ILocalDocumentStore store,
-    ILogger<LocalEntityStorage<string, TEntity>> logger,
-    IValidator<TEntity>? validator = null,
-    string? collection = null
-) : LocalEntityStorage<string, TEntity>(store, logger, validator, collection), IStringEntityStorage<TEntity> where TEntity : class, IStringEntity;

@@ -30,10 +30,14 @@ public abstract class FloxBootstrapper : Bootstrapper
         // not override-by-replacement like Branding.App is).
         Services.AddSingleton<IFloxMenuSource, SharedMenuSource>();
 
+        // The license of the server as the client may know it (Flox:License of appsettings.client.json); the free edition without a server or
+        // without a license. A singleton: the license of a server changes only with its restart
+        Services.AddSingleton(_ => LicenseConfiguration.Read(Configuration.GetSection(LicenseConfiguration.SectionName)));
+
         // Factory registration, not eager: appsettings.*.json aren't merged into Configuration
         // until ConfigurationModule.ConfigureServices() runs (later, during the ConfigureServices() phase) - this
         // factory only actually executes on first resolution, well after that. Every host
-        // (Server/WASM/MAUI) and every Razor component (SharedMenuSource, ProfileWidget) reads this
+        // (Server/WASM) and every Razor component (SharedMenuSource, ProfileWidget) reads this
         // same validated instance instead of re-parsing "Flox:Oidc" config themselves.
         Services.AddSingleton(_ =>
         {
@@ -57,7 +61,7 @@ public abstract class FloxBootstrapper : Bootstrapper
         RegisterValidators();
         AddModule(new ConfigurationModule());
         AddModule(new AuthorizationPoliciesModule());
-        AddModule(new RadzenModule());
+        AddModule(new BlueprintModule());
         AddModule(new ThemingModule());
     }
 

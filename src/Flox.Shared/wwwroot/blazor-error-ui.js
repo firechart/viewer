@@ -28,10 +28,8 @@
     let dismissed = false;
     const AFTER_EXIT = /\.NET runtime already exited/;
 
-    // Colors/fonts prefer Radzen's own theme variables (--rz-*) when the Radzen
-    // theme has actually loaded, falling
-    // back to the --blazor-error-* set below when it hasn't (which is exactly
-    // the case this whole UI exists for).
+    // Colors/fonts prefer the tokens of the theme of Blazor Blueprint (theme.css) when it has loaded, falling back to the --blazor-error-* set
+    // below when it hasn't (which is exactly the case this whole UI exists for).
     const STYLES = `
         :root {
             --blazor-error-font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -80,7 +78,7 @@
             color: inherit !important;
             box-shadow: none !important;
             z-index: 9999;
-            font-family: var(--rz-text-font-family, var(--blazor-error-font));
+            font-family: var(--font-sans, var(--blazor-error-font));
             padding: 16px !important;
             box-sizing: border-box;
         }
@@ -96,8 +94,8 @@
 
         #blazor-error-ui-card {
             position: relative;
-            background: var(--rz-base-background-color, var(--blazor-error-bg-card));
-            border-radius: var(--rz-border-radius, 14px);
+            background: var(--card, var(--blazor-error-bg-card));
+            border-radius: var(--radius, 14px);
             max-width: 380px;
             max-height: 85vh;
             width: 100%;
@@ -138,19 +136,19 @@
         #blazor-error-ui-icon {
             width: 28px;
             height: 28px;
-            fill: var(--rz-danger, var(--blazor-error-accent));
+            fill: var(--destructive, var(--blazor-error-accent));
             flex-shrink: 0;
         }
 
         #blazor-error-ui-icon rect {
-            fill: var(--rz-base-background-color, var(--blazor-error-bg-card));
+            fill: var(--card, var(--blazor-error-bg-card));
         }
 
         #blazor-error-ui-title {
             font-size: 16px;
             font-family: inherit;
             font-weight: 600;
-            color: var(--rz-text-color, var(--blazor-error-text-title));
+            color: var(--foreground, var(--blazor-error-text-title));
             letter-spacing: -0.01em;
         }
 
@@ -159,7 +157,7 @@
             font-size: 13px;
             font-family: inherit;
             line-height: 1.5;
-            color: var(--rz-text-secondary-color, var(--blazor-error-text-body));
+            color: var(--muted-foreground, var(--blazor-error-text-body));
         }
 
         #blazor-error-ui-stack {
@@ -173,8 +171,8 @@
             font-family: var(--blazor-error-font-mono);
             font-size: 11px;
             line-height: 1.6;
-            color: var(--rz-text-secondary-color, var(--blazor-error-text-pre));
-            background: var(--rz-base-200, var(--blazor-error-bg-pre));
+            color: var(--muted-foreground, var(--blazor-error-text-pre));
+            background: var(--muted, var(--blazor-error-bg-pre));
             padding: 10px 12px;
             border-radius: 8px;
             border: 1px solid var(--blazor-error-border);
@@ -194,7 +192,7 @@
             width: 100%;
             box-sizing: border-box;
             padding: 9px 16px;
-            border-radius: var(--rz-border-radius, 8px);
+            border-radius: var(--radius, 8px);
             border: none;
             cursor: pointer;
             font-size: 13px;
@@ -203,8 +201,8 @@
             text-decoration: none;
             text-align: center;
             display: inline-block;
-            background: var(--rz-primary, var(--blazor-error-btn-reload-bg));
-            color: var(--rz-on-primary, var(--blazor-error-btn-reload-text));
+            background: var(--primary, var(--blazor-error-btn-reload-bg));
+            color: var(--primary-foreground, var(--blazor-error-btn-reload-text));
         }
 
         .blazor-error-close {
@@ -221,11 +219,11 @@
             font-size: 22px;
             line-height: 32px;
             font-family: var(--blazor-error-font);
-            color: var(--rz-text-secondary-color, var(--blazor-error-btn-details-text));
+            color: var(--muted-foreground, var(--blazor-error-btn-details-text));
         }
 
         .blazor-error-close:hover {
-            background: var(--rz-base-200, var(--blazor-error-bg-pre));
+            background: var(--muted, var(--blazor-error-bg-pre));
         }
 
         .blazor-error-details-toggle {
@@ -234,8 +232,8 @@
             background: none;
             cursor: pointer;
             font-size: 12px;
-            font-family: var(--rz-text-font-family, var(--blazor-error-font));
-            color: var(--rz-text-secondary-color, var(--blazor-error-btn-details-text));
+            font-family: var(--font-sans, var(--blazor-error-font));
+            color: var(--muted-foreground, var(--blazor-error-btn-details-text));
             text-decoration: underline;
         }
     `;
@@ -407,7 +405,7 @@ ${arg.stack ?? ''}` : String(arg))).join(' ');
 
     // Catches everything a targeted signal can: pre-boot failures and any other
     // truly uncaught error or rejection, on every platform this script runs on
-    // (browser, or the WKWebView/Chromium WebView hosting a MAUI BlazorWebView).
+    // (the browser).
     window.addEventListener('error', (e) => {
         if (!e.error && BENIGN_ERROR.test(e.message ?? '')) {
             remember(e.message, false);

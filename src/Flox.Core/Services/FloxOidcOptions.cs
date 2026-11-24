@@ -75,23 +75,8 @@ public class FloxOidcOptions
         }
     }
 
-    /// <summary>MAUI only: the custom URL scheme registered in the application manifest to receive the sign-in callback on Android, iOS and MacCatalyst. Every application built on Flox overrides it with its own scheme.</summary>
-    public string MauiRedirectScheme { get; set; } = "com.flox";
-
-    /// <summary>MAUI on Windows: the port of the loopback listener that receives the sign-in callback; change it when the default is taken on the workstation.</summary>
-    public int MauiLoopbackPort { get; set; } = 7890;
-
-    /// <summary>MAUI on Windows: the address the identity provider redirects to after sign-in.</summary>
-    public string MauiLoopbackRedirectUri
-    {
-        get
-        {
-            return $"http://127.0.0.1:{MauiLoopbackPort}/callback";
-        }
-    }
-
     /// <summary>Checks that the options are complete when sign-in is on.</summary>
-    /// <exception cref="InvalidOperationException">The authority or the client id is missing, or the loopback port is out of range.</exception>
+    /// <exception cref="InvalidOperationException">The authority or the client id is missing.</exception>
     public void Validate()
     {
         if (!Enabled)
@@ -102,11 +87,6 @@ public class FloxOidcOptions
         if (string.IsNullOrEmpty(Authority) || string.IsNullOrEmpty(ClientId))
         {
             throw new InvalidOperationException("Flox:Oidc:Enabled is true but Flox:Oidc:Authority/Flox:Oidc:ClientId are missing. " + "Either configure both or set Flox:Oidc:Enabled=false.");
-        }
-
-        if (MauiLoopbackPort is < 1024 or > 65535)
-        {
-            throw new InvalidOperationException("Flox:Oidc:MauiLoopbackPort must be between 1024 and 65535.");
         }
     }
 }

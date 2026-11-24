@@ -1,10 +1,21 @@
+@using BlazorBlueprint.Components
 @* A property of a record: a pair of a definition list, inside <ListSection Definitions>. The value stays on the line of the label while
-   both fit, then goes under it and takes up to three lines (an address breaks anywhere); the full text is its title *@
-<RadzenStack Orientation="Radzen.Orientation.Horizontal" Wrap="Radzen.FlexWrap.Wrap" AlignItems="Radzen.AlignItems.Center" Gap="0"
-             class="min-h-12 gap-x-3 rz-px-3 rz-py-2">
-    <dt class="rz-text-body2 m-0 min-w-0 flex-auto truncate" style="color: var(--rz-text-title-color)">@Label</dt>
-    <dd class="rz-text-subtitle2 m-0 min-w-0 max-w-full flex-initial line-clamp-3 wrap-anywhere" title=@Value>@Value</dd>
-</RadzenStack>
+   both fit, then goes under it and takes up to three lines (an address breaks anywhere); the full text is its title. With Link a value that is an
+   address of the web (http, https) opens it in a new tab. The label is regular, as the titles of the rows of a list (ListTile): beside such a list
+   a medium label read heavier than its rows *@
+<div class="flex min-h-12 flex-wrap items-center gap-x-3 px-3 py-2 text-sm">
+    <dt class="m-0 min-w-0 flex-auto truncate font-normal text-foreground">@Label</dt>
+    <dd class="m-0 min-w-0 max-w-full flex-initial text-muted line-clamp-3 wrap-anywhere" title=@Value>
+        @if (WebAddress is { } address)
+        {
+            <BbLink Href=@address Target="_blank">@Value</BbLink>
+        }
+        else
+        {
+            @Value
+        }
+    </dd>
+</div>
 
 @code {
 
@@ -14,5 +25,11 @@
 
     [Parameter]
     public string? Value { get; set; }
+
+    // The value is an address to open (a URL, a canonical): a link when it is one of the web
+    [Parameter]
+    public bool Link { get; set; }
+
+    private string? WebAddress => Link && Uri.TryCreate(Value, UriKind.Absolute, out var uri) && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp) ? Value : null;
 
 }

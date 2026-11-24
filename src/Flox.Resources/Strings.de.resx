@@ -222,6 +222,9 @@
   <data name="Caption_More" xml:space="preserve">
     <value>Mehr</value>
   </data>
+  <data name="Caption_Path" xml:space="preserve">
+    <value>Pfad</value>
+  </data>
   <data name="Caption_Bookmarks" xml:space="preserve">
     <value>Lesezeichen</value>
   </data>
@@ -396,9 +399,6 @@
   <data name="Caption_ShowTotal" xml:space="preserve">
     <value>Anzahl anzeigen</value>
   </data>
-  <data name="Caption_TotalCount" xml:space="preserve">
-    <value>Gesamt: {0}</value>
-  </data>
   <data name="Caption_Connect" xml:space="preserve">
     <value>Verbinden</value>
   </data>
@@ -519,6 +519,24 @@
   <data name="Caption_LicensePerpetual" xml:space="preserve">
     <value>Unbefristet</value>
   </data>
+  <data name="Caption_LicenseProduct" xml:space="preserve">
+    <value>Produkt</value>
+  </data>
+  <data name="Caption_LicenseMode" xml:space="preserve">
+    <value>Modus</value>
+  </data>
+  <data name="LicenseMode_Demo" xml:space="preserve">
+    <value>Demonstration</value>
+  </data>
+  <data name="LicenseMode_Trial" xml:space="preserve">
+    <value>Testversion</value>
+  </data>
+  <data name="Caption_LicenseSeats" xml:space="preserve">
+    <value>Arbeitsplätze</value>
+  </data>
+  <data name="Caption_LicenseSeatsUnlimited" xml:space="preserve">
+    <value>Unbegrenzt</value>
+  </data>
   <data name="LicenseState_None" xml:space="preserve">
     <value>Keine Lizenz: die kostenlose Edition</value>
   </data>
@@ -563,5 +581,68 @@
   </data>
   <data name="Caption_SelectItem" xml:space="preserve">
     <value>{0} auswählen</value>
+  </data>
+  <data name="Caption_Refresh" xml:space="preserve">
+    <value>Aktualisieren</value>
+  </data>
+  <data name="Access_Button" xml:space="preserve">
+    <value>Zugriff…</value>
+  </data>
+  <data name="Access_TitleOf" xml:space="preserve">
+    <value>Zugriff auf {0}</value>
+  </data>
+  <data name="Access_Subject" xml:space="preserve">
+    <value>Wer</value>
+  </data>
+  <data name="Access_Owner" xml:space="preserve">
+    <value>Eigentümer</value>
+  </data>
+  <data name="Access_OwnerOf" xml:space="preserve">
+    <value>Eigentümer ({0})</value>
+  </data>
+  <data name="Access_Everyone" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="Access_Authenticated" xml:space="preserve">
+    <value>Angemeldete Benutzer</value>
+  </data>
+  <data name="Access_Role" xml:space="preserve">
+    <value>Rolle {0}</value>
+  </data>
+  <data name="Access_UnknownUser" xml:space="preserve">
+    <value>Unbekannter Benutzer {0}</value>
+  </data>
+  <data name="Access_AddSubject" xml:space="preserve">
+    <value>Rolle oder Benutzer hinzufügen</value>
+  </data>
+  <data name="Access_Ineffective" xml:space="preserve">
+    <value>Die Berechtigungen von {1} enthalten {0} nicht: dieser Eintrag wirkt nicht.</value>
+  </data>
+  <data name="Access_Sensitive" xml:space="preserve">
+    <value>Eine sensible Operation: auch ein Administrator braucht einen ausdrücklichen Eintrag, und sie wird nur einer Rolle oder einem Benutzer gegeben.</value>
+  </data>
+  <data name="Access_ConfirmSensitive" xml:space="preserve">
+    <value>Sie vergeben sensible Operationen: {0}. Die Änderung wird im Audit-Protokoll festgehalten.</value>
+  </data>
+  <data name="Access_ConfirmSelf" xml:space="preserve">
+    <value>Einige davon vergeben Sie an sich selbst.</value>
+  </data>
+  <data name="Caption_Copy" xml:space="preserve">
+    <value>Kopieren</value>
+  </data>
+  <data name="Message_Copied" xml:space="preserve">
+    <value>In die Zwischenablage kopiert</value>
+  </data>
+  <data name="Caption_ShowDetails" xml:space="preserve">
+    <value>Details anzeigen</value>
+  </data>
+  <data name="Caption_HideDetails" xml:space="preserve">
+    <value>Details ausblenden</value>
+  </data>
+  <data name="Caption_Share" xml:space="preserve">
+    <value>Teilen</value>
+  </data>
+  <data name="Message_NotCopied" xml:space="preserve">
+    <value>Der Browser hat das Kopieren nicht erlaubt</value>
   </data>
 </root>

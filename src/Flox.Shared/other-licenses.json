@@ -1,11 +1,11 @@
 [
   {
     "PackageId": "Material Symbols (Flox Symbols)",
-    "PackageVersion": "Radzen.Blazor 13.1.0",
+    "PackageVersion": "2.888",
     "PackageProjectUrl": "https://github.com/google/material-design-icons",
     "Copyright": "Copyright 2022 Google LLC",
     "Authors": "Google",
-    "Description": "The icon font Material Symbols Outlined that Radzen.Blazor ships, with its weight fixed at 400 (wwwroot/fonts/FloxSymbols.woff2 of Flox.Shared, icon_font.py of the skill package-upgrade)",
+    "Description": "The icon font Material Symbols Outlined of Google with its weight fixed at 400 (wwwroot/fonts/FloxSymbols.woff2 of Flox.Shared, icon_font.py of the skill package-upgrade)",
     "License": "Apache-2.0",
     "LicenseUrl": "https://www.apache.org/licenses/LICENSE-2.0",
     "LicenseInformationOrigin": 0

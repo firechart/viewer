@@ -1,0 +1,31 @@
+<!-- The page of a contract: when it was issued and applies, its type, authority, subject and scope, then who signed it -->
+<Component name="Contract.view">
+  <Param name="record" required="true"/>
+
+  <If test="{{%record.issued.exists() or %record.applies.exists() or %record.type.exists() or %record.subType.exists() or %record.authority.exists() or %record.subject.exists() or %record.scope.exists() or %record.domain.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Issued}}" value="{{%record.issued}}"/>
+      <Field label="{{%strings.Applies}}" value="{{%record.applies}}"/>
+      <Field label="{{%strings.Type}}" value="{{%record.type}}"/>
+      <Field label="{{%strings.Subtype}}" value="{{%record.subType}}"/>
+      <Field label="{{%strings.Authority}}">
+        <Link value="{{%record.authority}}"/>
+      </Field>
+      <Field label="{{%strings.Subject}}">
+        <Link value="{{%record.subject}}"/>
+      </Field>
+      <Field label="{{%strings.Scope}}" value="{{%record.scope}}"/>
+      <Field label="{{%strings.Domain}}">
+        <Link value="{{%record.domain}}"/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.signer.exists()}}">
+    <Section title="{{%strings.Signers}}" count="{{%record.signer.count()}}">
+      <Repeat each="{{%record.signer}}" as="signer">
+        <Row meta="{{%signer.type}}"><Main><Link value="{{%signer.party}}"/></Main></Row>
+      </Repeat>
+    </Section>
+  </If>
+</Component>

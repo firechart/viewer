@@ -4,7 +4,7 @@ using FireChart.Viewer.Library;
 
 namespace FireChart.Viewer.Tests.Viewer;
 
-// The appearance sets the tokens of the kit (--fx-*); with a style or a variable the base of a theme passes them to Radzen around the content. A value that
+// The appearance sets the tokens of the kit (--fx-*); with a style or a variable the base of a theme passes them to Blazor Blueprint around the content. A value that
 // could do more than style is left out with an error
 public partial class AppearanceCssTests
 {
@@ -30,7 +30,7 @@ public partial class AppearanceCssTests
         {
             Assert.That(sheet.Errors, Is.Empty);
             Assert.That(sheet.Css, Does.StartWith("@layer fx, fx-custom;"), "the order of the layers before any page declares one");
-            var bridge = sheet.Css.IndexOf("--rz-primary: var(--fx-color-accent);", StringComparison.Ordinal);
+            var bridge = sheet.Css.IndexOf("  --primary: var(--fx-color-accent);", StringComparison.Ordinal);
             var style = sheet.Css.IndexOf("--fx-color-accent: #0f6cbd;", StringComparison.Ordinal);
             var variable = sheet.Css.IndexOf("--fx-color-accent: #0f766e;", StringComparison.Ordinal);
             Assert.That(bridge, Is.GreaterThan(0).And.LessThan(style), "the bridge of the base");
@@ -67,7 +67,7 @@ public partial class AppearanceCssTests
     [TestCase(":root { --fx-color-accent: red; } </style><script>alert(1)</script>")]
     public void AStyleThatCouldHideTheNoticesOrReachOutside_IsLeftOut(string text)
     {
-        var sheet = AppearanceCss.Compose(new ViewerAppearance { Style = "acme" }, new FxThemeSheets(":root:root:root { --rz-primary: var(--fx-color-accent); }", text));
+        var sheet = AppearanceCss.Compose(new ViewerAppearance { Style = "acme" }, new FxThemeSheets(":root:root:root { --primary: var(--fx-color-accent); }", text));
 
         Assert.Multiple(() =>
         {
@@ -76,7 +76,7 @@ public partial class AppearanceCssTests
         });
     }
 
-    // The contract: a theme of the vendor sets only the tokens of the kit (never a Radzen variable), passes the checks of a customer style, and every
+    // The contract: a theme of the vendor sets only the tokens of the kit (never a token of Blazor Blueprint), passes the checks of a customer style, and every
     // token the bridge reads has a value without a theme
     [Test]
     public void TheThemesOfTheVendor_SetOnlyTheTokensOfTheKit_AndTheBridgeReadsOnlyTokensThatExist()

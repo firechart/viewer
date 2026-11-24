@@ -1,6 +1,5 @@
 @page "/login"
 
-@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager Navigation
 
 @* Starts the sign-in of the provider; whoever is signed in already (the provider brings the browser back here) goes to the home page *@
@@ -10,9 +9,12 @@
     [Inject]
     public IAuthenticationService AuthenticationService { get; set; } = default!;
 
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationState { get; set; } = default!;
+
     protected override async Task OnInitializedAsync()
     {
-        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        var user = (await AuthenticationState).User;
         if (user.IsAuthenticated())
         {
             Navigation.NavigateTo(AppUrl.ToHref(SharedRoutes.HOME), replace: true);

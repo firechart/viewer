@@ -1,0 +1,24 @@
+<!-- The page of a device: its type, manufacturer, model, serial and lot numbers, expiry, and its patient, owner and location -->
+<Component name="Device.view">
+  <Param name="record" required="true"/>
+
+  <If test="{{%record.type.exists() or %record.manufacturer.exists() or %record.modelNumber.exists() or %record.serialNumber.exists() or %record.lotNumber.exists() or %record.expirationDate.exists() or %record.patient.exists() or %record.owner.exists() or %record.location.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Type}}" value="{{%record.type}}"/>
+      <Field label="{{%strings.Manufacturer}}" value="{{%record.manufacturer}}"/>
+      <Field label="{{%strings.Model}}" value="{{%record.modelNumber}}"/>
+      <Field label="{{%strings.SerialNumber}}" value="{{%record.serialNumber}}"/>
+      <Field label="{{%strings.Lot}}" value="{{%record.lotNumber}}"/>
+      <Field label="{{%strings.Expires}}" value="{{%record.expirationDate}}"/>
+      <Field label="{{%strings.Patient}}">
+        <Link value="{{%record.patient}}"/>
+      </Field>
+      <Field label="{{%strings.Owner}}">
+        <Link value="{{%record.owner}}"/>
+      </Field>
+      <Field label="{{%strings.Location}}">
+        <Link value="{{%record.location}}"/>
+      </Field>
+    </Section>
+  </If>
+</Component>

@@ -1,39 +1,56 @@
+@using System.Globalization
+@using System.Text
+@using BlazorBlueprint.Components
 @using Flox.Shared.Layout
+@using Flox.Shared.Services
 @inject IFloxRuntime Runtime
 @inject NavigationManager Navigation
+@inject ShareService Share
+@inject FloxSnackbar Notifications
 
-@* Rendered in place of what failed: an alert, so a screen reader tells it at once *@
-<RadzenCard Variant="Radzen.Variant.Outlined" role="alert">
-    <IconTitle Icon="error" IconColor="var(--rz-danger)" Text=@Strings.Caption_Error/>
-    <RadzenText>@Strings.Caption_ErrorNotification</RadzenText>
-    @if (ErrorBoundary is AppErrorBoundary { CorrelationId: { } reference })
-    {
-        <RadzenText TextStyle="TextStyle.Caption" class="rz-mt-1">@string.Format(Strings.Error_Reference, reference)</RadzenText>
-    }
-
-    @if (Runtime.IsDevelopment)
-    {
-        <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-2">@Exception?.Message</RadzenText>
-        <StackTraceView Trace=@Exception?.StackTrace/>
-    }
-    else
-    {
-        <AuthorizeView Roles="@AppRoles.ADMINISTRATOR">
-            <Authorized>
-                <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-2">@Exception?.Message</RadzenText>
-            </Authorized>
-        </AuthorizeView>
-    }
-    <DialogActions>
-        @* A link that looks like Radzen's text button: it opens in a new tab too; a click loads the page again, which leaves the broken state *@
-        <a href=@AppUrl.ToHref("/") class="rz-button rz-button-md rz-variant-text rz-secondary rz-shade-default no-underline" @onclick=@GoHome @onclick:preventDefault>
-            <span class="rz-button-box"><span class="rz-button-text">@Strings.Caption_Home</span></span>
-        </a>
-        <RadzenButton ButtonStyle="Radzen.ButtonStyle.Warning" Text=@Strings.Caption_Retry Click="@RecoverAsync"/>
-    </DialogActions>
-</RadzenCard>
+@* Rendered in place of what failed: an alert (role alert), so a screen reader tells it at once; Home loads the page again, which leaves the broken state.
+   The details (the message and the stack) fold: open at once for those who debug (Administrator, Developer, development), behind Show details for the
+   others; Copy and Share hand the diagnostic text to the support *@
+<div class="mx-auto w-full max-w-2xl">
+    <Alert Kind="AlertKind.Danger" Title=@Strings.Caption_Error>
+        <p class="m-0">@Strings.Caption_ErrorNotification</p>
+        @if (Reference is { } reference)
+        {
+            <p class="m-0 text-xs">@string.Format(CultureInfo.CurrentCulture, Strings.Error_Reference, reference)</p>
+        }
+        @if (Exception is not null)
+        {
+            <BbCollapsible @bind-Open=_expanded>
+                <BbCollapsibleContent>
+                    <p class="m-0 mt-2 break-words">@Exception.Message</p>
+                    <StackTraceView Trace=@Exception.StackTrace/>
+                </BbCollapsibleContent>
+            </BbCollapsible>
+        }
+        <div class="mt-2 flex flex-wrap items-center gap-2">
+            @if (Exception is not null)
+            {
+                <Button Variant="ButtonVariant.Outline" OnClick=@(() => _expanded = !_expanded) aria-expanded=@(_expanded ? "true" : "false")>
+                    @(_expanded ? Strings.Caption_HideDetails : Strings.Caption_ShowDetails)
+                </Button>
+            }
+            <Button Variant="ButtonVariant.Outline" OnClick=@CopyAsync>@Strings.Caption_Copy</Button>
+            @if (_canShare)
+            {
+                <Button Variant="ButtonVariant.Outline" OnClick=@ShareAsync>@Strings.Caption_Share</Button>
+            }
+            <span class="flex-1"></span>
+            <Button Variant="ButtonVariant.Outline" OnClick=@GoHome>@Strings.Caption_Home</Button>
+            <Button OnClick="@RecoverAsync">@Strings.Caption_Retry</Button>
+        </div>
+    </Alert>
+</div>
 
 @code {
+
+    private bool _expanded;
+    private bool _canShare;
+    private Exception? _shown;
 
     [Parameter]
     public Exception? Exception { get; set; }
@@ -47,6 +64,90 @@
     // initialization) instead of just clearing the boundary.
     [Parameter]
     public EventCallback OnRetry { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+
+    private string? Reference => ErrorBoundary is AppErrorBoundary { CorrelationId: { } reference } ? reference : null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Folded or not once per failure; the user's choice stays while it is shown
+        if (ReferenceEquals(_shown, Exception))
+        {
+            return;
+        }
+
+        _shown = Exception;
+        _expanded = Runtime.IsDevelopment;
+        if (!_expanded && AuthenticationState is not null)
+        {
+            try
+            {
+                _expanded = (await AuthenticationState).User.CanSeeErrorDetails();
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                // the state of the sign-in failed too: folded
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                _canShare = await Share.PrepareAsync();
+            }
+            catch (JSException)
+            {
+                _canShare = false;
+            }
+
+            if (_canShare)
+            {
+                StateHasChanged();
+            }
+        }
+    }
+
+    // What the support needs: the reference, when and where, the exception with its inner ones and their stacks
+    private string DiagnosticText()
+    {
+        var text = new StringBuilder();
+        text.AppendLine(Strings.Caption_Error);
+        if (Reference is { } reference)
+        {
+            text.AppendLine(CultureInfo.InvariantCulture, $"Reference: {reference}");
+        }
+
+        text.AppendLine(CultureInfo.InvariantCulture, $"Time: {DateTimeOffset.UtcNow:yyyy-MM-dd HH:mm:ss} UTC");
+        text.AppendLine(CultureInfo.InvariantCulture, $"Page: {Navigation.Uri}");
+        if (Exception is not null)
+        {
+            text.AppendLine();
+            text.AppendLine(Exception.ToString());
+        }
+
+        return text.ToString();
+    }
+
+    private async Task CopyAsync()
+    {
+        var copied = await Share.CopyAsync(DiagnosticText());
+        Notifications.Show(copied ? Strings.Message_Copied : Strings.Message_NotCopied, copied ? SnackSeverity.Info : SnackSeverity.Warning, 2000);
+    }
+
+    // Where the dialog of the system could not open, the text goes to the clipboard
+    private async Task ShareAsync()
+    {
+        if (await Share.ShareAsync(Strings.Caption_Error, DiagnosticText()) is ShareResult.Failed or ShareResult.Unsupported)
+        {
+            await CopyAsync();
+        }
+    }
 
     private void GoHome()
     {

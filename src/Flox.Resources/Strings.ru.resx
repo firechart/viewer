@@ -222,6 +222,9 @@
   <data name="Caption_More" xml:space="preserve">
     <value>Ещё</value>
   </data>
+  <data name="Caption_Path" xml:space="preserve">
+    <value>Путь</value>
+  </data>
   <data name="Caption_Bookmarks" xml:space="preserve">
     <value>Закладки</value>
   </data>
@@ -417,9 +420,6 @@
   <data name="Caption_ShowTotal" xml:space="preserve">
     <value>Показать количество</value>
   </data>
-  <data name="Caption_TotalCount" xml:space="preserve">
-    <value>Всего: {0}</value>
-  </data>
   <data name="Caption_Connect" xml:space="preserve">
     <value>Подключиться</value>
   </data>
@@ -519,6 +519,24 @@
   <data name="Caption_LicensePerpetual" xml:space="preserve">
     <value>Бессрочно</value>
   </data>
+  <data name="Caption_LicenseProduct" xml:space="preserve">
+    <value>Продукт</value>
+  </data>
+  <data name="Caption_LicenseMode" xml:space="preserve">
+    <value>Режим</value>
+  </data>
+  <data name="LicenseMode_Demo" xml:space="preserve">
+    <value>Демонстрационный</value>
+  </data>
+  <data name="LicenseMode_Trial" xml:space="preserve">
+    <value>Пробный</value>
+  </data>
+  <data name="Caption_LicenseSeats" xml:space="preserve">
+    <value>Рабочие места</value>
+  </data>
+  <data name="Caption_LicenseSeatsUnlimited" xml:space="preserve">
+    <value>Без ограничения</value>
+  </data>
   <data name="LicenseState_None" xml:space="preserve">
     <value>Нет лицензии: бесплатная редакция</value>
   </data>
@@ -563,5 +581,68 @@
   </data>
   <data name="Caption_SelectItem" xml:space="preserve">
     <value>Выбрать: {0}</value>
+  </data>
+  <data name="Caption_Refresh" xml:space="preserve">
+    <value>Обновить</value>
+  </data>
+  <data name="Access_Button" xml:space="preserve">
+    <value>Доступ…</value>
+  </data>
+  <data name="Access_TitleOf" xml:space="preserve">
+    <value>Доступ к {0}</value>
+  </data>
+  <data name="Access_Subject" xml:space="preserve">
+    <value>Кто</value>
+  </data>
+  <data name="Access_Owner" xml:space="preserve">
+    <value>Владелец</value>
+  </data>
+  <data name="Access_OwnerOf" xml:space="preserve">
+    <value>Владелец ({0})</value>
+  </data>
+  <data name="Access_Everyone" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="Access_Authenticated" xml:space="preserve">
+    <value>Вошедшие пользователи</value>
+  </data>
+  <data name="Access_Role" xml:space="preserve">
+    <value>Роль {0}</value>
+  </data>
+  <data name="Access_UnknownUser" xml:space="preserve">
+    <value>Неизвестный пользователь {0}</value>
+  </data>
+  <data name="Access_AddSubject" xml:space="preserve">
+    <value>Добавить роль или пользователя</value>
+  </data>
+  <data name="Access_Ineffective" xml:space="preserve">
+    <value>В правах {1} нет {0}: эта запись не действует.</value>
+  </data>
+  <data name="Access_Sensitive" xml:space="preserve">
+    <value>Чувствительная операция: даже администратору нужна явная запись, и выдаётся она только роли или пользователю.</value>
+  </data>
+  <data name="Access_ConfirmSensitive" xml:space="preserve">
+    <value>Вы выдаёте чувствительные операции: {0}. Изменение записывается в журнал аудита.</value>
+  </data>
+  <data name="Access_ConfirmSelf" xml:space="preserve">
+    <value>Часть из них вы выдаёте самому себе.</value>
+  </data>
+  <data name="Caption_Copy" xml:space="preserve">
+    <value>Копировать</value>
+  </data>
+  <data name="Message_Copied" xml:space="preserve">
+    <value>Скопировано в буфер обмена</value>
+  </data>
+  <data name="Caption_ShowDetails" xml:space="preserve">
+    <value>Показать подробности</value>
+  </data>
+  <data name="Caption_HideDetails" xml:space="preserve">
+    <value>Скрыть подробности</value>
+  </data>
+  <data name="Caption_Share" xml:space="preserve">
+    <value>Поделиться</value>
+  </data>
+  <data name="Message_NotCopied" xml:space="preserve">
+    <value>Браузер не разрешил копирование</value>
   </data>
 </root>

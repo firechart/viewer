@@ -21,6 +21,9 @@ public enum SearchFailureKind
 
     /// <summary>The answer could not be read (not JSON, not a <c>Bundle</c>).</summary>
     Unreadable,
+
+    /// <summary>The loading was cancelled before the server answered (Cancel of a summary loaded at once).</summary>
+    Cancelled,
 }
 
 /// <summary>A search that failed: what happened, the status of the answer and what the server said.</summary>

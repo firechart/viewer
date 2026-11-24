@@ -1,0 +1,26 @@
+@* A small ring that fills with the part done (0 to 100), in the color of the text; for a download beside a row *@
+<svg class=@($"size-5 -rotate-90 {Class}") viewBox="0 0 20 20" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow=@((int)Value) aria-label=@Label>
+    <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-opacity="0.15" stroke-width="3"/>
+    <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+            stroke-dasharray=@Circumference stroke-dashoffset=@Offset/>
+</svg>
+
+@code {
+
+    private const double Length = 2 * Math.PI * 8;
+
+    // The part done, 0 to 100
+    [Parameter]
+    public double Value { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    private static string Circumference => Length.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+
+    private string Offset => (Length * (1 - Math.Clamp(Value, 0, 100) / 100)).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+
+}

@@ -1,0 +1,532 @@
+@* A report of components over a record (a prototype): the component of the library with its components, checked as a whole; the record is %context.
+   A definition with problems is not shown, its problems are; the searches start at once and every block waits for its own. Loaded at once
+   (LoadAll), the report is drawn hidden behind a panel of progress until no block waits, so it appears whole; Cancel stops the searches and shows
+   what has come *@
+@using System.Globalization
+@using FireChart.Viewer.Core
+@using FireChart.Viewer.Core.Fhir
+@using FireChart.Viewer.Core.Reports
+@using FireChart.Viewer.Library
+@using Microsoft.Extensions.Logging
+@implements IDisposable
+@inject IFhirServerReader Reader
+@inject IReleaseModels Models
+@inject IServerResourceTypeProvider Types
+@inject IViewerAssets LibraryAssets
+@inject IViewerStyle Style
+@inject IJSRuntime JS
+@inject ViewerTerminology Terminology
+@inject ILogger<ReportView> Logger
+
+@if (_fallback && Fallback is not null)
+{
+    @Fallback
+    return;
+}
+
+@* No <style> here: the kit is one sheet in the head (KitStyleSheet), a sheet of the page lost the icons on iOS *@
+@if (_progress is not null && !_revealed)
+{
+    @RenderLoadingPanel(_progress)
+}
+
+@* The notices and the report in the kit fx-* (its box model, its font, the container of its queries); a notice keeps its own margin, no gap
+   on top of it *@
+<div class="fx-root" style="display:flex;flex-direction:column">
+@if (_cancelled)
+{
+    <div class="fx-notice fx-notice-warning" data-report-cancelled>@Strings.Message_LoadingCancelled</div>
+}
+
+@* A page with sections (Feeds, a summary): its menu goes to a section, opens or closes them all; the toolbar loads every record, print loads
+   everything first *@
+@if (_page.Feeds.Count > 0)
+{
+    <PageMenu SectionName=@FhirViewer.PageMenuSection>
+        @foreach (var feed in _page.Feeds.Where(feed => feed.Section is { Hidden: false }))
+        {
+            var section = feed.Section!;
+            <PageMenuItem Text=@section.Title Note=@(section.IsLoaded ? section.CountText : null) OnClick=@(() => GoToAsync(feed))>
+                <Leading><IconResource ResourceType=@section.IconType Autocolor/></Leading>
+            </PageMenuItem>
+        }
+        <PageMenuSeparator/>
+        <PageMenuItem Icon="unfold_more" Text=@FloxStrings.Caption_ExpandAll OnClick=@(() => _page.SetCollapsed(false))/>
+        <PageMenuItem Icon="unfold_less" Text=@FloxStrings.Caption_CollapseAll OnClick=@(() => _page.SetCollapsed(true))/>
+    </PageMenu>
+}
+
+@* The commands of the page, in one content of the section (a section shows one): a summary has the switch Record | Summary and its bookmark, a page
+   with sections prints *@
+@if ((Summary && _contextTitle is not null) || _page.Feeds.Count > 0)
+{
+    <SectionContent SectionName=@FhirViewer.PageCommandsSection>
+        @if (Summary && _contextTitle is not null)
+        {
+            <SummarySwitch ResourceType=@ContextType ResourceId=@ContextId Summary/>
+        }
+        @if (_page.Feeds.Count > 0)
+        {
+            <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Strings.Caption_LoadAll AriaLabel=@Strings.Caption_LoadAll Loading=@_page.LoadingAll OnClick=@(() => _page.LoadAllAsync()) data-viewer="load-all"><FloxIcon Icon="downloading"/></Button>
+            <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Strings.Caption_Print AriaLabel=@Strings.Caption_Print Loading=@_page.LoadingAll OnClick=@PrintAsync data-viewer="print"><FloxIcon Icon="print"/></Button>
+        }
+        @if (Summary && _contextTitle is not null)
+        {
+            @* Last: in the toolbar it stands at the end, beside the menu *@
+            <BookmarkStar Route=@(new FireChart.Viewer.Routing.ViewerRoute(FireChart.Viewer.Routing.ViewerPage.Summary, ContextType, ContextId))
+                          Title=@(() => Task.FromResult<string?>(_contextTitle)) Category=@SummaryCaption.Of(ContextType) Icon="history"/>
+        }
+    </SectionContent>
+}
+
+@* The safety net of the page of a record: no component can switch it off *@
+@if (_safety is { Modifiers.Count: > 0 } withModifiers)
+{
+    <div class="fx-notice fx-notice-danger" data-report-safety="modifiers">
+        <div class="fx-notice-title">Modifier extensions: they can change the meaning of this record</div>
+        @foreach (var field in withModifiers.Modifiers)
+        {
+            <div class="fx-field"><div class="fx-label" title=@field.Title>@field.Name</div><div class="fx-value">@field.Text</div></div>
+        }
+    </div>
+}
+@if (_safety is { Unshown.Count: > 0 } withUnshown)
+{
+    <div class="fx-notice fx-notice-warning" data-report-safety="unshown">
+        Not shown above: @withUnshown.Unshown.Count @(withUnshown.Unshown.Count == 1 ? "element" : "elements") (@ReportSafety.Names(withUnshown.Unshown)).
+        They are listed under "Other data" at the end of the page.
+    </div>
+}
+
+@if (_printRefused)
+{
+    <div class="fx-notice fx-notice-warning print:hidden" data-error="print_refused">@Strings.Message_PrintRefused</div>
+}
+
+@* Loaded at once, the report is drawn hidden (not left out: its blocks load meanwhile, and its stack is laid out) until everything has come *@
+<div data-report=@Component aria-hidden=@(Hidden ? "true" : null)
+     style=@($"display:flex;flex-direction:column;gap:var(--fx-space-4, 1rem){(Hidden ? ";visibility:hidden" : null)}")>
+    @if (_problems is { Count: > 0 })
+    {
+        <div class="fx-notice fx-notice-danger" data-report-problems>
+            <div class="fx-notice-title">The report @Component cannot be shown</div>
+            <ul>
+                @foreach (var problem in _problems)
+                {
+                    <li>@problem.ToString()</li>
+                }
+            </ul>
+        </div>
+    }
+    else if (_failure is not null)
+    {
+        <div class="fx-notice fx-notice-warning" data-report-failure>@_failure</div>
+    }
+    else if (_scope is null || _root is null)
+    {
+        @* The component and the record are read: an indicator that shows only when it lasts, so a quick switch Record | Summary shows nothing *@
+        <div class="relative" style="min-height: 8rem" data-report-reading>
+            <BusyIndicator Visible="true" Dim="false"/>
+        </div>
+    }
+    else
+    {
+        <CascadingValue Value=@_page IsFixed="true">
+            <SummaryStack @ref=_stack>
+                @_scope.Render(_root.Body)
+            </SummaryStack>
+        </CascadingValue>
+    }
+    @if (_safety is { Unshown.Count: > 0 } other)
+    {
+        <details class="fx-other" data-report-safety="other">
+            <summary>Other data (@other.Unshown.Count)</summary>
+            @foreach (var field in other.Unshown)
+            {
+                <div class="fx-field"><div class="fx-label">@field.Name</div><div class="fx-value">@field.Text</div></div>
+            }
+        </details>
+    }
+</div>
+</div>
+
+@code {
+
+    private readonly CancellationTokenSource _cancel = new();
+    private readonly CancellationToken _token;
+
+    // The token is taken once: the source is disposed with the component, and a load awaited since may still ask for it
+    public ReportView()
+    {
+        _token = _cancel.Token;
+    }
+    private readonly ReportPage _page = new();
+    private SummaryStack? _stack;
+    private bool _printing;
+    private bool _printRefused;
+    private bool _feedsLoaded;
+    private bool _fallback;
+    private string? _contextTitle;
+    private SafetyReport? _safety;
+    private CancellationTokenSource? _loading;
+    private ReportLibrary? _library;
+    private ComponentDefinition? _root;
+    private ReportScope? _scope;
+    private ReportProgress? _progress;
+    private IReadOnlyList<ReportProblem>? _problems;
+    private string? _failure;
+    private string? _loaded;
+
+    // Since the report was opened: the log tells when it was read, loaded and shown, by its component and its counts only (no PHI)
+    private System.Diagnostics.Stopwatch _opened = new();
+    private bool _loadedLogged;
+    private string _style = string.Empty;
+    private bool _revealed;
+    private bool _refit;
+    private int _pageScheduled;
+    private int _progressScheduled;
+    private int _progressVersion;
+    private bool _cancelled;
+    private int _checking;
+
+    [CascadingParameter]
+    private ViewerSession Session { get; set; } = null!;
+
+    // The name of the component of the library (components/{Component}.xml)
+    [Parameter, EditorRequired]
+    public string Component { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string ContextType { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string ContextId { get; set; } = string.Empty;
+
+    // The definition itself, instead of the file of Component in the library (the preview of a component): Component only names it
+    [Parameter]
+    public string? Definition { get; set; }
+
+    // The report loads at once and has not appeared yet
+    private bool Hidden => _progress is not null && !_revealed;
+
+    // The page of a record of a type with no report of its own
+    private const string RecordPage = """
+        <Component name="RecordPage">
+          <Show value="{{%context}}" mode="banner"/>
+          <Show value="{{%context}}" mode="view"/>
+        </Component>
+        """;
+
+    // What the page shows when the library has no component Component (the summary of the forms, while the summaries move to components); none:
+    // the banner and the view of the record
+    [Parameter]
+    public RenderFragment? Fallback { get; set; }
+
+    // The record, already read (the page of a record has it): not asked again
+    [Parameter]
+    public string? Record { get; set; }
+
+    // The page of the record: the safety net says what its view does not show, and its modifier extensions
+    [Parameter]
+    public bool Safety { get; set; }
+
+    // The page is the summary of the record: it carries the switch Record | Summary and a bookmark
+    [Parameter]
+    public bool Summary { get; set; }
+
+    // Everything is loaded before the report is shown (summary.loadAll)
+    [Parameter]
+    public bool LoadAll { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var key = $"{Component}|{ContextType}/{ContextId}|{Definition}";
+        if (key == _loaded)
+        {
+            return;
+        }
+
+        _loaded = key;
+        _opened = System.Diagnostics.Stopwatch.StartNew();
+        _loadedLogged = false;
+        _root = null;
+        _scope = null;
+        _problems = null;
+        _failure = null;
+        _cancelled = false;
+        _feedsLoaded = false;
+        _printRefused = false;
+        _fallback = false;
+        _revealed = !LoadAll;
+        Stop();
+        try
+        {
+            _library ??= new ReportLibrary(LibraryAssets, VendorLibrary.UrlOf);
+            _style = await Style.GetStyleAsync(_token);
+            await KitStyleSheet.AdoptAsync(JS, _style);
+            var library = _library;
+            var bundle = Definition is { } definition
+                ? ReportLibrary.Check(ReportXml.Parse(definition), new Dictionary<string, ComponentDefinition>())
+                : await library.LoadAsync(Component, _token);
+            if (bundle.Missing && Fallback is not null)
+            {
+                _fallback = true;
+                _revealed = true;
+                return;
+            }
+
+            if (bundle.Missing)
+            {
+                // A type without a report of its own: its banner and its view, by the components of its modes or the built-in ones
+                bundle = ReportLibrary.Check(ReportXml.Parse(RecordPage), new Dictionary<string, ComponentDefinition>());
+            }
+
+            if (bundle.Problems.Length > 0 || bundle.Root is null)
+            {
+                _problems = bundle.Problems;
+                _revealed = true;
+                return;
+            }
+
+            _loading = CancellationTokenSource.CreateLinkedTokenSource(_token);
+            var model = await Models.GetAsync(await Types.ReleaseOfAsync(Session.Server), _token);
+            var data = new ReportData(Reader, Session.Server, model, _loading.Token, Logger);
+            var context = Record is { } json ? data.Adopt(json) : await data.ReadAsync(ContextType, ContextId);
+            var format = new ReportFormat(CultureInfo.CurrentCulture, TimeProvider.System.LocalTimeZone, Terminology.For(Session.TerminologyServer),
+                                          strings: await library.StringsAsync(CultureInfo.CurrentUICulture, _token));
+            _contextTitle = ReportText.TitleOf(context, format);
+            var runtime = new ReportRuntime(bundle.Components, data, format, name => library.LoadAsync(name, _token));
+            _safety = null;
+            if (Safety)
+            {
+                // What the view and the banner of the type name of the record; the built-in view shows every element
+                var view = await runtime.ModeAsync(ContextType, "view");
+                var banner = await runtime.ModeAsync(ContextType, "banner");
+                HashSet<string>? shown = null;
+                if (view is not null)
+                {
+                    shown = ReportSafety.ShownBy(view, runtime.Components);
+                    if (banner is not null)
+                    {
+                        shown.UnionWith(ReportSafety.ShownBy(banner, runtime.Components));
+                    }
+                }
+
+                _safety = ReportSafety.Check(context, shown, format);
+            }
+
+            _root = bundle.Root;
+            _scope = ReportScope.Root(runtime, context).WithSearches(bundle.Root.Data);
+            Logger.LogInformation("Report {Component}: {Components} components, the record and the texts read in {ReadMs} ms", Component, runtime.Components.Count,
+                                  _opened.ElapsedMilliseconds);
+            if (LoadAll)
+            {
+                _progress = data.Progress;
+                _progress.Changed += OnProgress;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            _failure = $"The record {ContextType}/{ContextId} could not be read: {ex.Message}";
+            _revealed = true;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _page.Changed += OnPageChanged;
+            Terminology.Changed += OnWords;
+        }
+
+        if (_printing)
+        {
+            _printing = false;
+            await JS.InvokeVoidAsync("print");
+        }
+
+        // The report has appeared: the stack fits the window as it is now
+        if (_refit && _stack is not null)
+        {
+            _refit = false;
+            await _stack.RefitAsync();
+        }
+
+        await RevealWhenLoadedAsync();
+    }
+
+    // Words of codes have come: the report draws again
+    private void OnWords(object? sender, EventArgs e)
+    {
+        _scope?.Runtime.Invalidate();
+        OnPageChanged();
+    }
+
+    // The sections change many times while they load: the page (its menu, its counts) draws again at most every 100 ms
+    private void OnPageChanged()
+    {
+        if (Interlocked.Exchange(ref _pageScheduled, 1) == 1)
+        {
+            return;
+        }
+
+        _ = InvokeAsync(async () =>
+        {
+            await Task.Delay(100);
+            Interlocked.Exchange(ref _pageScheduled, 0);
+            LogWhenLoaded();
+            StateHasChanged();
+        });
+    }
+
+    // The menu of the page: the section is opened, the stack brings it to the top after it has drawn its records
+    private async Task GoToAsync(IReportFeed feed)
+    {
+        feed.SetCollapsed(false);
+        if (_stack is not null && feed.Section is { } section)
+        {
+            await Task.Yield();
+            await _stack.ScrollToAsync(section.ElementId);
+        }
+    }
+
+    // Print only a complete page: every record is loaded first, the browser prints after the page has drawn them
+    private async Task PrintAsync()
+    {
+        _printRefused = !await _page.LoadAllAsync();
+        _printing = !_printRefused;
+    }
+
+    // A block that answers may draw blocks that wait in turn (the rows of a list, a component), so "nothing waits" must hold a moment before the report
+    // is shown
+    private async Task RevealWhenLoadedAsync()
+    {
+        if (_revealed || _progress is null || _progress.IsLoading || Interlocked.Exchange(ref _checking, 1) == 1)
+        {
+            return;
+        }
+
+        try
+        {
+            // The first pages have come: a page loaded at once loads the next pages of its sections too
+            if (!_feedsLoaded && _page.Feeds.Count > 0)
+            {
+                _feedsLoaded = true;
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+                await _page.LoadAllAsync();
+                Logger.LogInformation("Report {Component}: the next pages of its sections loaded in {LoadAllMs} ms, {Rounds} rounds", Component,
+                                      watch.ElapsedMilliseconds, _page.Rounds);
+            }
+
+            // The report appears when nothing has started for a moment; what started meanwhile (the tiles of the next pages) is waited for here, as
+            // a call of the progress while this one runs returns at once. A block still loading returns: its end calls again
+            while (!_revealed && _progress is { IsLoading: false } progress)
+            {
+                var started = progress.Started;
+                await Task.Delay(150);
+                if (!progress.IsLoading && progress.Started == started)
+                {
+                    Logger.LogInformation("Report {Component}: shown {ShownMs} ms after it was opened, {Sections} sections, {Records} records, {Blocks} blocks waited",
+                                          Component, _opened.ElapsedMilliseconds, _page.Feeds.Count, RecordCount(), progress.Started);
+                    _revealed = true;
+                    _refit = true;
+                    StateHasChanged();
+                }
+            }
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _checking, 0);
+        }
+    }
+
+    // Every section has its first page: logged once, with the time since the report was opened
+    private void LogWhenLoaded()
+    {
+        if (_loadedLogged || _page.Feeds.Count == 0 || _page.Feeds.Any(feed => feed.Section is { IsLoaded: false } or { IsLoading: true }))
+        {
+            return;
+        }
+
+        _loadedLogged = true;
+        Logger.LogInformation("Report {Component}: every section has its first page {LoadedMs} ms after it was opened, {Sections} sections, {Records} records",
+                              Component, _opened.ElapsedMilliseconds, _page.Feeds.Count, RecordCount());
+    }
+
+    private int RecordCount()
+    {
+        return _page.Feeds.Sum(feed => feed.Section?.Items.Count ?? 0);
+    }
+
+    // The progress draws only its panel (ReportLoadingPanel); the report checks whether everything has come once the progress has been quiet for a
+    // moment, and draws itself only to appear
+    private void OnProgress()
+    {
+        Interlocked.Increment(ref _progressVersion);
+        if (Interlocked.Exchange(ref _progressScheduled, 1) == 1)
+        {
+            return;
+        }
+
+        _ = InvokeAsync(async () =>
+        {
+            int version;
+            do
+            {
+                version = Volatile.Read(ref _progressVersion);
+                await Task.Delay(150);
+            }
+            while (version != Volatile.Read(ref _progressVersion));
+
+            Interlocked.Exchange(ref _progressScheduled, 0);
+            await RevealWhenLoadedAsync();
+        });
+    }
+
+    // The panel of the progress (an internal component, drawn by a builder)
+    private RenderFragment RenderLoadingPanel(ReportProgress progress)
+    {
+        return builder =>
+        {
+            builder.OpenComponent<ReportLoadingPanel>(0);
+            builder.AddComponentParameter(1, nameof(ReportLoadingPanel.Progress), progress);
+            builder.AddComponentParameter(2, nameof(ReportLoadingPanel.OnCancel), EventCallback.Factory.Create(this, CancelLoading));
+            builder.CloseComponent();
+        };
+    }
+
+    private void CancelLoading()
+    {
+        _loading?.Cancel();
+        _cancelled = true;
+        _revealed = true;
+        _refit = true;
+    }
+
+    private void Stop()
+    {
+        if (_progress is not null)
+        {
+            _progress.Changed -= OnProgress;
+            _progress = null;
+        }
+
+        _loading?.Cancel();
+        _loading?.Dispose();
+        _loading = null;
+    }
+
+    public void Dispose()
+    {
+        _page.Changed -= OnPageChanged;
+        Terminology.Changed -= OnWords;
+        Stop();
+        _cancel.Cancel();
+        _cancel.Dispose();
+    }
+
+}

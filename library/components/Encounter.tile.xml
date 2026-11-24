@@ -1,0 +1,10 @@
+<!-- An encounter in a list: its type, its period and class; its status at the end -->
+<Component name="Encounter.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.type.exists(), %record.type.first(), %record.class)}}" subtitle="{{%record.period}}" patient="{{%record.subject}}">
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

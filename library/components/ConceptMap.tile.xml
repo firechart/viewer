@@ -1,0 +1,10 @@
+<!-- A concept map in a list: its name, canonical URL and version; its status at the end -->
+<Component name="ConceptMap.tile">
+  <Param name="record" required="true"/>
+
+  <Tile title="{{iif(%record.name.exists(), %record.name, iif(%record.title.exists(), %record.title, %record.id))}}" subtitle="{{%record.url}}{{iif(%record.url.exists() and %record.version.exists(), ' · ', '')}}{{%record.version}}">
+    <Trailing>
+      <Status value="{{%record.status}}"/>
+    </Trailing>
+  </Tile>
+</Component>

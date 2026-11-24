@@ -65,9 +65,21 @@ public abstract class StorageBase<TKey, TEntity> : IStorage<TKey, TEntity> where
     public abstract Task<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default);
 
     /// <inheritdoc />
-    public virtual Task<TEntity> SetAccessAsync(TKey key, AccessGrant readAccess, AccessGrant writeAccess, CancellationToken cancellationToken = default)
+    public virtual Task<TEntity> InsertAsync(TEntity entity, IReadOnlyCollection<AclEntry> acl, CancellationToken cancellationToken = default)
     {
-        throw new NotSupportedException($"{GetType().Name} does not change the access of a document.");
+        throw new NotSupportedException($"{GetType().Name} keeps no access lists.");
+    }
+
+    /// <inheritdoc />
+    public virtual Task<IReadOnlyList<AclEntry>> GetAccessAsync(TKey key, CancellationToken cancellationToken = default)
+    {
+        throw new NotSupportedException($"{GetType().Name} keeps no access lists.");
+    }
+
+    /// <inheritdoc />
+    public virtual Task<IReadOnlyList<AclEntry>> SetAccessAsync(TKey key, IReadOnlyCollection<AclEntry> acl, CancellationToken cancellationToken = default)
+    {
+        throw new NotSupportedException($"{GetType().Name} keeps no access lists.");
     }
 
     /// <inheritdoc />
@@ -99,8 +111,7 @@ public abstract class StorageBase<TKey, TEntity> : IStorage<TKey, TEntity> where
     }
 
     /// <summary>
-    /// Tells whether the role of the caller may use the table for the operation: the first layer of access; the rights of the row are the
-    /// second.
+    /// Tells whether the role of the caller may use the table for the operation (the matrix alone, no row): what a list and an insert need.
     /// </summary>
     protected async Task<bool> HasPermissionAsync(string operation)
     {
@@ -123,6 +134,58 @@ public abstract class StorageBase<TKey, TEntity> : IStorage<TKey, TEntity> where
 
         var user = await AuthenticationService.GetCurrentUserAsync();
         throw user.IsAuthenticated() ? new ForbidDocumentException($"No permission {EntityPermissions.Name(typeof(TEntity), operation)}") : new UnauthenticatedException();
+    }
+
+    /// <summary>
+    /// Tells whether the caller may do the operation on the row: the permission of the table and the access list of the row (of its master for
+    /// a detail), through <see cref="IAuthorizationService"/> with the row as the resource (the handler of the server applies the rule of
+    /// <see cref="EntityAcl"/>). Without an authorization service (a storage built by hand) the access list alone decides. A probe only asks:
+    /// its refusal is not recorded in the audit trail.
+    /// </summary>
+    /// <param name="row">The row.</param>
+    /// <param name="operation">The operation.</param>
+    /// <param name="probe">True when the caller only asks.</param>
+    /// <param name="acl">The access list of the row (of the master of a detail) when it is already loaded.</param>
+    /// <param name="master">The master of a detail when it is already loaded.</param>
+    /// <param name="cancellationToken">Cancels the reads.</param>
+    protected async Task<bool> MayAsync(TEntity row, string operation, bool probe = false, IReadOnlyList<AclEntry>? acl = null, IAclEntity? master = null, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(row);
+        var user = await AuthenticationService.GetCurrentUserAsync();
+        if (AuthorizationService is not null)
+        {
+            object resource = probe || acl is not null || master is not null ? new EntityProbe(row, acl, Quiet: probe, Master: master) : row;
+            return (await AuthorizationService.AuthorizeAsync(user, resource, Permissions.Policy(EntityPermissions.Name(typeof(TEntity), operation)))).Succeeded;
+        }
+
+        var descriptor = EntityPermissions.Of(typeof(TEntity));
+        switch (descriptor.Kind)
+        {
+            case EntityAccessKind.Table:
+                return true;
+            case EntityAccessKind.Detail:
+                var of = master ?? (row is IAclDetail detail ? await GetMasterAsync(detail, cancellationToken) : null);
+                return of is not null && EntityAcl.RowAllows(descriptor, acl ?? await GetAclAsync(of, cancellationToken), of.OwnerId, user, operation);
+            default:
+                return EntityAcl.RowAllows(descriptor, acl ?? await GetAclAsync(row, cancellationToken), ((IAclEntity)row).OwnerId, user, operation);
+        }
+    }
+
+    /// <summary>
+    /// Reads the access list of a row (or of the master of a detail) for <see cref="MayAsync"/> without an authorization service; a storage
+    /// without lists has none.
+    /// </summary>
+    protected virtual Task<IReadOnlyList<AclEntry>> GetAclAsync(IEntity row, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult<IReadOnlyList<AclEntry>>([]);
+    }
+
+    /// <summary>
+    /// Reads the master of a detail for <see cref="MayAsync"/> without an authorization service; a storage without masters has none.
+    /// </summary>
+    protected virtual Task<IAclEntity?> GetMasterAsync(IAclDetail detail, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult<IAclEntity?>(null);
     }
 
     /// <summary>

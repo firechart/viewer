@@ -1,0 +1,90 @@
+@* A title with its commands on the right: the visible ones (Commands), then the menu of the rarer ones (Menu, PageMenuItem), then the menu a child
+   puts into the outlet MenuSection. The title starts where the text of the rows does; the last command ends where the frame of the rows ends.
+   A toolbar (Toolbar) has no title: the commands from the start, a command marked data-toolbar-end and the menu of MenuSection at the end. Only classes change between the two, so the
+   outlets stay the same components (a new outlet of a section beside the old one, in one render, is refused by Blazor) *@
+<div class=@RootClass>
+    @if (Size == HeadingSize.Section)
+    {
+        @* The caption of a section is one line, cut with an ellipsis; its whole text is the tooltip. It is the twin of the captions of the buttons
+           beside it: their color, a step larger (13px against the 12px of a small button) and a touch heavier (--flox-caption-weight of the theme:
+           500 against their 450 in the light one). A semibold caption above every list made a page busy, a muted one was too faint *@
+        <h3 id=@Id class="m-0 min-w-0 flex-auto truncate text-[0.8125rem]" style="font-weight: var(--flox-caption-weight, 600)" title=@Tooltip>@ChildContent</h3>
+    }
+    else if (!Toolbar)
+    {
+        <h2 id=@Id class="m-0 min-w-0 flex-auto break-words text-xl font-semibold tracking-tight">@ChildContent</h2>
+    }
+    @if (Commands is not null || Menu is not null || MenuSection is not null || ListCommandsSection is not null)
+    {
+        <div class=@CommandsClass>
+            @if (ListCommandsSection is not null)
+            {
+                <SectionOutlet SectionName=@ListCommandsSection/>
+            }
+            @Commands
+            @if (Menu is not null)
+            {
+                <PageMenu Title=@MenuTitle>@Menu</PageMenu>
+            }
+            @if (MenuSection is not null)
+            {
+                <div class=@(Toolbar ? "ms-auto flex items-center" : "contents") data-toolbar-menu><SectionOutlet SectionName=@MenuSection/></div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+
+    /// <summary>The text of the title.</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>The size of the title: of a page (h2) or of a section (h3).</summary>
+    [Parameter]
+    public HeadingSize Size { get; set; }
+
+    /// <summary>A toolbar without a title: the commands from the start, the menu of <see cref="MenuSection"/> at the end.</summary>
+    [Parameter]
+    public bool Toolbar { get; set; }
+
+    /// <summary>The whole text of a caption of a section, shown as its tooltip when it is cut.</summary>
+    [Parameter]
+    public string? Tooltip { get; set; }
+
+    /// <summary>The id of the title element, for <c>aria-labelledby</c> of what it names.</summary>
+    [Parameter]
+    public string? Id { get; set; }
+
+    /// <summary>The commands always shown on the right of the title.</summary>
+    [Parameter]
+    public RenderFragment? Commands { get; set; }
+
+    /// <summary>The rarer commands (<see cref="PageMenuItem"/>), in a menu after <see cref="Commands"/>.</summary>
+    [Parameter]
+    public RenderFragment? Menu { get; set; }
+
+    /// <summary>The tooltip of the button of <see cref="Menu"/>; "More" when not given.</summary>
+    [Parameter]
+    public string? MenuTitle { get; set; }
+
+    /// <summary>The outlet of the commands of a list of the page (a <see cref="DataList{TItem}"/> without a search), shown before <see cref="Commands"/>.</summary>
+    [Parameter]
+    public string? ListCommandsSection { get; set; }
+
+    /// <summary>The outlet of a menu a child puts there (a <see cref="PageMenu"/> with this <c>SectionName</c>), shown at the right end.</summary>
+    [Parameter]
+    public string? MenuSection { get; set; }
+
+    // A page title never shrinks below its own width beside the commands: they wrap to a line of their own (a phone)
+    private string RootClass => Toolbar ? "@container mb-1 flex items-center" : Size == HeadingSize.Section ? $"{Layout} min-h-8" : $"{Layout} mb-1 flex-wrap gap-y-1";
+
+    // A command marked data-toolbar-end (a box, not display: contents) goes to the end of a toolbar, the menu right after it
+    private string CommandsClass => Toolbar
+        ? "flex flex-1 flex-wrap items-center gap-1 print:hidden [&_[data-toolbar-end]]:ms-auto [&:has([data-toolbar-end])>[data-toolbar-menu]]:ms-0"
+        : "ms-auto flex shrink-0 items-center gap-1 print:hidden";
+
+    // A size container: a Button with an icon and a text shows only its icon when the heading is narrow
+    private const string Layout = "@container flex items-center justify-between gap-2 ps-[calc(1px+var(--spacing)*3)]";
+
+}

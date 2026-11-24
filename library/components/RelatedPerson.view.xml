@@ -1,0 +1,23 @@
+<!-- The page of a related person: the name, gender and birth date, then the relationship, how to contact them and the period -->
+<Component name="RelatedPerson.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{iif(%record.name.exists(), %record.name.first(), %record.id)}}">
+    <Field label="{{%strings.Gender}}" value="{{%record.gender}}"/>
+    <Field label="{{%strings.Born}}" value="{{%record.birthDate}}"/>
+    <If test="{{%record.active = false}}">
+      <Field label="{{%strings.Status}}">
+        <Badge text="{{%strings.InactiveBadge}}" tone="danger"/>
+      </Field>
+    </If>
+  </Section>
+
+  <If test="{{%record.relationship.exists() or %record.telecom.exists() or %record.address.exists() or %record.period.exists()}}">
+    <Section title="{{%strings.Details}}">
+      <Field label="{{%strings.Relationship}}" value="{{%record.relationship}}"/>
+      <Field label="{{%strings.PhoneAndEmail}}" value="{{%record.telecom}}"/>
+      <Field label="{{%strings.Address}}" value="{{%record.address}}"/>
+      <Field label="{{%strings.Period}}" value="{{%record.period}}"/>
+    </Section>
+  </If>
+</Component>

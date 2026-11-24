@@ -1,0 +1,67 @@
+<!-- The page of a patient: the details, the contact details, the related persons, the care and the identifiers -->
+<Component name="Patient.view">
+  <Param name="record" required="true"/>
+
+  <Section title="{{%strings.Details}}">
+    <Field label="{{%strings.Name}}">
+      <Value value="{{%record.name}}" separator=", "/>
+    </Field>
+    <Field label="{{%strings.Gender}}" value="{{%record.gender}}"/>
+    <Field label="{{%strings.BirthDate}}" value="{{%record.birthDate}}"/>
+    <Field label="{{%strings.MaritalStatus}}" value="{{%record.maritalStatus}}"/>
+    <Repeat each="{{%record.communication}}" as="communication">
+      <Field label="{{%strings.Language}}" value="{{%communication.language}}"/>
+    </Repeat>
+  </Section>
+
+  <If test="{{%record.telecom.exists() or %record.address.exists()}}">
+    <Section title="{{%strings.ContactDetails}}" count="{{%record.telecom.count() + %record.address.count()}}">
+      <Repeat each="{{%record.telecom}}" as="telecom">
+        <Row main="{{%telecom.value}}" meta="{{%telecom.system &amp; iif(%telecom.use.exists(), ', ' &amp; %telecom.use, '')}}"/>
+      </Repeat>
+      <Repeat each="{{%record.address}}" as="address">
+        <Row main="{{%address}}" meta="{{%address.use}}"/>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.contact.exists()}}">
+    <Section title="{{%strings.RelatedPersons}}" count="{{%record.contact.count()}}">
+      <Repeat each="{{%record.contact}}" as="contact">
+        <Row>
+          <Main>
+            <If test="{{%contact.name.exists()}}">
+              <Value value="{{%contact.name}}"/>
+            </If>
+            <If test="{{%contact.name.empty()}}">
+              <Link value="{{%contact.organization}}"/>
+            </If>
+          </Main>
+          <Value value="{{%contact.relationship}}" separator=", "/>
+          <If test="{{%contact.telecom.exists()}}">
+            <Text>; <Value value="{{%contact.telecom.value}}" separator=", "/></Text>
+          </If>
+        </Row>
+      </Repeat>
+    </Section>
+  </If>
+
+  <If test="{{%record.generalPractitioner.exists() or %record.managingOrganization.exists()}}">
+    <Section title="{{%strings.Care}}">
+      <Field label="{{%strings.GeneralPractitioner}}">
+        <Link value="{{%record.generalPractitioner}}"/>
+      </Field>
+      <Field label="{{%strings.ManagingOrganization}}">
+        <Link value="{{%record.managingOrganization}}"/>
+      </Field>
+    </Section>
+  </If>
+
+  <If test="{{%record.identifier.exists()}}">
+    <Section title="{{%strings.Identifiers}}" count="{{%record.identifier.count()}}">
+      <Repeat each="{{%record.identifier}}" as="identifier">
+        <Row main="{{%identifier.value}}" meta="{{iif(%identifier.type.exists(), %identifier.type, %identifier.system)}}"/>
+      </Repeat>
+    </Section>
+  </If>
+</Component>
