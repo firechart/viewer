@@ -15,6 +15,7 @@ internal abstract class ReportBlock : ComponentBase
     private string? _failure;
     private ReportValues? _values;
     private Task? _work;
+    private int _run;
     private ReportNode? _node;
     private ReportScope? _scope;
     private int _generation;
@@ -98,7 +99,7 @@ internal abstract class ReportBlock : ComponentBase
         _scope = Scope;
         _generation = generation;
         _failure = null;
-        var work = LoadAsync();
+        var work = LoadAsync(++_run);
         _work = work;
         _ready = work.IsCompleted;
 
@@ -108,6 +109,10 @@ internal abstract class ReportBlock : ComponentBase
         try
         {
             await work;
+        }
+        catch (Exception) when (!ReferenceEquals(_work, work))
+        {
+            // of a load that a newer one (another node or scope) replaced
         }
         catch (OperationCanceledException)
         {
@@ -122,12 +127,23 @@ internal abstract class ReportBlock : ComponentBase
             progress?.End();
         }
 
-        _ready = true;
+        // The newer load says when the block is ready
+        if (ReferenceEquals(_work, work))
+        {
+            _ready = true;
+        }
     }
 
-    private async Task LoadAsync()
+    // A load that a newer one replaced while it waited for its values leaves them
+    private async Task LoadAsync(int run)
     {
-        _values = await Scope.ResolveAsync(Reads);
+        var values = await Scope.ResolveAsync(Reads);
+        if (run != _run)
+        {
+            return;
+        }
+
+        _values = values;
         await PrepareAsync();
     }
 

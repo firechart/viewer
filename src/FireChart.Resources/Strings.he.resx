@@ -420,9 +420,6 @@
   <data name="Conformance_NoElementsFound" xml:space="preserve">
     <value>אין רכיב תואם.</value>
   </data>
-  <data name="Conformance_NotInDifferential" xml:space="preserve">
-    <value>לא שונה על ידי הפרופיל</value>
-  </data>
   <data name="Conformance_Description" xml:space="preserve">
     <value>תיאור</value>
   </data>
@@ -513,9 +510,6 @@
   <data name="Caption_TimesInDeviceZone" xml:space="preserve">
     <value>השעות מוצגות באזור הזמן של מכשיר זה</value>
   </data>
-  <data name="Message_SectionsFailed" xml:space="preserve">
-    <value>מקטעים שלא ניתן היה לטעון: {0}</value>
-  </data>
   <data name="Caption_TrendValues" xml:space="preserve">
     <value>ערכים</value>
   </data>
@@ -536,9 +530,6 @@
   </data>
   <data name="Caption_LoadingRecord" xml:space="preserve">
     <value>טוען את הרשומה</value>
-  </data>
-  <data name="Message_LoadingProgress" xml:space="preserve">
-    <value>נטענו {0} מתוך {1} חלקים</value>
   </data>
   <data name="Message_LoadedRecords" xml:space="preserve">
     <value>נטען: {0} ({1})</value>
@@ -561,14 +552,14 @@
   <data name="Caption_SearchCancelled" xml:space="preserve">
     <value>לא נטען: הטעינה בוטלה</value>
   </data>
-  <data name="Caption_PatientRecordSettings" xml:space="preserve">
-    <value>רשומת מטופל</value>
-  </data>
   <data name="Caption_SummaryPageSize" xml:space="preserve">
     <value>רשומות לבקשה</value>
   </data>
   <data name="Caption_SummaryLoadAll" xml:space="preserve">
     <value>טען את כל הרשומה לפני ההצגה</value>
+  </data>
+  <data name="Caption_ValueDecimals" xml:space="preserve">
+    <value>דיוק ערכי התצפיות</value>
   </data>
   <data name="Caption_Print" xml:space="preserve">
     <value>הדפסה</value>
@@ -587,9 +578,6 @@
   </data>
   <data name="PackageBase_Download" xml:space="preserve">
     <value>הורדה</value>
-  </data>
-  <data name="PackageBase_UpdateButton" xml:space="preserve">
-    <value>עדכון</value>
   </data>
   <data name="PackageBase_Failed" xml:space="preserve">
     <value>ההורדה נכשלה: {0}</value>
@@ -633,9 +621,6 @@
   <data name="Message_NothingFound" xml:space="preserve">
     <value>לא נמצא דבר</value>
   </data>
-  <data name="Placeholder_TypeToFind" xml:space="preserve">
-    <value>הקלידו לחיפוש</value>
-  </data>
   <data name="Caption_RangeFrom" xml:space="preserve">
     <value>{0}: מ־</value>
   </data>
@@ -668,5 +653,77 @@
   </data>
   <data name="Caption_ShowResourceType" xml:space="preserve">
     <value>הצג את {0}</value>
+  </data>
+  <data name="Caption_BundleGraph" xml:space="preserve">
+    <value>גרף של ה-Bundle</value>
+  </data>
+  <data name="Caption_BundleNeighbourhood" xml:space="preserve">
+    <value>הצג את הסביבה</value>
+  </data>
+  <data name="Caption_BundleCard" xml:space="preserve">
+    <value>כרטיס</value>
+  </data>
+  <data name="Caption_BundleRefersTo" xml:space="preserve">
+    <value>מפנה אל</value>
+  </data>
+  <data name="Caption_BundleReferredBy" xml:space="preserve">
+    <value>מופנה מ</value>
+  </data>
+  <data name="Caption_BundleTypes" xml:space="preserve">
+    <value>סוגי משאבים</value>
+  </data>
+  <data name="Caption_BundleShowAll" xml:space="preserve">
+    <value>הצג הכול</value>
+  </data>
+  <data name="Caption_ZoomIn" xml:space="preserve">
+    <value>הגדל</value>
+  </data>
+  <data name="Caption_ZoomOut" xml:space="preserve">
+    <value>הקטן</value>
+  </data>
+  <data name="Caption_FitToView" xml:space="preserve">
+    <value>התאם לתצוגה</value>
+  </data>
+  <data name="Message_BundleNoSource" xml:space="preserve">
+    <value>אין מקור להצגה: ה-Bundle מפנה למשאב הזה אך אינו מכיל אותו, והמציג אינו קורא דבר שחסר ב-Bundle.</value>
+  </data>
+  <data name="Message_BundleNotInBundle" xml:space="preserve">
+    <value>ה-Bundle מפנה למשאב הזה אך אינו מכיל אותו.</value>
+  </data>
+  <data name="Message_BundleNone" xml:space="preserve">
+    <value>הדביקו Bundle או ציינו את כתובתו.</value>
+  </data>
+  <data name="Message_BundleEmpty" xml:space="preserve">
+    <value>ה-Bundle אינו מכיל משאבים.</value>
+  </data>
+  <data name="Message_BundleCounts" xml:space="preserve">
+    <value>{0} משאבים, {1} הפניות</value>
+  </data>
+  <data name="Message_BundleInvalid" xml:space="preserve">
+    <value>זה אינו FHIR Bundle: {0}</value>
+  </data>
+  <data name="Message_BundleUnavailable" xml:space="preserve">
+    <value>לא ניתן היה לקרוא את ה-Bundle מכתובתו.</value>
+  </data>
+  <data name="Caption_LoadingBundle" xml:space="preserve">
+    <value>טוען את ה-Bundle</value>
+  </data>
+  <data name="Message_BundleReading" xml:space="preserve">
+    <value>קורא אותו מ-{0}</value>
+  </data>
+  <data name="Message_BundleResolving" xml:space="preserve">
+    <value>פותר את ההפניות בין המשאבים</value>
+  </data>
+  <data name="Message_BundleCancelled" xml:space="preserve">
+    <value>הטעינה בוטלה.</value>
+  </data>
+  <data name="Message_ModifierExtensions" xml:space="preserve">
+    <value>הרחבות משנות: הן עשויות לשנות את משמעות הרשומה</value>
+  </data>
+  <data name="Message_NotShownAbove" xml:space="preserve">
+    <value>לא מוצג למעלה ({0}): {1}. הרכיבים האלה מפורטים תחת „נתונים נוספים” בסוף הדף.</value>
+  </data>
+  <data name="Caption_OtherData" xml:space="preserve">
+    <value>נתונים נוספים</value>
   </data>
 </root>

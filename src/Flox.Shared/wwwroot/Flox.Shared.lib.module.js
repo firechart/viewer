@@ -3,6 +3,23 @@
 // Docs: https://learn.microsoft.com/aspnet/core/blazor/fundamentals/startup?view=aspnetcore-10.0
 import { installEnterKey } from './flox-enter-key.js';
 import { installIosRepaint } from './flox-ios-repaint.js';
+import { installHistory } from './flox-history.js';
+
+// A keydown without a key (the browser filling a field from its autofill) is stopped before the handlers of the page: the shortcuts of Blazor
+// Blueprint read event.key.toLowerCase() on the document and failed on it, which the error UI showed as fatal. Window, capture: before them all
+let keylessGuarded = false;
+
+function installKeylessKeydownGuard() {
+    if (keylessGuarded) {
+        return;
+    }
+    keylessGuarded = true;
+    window.addEventListener('keydown', event => {
+        if (typeof event.key !== 'string') {
+            event.stopImmediatePropagation();
+        }
+    }, true);
+}
 
 function loadScript(src) {
     return new Promise((resolve, reject) => {
@@ -37,6 +54,8 @@ async function loadPostStartScripts() {
 // Standalone WASM / Blazor Server
 export async function beforeStart(_options, _extensions) {
     installEnterKey();
+    installKeylessKeydownGuard();
+    installHistory();
 }
 
 export async function afterStarted(_blazor) {
@@ -47,6 +66,8 @@ export async function afterStarted(_blazor) {
 // WASM
 export async function beforeWebAssemblyStart(_options, _extensions) {
     installEnterKey();
+    installKeylessKeydownGuard();
+    installHistory();
 }
 
 export async function afterWebAssemblyStarted(_blazor) {

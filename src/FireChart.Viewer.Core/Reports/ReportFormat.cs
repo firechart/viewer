@@ -3,8 +3,8 @@ using System.Globalization;
 namespace FireChart.Viewer.Core.Reports;
 
 // How the texts of a report are written: the culture of the reader, the zone of the display (a moment with an offset is shown in it), where the
-// words of bare codes come from (a terminology server; none: the code itself), and the most decimal places of a number (the rows of a section that
-// says so; none: the digits of the record)
+// words of bare codes come from (a terminology server; none: the code itself), and the most decimal places of a number (DecimalText: the FHIR
+// settings of the Viewer, a section that says otherwise; none: the digits of the record)
 internal sealed class ReportFormat(CultureInfo culture, TimeZoneInfo zone, IReportDisplays? displays = null, TimeProvider? clock = null, ReportStrings? strings = null,
                                    int? decimals = null)
 {

@@ -1,119 +1,81 @@
 using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.JSInterop;
 
 namespace Flox.Services;
 
-/// <summary>Keeps the stack of the pages the user visited, to go back through.</summary>
+/// <summary>
+/// Back of the app bar is the Back of the browser: it goes where the user came from, whatever the depth of the two addresses, and the browser's own
+/// Back (a key, a gesture, a button of Android) agrees with it. The browser keeps the history; Blazor numbers its entries.
+/// </summary>
 [FloxService(typeof(INavigationHistoryService))]
 public sealed class NavigationHistoryService : IDisposable, INavigationHistoryService
 {
     private readonly NavigationManager _navigationManager;
-    private readonly Stack<string> _history = new Stack<string>();
-    private bool _isNavigatingBack;
-    private string? _currentUri;
+    private readonly IJSRuntime _js;
+    private int _index;
 
     /// <summary>Creates the service and starts following the navigation manager.</summary>
-    public NavigationHistoryService(NavigationManager navigationManager)
+    public NavigationHistoryService(NavigationManager navigationManager, IJSRuntime js)
     {
         _navigationManager = navigationManager;
-        _currentUri = _navigationManager.Uri;
+        _js = js;
         _navigationManager.LocationChanged += OnLocationChanged;
+        _ = ReadIndexAsync();
     }
 
     /// <inheritdoc />
     public event EventHandler? HistoryChanged;
 
     /// <inheritdoc />
-    public bool CanGoBack
-    {
-        get
-        {
-            return _history.Count > 0;
-        }
-    }
+    /// <remarks>A page of the app before this one in the tab, and this one below a section of the menu (a section has the menu instead).</remarks>
+    public bool CanGoBack => _index > 0 && GetRouteDepth(_navigationManager.Uri) > 1;
 
     /// <inheritdoc />
     public void GoBack()
     {
-        if (!CanGoBack)
+        if (CanGoBack)
         {
-            return;
+            _ = CallAsync("floxHistory.back");
         }
-
-        _isNavigatingBack = true;
-        var previousUri = _history.Pop();
-        _navigationManager.NavigateTo(previousUri);
-        NotifyHistoryChanged();
-    }
-
-    /// <inheritdoc />
-    public void ClearHistory()
-    {
-        _history.Clear();
-        NotifyHistoryChanged();
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        if (_isNavigatingBack)
+        _ = ReadIndexAsync();
+    }
+
+    private async Task ReadIndexAsync()
+    {
+        try
         {
-            _isNavigatingBack = false;
-            _currentUri = e.Location;
-            return;
+            _index = await _js.InvokeAsync<int>("floxHistory.index");
+        }
+        catch (Exception exception) when (exception is JSException or JSDisconnectedException or InvalidOperationException or TaskCanceledException)
+        {
+            _index = 0;
         }
 
-        var currentDepth = GetRouteDepth(_currentUri);
-        var newDepth = GetRouteDepth(e.Location);
+        HistoryChanged?.Invoke(this, EventArgs.Empty);
+    }
 
-        if (newDepth > currentDepth)
+    private async Task CallAsync(string identifier)
+    {
+        try
         {
-            var isRootToFirstLevelTransition = currentDepth == 0 && newDepth == 1;
-
-            if (!isRootToFirstLevelTransition && _currentUri != null)
-            {
-                _history.Push(_currentUri);
-            }
+            await _js.InvokeVoidAsync(identifier);
         }
-        else if (newDepth < currentDepth)
+        catch (Exception exception) when (exception is JSException or JSDisconnectedException or InvalidOperationException or TaskCanceledException)
         {
-            while (_history.Count > 0 && GetRouteDepth(_history.Peek()) >= newDepth)
-            {
-                _history.Pop();
-            }
+            // No page to go back through: the app is leaving or not in a browser
         }
-        else
-        {
-            while (_history.Count > 0 && GetRouteDepth(_history.Peek()) >= newDepth)
-            {
-                _history.Pop();
-            }
-        }
-
-        _currentUri = e.Location;
-        NotifyHistoryChanged();
     }
 
     // The depth below the base of the application, whatever path the application is served from
-    private int GetRouteDepth(string? uri)
+    private int GetRouteDepth(string uri)
     {
-        if (string.IsNullOrEmpty(uri))
-        {
-            return 0;
-        }
-
         var path = _navigationManager.ToBaseRelativePath(uri);
         var end = path.IndexOfAny(['?', '#']);
-        if (end >= 0)
-        {
-            path = path[..end];
-        }
-
-        return path.Split('/', StringSplitOptions.RemoveEmptyEntries)
-                   .Length;
-    }
-
-    private void NotifyHistoryChanged()
-    {
-        HistoryChanged?.Invoke(this, EventArgs.Empty);
+        return (end >= 0 ? path[..end] : path).Split('/', StringSplitOptions.RemoveEmptyEntries).Length;
     }
 
     /// <inheritdoc />

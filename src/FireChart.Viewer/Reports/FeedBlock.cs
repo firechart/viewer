@@ -58,6 +58,7 @@ internal sealed class FeedBlock : ReportBlock, IReportFeed, IDisposable
     private ILogger<FeedBlock> Logger { get; set; } = default!;
 
     private int _round;
+    private Task? _filling;
     private Stopwatch? _drawing;
 
     public SummarySection? Section => _section;
@@ -110,7 +111,7 @@ internal sealed class FeedBlock : ReportBlock, IReportFeed, IDisposable
         // title, the decimals of the section
         _options = new TileOptions(Text("age") == "true", Text("status") != "false",
                                    Text("codes").Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), _decimals);
-        _section = new SummarySection(definition, searches, Scope.Runtime.Culture.Name, _options, _contextType, Session?.Summary.EffectivePageSize());
+        _section = new SummarySection(definition, searches, Scope.Runtime.Culture.Name, _options, _contextType, Session?.Fhir.EffectivePageSize());
 
         // What the tiles of the records show of others comes with the records (_include): one request instead of one per record. A tile that shows
         // the encounter of its record asks for {Type}:encounter; a server that refuses it is asked again without it (the reader remembers)
@@ -136,7 +137,8 @@ internal sealed class FeedBlock : ReportBlock, IReportFeed, IDisposable
 
     public Task MoreAsync()
     {
-        return _section is null ? Task.CompletedTask : FillAsync();
+        // One load at a time: a second ask while the pages come (Load all, Print) waits for them, else both would add the same records
+        return _section is null ? Task.CompletedTask : _filling is { IsCompleted: false } running ? running : _filling = FillAsync();
     }
 
     // The pages a load asks for: the first ones, the next ones, or after a failure the ones that failed
@@ -463,7 +465,7 @@ internal sealed class FeedBlock : ReportBlock, IReportFeed, IDisposable
     {
         var value = ReportText.Children(quantity, "value").FirstOrDefault()?.Poco as FhirDecimal;
         return value?.Value is { } number
-            ? _decimals is { } places ? Math.Round(number, places).ToString("0." + new string('#', places), format.Culture) : number.ToString(format.Culture)
+            ? DecimalText.Format(number, _decimals ?? format.Decimals, format.Culture)
             : string.Empty;
     }
 
@@ -512,7 +514,7 @@ internal sealed class FeedBlock : ReportBlock, IReportFeed, IDisposable
             builder.AddComponentParameter(33, nameof(ReportTrends.Selected), _selected);
             builder.AddComponentParameter(34, nameof(ReportTrends.History), _history);
             builder.AddComponentParameter(35, nameof(ReportTrends.Loading), _trendLoading);
-            builder.AddComponentParameter(36, nameof(ReportTrends.Decimals), _decimals);
+            builder.AddComponentParameter(36, nameof(ReportTrends.Decimals), _decimals ?? Session?.Fhir.Decimals);
             builder.AddComponentParameter(37, nameof(ReportTrends.Tile), (RenderFragment<ResourceSummary>)(item => TileOf(item, _ => null)));
             builder.AddComponentParameter(38, nameof(ReportTrends.TitleOf),
                                           (Func<ResourceSummary, string>)(item => item.Json is null ? item.Id : ReportText.Text(Scope.Runtime.Data.NodeOf(item), "code", Scope.Runtime.Format)));

@@ -12,8 +12,8 @@
           "name": "SMART Health IT R4",
           "fhirRelease": "R4"
         },
-        "terminology": {
-          "server": "https://tx.fhir.org/r4"
+        "fhir": {
+          "terminologyServer": "https://tx.fhir.org/r4"
         }
       }
     },
@@ -32,8 +32,8 @@
           "extraParameters": "launch=e30",
           "flow": "popup"
         },
-        "terminology": {
-          "server": "https://tx.fhir.org/r4"
+        "fhir": {
+          "terminologyServer": "https://tx.fhir.org/r4"
         }
       }
     },
@@ -48,8 +48,8 @@
           "name": "HAPI FHIR R4",
           "fhirRelease": "R4"
         },
-        "terminology": {
-          "server": "https://tx.fhir.org/r4"
+        "fhir": {
+          "terminologyServer": "https://tx.fhir.org/r4"
         }
       }
     }

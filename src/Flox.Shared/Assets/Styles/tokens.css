@@ -99,6 +99,21 @@ input.bb\:h-10 {
     }
 }
 
+/* The bar of a navigation under the app bar (AppBar, NavigationProgress): a segment runs across it while the next page comes */
+@theme {
+    --animate-navigation-progress: navigation-progress 1.1s ease-in-out infinite;
+
+    @keyframes navigation-progress {
+        from {
+            transform: translateX(-100%);
+        }
+
+        to {
+            transform: translateX(250%);
+        }
+    }
+}
+
 @import "./fire.css";
 
 /* The tokens of the Blazor Blueprint theme (theme.css) as utilities, by the names of shadcn/ui: bg-primary, text-muted-foreground, border-border, ...;

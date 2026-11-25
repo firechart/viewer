@@ -1,0 +1,134 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e01",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "example-patient",
+        "name": [{ "family": "Example", "given": ["Alex"] }],
+        "gender": "female",
+        "birthDate": "1984-03-12",
+        "generalPractitioner": [{ "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e02" }],
+        "managingOrganization": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e03" }
+      },
+      "request": { "method": "POST", "url": "Patient" }
+    },
+    {
+      "fullUrl": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e02",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "example-practitioner",
+        "name": [{ "family": "Sample", "given": ["Robin"], "prefix": ["Dr."] }]
+      },
+      "request": { "method": "POST", "url": "Practitioner" }
+    },
+    {
+      "fullUrl": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e03",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "example-organization",
+        "name": "Example Community Clinic"
+      },
+      "request": { "method": "POST", "url": "Organization" }
+    },
+    {
+      "fullUrl": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e04",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "example-encounter",
+        "status": "finished",
+        "class": { "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode", "code": "AMB", "display": "ambulatory" },
+        "type": [{ "text": "General check-up" }],
+        "subject": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e01" },
+        "participant": [{ "individual": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e02" } }],
+        "period": { "start": "2026-10-02T09:00:00+02:00", "end": "2026-10-02T09:40:00+02:00" },
+        "location": [{ "location": { "reference": "Location/example-room-12" } }],
+        "serviceProvider": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e03" }
+      },
+      "request": { "method": "POST", "url": "Encounter" }
+    },
+    {
+      "fullUrl": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e05",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "example-condition",
+        "clinicalStatus": { "coding": [{ "system": "http://terminology.hl7.org/CodeSystem/condition-clinical", "code": "active" }] },
+        "code": { "coding": [{ "system": "http://snomed.info/sct", "code": "38341003", "display": "Hypertensive disorder" }], "text": "Hypertension" },
+        "subject": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e01" },
+        "encounter": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e04" },
+        "recordedDate": "2026-10-02"
+      },
+      "request": { "method": "POST", "url": "Condition" }
+    },
+    {
+      "fullUrl": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e06",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "example-bp",
+        "status": "final",
+        "category": [{ "coding": [{ "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs" }] }],
+        "code": { "coding": [{ "system": "http://loinc.org", "code": "85354-9", "display": "Blood pressure panel" }], "text": "Blood pressure" },
+        "subject": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e01" },
+        "encounter": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e04" },
+        "performer": [{ "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e02" }],
+        "effectiveDateTime": "2026-10-02T09:10:00+02:00",
+        "component": [
+          { "code": { "coding": [{ "system": "http://loinc.org", "code": "8480-6", "display": "Systolic blood pressure" }] },
+            "valueQuantity": { "value": 148, "unit": "mmHg", "system": "http://unitsofmeasure.org", "code": "mm[Hg]" } },
+          { "code": { "coding": [{ "system": "http://loinc.org", "code": "8462-4", "display": "Diastolic blood pressure" }] },
+            "valueQuantity": { "value": 92, "unit": "mmHg", "system": "http://unitsofmeasure.org", "code": "mm[Hg]" } }
+        ]
+      },
+      "request": { "method": "POST", "url": "Observation" }
+    },
+    {
+      "fullUrl": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e07",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "example-weight",
+        "status": "final",
+        "category": [{ "coding": [{ "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "vital-signs" }] }],
+        "code": { "coding": [{ "system": "http://loinc.org", "code": "29463-7", "display": "Body weight" }], "text": "Body weight" },
+        "subject": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e01" },
+        "encounter": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e04" },
+        "effectiveDateTime": "2026-10-02T09:05:00+02:00",
+        "valueQuantity": { "value": 71.4, "unit": "kg", "system": "http://unitsofmeasure.org", "code": "kg" }
+      },
+      "request": { "method": "POST", "url": "Observation" }
+    },
+    {
+      "fullUrl": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e08",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "example-glucose",
+        "status": "final",
+        "category": [{ "coding": [{ "system": "http://terminology.hl7.org/CodeSystem/observation-category", "code": "laboratory" }] }],
+        "code": { "coding": [{ "system": "http://loinc.org", "code": "2339-0", "display": "Glucose [Mass/volume] in Blood" }], "text": "Glucose" },
+        "subject": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e01" },
+        "encounter": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e04" },
+        "effectiveDateTime": "2026-10-02T09:20:00+02:00",
+        "valueQuantity": { "value": 104, "unit": "mg/dL", "system": "http://unitsofmeasure.org", "code": "mg/dL" }
+      },
+      "request": { "method": "POST", "url": "Observation" }
+    },
+    {
+      "fullUrl": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e09",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "example-medication",
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": { "coding": [{ "system": "http://www.nlm.nih.gov/research/umls/rxnorm", "code": "314076", "display": "lisinopril 10 MG Oral Tablet" }] },
+        "subject": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e01" },
+        "encounter": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e04" },
+        "requester": { "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e02" },
+        "reasonReference": [{ "reference": "urn:uuid:9f1c5a1e-3d4b-4e7a-9d3c-1a2b3c4d5e05" }],
+        "authoredOn": "2026-10-02",
+        "dosageInstruction": [{ "text": "One tablet once a day" }]
+      },
+      "request": { "method": "POST", "url": "MedicationRequest" }
+    }
+  ]
+}

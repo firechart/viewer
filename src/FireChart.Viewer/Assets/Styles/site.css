@@ -3,8 +3,10 @@
 @import "../../../Flox.Shared/Assets/Styles/tokens.css";
 
 @source "../../Appearance";
+@source "../../Bundles";
 @source "../../Components";
 @source "../../Pages";
+@source "../../Reports";
 @source "../../Routing";
 @source "../../SearchForms";
 @source "../../Smart";

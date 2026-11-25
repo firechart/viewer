@@ -1,4 +1,4 @@
-// The public servers of the sandbox at /; each with a patient that has much data. Checked by hand 2026-11-07 (CapabilityStatement, CORS, the patient)
+// The public servers of the playground and of the demo viewer.html; each with a patient that has much data. Checked by hand 2026-11-07 (CapabilityStatement, CORS, the patient)
 [
   {
     "id": "smart-open",

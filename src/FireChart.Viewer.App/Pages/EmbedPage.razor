@@ -25,10 +25,8 @@ else
         <FhirViewer @key=@_culture.Name
                     Server=@_setup.Server
                     RoutePrefix=@Prefix
-                    SmartRedirectUri=@NavigationManager.ToAbsoluteUri(SmartCallbackPage.Route).ToString()
-                    SmartFlow=@_setup.SmartFlow
-                    TerminologyServer=@_setup.TerminologyServer
-                    Summary=@_setup.Summary
+                    Smart=@SmartCallbackPage.OptionsOf(NavigationManager, _setup.SmartFlow)
+                    Fhir=@_setup.Fhir
                     Appearance=@_setup.Appearance
                     OnConfigError=@ReportAsync/>
     </div>
@@ -100,13 +98,21 @@ else
             return;
         }
 
+        var text = config.ToJsonString();
+        var setup = ViewerAppConfigLoader.Parse(text);
+
+        // A configuration that is not valid is refused and the Viewer that runs stays, with the configuration the host knows it has
+        if (setup.Server is null && _setup?.Server is not null)
+        {
+            await _channel!.FailAsync(request, "config_error", setup.Errors);
+            return;
+        }
+
         if (restart)
         {
             await _channel!.PostAsync("restarting");
         }
 
-        var text = config.ToJsonString();
-        var setup = ViewerAppConfigLoader.Parse(text);
         var otherServer = IsOtherServer(setup);
         await ApplyAsync(setup);
         if (setup.Server is null)
@@ -120,8 +126,7 @@ else
         var location = CurrentLocation();
         if (restart || otherServer || string.IsNullOrEmpty(Path))
         {
-            _hostNavigation = true;
-            GoToStart();
+            GoToStart(byHost: true);
             location = StartLocation;
         }
 
@@ -159,13 +164,7 @@ else
         }
 
         _configText = result.Text;
-        var otherServer = IsOtherServer(setup);
         await ApplyAsync(setup);
-        if (otherServer)
-        {
-            _hostNavigation = true;
-            GoToStart();
-        }
 
         var applied = new JsonObject { ["applied"] = new JsonArray([.. result.Applied.Select(a => (JsonNode)JsonValue.Create(a))]) };
         await _channel!.PostAsync("updated", applied);
@@ -208,8 +207,9 @@ else
 
     private static string StartLocation => new ViewerRoute(ViewerPage.ResourceTypes).Location;
 
-    private void GoToStart()
+    private void GoToStart(bool byHost = false)
     {
+        _hostNavigation = byHost;
         NavigationManager.NavigateTo(Prefix + StartLocation, replace: true);
     }
 

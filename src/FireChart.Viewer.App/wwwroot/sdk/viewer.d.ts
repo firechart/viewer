@@ -29,9 +29,16 @@ export interface ViewerConfig {
     };
     /** auto (the language of the browser), inherit (lang of the page, followed live; SDK only) or en, de, es, he, ru, zh-Hans, with a region (ru-RU). */
     locale?: string;
-    terminology?: {
-        /** The terminology server for the displays of bare codes. */
-        server?: string;
+    /** The FHIR settings; a change starts a new session of the Viewer (no reload of the page). */
+    fhir?: {
+        /** The terminology server for the displays of bare codes; none: the codes are shown as they are. */
+        terminologyServer?: string;
+        /** The page size (_count) of the searches of a summary whose form gives none: 1 to 500; default 20. */
+        pageSize?: number;
+        /** Load every record before the summary is shown, behind a panel of progress with Cancel; default false. */
+        loadAll?: boolean;
+        /** The most decimal places of a value: 0 to 10; default 2. More are rounded, without the zeros the rounding leaves (100.004 is 100). */
+        decimals?: number;
     };
     appearance?: {
         /** inherit (SDK only): the theme of the page (data-theme, data-bs-theme, the class dark, color-scheme), followed live. */
@@ -45,16 +52,10 @@ export interface ViewerConfig {
         /** Properties of public selectors (.Banner, .Tile, .Badge--status, ...). */
         rules?: Record<string, Record<string, string>>;
     };
-    summary?: {
-        /** The page size (_count) of the searches of a summary whose form gives none: 1 to 500; default 20. */
-        pageSize?: number;
-        /** Load every record before the summary is shown, behind a panel of progress with Cancel; default false. */
-        loadAll?: boolean;
-    };
 }
 
 /** The options that change without a restart. */
-export type ViewerUpdate = Pick<ViewerConfig, "locale" | "terminology" | "appearance">;
+export type ViewerUpdate = Pick<ViewerConfig, "locale" | "fhir" | "appearance">;
 
 export interface ViewerOptions {
     /** Where FireChart.Viewer.App is served (https://viewer.example.org/); its host.json must allow the origin of this page. */
@@ -68,9 +69,11 @@ export interface ViewerOptions {
 }
 
 export interface ViewerErrorData {
-    /** config_error, navigation_error, protocol_error, state_error. */
+    /** config_error, navigation_error, protocol_error, state_error; bundle_error of the Bundle Visualizer. */
     type: string;
-    /** unknown_option, missing_option, invalid_option, invalid_value, restart_required, invalid_location, not_mounted, destroyed, ... */
+    /** unknown_option, missing_option, invalid_option, invalid_value, restart_required, invalid_location, not_ready, origin_not_allowed (the origin of the page is
+     * not in host.json of the Viewer), internal_error, not_mounted, already_mounted, destroyed; of a Bundle
+     * invalid_bundle, unavailable, superseded, ... */
     code: string;
     /** The path of the option (appearance.theme) or the argument. */
     param: string;
@@ -113,5 +116,61 @@ export declare class Viewer {
     /** Prints the page of the Viewer: a summary loads all its records first and is not printed when some cannot be loaded; another page opens the
      * print dialog of the browser as it is (a list prints the rows in view, with a note that the printout is incomplete). */
     print(): Promise<Record<string, never>>;
+    destroy(): void;
+}
+
+/** The configuration of the Bundle Visualizer: the keys of viewer.json, the server optional. */
+export interface BundleVisualizerConfig {
+    /** The FHIR server of a Bundle read by an address (its release is the release of the Bundle); a pasted Bundle needs none. */
+    server?: ViewerConfig["server"];
+    /** The SMART client of the server, when it needs a sign-in: the sign-in comes before the address is read. After a redirect the SDK shows the last
+     * Bundle again by itself; "popup" keeps the frame. */
+    smart?: ViewerConfig["smart"];
+    locale?: ViewerConfig["locale"];
+    /** The release assumed for a Bundle without a server (fhirRelease of the server otherwise) and the decimal places of a value on a card. */
+    fhir?: ViewerConfig["fhir"];
+    appearance?: ViewerConfig["appearance"];
+}
+
+/** What show() draws: a Bundle (the parsed JSON, or a text of JSON or XML), or the address to read it from (absolute, or relative to server). */
+export type BundleSource = object | string | { location: string };
+
+/** The counts of a Bundle drawn. */
+export interface BundleShown {
+    /** The entries that hold a resource. */
+    resources: number;
+    /** The references drawn, to the resources the Bundle lacks too. */
+    references: number;
+}
+
+export interface BundleVisualizerEvents {
+    /** The frame runs with a configuration (after mount, a restart). */
+    ready: { server: string | null };
+    /** A Bundle is drawn (after show, or again after a change of the language). */
+    shown: BundleShown;
+    /** A resource was chosen (its sheet opened), or the sheet closed (null). */
+    select: { reference: string | null };
+    restarting: Record<string, never>;
+    updated: { applied: string[] };
+    /** An option, a message or a Bundle the frame could not use. */
+    error: ViewerErrorData;
+}
+
+export declare class BundleVisualizer {
+    static create(config: BundleVisualizerConfig, options: Omit<ViewerOptions, "urlParam">): BundleVisualizer;
+    /** The reference of the resource whose sheet is open; null when none is. */
+    readonly selected: string | null;
+    /** The configuration in effect. */
+    readonly options: BundleVisualizerConfig;
+    mount(target: string | Element): this;
+    on<K extends keyof BundleVisualizerEvents>(event: K, handler: (payload: BundleVisualizerEvents[K]) => void): () => void;
+    off<K extends keyof BundleVisualizerEvents>(event: K, handler: (payload: BundleVisualizerEvents[K]) => void): void;
+    /** Draws a Bundle; resolves when it is drawn (after the sign-in, when the server needs one), rejects with a bundle_error (invalid_bundle,
+     * unavailable, cancelled by the user, superseded) or a config_error. The same Bundle again after a failure or a cancel is read anew. */
+    show(bundle: BundleSource): Promise<BundleShown>;
+    update(changes: ViewerUpdate): Promise<{ applied: string[] }>;
+    /** Starts anew with another configuration; nothing is shown after it. */
+    restart(config: BundleVisualizerConfig): Promise<{ server: string | null }>;
+    configure(config: BundleVisualizerConfig): Promise<{ applied: string[] } | { server: string | null } | null>;
     destroy(): void;
 }

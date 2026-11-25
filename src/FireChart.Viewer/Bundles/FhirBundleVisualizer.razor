@@ -1,0 +1,902 @@
+@* The Bundle Visualizer: a FHIR Bundle as the graph of the references between its resources, beside the Viewer and of its kind (the same components of
+   the library, the same look). The Bundle is a text (pasted, dropped: it stays in the browser) or an address read once (a search, $everything, a
+   document). The references are curves in SVG, the resources buttons over them (the keyboard reaches each); a drag pans, the wheel and a pinch zoom
+   (FhirBundleVisualizer.razor.js). A click or a tap on a resource opens its sheet (as RecordSheet): its card (the tile of its type, its references
+   either way) and its source. The resources a Bundle refers to and does not hold are drawn dashed; nothing is read to complete them *@
+@implements IAsyncDisposable
+@inject IReleaseModels Models
+@inject IServerResourceTypeProvider Types
+@inject IViewerAssets LibraryAssets
+@inject IViewerStyle Style
+@inject FireChart.Viewer.Reports.ViewerTerminology Terminology
+@inject IHttpClientFactory HttpClientFactory
+@inject IServerCredentialStore Credentials
+@inject IJSRuntime JS
+@inject ISmartAuthorizer Authorizer
+@inject Microsoft.Extensions.Logging.ILogger<FhirBundleVisualizer> Logger
+@using System.Globalization
+@using System.Text.Json
+@using FireChart.Viewer.Core.Bundles
+@using FireChart.Viewer.Core.Reports
+@using FireChart.Viewer.Library
+@using Hl7.Fhir.Utility
+
+@if (_look?.Stylesheet.Css is { Length: > 0 } css)
+{
+    <style>@css</style>
+}
+<div class="flex h-full min-h-0 flex-col gap-2" data-viewer="bundle-visualizer">
+    @if (_loading)
+    {
+        <div class="flex grow items-center justify-center text-muted" data-viewer="bundle-loading">
+            <LoadingPanel Title=@Strings.Caption_LoadingBundle Message=@_phase OnCancel=@CancelLoadAsync/>
+        </div>
+    }
+    else if (_access is not ServerAccess.Ready && Server is not null)
+    {
+        @* The server of the address needs a sign-in or credentials: the Bundle is read once they are given *@
+        <div class="overflow-y-auto p-2" data-viewer="bundle-access">
+            @if (_access == ServerAccess.NeedsAuthorization)
+            {
+                <FireChart.Viewer.Smart.ServerSignInPanel Server=@Server Rejected=@_rejected Smart=@Smart OnSignedIn=@(_ => ReloadAsync())/>
+            }
+            else if (_access == ServerAccess.NeedsCredentials)
+            {
+                <FireChart.Viewer.Smart.ServerCredentialsPanel Server=@Server Rejected=@_rejected OnSubmitted=@ReloadAsync/>
+            }
+            else
+            {
+                <Alert Kind="AlertKind.Warning" data-error="bundle">@Strings.Message_BundleUnavailable</Alert>
+            }
+        </div>
+    }
+    else if (_error is not null)
+    {
+        <Alert Kind="AlertKind.Warning" data-error="bundle">@_error</Alert>
+    }
+    else if (_graph is null)
+    {
+        <div class="flex grow items-center justify-center p-4 text-center text-muted" data-viewer="bundle-none">
+            <p class="m-0">@Strings.Message_BundleNone</p>
+        </div>
+    }
+    else if (_graph.Nodes.Count == 0)
+    {
+        <Alert Kind="AlertKind.Info" data-viewer="bundle-empty">@Strings.Message_BundleEmpty</Alert>
+    }
+    else
+    {
+        <div class="flex shrink-0 flex-wrap items-center gap-2" data-viewer="bundle-toolbar">
+            <span class="text-sm text-muted" data-viewer="bundle-counts">
+                @string.Format(CultureInfo.CurrentCulture, Strings.Message_BundleCounts, _graph.EntryCount, _graph.Edges.Count)
+            </span>
+            <div class="flex flex-wrap gap-1" role="group" aria-label=@Strings.Caption_BundleTypes data-viewer="bundle-types">
+                @foreach (var type in _types)
+                {
+                    var shown = !_hidden.Contains(type.Name);
+                    <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small" aria-pressed=@(shown ? "true" : "false")
+                            Class=@(shown ? null : "border-dashed opacity-60") OnClick=@(() => ToggleType(type.Name)) data-type=@type.Name>
+                        <IconResource ResourceType=@type.Name Autocolor/>
+                        <span>@type.Name</span>
+                        <span class="text-muted">@type.Count</span>
+                    </Button>
+                }
+            </div>
+            <span class="grow"></span>
+            @if (_focus is not null)
+            {
+                <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small" OnClick=@ShowAll IconName="select_all" Text=@Strings.Caption_BundleShowAll data-viewer="bundle-show-all"/>
+            }
+            <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Strings.Caption_ZoomOut AriaLabel=@Strings.Caption_ZoomOut OnClick=@(() => ZoomAsync(1 / ZoomStep))>
+                <FloxIcon Icon="zoom_out"/>
+            </Button>
+            <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Strings.Caption_ZoomIn AriaLabel=@Strings.Caption_ZoomIn OnClick=@(() => ZoomAsync(ZoomStep))>
+                <FloxIcon Icon="zoom_in"/>
+            </Button>
+            <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Strings.Caption_FitToView AriaLabel=@Strings.Caption_FitToView OnClick=@FitAsync data-viewer="bundle-fit">
+                <FloxIcon Icon="fit_screen"/>
+            </Button>
+        </div>
+    }
+
+    @* The drawing is in the page as long as the component: its script holds it *@
+    <div @ref=_behind class=@($"relative min-h-0 grow rounded-lg border border-line bg-surface {(_graph is { Nodes.Count: > 0 } && !_loading && _error is null ? string.Empty : "hidden")}")>
+        @* The drawing is laid out from the left edge (its script and the places of the nodes count from it), also in a page written right to left *@
+        <div @ref=_viewport dir="ltr" class="absolute inset-0 cursor-grab touch-none select-none overflow-hidden active:cursor-grabbing" role="group"
+             aria-label=@Strings.Caption_BundleGraph data-viewer="bundle-graph">
+            <div @ref=_canvas class="absolute start-0 top-0 origin-top-left" style=@($"width:{Px(_drawing.Width)};height:{Px(_drawing.Height)}")>
+                <svg class="absolute inset-0 overflow-visible text-muted" width=@Px(_drawing.Width) height=@Px(_drawing.Height) aria-hidden="true">
+                    <defs>
+                        <marker id=@_marker viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+                        </marker>
+                    </defs>
+                    @foreach (var edge in _drawing.Edges)
+                    {
+                        var near = Marked is { } marked && (edge.Edge.From == marked || edge.Edge.To == marked);
+                        <path d=@edge.Path fill="none" stroke="currentColor" stroke-width=@(near ? "2.5" : "1.25") marker-end=@($"url(#{_marker})")
+                              class=@(near ? "text-primary" : Marked is null ? "opacity-70" : "opacity-30")>
+                            <title>@edge.Edge.Path</title>
+                        </path>
+                    }
+                </svg>
+                @foreach (var placed in _drawing.Nodes)
+                {
+                    var node = placed.Node;
+                    var chosen = node.Key == Marked;
+                    <button type="button" @key=@node.Key data-viewer="bundle-node" data-key=@node.Key aria-pressed=@(chosen ? "true" : "false")
+                            class=@NodeClass(node, chosen) style=@NodeStyle(placed) title=@TitleOf(node) @onclick=@(() => Select(node))>
+                        <IconResource ResourceType=@node.ResourceType Autocolor Class="shrink-0"/>
+                        <span class="flex min-w-0 flex-col text-start leading-tight">
+                            <span class="truncate text-xs text-muted">@node.ResourceType</span>
+                            <span class="truncate text-sm">@TitleOf(node)</span>
+                        </span>
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (_selected is { } selected && _graph is not null)
+    {
+        <div class="fixed inset-0 z-[1000] bg-black/40" @onclick=@CloseSheet data-viewer="bundle-sheet-mask"></div>
+        <div @ref=_panel tabindex="-1" role="dialog" aria-modal="true" aria-label=@selected.ResourceType @onkeydown=@OnSheetKey data-viewer="bundle-sheet"
+             class="fixed z-[1001] inset-x-0 bottom-0 h-[85dvh] rounded-t-xl md:inset-y-0 md:start-auto md:end-0 md:h-auto md:w-[min(40rem,92vw)] md:rounded-none flex flex-col bg-surface text-ink shadow-xl outline-none">
+            <div class="flex shrink-0 items-center gap-2 border-b border-line px-3 py-1">
+                <IconResource ResourceType=@selected.ResourceType Autocolor/>
+                <span class="grow truncate font-medium">@selected.ResourceType</span>
+                <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Strings.Caption_BundleNeighbourhood AriaLabel=@Strings.Caption_BundleNeighbourhood
+                        OnClick=@(() => FocusOn(selected)) data-viewer="bundle-focus"><FloxIcon Icon="hub"/></Button>
+                <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@FloxStrings.Caption_Close AriaLabel=@FloxStrings.Caption_Close OnClick=@CloseSheet>
+                    <FloxIcon Icon="close"/>
+                </Button>
+            </div>
+            <div class="grow overflow-y-auto overscroll-contain px-3 pb-3">
+                <BbTabs @key=@selected.Key DefaultValue="card" Class="mt-2">
+                    <BbTabsList>
+                        <BbTabsTrigger Value="card" data-viewer="bundle-card-tab">@Strings.Caption_BundleCard</BbTabsTrigger>
+                        <BbTabsTrigger Value="source" data-viewer="bundle-source-tab">@FloxStrings.Caption_Source</BbTabsTrigger>
+                    </BbTabsList>
+                    <BbTabsContent Value="card">
+                        <div class="fx-root mt-2 flex flex-col gap-4" data-viewer="bundle-card">
+                            @if (selected.Json is null)
+                            {
+                                <Alert Kind="AlertKind.Info">@Strings.Message_BundleNotInBundle</Alert>
+                                <code class="wrap-anywhere text-sm">@selected.Key</code>
+                            }
+                            else
+                            {
+                                @Card(selected)
+                            }
+
+                            @Links(Strings.Caption_BundleRefersTo, _graph.Edges.Where(edge => edge.From == selected.Key).Select(edge => new Link(edge.Path, edge.To)), "bundle-refers-to")
+                            @Links(Strings.Caption_BundleReferredBy, _graph.Edges.Where(edge => edge.To == selected.Key).Select(edge => new Link(edge.Path, edge.From)), "bundle-referred-by")
+                        </div>
+                    </BbTabsContent>
+                    <BbTabsContent Value="source">
+                        @if (selected.Json is null)
+                        {
+                            @* A resource the Bundle only refers to has no source: say why instead of an empty editor *@
+                            <Alert Kind="AlertKind.Info" Class="mt-2" data-viewer="bundle-no-source">@Strings.Message_BundleNoSource</Alert>
+                        }
+                        else
+                        {
+                            <CodeEditor Class="mt-2" Value=@SourceOf(selected) ReadOnly="true" WordWrap="true" Height="calc(85dvh - 8rem)"/>
+                        }
+                    </BbTabsContent>
+                </BbTabs>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+
+    private const double ZoomStep = 1.25;
+    private const int NeighbourhoodDepth = 2;
+    private const int TitlesPerStep = 8;
+    private const int TitlesDrawMs = 250;
+    // The source as it was written: indented, no character escaped that JSON allows as it is (+, <, non-Latin letters)
+    private static readonly JsonSerializerOptions s_indented = new() { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+
+    private readonly string _marker = $"fx-bundle-arrow-{Guid.NewGuid():N}";
+    private readonly HashSet<string> _hidden = new(StringComparer.Ordinal);
+    private CancellationTokenSource? _load;
+    private string? _loadedKey;
+    private string? _loadedBundle;
+    private bool _loading;
+    private string? _phase;
+    private string? _error;
+    private BundleGraph? _graph;
+    private BundleDrawing _drawing = BundleDrawing.Empty;
+    private BundleDrawing? _fitted;
+    private IReadOnlyList<TypeCount> _types = [];
+    private Dictionary<string, string> _titles = new(StringComparer.Ordinal);
+    private FireChart.Viewer.Reports.ReportScope? _scope;
+    private BundleNode? _selected;
+    private string? _focus;
+    private string? _sourceOf;
+    private string? _source;
+    private ElementReference _behind;
+    private ElementReference _viewport;
+    private ElementReference _canvas;
+    private ElementReference _panel;
+    private IJSObjectReference? _module;
+    private IJSObjectReference? _view;
+    private IJSObjectReference? _sheetModule;
+    private IJSObjectReference? _sheet;
+    private string? _sheetFocused;
+    private bool _sheetAttaching;
+    private bool _disposed;
+    private ServerAccess _access = ServerAccess.Ready;
+    private bool _rejected;
+    private bool _kitAdopted;
+    private FireChart.Viewer.Appearance.AppearanceApplier? _look;
+
+    private sealed record TypeCount(string Name, int Count);
+
+    private sealed record Link(string Path, string Key);
+
+    /// <summary>
+    /// The Bundle to show, as a text: JSON or XML of FHIR (pasted, dropped, read by the host). It wins over <see cref="Location"/>. Nothing of it leaves
+    /// the browser: the resources the Bundle refers to and does not hold are not read.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// &lt;FhirBundleVisualizer Bundle=@_pasted/&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public string? Bundle { get; set; }
+
+    /// <summary>
+    /// The address of the Bundle to read when there is no <see cref="Bundle"/>: absolute (<c>https://hapi.fhir.org/baseR4/Patient/1/$everything</c>), or
+    /// relative to <see cref="Server"/> (<c>Patient?name=smith&amp;_include=Patient:organization</c>). Read once as JSON; another address reads again.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// &lt;FhirBundleVisualizer Server=@server Location="Encounter?patient=123&amp;_revinclude=Observation:encounter"/&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public string? Location { get; set; }
+
+    /// <summary>
+    /// The FHIR server of <see cref="Location"/>: the base of a relative address, and its credentials go with a request to its own origin only (never
+    /// to an address elsewhere). Its release is the release of the Bundle. None: an absolute address is read without credentials.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// &lt;FhirBundleVisualizer Server=@server Location="Patient/123/$everything"/&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public IViewerServer? Server { get; set; }
+
+    /// <summary>
+    /// The FHIR settings: the release assumed for a Bundle without a server (<see cref="FhirOptions.DefaultFhirVersion"/>) and the decimal places of
+    /// a value on a card; the defaults when none.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// &lt;FhirBundleVisualizer Bundle=@_text Fhir=@(new FhirOptions { DefaultFhirVersion = FhirRelease.R5 })/&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public FhirOptions? Fhir { get; set; }
+
+    /// <summary>Raised when a resource is chosen (its sheet opens) or the sheet is closed (<see langword="null"/>): the reference of the resource
+    /// (<c>Patient/123</c>), or its <c>fullUrl</c> when it has no id.</summary>
+    /// <example>
+    /// <code>
+    /// &lt;FhirBundleVisualizer Bundle=@_text OnSelect=@(reference =&gt; _chosen = reference)/&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public EventCallback<string?> OnSelect { get; set; }
+
+    /// <summary>Raised once for every Bundle given (a text or an address) when it is drawn or could not be: its counts, or the error the component
+    /// shows. A frame or a host reports it on (the frame of the Viewer app answers <c>show</c> of the SDK with it).</summary>
+    /// <example>
+    /// <code>
+    /// &lt;FhirBundleVisualizer Location=@_address Server=@server OnLoad=@(load =&gt; _failed = !load.Succeeded)/&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public EventCallback<BundleLoad> OnLoad { get; set; }
+
+    /// <summary>How a SMART sign-in leaves the page and where it comes back, as <see cref="FhirViewer.Smart"/>: a <see cref="Server"/> with OAuth2 is
+    /// signed in to before its <see cref="Location"/> is read. A redirect leaves the page and comes back to where it was, so the host gives the
+    /// visualizer its <see cref="Location"/> again (the SDK does); <see cref="FireChart.Viewer.Smart.SmartFlow.Popup"/> keeps the page.</summary>
+    /// <example>
+    /// <code>
+    /// &lt;FhirBundleVisualizer Server=@server Location="Patient/123/$everything" Smart=@(new SmartOptions { Flow = SmartFlow.Popup })/&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public FireChart.Viewer.Smart.SmartOptions? Smart { get; set; }
+
+    /// <summary>How the Bundle Visualizer looks, as <see cref="FhirViewer.Appearance"/>: none in a Flox application, where it inherits the styles of the
+    /// host; another instance is applied live.</summary>
+    /// <example>
+    /// <code>
+    /// &lt;FhirBundleVisualizer Bundle=@_text Appearance=@(new ViewerAppearance { Theme = ViewerTheme.Dark })/&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public FireChart.Viewer.Appearance.ViewerAppearance? Appearance { get; set; }
+
+    /// <summary>Raised for an option of the appearance that cannot be used and is left out, as <see cref="FhirViewer.OnConfigError"/>.</summary>
+    /// <example>
+    /// <code>
+    /// &lt;FhirBundleVisualizer Bundle=@_text Appearance=@look OnConfigError=@(error =&gt; Console.WriteLine(error.Message))/&gt;
+    /// </code>
+    /// </example>
+    [Parameter]
+    public EventCallback<ViewerConfigError> OnConfigError { get; set; }
+
+    /// <inheritdoc/>
+    protected override async Task OnParametersSetAsync()
+    {
+        _look ??= new FireChart.Viewer.Appearance.AppearanceApplier(LibraryAssets, JS, Logger);
+        foreach (var error in await _look.ComposeAsync(Appearance))
+        {
+            await OnConfigError.InvokeAsync(error);
+        }
+
+        // The text of the Bundle is compared as it is (the same string at once), not copied into a key at every render
+        var key = $"{Location}|{Server?.Key}|{Server?.BaseUrl}|{Fhir}";
+        if (key == _loadedKey && string.Equals(Bundle, _loadedBundle, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _loadedKey = key;
+        _loadedBundle = Bundle;
+        if (_load is not null)
+        {
+            await _load.CancelAsync();
+            _load.Dispose();
+        }
+
+        _load = new CancellationTokenSource();
+        await LoadAsync(_load.Token);
+    }
+
+    private async Task LoadAsync(CancellationToken token)
+    {
+        _graph = null;
+        _scope = null;
+        _selected = null;
+        _focus = null;
+        _error = null;
+        _access = ServerAccess.Ready;
+        _hidden.Clear();
+        _drawing = BundleDrawing.Empty;
+        _titles = new Dictionary<string, string>(StringComparer.Ordinal);
+        if (string.IsNullOrWhiteSpace(Bundle) && string.IsNullOrWhiteSpace(Location))
+        {
+            return;
+        }
+
+        _loading = true;
+        _phase = Server is not null && !string.IsNullOrWhiteSpace(Location) && string.IsNullOrWhiteSpace(Bundle) ? ReadingFrom(Server.BaseUrl) : null;
+        StateHasChanged();
+        BundleLoad? outcome = null;
+        try
+        {
+            var fhir = Fhir ?? FhirOptions.Default;
+            var release = (Server is null ? null : await Types.ReleaseOfAsync(Server)) ?? fhir.DefaultFhirVersion.GetLiteral();
+            var model = await Models.GetAsync(release, token);
+            string text;
+            if (!string.IsNullOrWhiteSpace(Bundle))
+            {
+                text = Bundle;
+            }
+            else
+            {
+                // An address of a server that needs a sign-in (or credentials) waits for them: the session of the tab, else the panel
+                if (BundleLoader.IsOfServer(Location!, Server))
+                {
+                    await Authorizer.RestoreAsync(Server!, token);
+                    _access = Credentials.AccessOf(Server!);
+                    if (_access != ServerAccess.Ready)
+                    {
+                        return;
+                    }
+                }
+
+                await ShowPhaseAsync(ReadingFrom(BundleLoader.AddressOf(Location!, Server)), token);
+                text = await LoadWithCredentialsAsync(token);
+                if (_access != ServerAccess.Ready)
+                {
+                    return;
+                }
+            }
+
+            // The tiles of the cards and of the nodes are of the kit fx-*: its sheet is in the head before them, as for the lists of the Viewer
+            if (!_kitAdopted)
+            {
+                await KitStyleSheet.AdoptAsync(JS, await Style.GetStyleAsync(token));
+                _kitAdopted = true;
+            }
+
+            await ShowPhaseAsync(Strings.Message_BundleResolving, token);
+            var graph = BundleGraph.Parse(BundleText.IsXml(text) ? BundleText.ToJson(text, model) : text);
+            var scope = await ScopeAsync(graph, model, fhir, token);
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
+
+            _graph = graph;
+            _scope = scope;
+            _types = [.. graph.Nodes.GroupBy(node => node.ResourceType, StringComparer.Ordinal)
+                                    .Select(group => new TypeCount(group.Key, group.Count()))
+                                    .OrderByDescending(type => type.Count).ThenBy(type => type.Name, StringComparer.Ordinal)];
+            Redraw();
+            _ = TitlesAsync(graph, scope, token);
+            outcome = new BundleLoad(graph.EntryCount, graph.Edges.Count);
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            return;
+        }
+        catch (FormatException ex)
+        {
+            _error = string.Format(CultureInfo.CurrentCulture, Strings.Message_BundleInvalid, ex.Message);
+            outcome = new BundleLoad(0, 0, BundleLoad.InvalidBundle, _error);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or Flox.Core.FloxException or JsonException)
+        {
+            _error = Strings.Message_BundleUnavailable;
+            outcome = new BundleLoad(0, 0, BundleLoad.Unavailable, _error);
+        }
+        finally
+        {
+            if (!token.IsCancellationRequested)
+            {
+                _loading = false;
+            }
+        }
+
+        if (outcome is not null && !token.IsCancellationRequested)
+        {
+            await OnLoad.InvokeAsync(outcome);
+        }
+    }
+
+    private static string ReadingFrom(string address)
+    {
+        return string.Format(CultureInfo.CurrentCulture, Strings.Message_BundleReading,
+                             Uri.TryCreate(address, UriKind.Absolute, out var uri) ? uri.Host : address);
+    }
+
+    // The step of the loading in its dialog, drawn before the work of the step holds the thread
+    private async Task ShowPhaseAsync(string phase, CancellationToken token)
+    {
+        _phase = phase;
+        StateHasChanged();
+        await Task.Delay(1, token);
+    }
+
+    // Cancel of the dialog: the Bundle is not shown and the host learns it (OnLoad); it loads again by ReloadAsync
+    private async Task CancelLoadAsync()
+    {
+        if (_load is null || !_loading)
+        {
+            return;
+        }
+
+        await _load.CancelAsync();
+        _loading = false;
+        _error = Strings.Message_BundleCancelled;
+        await OnLoad.InvokeAsync(new BundleLoad(0, 0, BundleLoad.Cancelled, _error));
+    }
+
+    // A token the server no longer takes is forgotten (with its session) and asked for again
+    private async Task<string> LoadWithCredentialsAsync(CancellationToken token)
+    {
+        try
+        {
+            var text = await BundleLoader.LoadAsync(HttpClientFactory, Credentials, Location!, Server, token);
+            _rejected = false;
+            return text;
+        }
+        catch (HttpRequestException ex) when (ex.IsRejected() && Server is not null && Server.AuthenticationType != AuthenticationType.None
+                                              && BundleLoader.IsOfServer(Location!, Server))
+        {
+            await Authorizer.DisconnectAsync(Server, token);
+            Credentials.Forget(Server);
+            _rejected = true;
+            _access = Credentials.AccessOf(Server);
+            return string.Empty;
+        }
+    }
+
+    /// <summary>Loads the Bundle of the parameters again: the address is read anew (a server whose data changed, a loading that was cancelled or
+    /// failed); a pasted Bundle is drawn anew. The same parameters given again do not reload by themselves.</summary>
+    /// <returns>A task that completes when the Bundle is drawn, or could not be (<see cref="OnLoad"/> tells which).</returns>
+    /// <example>
+    /// <code>
+    /// &lt;FhirBundleVisualizer @ref=_visualizer Server=@server Location=@address/&gt;
+    /// @code { private FhirBundleVisualizer? _visualizer; private Task RefreshAsync() =&gt; _visualizer!.ReloadAsync(); }
+    /// </code>
+    /// </example>
+    public Task ReloadAsync()
+    {
+        // Called by the host through a reference, outside an event of this component: the drawing is asked for here
+        return InvokeAsync(async () =>
+        {
+            _loadedKey = null;
+            await OnParametersSetAsync();
+            StateHasChanged();
+        });
+    }
+
+    // The scope of the cards: the Bundle as the server of its components, every entry known (by Type/id and by its fullUrl)
+    private async Task<FireChart.Viewer.Reports.ReportScope> ScopeAsync(BundleGraph graph, Hl7.Fhir.Introspection.ModelInspector model, FhirOptions fhir,
+                                                                       CancellationToken token)
+    {
+        var library = new ReportLibrary(LibraryAssets, VendorLibrary.UrlOf);
+        var server = new BundleServer(Server?.BaseUrl ?? BundleServer.PastedBase, Server?.FhirRelease ?? fhir.DefaultFhirVersion);
+        var data = new ReportData(BundleReader.Instance, server, model, token);
+        data.KnowEntries(graph.Nodes.Where(node => node.Json is not null).Select(node => new KnownEntry(EntryKey(node), node.Json!, node.FullUrl)));
+        var format = new ReportFormat(CultureInfo.CurrentCulture, TimeProvider.System.LocalTimeZone, Terminology.For(null), decimals: fhir.Decimals,
+                                      strings: await library.StringsAsync(CultureInfo.CurrentUICulture, token));
+        var runtime = new FireChart.Viewer.Reports.ReportRuntime(new Dictionary<string, ComponentDefinition>(), data, format, name => library.LoadAsync(name, token));
+        return FireChart.Viewer.Reports.ReportScope.Root(runtime, null);
+    }
+
+    // The key of an entry to the data of the cards: the one a tile asks for (Type/id), the fullUrl for an entry without an id
+    private static string EntryKey(BundleNode node)
+    {
+        return $"{node.ResourceType}/{node.Id ?? node.Key}";
+    }
+
+    private static ResourceSummary SummaryOf(BundleNode node)
+    {
+        return new ResourceSummary(node.Id ?? node.Key, node.ResourceType, node.Json);
+    }
+
+    // The names of the resources, a few at a time so the drawing is not held up: the title of a record (what it is about, a name, a code)
+    private async Task TitlesAsync(BundleGraph graph, FireChart.Viewer.Reports.ReportScope scope, CancellationToken token)
+    {
+        var titles = new Dictionary<string, string>(StringComparer.Ordinal);
+        var drawn = System.Diagnostics.Stopwatch.StartNew();
+        foreach (var chunk in graph.Nodes.Where(node => node.Json is not null).Chunk(TitlesPerStep))
+        {
+            foreach (var node in chunk)
+            {
+                try
+                {
+                    titles[node.Key] = ReportText.TitleOf(scope.Runtime.Data.NodeOf(SummaryOf(node)), scope.Runtime.Format);
+                }
+                catch (Exception ex) when (ex is FormatException or InvalidOperationException or JsonException)
+                {
+                    // a resource that cannot be read is named by its id
+                }
+            }
+
+            await Task.Delay(1, CancellationToken.None);
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
+
+            // The graph draws again a few times a second, not at every step: each time is every node and edge
+            if (drawn.ElapsedMilliseconds >= TitlesDrawMs)
+            {
+                drawn.Restart();
+                _titles = new Dictionary<string, string>(titles, StringComparer.Ordinal);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+
+        _titles = titles;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void Redraw()
+    {
+        if (_graph is null)
+        {
+            _drawing = BundleDrawing.Empty;
+            return;
+        }
+
+        var shown = _focus is not null && _graph.Find(_focus) is not null ? _graph.Around(_focus, NeighbourhoodDepth) : _graph;
+        _drawing = BundleLayout.Draw(shown.Where(node => !_hidden.Contains(node.ResourceType) || node.Key == _focus));
+    }
+
+    private void ToggleType(string type)
+    {
+        if (!_hidden.Remove(type))
+        {
+            _hidden.Add(type);
+        }
+
+        Redraw();
+    }
+
+    private async Task Select(BundleNode node)
+    {
+        _selected = node;
+        await OnSelect.InvokeAsync(node.Reference ?? node.Key);
+    }
+
+    private async Task CloseSheet()
+    {
+        _selected = null;
+        await OnSelect.InvokeAsync(null);
+    }
+
+    private async Task FocusOn(BundleNode node)
+    {
+        _focus = node.Key;
+        Redraw();
+        await CloseSheet();
+    }
+
+    private void ShowAll()
+    {
+        _focus = null;
+        Redraw();
+    }
+
+    private async Task OnSheetKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            await CloseSheet();
+        }
+    }
+
+    private async Task ZoomAsync(double factor)
+    {
+        if (_view is not null)
+        {
+            await _view.InvokeVoidAsync("zoom", factor);
+        }
+    }
+
+    private async Task FitAsync()
+    {
+        if (_view is not null)
+        {
+            await _view.InvokeVoidAsync("fit", _drawing.Width, _drawing.Height);
+        }
+    }
+
+    // The resource whose references stand out: the one of the sheet, else the centre of the neighbourhood shown
+    private string? Marked => _selected?.Key ?? _focus;
+
+    private string TitleOf(BundleNode node)
+    {
+        return _titles.TryGetValue(node.Key, out var title) && title.Length > 0 ? title : node.Id ?? node.Key;
+    }
+
+    // The JSON of the resource of the sheet, indented once per resource
+    private string? SourceOf(BundleNode node)
+    {
+        if (_sourceOf != node.Key)
+        {
+            _sourceOf = node.Key;
+            using var document = node.Json is null ? null : JsonDocument.Parse(node.Json);
+            _source = document is null ? null : JsonSerializer.Serialize(document.RootElement, s_indented);
+        }
+
+        return _source;
+    }
+
+    private static string NodeClass(BundleNode node, bool chosen)
+    {
+        var line = node.InBundle ? "border-solid" : "border-dashed";
+        var ring = chosen ? "ring-2 ring-ring" : string.Empty;
+        return $"absolute flex items-center gap-2 overflow-hidden rounded-md border border-line {line} border-s-4 bg-card px-2 text-ink shadow-sm " +
+               $"hover:bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring {ring}";
+    }
+
+    private static string NodeStyle(PlacedNode placed)
+    {
+        var color = ResourceTypeColors.Of(placed.Node.ResourceType) ?? "var(--color-line)";
+        return $"left:{Px(placed.X)};top:{Px(placed.Y)};width:{Px(BundleLayout.NodeWidth)};height:{Px(BundleLayout.NodeHeight)};border-inline-start-color:{color}";
+    }
+
+    private static string Px(double value)
+    {
+        return FormattableString.Invariant($"{value:0.#}px");
+    }
+
+    // The resource whole, as the sheet of a record of the Viewer shows it ({Type}.page, else its banner and its view), in the scope of the Bundle
+    // (RecordCard is internal: drawn by the builder)
+    private RenderFragment Card(BundleNode node) => builder =>
+    {
+        if (_scope is null)
+        {
+            return;
+        }
+
+        builder.OpenComponent<CascadingValue<FireChart.Viewer.Reports.ReportScope>>(0);
+        builder.AddComponentParameter(1, nameof(CascadingValue<FireChart.Viewer.Reports.ReportScope>.Value), _scope);
+        builder.AddComponentParameter(2, nameof(CascadingValue<FireChart.Viewer.Reports.ReportScope>.IsFixed), true);
+        builder.AddComponentParameter(3, nameof(CascadingValue<FireChart.Viewer.Reports.ReportScope>.ChildContent), (RenderFragment)(inner =>
+        {
+            inner.OpenComponent<FireChart.Viewer.Reports.RecordCard>(0);
+            inner.AddComponentParameter(1, nameof(FireChart.Viewer.Reports.RecordCard.Item), SummaryOf(node));
+            inner.SetKey(node.Key);
+            inner.CloseComponent();
+        }));
+        builder.CloseComponent();
+    };
+
+    // The references of the resource of the sheet one way, each a button that chooses the resource it names
+    private RenderFragment Links(string caption, IEnumerable<Link> links, string marker) => builder =>
+    {
+        var list = links.Where(link => _graph?.Find(link.Key) is not null).ToList();
+        if (list.Count == 0)
+        {
+            return;
+        }
+
+        builder.OpenElement(0, "section");
+        builder.AddAttribute(1, "data-viewer", marker);
+        builder.OpenElement(2, "h3");
+        builder.AddAttribute(3, "class", "m-0 mb-1 text-sm font-medium text-muted");
+        builder.AddContent(4, caption);
+        builder.CloseElement();
+        builder.OpenElement(5, "ul");
+        builder.AddAttribute(6, "class", "m-0 flex list-none flex-col gap-1 p-0");
+        foreach (var link in list)
+        {
+            var target = _graph!.Find(link.Key)!;
+            builder.OpenElement(7, "li");
+            builder.SetKey($"{link.Path}|{link.Key}");
+            builder.OpenElement(8, "button");
+            builder.AddAttribute(9, "type", "button");
+            builder.AddAttribute(10, "class", "flex w-full items-center gap-2 rounded-md px-2 py-1 text-start hover:bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring");
+            builder.AddAttribute(11, "onclick", EventCallback.Factory.Create(this, () => Select(target)));
+            builder.OpenComponent<IconResource>(12);
+            builder.AddComponentParameter(13, nameof(IconResource.ResourceType), target.ResourceType);
+            builder.AddComponentParameter(14, nameof(IconResource.Autocolor), true);
+            builder.CloseComponent();
+            builder.OpenElement(15, "span");
+            builder.AddAttribute(16, "class", "min-w-0 grow truncate text-sm");
+            builder.AddContent(17, _titles.TryGetValue(target.Key, out var title) && title.Length > 0 ? title : $"{target.ResourceType} {target.Id ?? target.Key}");
+            builder.CloseElement();
+            builder.OpenElement(18, "code");
+            builder.AddAttribute(19, "class", "shrink-0 text-xs text-muted");
+            builder.AddContent(20, link.Path);
+            builder.CloseElement();
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    /// <inheritdoc/>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_look is not null)
+        {
+            await _look.ApplyThemeAsync(Appearance);
+        }
+
+        if (firstRender)
+        {
+            _module = await JS.ImportModuleAsync("./_content/FireChart.Viewer/Bundles/FhirBundleVisualizer.razor.js");
+            if (_disposed)
+            {
+                await _module.DisposeAsync();
+                return;
+            }
+
+            _view = await _module.InvokeAsync<IJSObjectReference>("attach", _viewport, _canvas);
+        }
+
+        // A new drawing (another Bundle, a neighbourhood, types hidden) is shown whole
+        if (_view is not null && !ReferenceEquals(_fitted, _drawing) && _drawing.Nodes.Count > 0)
+        {
+            _fitted = _drawing;
+            await FitAsync();
+        }
+
+        await FollowSheetAsync();
+    }
+
+    // The sheet keeps the focus while it is open and gives it back when it closes; the drawing behind is inert meanwhile (the script of RecordSheet)
+    // Renders overlap while it awaits the script: the fields change before an await, the awaits work on locals
+    private async Task FollowSheetAsync()
+    {
+        var selected = _selected;
+        if (selected is null)
+        {
+            if (_sheet is { } closing)
+            {
+                _sheet = null;
+                _sheetFocused = null;
+                await closing.InvokeVoidAsync("dispose");
+                await closing.DisposeAsync();
+            }
+
+            return;
+        }
+
+        if (_sheet is null)
+        {
+            if (_sheetAttaching)
+            {
+                return;
+            }
+
+            _sheetAttaching = true;
+            try
+            {
+                _sheetModule ??= await JS.ImportModuleAsync("./_content/FireChart.Viewer/Components/RecordSheet.razor.js");
+                if (_disposed || _selected is null)
+                {
+                    return;
+                }
+
+                var sheet = await _sheetModule.InvokeAsync<IJSObjectReference>("attach", _panel);
+                await sheet.InvokeVoidAsync("behind", _behind);
+                if (_disposed || _selected is null)
+                {
+                    // Closed while it was attached
+                    await sheet.InvokeVoidAsync("dispose");
+                    await sheet.DisposeAsync();
+                    return;
+                }
+
+                _sheet = sheet;
+                _sheetFocused = _selected.Key;
+            }
+            finally
+            {
+                _sheetAttaching = false;
+            }
+        }
+        else if (_sheetFocused != selected.Key)
+        {
+            _sheetFocused = selected.Key;
+            await _sheet.InvokeVoidAsync("focus");
+        }
+    }
+
+    /// <summary>Stops a Bundle that is still being read and releases the scripts of the drawing and of the sheet.</summary>
+    /// <returns>A task that completes when it is done.</returns>
+    public async ValueTask DisposeAsync()
+    {
+        _disposed = true;
+        _load?.Cancel();
+        _load?.Dispose();
+        try
+        {
+            foreach (var reference in new[] { _sheet, _sheetModule, _view is null ? null : await Detached(_view), _module })
+            {
+                if (reference is not null)
+                {
+                    await reference.DisposeAsync();
+                }
+            }
+
+            if (_look is not null)
+            {
+                await _look.DisposeAsync();
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+            // the page is gone
+        }
+    }
+
+    private static async Task<IJSObjectReference> Detached(IJSObjectReference view)
+    {
+        await view.InvokeVoidAsync("dispose");
+        return view;
+    }
+
+}

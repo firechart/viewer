@@ -5,7 +5,9 @@ The application of FireChart Viewer: a Blazor WebAssembly application whose publ
 | Address | What it is |
 |---|---|
 | `/embed` | The Viewer, the whole page: the frame another application (an EHR, a portal) embeds |
-| `/` | The sandbox (opens empty: the frame, a second .NET runtime, is created when a server is chosen): public test servers in one click, the editor of the configuration, theme and language, the messages, the code to copy |
+| `/embed-bundle` | The Bundle Visualizer, the whole page: the frame of `BundleVisualizer` of the SDK (the messages below, `show` instead of `navigate`) |
+| `/` | The home page: plain HTML (`index.html` starts the runtime only on a route of the application), with the demos `viewer.html` and `bundle.html` (the frames through the SDK, the server and the place in the address of the page) and `developers.html` |
+| `/playground` | The playground (opens empty: the frame, a second .NET runtime, is created when a server is chosen): public test servers in one click, the editor of the configuration, theme and language, the messages, the code to copy; a second tab, the Bundle Visualizer (a Bundle pasted, opened from a file, the example `examples/bundle-example.json`, or read by its address from an open demo server) |
 | `/smart/callback` | The way back of a SMART sign-in by redirect |
 | `/_content/FireChart.Viewer/smart-callback.html` | The way back of a SMART sign-in in a popup |
 
@@ -23,9 +25,8 @@ image is built from the `Dockerfile` of that folder (below).
   "server": { "url": "https://fhir.example.org/r4", "name": "Our FHIR server", "fhirRelease": "R4", "pageSize": 50 },
   "smart": { "clientId": "viewer", "scopes": "launch/patient patient/*.rs openid fhirUser", "flow": "redirect" },
   "locale": "auto",
-  "terminology": { "server": "https://tx.fhir.org/r4" },
-  "appearance": { "theme": "auto", "variables": { "colorPrimary": "#0a7f5a" } },
-  "summary": { "pageSize": 100, "loadAll": true }
+  "fhir": { "terminologyServer": "https://tx.fhir.org/r4", "pageSize": 100, "loadAll": true, "decimals": 2 },
+  "appearance": { "theme": "auto", "variables": { "colorPrimary": "#0a7f5a" } }
 }
 ```
 
@@ -34,9 +35,12 @@ Only `server.url` is required. `smart` is there when the server needs a sign-in 
 when wanted (`ru-RU`); `appearance.theme` is `light`, `dark` or `auto`. An unknown key, a missing one or a wrong value is shown in the page with
 its path (`'apperance' is not an option. Did you mean 'appearance'?`); the Viewer does not start with a wrong configuration.
 
-`summary` is how a patient summary loads. `summary.pageSize` is the page size of its searches whose summary form gives none (1 to 500,
-default 20; it is not `server.pageSize`, the page of a list). With `summary.loadAll` the summary loads every record of every section before it
-is shown, behind a panel of progress with Cancel (what has come is then shown, marked incomplete), so it does not move as the sections fill.
+`fhir` is the FHIR settings of the Viewer (`FhirOptions`), the group FHIR settings of FireChart. `fhir.terminologyServer` turns bare codes into
+words. `fhir.pageSize` is the page size of the searches of a patient summary whose summary form gives none (1 to 500, default 20; it is not
+`server.pageSize`, the page of a list). With `fhir.loadAll` the summary loads every record of every section before it is shown, behind a panel
+of progress with Cancel (what has come is then shown, marked incomplete), so it does not move as the sections fill. `fhir.decimals` is the
+most decimal places of a value (0 to 10, default 2): a value with more is rounded, without the zeros the rounding leaves (`100.004` is `100`),
+one with fewer keeps the digits of the record (`1.30`). `fhir` changes without a restart (`update`), as `locale` and `appearance` do.
 
 ## Docker
 
@@ -49,7 +53,7 @@ docker run -d --name fhir-viewer -p 8080:8080   -v "$PWD/viewer.json:/usr/share/
 ```
 
 `viewer.json` is the configuration (read at every load of the page), `host.json` the origins that may drive the frame (below); without them
-the image has the files of the sources: the open SMART Health IT server, `'self'` only. `/` is the sandbox, `/embed` the frame.
+the image has the files of the sources: the open SMART Health IT server, `'self'` only. `/` is the home page, `/playground` the playground, `/embed` the frame.
 
 **Your own components, forms and style.** The vendor library is the folder `/usr/share/nginx/html/library` of the image (the package
 `library` with its manifest `firechart.project.json`, which says its version). A project of the FireChart FHIR Designer mounted at
@@ -76,7 +80,7 @@ container (CORS).
 
 ## The frame and its host
 
-A page of another application embeds the Viewer with the JavaScript SDK (`wwwroot/sdk/viewer.js`, served by the app at `sdk/viewer.js`; [Sdk/README.md](Sdk/README.md)); the sandbox at `/`
+A page of another application embeds the Viewer with the JavaScript SDK (`wwwroot/sdk/viewer.js`, served by the app at `sdk/viewer.js`; [Sdk/README.md](Sdk/README.md)); the playground at `/playground`
 uses the same messages. The frame is opened as `embed?host=parent`, says `hello` to its parent and waits for the configuration. Envelopes
 `{ protocol: "fxv", type, id?, payload }`:
 
@@ -84,11 +88,22 @@ uses the same messages. The frame is opened as `embed?host=parent`, says `hello`
 |---|---|---|---|
 | `init` | `{ config }` | `hello` | (loaded, waits for `init`; again after the way back of a SMART redirect) |
 | `restart` | `{ config }` | `ready` | `{ location, server }` |
-| `update` | `{ config }`: `locale`, `appearance`, `terminology` only | `updated` | `{ applied }` |
+| `update` | `{ config }`: `locale`, `appearance`, `fhir` only | `updated` | `{ applied }` |
 | `navigate` | `{ location, replace? }` (`summary/Patient/123`) | `navigate` | `{ location, source: "user" \| "host" }` |
 | | | `restarting`, `resize` | `resize`: `{ height }` of the content |
 | | | `error` | `{ type, code, param, message }` |
 | | | `result` | `{ ok, value }` or `{ ok: false, error, errors }`, for a request with an `id` |
+
+The frame of the Bundle Visualizer (`embed-bundle?host=parent`) speaks the same envelopes. Its configuration is the keys of `viewer.json`,
+`server` optional (only for a Bundle read by an address) and `smart` its client when it needs a sign-in (the sign-in comes before the address is
+read; the way back of a redirect returns to the frame, never to a patient summary, and the SDK shows the last Bundle again); `update` and `restart`
+are as above, and instead of `navigate`:
+
+| From the host | Payload | From the frame | Payload |
+|---|---|---|---|
+| `show` | `{ bundle }` (an object, or a text of JSON or XML) or `{ location }`; answered when drawn: `{ resources, references }`, or `bundle_error` (`invalid_bundle`, `unavailable`, `cancelled`, `superseded`) | `shown` | `{ resources, references }` |
+| | | `select` | `{ reference }` of the resource whose sheet opened, `null` when it closed |
+| | | `ready` | `{ server }` (`null` without one) |
 
 **Who may drive the frame:** only a parent whose origin is in `host.json` (`{ "frameAncestors": ["'self'", "https://emr.example.org"] }`), the
 same syntax as CSP `frame-ancestors` (put the same list into that header of your proxy). The file of the published app allows `'self'` only;

@@ -238,11 +238,6 @@
         };
     }
 
-    private void Open(ResourceSummary row)
-    {
-        Session.Navigate(new ViewerRoute(ViewerPage.Resource, row.ResourceType, row.Id));
-    }
-
     // The address Open goes to: the row is a link to it
     private string? HrefOf(ResourceSummary row)
     {

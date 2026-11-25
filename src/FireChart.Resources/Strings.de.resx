@@ -420,9 +420,6 @@
   <data name="Conformance_NoElementsFound" xml:space="preserve">
     <value>Kein Element passt.</value>
   </data>
-  <data name="Conformance_NotInDifferential" xml:space="preserve">
-    <value>Vom Profil nicht geändert</value>
-  </data>
   <data name="Conformance_Description" xml:space="preserve">
     <value>Beschreibung</value>
   </data>
@@ -513,9 +510,6 @@
   <data name="Caption_TimesInDeviceZone" xml:space="preserve">
     <value>Zeiten werden in der Zeitzone dieses Geräts angezeigt</value>
   </data>
-  <data name="Message_SectionsFailed" xml:space="preserve">
-    <value>Abschnitte, die nicht geladen werden konnten: {0}</value>
-  </data>
   <data name="Caption_TrendValues" xml:space="preserve">
     <value>Werte</value>
   </data>
@@ -536,9 +530,6 @@
   </data>
   <data name="Caption_LoadingRecord" xml:space="preserve">
     <value>Datensatz wird geladen</value>
-  </data>
-  <data name="Message_LoadingProgress" xml:space="preserve">
-    <value>{0} von {1} Teilen geladen</value>
   </data>
   <data name="Message_LoadedRecords" xml:space="preserve">
     <value>Geladen: {0} ({1})</value>
@@ -561,14 +552,14 @@
   <data name="Caption_SearchCancelled" xml:space="preserve">
     <value>Nicht geladen: Das Laden wurde abgebrochen</value>
   </data>
-  <data name="Caption_PatientRecordSettings" xml:space="preserve">
-    <value>Patientenakte</value>
-  </data>
   <data name="Caption_SummaryPageSize" xml:space="preserve">
     <value>Datensätze pro Anfrage</value>
   </data>
   <data name="Caption_SummaryLoadAll" xml:space="preserve">
     <value>Den ganzen Datensatz vor der Anzeige laden</value>
+  </data>
+  <data name="Caption_ValueDecimals" xml:space="preserve">
+    <value>Genauigkeit der Beobachtungswerte</value>
   </data>
   <data name="Caption_Print" xml:space="preserve">
     <value>Drucken</value>
@@ -587,9 +578,6 @@
   </data>
   <data name="PackageBase_Download" xml:space="preserve">
     <value>Herunterladen</value>
-  </data>
-  <data name="PackageBase_UpdateButton" xml:space="preserve">
-    <value>Aktualisieren</value>
   </data>
   <data name="PackageBase_Failed" xml:space="preserve">
     <value>Der Download ist fehlgeschlagen: {0}</value>
@@ -633,9 +621,6 @@
   <data name="Message_NothingFound" xml:space="preserve">
     <value>Nichts gefunden</value>
   </data>
-  <data name="Placeholder_TypeToFind" xml:space="preserve">
-    <value>Zum Suchen tippen</value>
-  </data>
   <data name="Caption_RangeFrom" xml:space="preserve">
     <value>{0}: von</value>
   </data>
@@ -668,5 +653,77 @@
   </data>
   <data name="Caption_ShowResourceType" xml:space="preserve">
     <value>{0} anzeigen</value>
+  </data>
+  <data name="Caption_BundleGraph" xml:space="preserve">
+    <value>Graph des Bundles</value>
+  </data>
+  <data name="Caption_BundleNeighbourhood" xml:space="preserve">
+    <value>Umgebung zeigen</value>
+  </data>
+  <data name="Caption_BundleCard" xml:space="preserve">
+    <value>Karte</value>
+  </data>
+  <data name="Caption_BundleRefersTo" xml:space="preserve">
+    <value>Verweist auf</value>
+  </data>
+  <data name="Caption_BundleReferredBy" xml:space="preserve">
+    <value>Referenziert von</value>
+  </data>
+  <data name="Caption_BundleTypes" xml:space="preserve">
+    <value>Ressourcentypen</value>
+  </data>
+  <data name="Caption_BundleShowAll" xml:space="preserve">
+    <value>Alle zeigen</value>
+  </data>
+  <data name="Caption_ZoomIn" xml:space="preserve">
+    <value>Vergrößern</value>
+  </data>
+  <data name="Caption_ZoomOut" xml:space="preserve">
+    <value>Verkleinern</value>
+  </data>
+  <data name="Caption_FitToView" xml:space="preserve">
+    <value>An Ansicht anpassen</value>
+  </data>
+  <data name="Message_BundleNoSource" xml:space="preserve">
+    <value>Es gibt keine Quelle: Das Bundle verweist auf diese Ressource, enthält sie aber nicht, und der Visualizer lädt nichts nach, was dem Bundle fehlt.</value>
+  </data>
+  <data name="Message_BundleNotInBundle" xml:space="preserve">
+    <value>Das Bundle verweist auf diese Ressource, enthält sie aber nicht.</value>
+  </data>
+  <data name="Message_BundleNone" xml:space="preserve">
+    <value>Fügen Sie ein Bundle ein oder geben Sie seine Adresse an.</value>
+  </data>
+  <data name="Message_BundleEmpty" xml:space="preserve">
+    <value>Das Bundle enthält keine Ressourcen.</value>
+  </data>
+  <data name="Message_BundleCounts" xml:space="preserve">
+    <value>{0} Ressourcen, {1} Verweise</value>
+  </data>
+  <data name="Message_BundleInvalid" xml:space="preserve">
+    <value>Das ist kein FHIR-Bundle: {0}</value>
+  </data>
+  <data name="Message_BundleUnavailable" xml:space="preserve">
+    <value>Das Bundle konnte unter seiner Adresse nicht gelesen werden.</value>
+  </data>
+  <data name="Caption_LoadingBundle" xml:space="preserve">
+    <value>Bundle wird geladen</value>
+  </data>
+  <data name="Message_BundleReading" xml:space="preserve">
+    <value>Wird von {0} gelesen</value>
+  </data>
+  <data name="Message_BundleResolving" xml:space="preserve">
+    <value>Verweise zwischen den Ressourcen werden aufgelöst</value>
+  </data>
+  <data name="Message_BundleCancelled" xml:space="preserve">
+    <value>Das Laden wurde abgebrochen.</value>
+  </data>
+  <data name="Message_ModifierExtensions" xml:space="preserve">
+    <value>Modifier-Erweiterungen: Sie können die Bedeutung dieses Datensatzes ändern</value>
+  </data>
+  <data name="Message_NotShownAbove" xml:space="preserve">
+    <value>Oben nicht angezeigt ({0}): {1}. Diese Elemente stehen unter „Weitere Daten“ am Ende der Seite.</value>
+  </data>
+  <data name="Caption_OtherData" xml:space="preserve">
+    <value>Weitere Daten</value>
   </data>
 </root>

@@ -11,19 +11,47 @@
 @inject Flox.Shared.Components.FloxDialogService Dialogs
 
 @* A reference field: the record it holds shown as a line of text, the records opened lately and the bookmarks of its type offered at once, a search of
-   the type as the person types, and Find… for the list of the type with its own search form. In that list (Nested) a reference is a plain text box *@
-<div class="flex items-end gap-2">
+   the type as the person types, and Find… for the list of the type with its own search form. In that list (Nested) a reference is a plain text box.
+   A record of the list is drawn as the tile of its type ({Type}.tile, as in the lists), so a patient is told by the birth date and the sex, not by the
+   name alone; without the session or the record, its line of text. Where the form is narrow (a phone) the type stands on a line of its own, so the
+   record and its list keep the width *@
+<div class=@("@container flex flex-wrap items-end gap-2")>
     @if (_targets.Count > 1)
     {
-        <FormField Text=@FloxStrings.Caption_Type Class="w-36 shrink-0">
+        <FormField Text=@FloxStrings.Caption_Type Class=@("w-full shrink-0 @md:w-36")>
             <BbSelect TValue="string" Options=@_targets.Select(SelectOption.FromValue) Value=@_target ValueChanged=@(target => OnTargetChanged(target!)) AriaLabel=@FloxStrings.Caption_Type/>
         </FormField>
     }
     <FormField Text=@Label Class="min-w-0 flex-1">
-        <BbCombobox TValue="string" Options=@ShownOptions SearchQueryChanged=@FindAsync Placeholder=@Placeholder SearchPlaceholder=@Label MatchTriggerWidth="true"
+        <BbCombobox TValue="string" SearchQueryChanged=@FindAsync Placeholder=@Placeholder SearchPlaceholder=@Label MatchTriggerWidth="true"
                     Value=@Value.Text ValueChanged=@OnChosen AriaLabel=@Label Class="w-full"
-                    TriggerAttributes=@(new Dictionary<string, object> { ["data-reference-field"] = Field.QueryName })/>
+                    TriggerAttributes=@(new Dictionary<string, object> { ["data-reference-field"] = Field.QueryName })>
+            @foreach (var option in Shown)
+            {
+                <BbComboboxItem TValue="string" Value=@option.Reference Text=@CaptionOf(option) data-reference-option=@option.Reference>
+                    @if (_scope is not null && option.Item is { } item)
+                    {
+                        <div class="min-w-0 flex-1">
+                            @Tile(item)
+                            @if (option.Recent)
+                            {
+                                <span class="fx-muted text-xs">@Strings.Caption_RecentRecords</span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        @CaptionOf(option)
+                    }
+                </BbComboboxItem>
+            }
+        </BbCombobox>
     </FormField>
+    @* The combobox of Blueprint has no clear of its own: the record held is let go by this button *@
+    @if (!string.IsNullOrEmpty(Value.Text))
+    {
+        <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@FloxStrings.Caption_Clear AriaLabel=@FloxStrings.Caption_Clear OnClick=@(() => OnChosen(null)) data-reference-clear=@Field.QueryName><FloxIcon Icon="close"/></Button>
+    }
     @if (Session is not null && _target is not null)
     {
         <Button Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" title=@Strings.Caption_FindRecord AriaLabel=@Strings.Caption_FindRecord OnClick=@PickAsync data-reference-find=@Field.QueryName><FloxIcon Icon="manage_search"/></Button>
@@ -32,8 +60,9 @@
 
 @code {
 
-    // A record in the list: its reference (Patient/123), its line of text; Recent: offered because it was opened in this session or bookmarked
-    private sealed record RecordOption(string Reference, string Caption, bool Recent = false);
+    // A record in the list: its reference (Patient/123), its line of text, the record for its tile (none: a reference typed or not read); Recent:
+    // offered because it was opened in this session or bookmarked
+    private sealed record RecordOption(string Reference, string Caption, bool Recent = false, ResourceSummary? Item = null);
 
     private static readonly Regex s_reference = new(@"^[A-Z][A-Za-z]{0,63}/[A-Za-z0-9\-.]{1,64}$", RegexOptions.CultureInvariant);
 
@@ -46,6 +75,8 @@
     private string? _target;
     private string? _release;
     private CancellationTokenSource? _typing;
+    // What the tiles of the records are drawn with (as ReportHost makes it); none without a session or the assets of the library
+    private FireChart.Viewer.Reports.ReportScope? _scope;
     private readonly CancellationTokenSource _cancel = new();
     private readonly CancellationToken _token;
 
@@ -96,6 +127,7 @@
             _release = null;
         }
 
+        await ScopeAsync();
         await SuggestAsync();
         if (Value.Text is { Length: > 0 } text && !_known.ContainsKey(text))
         {
@@ -106,6 +138,32 @@
                 await CaptionAsync([reference]);
                 _known[text] = _known[reference] with { Reference = text };
             }
+        }
+    }
+
+    // The components of the tiles, the data of the server, the culture and the decimals of the session: once, for every record of the list
+    private async Task ScopeAsync()
+    {
+        if (Session is null || Services.GetService<FireChart.Viewer.Core.IViewerAssets>() is not { } assets
+            || Services.GetService<FireChart.Viewer.Reports.ViewerTerminology>() is not { } terminology)
+        {
+            return;
+        }
+
+        try
+        {
+            var library = new FireChart.Viewer.Core.Reports.ReportLibrary(assets, FireChart.Viewer.Library.VendorLibrary.UrlOf);
+            var model = await Models.GetAsync(_release, _token);
+            var data = new FireChart.Viewer.Core.Reports.ReportData(Reader, Server, model, _token);
+            var format = new FireChart.Viewer.Core.Reports.ReportFormat(CultureInfo.CurrentCulture, TimeProvider.System.LocalTimeZone, terminology.For(Session.TerminologyServer),
+                                                                         decimals: Session.Fhir.Decimals, strings: await library.StringsAsync(CultureInfo.CurrentUICulture, _token));
+            var runtime = new FireChart.Viewer.Reports.ReportRuntime(new Dictionary<string, FireChart.Viewer.Core.Reports.ComponentDefinition>(), data, format,
+                                                                     name => library.LoadAsync(name, _token));
+            _scope = FireChart.Viewer.Reports.ReportScope.Root(runtime, null);
+        }
+        catch (OperationCanceledException) when (_token.IsCancellationRequested)
+        {
+            // the field is gone
         }
     }
 
@@ -186,18 +244,35 @@
     {
         var model = await Models.GetAsync(_release, _token);
         var text = FireChart.Viewer.Core.Reports.ReportText.TitleOf(FireChart.Viewer.Core.Reports.ReportExpressions.Parse(json, model), CultureInfo.CurrentCulture);
-        return new RecordOption(reference, string.IsNullOrWhiteSpace(text) ? reference : text);
+        var parts = reference.Split('/');
+        return new RecordOption(reference, string.IsNullOrWhiteSpace(text) ? reference : text, Item: new ResourceSummary(parts[^1], parts[0], json));
     }
 
     // What the person typed: a search of the type by the parameter of the lookup, ten records; a reference typed as it is (Patient/123) is offered too
-    // The records offered, those opened lately or bookmarked marked as such
-    private IEnumerable<SelectOption<string>> ShownOptions =>
-        Shown.Select(option => new SelectOption<string>(option.Reference, option.Recent ? $"{option.Caption} · {Strings.Caption_RecentRecords}" : option.Caption));
+    // The tile of a record in the scope of the field (RecordTile is internal: drawn by the builder)
+    private RenderFragment Tile(ResourceSummary item) => builder =>
+    {
+        builder.OpenComponent<CascadingValue<FireChart.Viewer.Reports.ReportScope>>(0);
+        builder.AddComponentParameter(1, nameof(CascadingValue<FireChart.Viewer.Reports.ReportScope>.Value), _scope);
+        builder.AddComponentParameter(2, nameof(CascadingValue<FireChart.Viewer.Reports.ReportScope>.IsFixed), true);
+        builder.AddComponentParameter(3, nameof(CascadingValue<FireChart.Viewer.Reports.ReportScope>.ChildContent), (RenderFragment)(inner =>
+        {
+            inner.OpenComponent<FireChart.Viewer.Reports.RecordTile>(0);
+            inner.AddComponentParameter(1, nameof(FireChart.Viewer.Reports.RecordTile.Item), item);
+            inner.CloseComponent();
+        }));
+        builder.CloseComponent();
+    };
+
+    // The line of text of a record (the field when it is closed, the search of the list), those opened lately or bookmarked marked as such
+    private static string CaptionOf(RecordOption option)
+    {
+        return option.Recent ? $"{option.Caption} · {Strings.Caption_RecentRecords}" : option.Caption;
+    }
 
     private async Task FindAsync(string? query)
     {
-        _typing?.Cancel();
-        _typing?.Dispose();
+        StopTyping();
         var text = query?.Trim() ?? string.Empty;
         if (_target is null || text.Length < Math.Max(1, Field.Lookup?.MinChars ?? 2))
         {
@@ -261,10 +336,17 @@
         }
     }
 
-    public void Dispose()
+    // The search of the text typed before stops; the field forgets it, so a text too short to search leaves nothing disposed behind
+    private void StopTyping()
     {
         _typing?.Cancel();
         _typing?.Dispose();
+        _typing = null;
+    }
+
+    public void Dispose()
+    {
+        StopTyping();
         _cancel.Cancel();
         _cancel.Dispose();
     }

@@ -14,9 +14,9 @@
 }
 else if (_session is not null)
 {
-    @if (_stylesheet.Css.Length > 0)
+    @if (Look.Stylesheet.Css.Length > 0)
     {
-        <style>@_stylesheet.Css</style>
+        <style>@Look.Stylesheet.Css</style>
     }
 
     var route = ViewerRoutes.Parse(_session.Location.Location);
@@ -56,7 +56,7 @@ else if (_session is not null)
                 case { Page: ViewerPage.Summary, ResourceType: { } context, Id: { } id }:
                     @* The summary of a type is the component {Type}.summary of the library; a type without one shows the page of its record *@
                     <FireChart.Viewer.Reports.ReportView @key=@($"summary/{context}/{id}") Component=@($"{context}.summary") ContextType=@context ContextId=@id
-                                                         LoadAll=@_session.Summary.LoadAll Summary/>
+                                                         LoadAll=@_session.Fhir.LoadAll Summary/>
                     break;
                 case { Page: ViewerPage.Bookmarks }:
                     <BookmarksView OnOpenElsewhere=@OnOpenBookmark/>
@@ -65,7 +65,7 @@ else if (_session is not null)
                     <FireChart.Viewer.Reports.ComponentPreview @key=@preview.Location ResourceType=@type RecordId=@preview.Id Query=@preview.Query/>
                     break;
                 case { Page: ViewerPage.Report, ResourceType: { } type, Id: { } id }:
-                    <FireChart.Viewer.Reports.ReportView Component=@($"{type}Report") ContextType=@type ContextId=@id LoadAll=@_session.Summary.LoadAll/>
+                    <FireChart.Viewer.Reports.ReportView @key=@($"report/{type}/{id}") Component=@($"{type}Report") ContextType=@type ContextId=@id LoadAll=@_session.Fhir.LoadAll/>
                     break;
                 default:
                     <Alert Kind="AlertKind.Warning" data-error="invalid_location">
@@ -88,10 +88,9 @@ else if (_session is not null)
     private ViewerSession? _session;
     private ElementReference _page;
     private string? _sessionKey;
-    private ViewerAppearance? _composedFor;
-    private AppearanceStylesheet _stylesheet = new(string.Empty, []);
-    private ViewerTheme? _appliedTheme;
-    private IJSObjectReference? _themeModule;
+    private AppearanceApplier? _look;
+
+    private AppearanceApplier Look => _look ??= new AppearanceApplier(ViewerAssets, JS, Logger);
 
     /// <summary>How the Viewer looks; none in a Flox application, where it inherits the styles of the host. Another instance is applied live.</summary>
     [Parameter]
@@ -161,28 +160,15 @@ else if (_session is not null)
     [Parameter]
     public string? RoutePrefix { get; set; }
 
-    /// <summary>The callback address of the host for a SMART sign-in, as registered with the authorization servers (FireChart: its route
-    /// <c>smart/callback</c>); none: a server that needs a sign-in cannot be read. Another one starts a new session.</summary>
+    /// <summary>How a SMART sign-in leaves the page and where it comes back (<see cref="SmartOptions"/>: the flow, the callback route of the host, the
+    /// return page of the popup); none: no sign-in by redirect, a server that needs one cannot be read. Others start a new session.</summary>
     [Parameter]
-    public string? SmartRedirectUri { get; set; }
+    public SmartOptions? Smart { get; set; }
 
-    /// <summary>How a SMART sign-in leaves the page: <see cref="SmartFlow.Redirect"/> (the default) or <see cref="SmartFlow.Popup"/> (a frame whose
-    /// authorization server refuses to be framed; see the README).</summary>
+    /// <summary>The FHIR settings: the terminology server, how a summary loads its records, the decimal places of a value; the defaults when none.
+    /// Others start a new session.</summary>
     [Parameter]
-    public SmartFlow SmartFlow { get; set; }
-
-    /// <summary>The return page of a sign-in in a popup; by default <c>_content/FireChart.Viewer/smart-callback.html</c> of the application. Register
-    /// it with the authorization servers.</summary>
-    [Parameter]
-    public string? SmartPopupRedirectUri { get; set; }
-
-    /// <summary>The terminology server for the displays of bare codes; none: the codes are shown as they are. Another one starts a new session.</summary>
-    [Parameter]
-    public string? TerminologyServer { get; set; }
-
-    /// <summary>How the summary loads its records (page size, load everything before showing); the defaults when none. Others start a new session.</summary>
-    [Parameter]
-    public ViewerSummaryOptions? Summary { get; set; }
+    public FhirOptions? Fhir { get; set; }
 
     /// <summary>Opens a bookmark of another server from the page of the bookmarks (<c>bookmarks</c>): the host chooses the server of
     /// <see cref="Flox.Core.Models.UserBookmark.SourceAddress"/> and puts the Viewer at <see cref="Flox.Core.Models.UserBookmark.Location"/>. None:
@@ -198,18 +184,12 @@ else if (_session is not null)
     protected override async Task OnParametersSetAsync()
     {
         ArgumentNullException.ThrowIfNull(Server);
-        if (!ReferenceEquals(_composedFor, Appearance))
+        foreach (var error in await Look.ComposeAsync(Appearance))
         {
-            _composedFor = Appearance;
-            _stylesheet = AppearanceCss.Compose(Appearance, await LoadThemeAsync(Appearance));
-            foreach (var error in _stylesheet.Errors)
-            {
-                Logger.LogWarning("Appearance: {Param}: {Message}", error.Param, error.Message);
-                await OnConfigError.InvokeAsync(error);
-            }
+            await OnConfigError.InvokeAsync(error);
         }
 
-        var key = $"{Server.Key}|{Server.BaseUrl}|{RoutePrefix}|{TerminologyServer}|{SmartRedirectUri}|{SmartFlow}|{SmartPopupRedirectUri}|{Summary}";
+        var key = $"{Server.Key}|{Server.BaseUrl}|{RoutePrefix}|{Smart}|{Fhir}";
         if (key == _sessionKey)
         {
             return;
@@ -219,30 +199,10 @@ else if (_session is not null)
         _sessionKey = key;
         var location = new UrlLocationStore(NavigationManager, RoutePrefix);
         location.LocationChanged += OnLocationChanged;
-        var popupCallback = SmartPopupRedirectUri ?? NavigationManager.ToAbsoluteUri("_content/FireChart.Viewer/smart-callback.html").ToString();
-        _session = new ViewerSession(Server, location, SmartRedirectUri, TerminologyServer, SmartFlow, popupCallback)
+        _session = new ViewerSession(Server, location, Smart)
         {
-            Summary = Summary ?? ViewerSummaryOptions.Default
+            Fhir = Fhir ?? FhirOptions.Default
         };
-    }
-
-    // The base of a theme and its file, when the appearance makes the Viewer its own; none on an error (the vendor look stays)
-    private async Task<FireChart.Viewer.Library.FxThemeSheets?> LoadThemeAsync(ViewerAppearance? appearance)
-    {
-        if (!AppearanceCss.IsThemed(appearance))
-        {
-            return null;
-        }
-
-        try
-        {
-            return await FireChart.Viewer.Library.FxStyle.LoadThemeAsync(ViewerAssets, appearance!.Style);
-        }
-        catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
-        {
-            Logger.LogWarning(ex, "The theme of the Viewer could not be read");
-            return null;
-        }
     }
 
     private void OnLocationChanged(object? sender, EventArgs e)
@@ -272,15 +232,10 @@ else if (_session is not null)
     // The theme is set on the document only when the appearance asks for one: in a Flox application the host owns it
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var theme = Appearance?.Theme ?? ViewerTheme.Inherit;
-        if (!IsClientSide || theme == ViewerTheme.Inherit || theme == _appliedTheme)
+        if (IsClientSide)
         {
-            return;
+            await Look.ApplyThemeAsync(Appearance);
         }
-
-        _appliedTheme = theme;
-        _themeModule ??= await JS.ImportModuleAsync("./_content/FireChart.Viewer/js/viewer-theme.js");
-        await _themeModule.InvokeVoidAsync("setTheme", theme.ToString().ToLowerInvariant());
     }
 
     /// <summary>Stops following the address and releases the script of the theme.</summary>
@@ -288,16 +243,9 @@ else if (_session is not null)
     public async ValueTask DisposeAsync()
     {
         Close();
-        if (_themeModule is not null)
+        if (_look is not null)
         {
-            try
-            {
-                await _themeModule.DisposeAsync();
-            }
-            catch (JSDisconnectedException)
-            {
-                // the page is gone
-            }
+            await _look.DisposeAsync();
         }
     }
 

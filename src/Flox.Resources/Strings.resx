@@ -207,9 +207,6 @@
   <data name="Caption_ImportTasks" xml:space="preserve">
     <value>Import tasks</value>
   </data>
-  <data name="Caption_ImportTask" xml:space="preserve">
-    <value>Import task</value>
-  </data>
   <data name="Caption_Properties" xml:space="preserve">
     <value>Properties</value>
   </data>
@@ -300,9 +297,6 @@
   <data name="Caption_GeneralCategory" xml:space="preserve">
     <value>General</value>
   </data>
-  <data name="Caption_AboutPlatform" xml:space="preserve">
-    <value>About platform</value>
-  </data>
   <data name="Caption_ConfirmPurgeTasks" xml:space="preserve">
     <value>Delete completed tasks?</value>
   </data>
@@ -329,9 +323,6 @@
   </data>
   <data name="Error_NetworkUnavailable" xml:space="preserve">
     <value>The server is not reachable. Check your connection and try again.</value>
-  </data>
-  <data name="Caption_MoreFilters" xml:space="preserve">
-    <value>More filters</value>
   </data>
   <data name="Caption_Any" xml:space="preserve">
     <value>Any</value>
@@ -417,9 +408,6 @@
   <data name="Caption_View" xml:space="preserve">
     <value>View</value>
   </data>
-  <data name="Caption_ShowTotal" xml:space="preserve">
-    <value>Show the count</value>
-  </data>
   <data name="Caption_Connect" xml:space="preserve">
     <value>Connect</value>
   </data>
@@ -473,9 +461,6 @@
   </data>
   <data name="Caption_WordWrap" xml:space="preserve">
     <value>Word wrap</value>
-  </data>
-  <data name="Caption_BookmarkedOnly" xml:space="preserve">
-    <value>Bookmarked only</value>
   </data>
   <data name="Caption_ExpandAll" xml:space="preserve">
     <value>Expand all</value>
@@ -644,5 +629,23 @@
   </data>
   <data name="Message_NotCopied" xml:space="preserve">
     <value>The browser did not allow copying</value>
+  </data>
+  <data name="Message_LoadingProgress" xml:space="preserve">
+    <value>{0} of {1} parts loaded</value>
+  </data>
+  <data name="AppUpdate_Downloading" xml:space="preserve">
+    <value>New version downloading: {0} of {1} files</value>
+  </data>
+  <data name="AppUpdate_SavingOffline" xml:space="preserve">
+    <value>Saving for offline use: {0} of {1} files</value>
+  </data>
+  <data name="AppUpdate_Ready" xml:space="preserve">
+    <value>A new version is ready</value>
+  </data>
+  <data name="AppUpdate_Restart" xml:space="preserve">
+    <value>Restart</value>
+  </data>
+  <data name="AppUpdate_Later" xml:space="preserve">
+    <value>Later</value>
   </data>
 </root>

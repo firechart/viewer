@@ -160,9 +160,7 @@ internal static partial class ReportText
         {
             "date" or "dateTime" or "instant" => Date(value?.ToString() ?? string.Empty, culture),
             "boolean" => value is true ? "yes" : value is false ? "no" : value?.ToString() ?? string.Empty,
-            "decimal" when value is decimal number => culture.Decimals is { } places
-                ? Math.Round(number, places, MidpointRounding.AwayFromZero).ToString(places > 0 ? "0." + new string('#', places) : "0", culture.Culture)
-                : number.ToString(culture.Culture),
+            "decimal" when value is decimal number => DecimalText.Format(number, culture.Decimals, culture.Culture),
             _ => Convert.ToString(value, culture.Culture) ?? string.Empty
         };
     }

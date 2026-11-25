@@ -61,13 +61,36 @@ function matches(source, origin) {
     return source.replace(/\/$/, "") === origin;
 }
 
+// A parent that is not allowed is told so once (it knows the frame is there by hello already), and the frame says it too: else both wait for ever
+let refused = false;
+function refuse(origin) {
+    if (refused) {
+        return;
+    }
+
+    refused = true;
+    const text = `The Viewer does not obey ${origin}: the origin is not in frameAncestors of its host.json.`;
+    console.error(text);
+    window.parent.postMessage({ protocol, type: "error", payload: { type: "config_error", code: "origin_not_allowed", param: "host.json", message: text } }, origin);
+    const note = document.createElement("p");
+    note.textContent = text;
+    note.setAttribute("role", "alert");
+    note.style.cssText = "position:fixed;inset:0;z-index:2147483647;margin:0;padding:1rem;background:#fff;color:#b00020;font:14px/1.4 system-ui,sans-serif";
+    document.body.appendChild(note);
+}
+
 function onMessage(event) {
-    if (event.source !== window.parent || !allowed.some(source => matches(source, event.origin))) {
+    if (event.source !== window.parent) {
         return;
     }
 
     const message = event.data;
     if (!message || message.protocol !== protocol || typeof message.type !== "string") {
+        return;
+    }
+
+    if (!allowed.some(source => matches(source, event.origin))) {
+        refuse(event.origin);
         return;
     }
 
@@ -93,7 +116,14 @@ function onMessage(event) {
         return;
     }
 
-    dotnet?.invokeMethodAsync("OnMessage", message.type, typeof message.id === "string" ? message.id : null, JSON.stringify(message.payload ?? {}));
+    const id = typeof message.id === "string" ? message.id : null;
+    dotnet?.invokeMethodAsync("OnMessage", message.type, id, JSON.stringify(message.payload ?? {})).catch(error => {
+        // A request the frame failed to handle is answered all the same: the host does not wait for ever
+        console.error(error);
+        if (id) {
+            post("result", id, JSON.stringify({ ok: false, error: { type: "state_error", code: "internal_error", param: message.type, message: "The frame failed to handle the request." } }));
+        }
+    });
 }
 
 // The height of the content (the body, not the document: the document is at least as high as the frame and would never shrink), for the

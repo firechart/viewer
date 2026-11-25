@@ -144,7 +144,6 @@
     private readonly Dictionary<string, SearchOption> _known = new Dictionary<string, SearchOption>(StringComparer.Ordinal);
     private bool _expanding;
     private CancellationTokenSource? _typing;
-    private static readonly IReadOnlyList<SearchOption> _noOptions = [];
     private List<ListOption<string>> _booleans = [];
     private List<ListOption<string>> _units = [];
     private List<ListOption<string>> _modifiers = [];

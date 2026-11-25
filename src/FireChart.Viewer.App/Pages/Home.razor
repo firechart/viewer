@@ -1,5 +1,5 @@
 @using BlazorBlueprint.Components
-@page "/"
+@page "/playground"
 @using System.Text.Json
 @using System.Text.Json.Nodes
 @using FireChart.Viewer.App.Sandbox
@@ -9,9 +9,16 @@
 
 @* The sandbox: the Viewer of /embed in a frame, driven by the messages a host sends (init, update, restart, navigate), public servers in one click.
    The page opens empty: the frame (a second .NET runtime) is created when a server is chosen *@
-<PageTitle>FireChart Viewer: sandbox</PageTitle>
+<PageTitle>FireChart Viewer: playground</PageTitle>
 
 <div class="p-4">
+    @* Two components of the Viewer side by side: the Viewer in its frame (kept while the other tab is shown) and the Bundle Visualizer in the page *@
+    <BbTabs DefaultValue="viewer">
+        <BbTabsList Class="mb-3">
+            <BbTabsTrigger Value="viewer" data-sandbox="tab-viewer">Viewer</BbTabsTrigger>
+            <BbTabsTrigger Value="bundle" data-sandbox="tab-bundle">Bundle Visualizer</BbTabsTrigger>
+        </BbTabsList>
+        <BbTabsContent Value="viewer" ForceMount="true">
     <div class="grid grid-cols-12 gap-4">
         <div class="col-span-12 xl:col-span-4">
             <div class="flex flex-col gap-3">
@@ -54,6 +61,26 @@
                     {
                         <Button Variant="ButtonVariant.Outline" OnClick=@(() => NavigateAsync(new ViewerRoute(ViewerPage.Summary, "Patient", patient).Location)) data-sandbox="patient" IconName="person" Text="Patient summary"/>
                     }
+                </div>
+
+                @* The FHIR settings of the Viewer (FhirOptions, the option fhir): each change is an update of the frame, a new session of the Viewer *@
+                <div class="flex items-end flex-wrap gap-3" data-sandbox="fhir">
+                    <FormField Text="Decimals" Class="w-32">
+                        <BbNumericInput TValue="int" Value=@_decimals ValueChanged=@((int value) => SetFhirAsync("decimals", value)) Min="0" Max=@FhirOptions.MaxDecimals
+                                        AllowNegative="false" ShowButtons="true" AriaLabel="Decimals" data-sandbox="decimals"/>
+                    </FormField>
+                    <FormField Text="Summary page size" Class="w-40">
+                        <BbNumericInput TValue="int" Value=@_pageSize ValueChanged=@((int value) => SetFhirAsync("pageSize", value)) Min=@FhirOptions.MinPageSize
+                                        Max=@FhirOptions.MaxPageSize Step="10" AllowNegative="false" ShowButtons="true" AriaLabel="Summary page size" data-sandbox="page-size"/>
+                    </FormField>
+                    <FormField Text="Terminology server" Class="w-56">
+                        <BbSelect TValue="string" Options=@s_terminologyServers Value=@_terminology AriaLabel="Terminology server" data-sandbox="terminology"
+                                  ValueChanged=@((string? server) => SetFhirAsync("terminologyServer", server is null or NoTerminologyServer ? null : server))/>
+                    </FormField>
+                    <label class="flex h-10 items-center gap-2 text-sm">
+                        <BbSwitch Checked=@_loadAll CheckedChanged=@((bool loadAll) => SetFhirAsync("loadAll", loadAll)) aria-label="Load the whole summary first" data-sandbox="load-all"/>
+                        Load the whole summary first
+                    </label>
                 </div>
 
                 <FormField Text="Configuration (viewer.json)" For="sandbox-editor">
@@ -138,6 +165,11 @@
             </div>
         </div>
     </div>
+        </BbTabsContent>
+        <BbTabsContent Value="bundle">
+            <BundleSandbox State=@_bundle/>
+        </BbTabsContent>
+    </BbTabs>
 </div>
 
 @code {
@@ -146,9 +178,16 @@
 
     private static readonly JsonSerializerOptions s_indented = new() { WriteIndented = true };
     private static readonly string[] s_locales = ["auto", .. ViewerAppConfigLoader.Locales];
+    private const string NoTerminologyServer = "none";
+    private static readonly SelectOption<string>[] s_terminologyServers =
+    [
+        new(NoTerminologyServer, "None (codes as they are)"),
+        new("https://tx.fhir.org/r4", "tx.fhir.org (R4)")
+    ];
 
     private readonly Dictionary<string, PresetAvailability> _availability = new(StringComparer.Ordinal);
     private readonly List<SandboxEvent> _events = [];
+    private readonly BundleSandboxState _bundle = new();
     private readonly CancellationTokenSource _closing = new();
     private IReadOnlyList<DemoPreset> _presets = [];
     private IReadOnlyList<CodeSnippet> _snippets = [];
@@ -159,6 +198,10 @@
     private string _theme = "auto";
     private string _style = string.Empty;
     private string _locale = "auto";
+    private int _decimals = FhirOptions.DefaultDecimals;
+    private int _pageSize = FhirOptions.DefaultPageSize;
+    private bool _loadAll;
+    private string _terminology = NoTerminologyServer;
     private ElementReference _frameHost;
     private IJSObjectReference? _module;
     private DotNetObjectReference<Home>? _self;
@@ -266,6 +309,10 @@
         _theme = config["appearance"]?["theme"]?.GetValue<string>() ?? "auto";
         _style = config["appearance"]?["style"]?.GetValue<string>() ?? string.Empty;
         _locale = config["locale"]?.GetValue<string>() ?? "auto";
+        _decimals = setup.Fhir.Decimals;
+        _pageSize = setup.Fhir.PageSize;
+        _loadAll = setup.Fhir.LoadAll;
+        _terminology = setup.Fhir.TerminologyServerUrl ?? NoTerminologyServer;
         _snippets = CodeSnippets.Build(config);
         // A new frame says hello and gets the configuration by init
         if (frameShown)
@@ -291,6 +338,28 @@
     {
         _locale = locale;
         return UpdateAsync(new JsonObject { ["locale"] = locale });
+    }
+
+    // An option of the FHIR settings; null removes it (the default of the Viewer)
+    private Task SetFhirAsync(string name, JsonNode? value)
+    {
+        switch (name)
+        {
+            case "decimals":
+                _decimals = value!.GetValue<int>();
+                break;
+            case "pageSize":
+                _pageSize = value!.GetValue<int>();
+                break;
+            case "loadAll":
+                _loadAll = value!.GetValue<bool>();
+                break;
+            default:
+                _terminology = value?.GetValue<string>() ?? NoTerminologyServer;
+                break;
+        }
+
+        return UpdateAsync(new JsonObject { ["fhir"] = new JsonObject { [name] = value } });
     }
 
     // An option that changes live: the frame merges it into its configuration, the editor and the code follow

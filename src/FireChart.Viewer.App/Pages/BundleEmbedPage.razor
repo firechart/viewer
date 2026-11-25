@@ -1,0 +1,317 @@
+@page "/embed-bundle"
+@using System.Globalization
+@using System.Text.Json.Nodes
+@using FireChart.Viewer.Bundles
+@implements IAsyncDisposable
+@inject ViewerAppConfigLoader ConfigLoader
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+
+@* The frame of the Bundle Visualizer: one visualizer, the whole page, driven by the messages of the page that hosts it (the SDK, BundleVisualizer of
+   sdk/viewer.js; ViewerFrameChannel). Its configuration is the keys of viewer.json, the server optional; show gives it a Bundle (an object or a text,
+   JSON or XML) or its address and is answered when it is drawn (after a sign-in, when the server needs one). A Bundle sent to it stays in the
+   browser. The way back of a SMART redirect loads the frame again: the SDK gives it its configuration and its last show again. Without a host it
+   reads viewer.json and waits *@
+<PageTitle>FireChart Bundle Visualizer</PageTitle>
+
+@if (_setup is null)
+{
+    <div class="p-4"><CircularProgress Compact="true"/></div>
+}
+else if (_setup.Errors.Count > 0)
+{
+    <ConfigErrors Errors=@_setup.Errors/>
+}
+else
+{
+    <div class="h-dvh p-2">
+        <FhirBundleVisualizer @ref=_visualizer @key=@_culture.Name Bundle=@_bundle Location=@_location Server=@_setup.Server Fhir=@_setup.Fhir Appearance=@_setup.Appearance
+                              Smart=@SmartCallbackPage.OptionsOf(NavigationManager, _setup.SmartFlow)
+                              OnLoad=@OnLoadAsync OnSelect=@OnSelectAsync OnConfigError=@ReportAsync/>
+    </div>
+}
+
+@code {
+
+    public const string Route = "embed-bundle";
+
+    private const string BundleError = "bundle_error";
+    private static readonly CultureInfo s_browserCulture = CultureInfo.CurrentUICulture;
+
+    private ViewerAppSetup? _setup;
+    private string? _configText;
+    private CultureInfo _culture = s_browserCulture;
+    private ViewerFrameChannel? _channel;
+    private string? _bundle;
+    private string? _location;
+    private FrameRequest? _showing;
+    private BundleLoad? _shown;
+    private FhirBundleVisualizer? _visualizer;
+    private string? _selected;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _channel = await ViewerFrameChannel.OpenAsync(JS, OnParentMessageAsync);
+        if (_channel is null)
+        {
+            await ApplyAsync(await ConfigLoader.LoadBundleAsync());
+        }
+    }
+
+    private Task OnParentMessageAsync(FrameRequest request)
+    {
+        return InvokeAsync(async () =>
+        {
+            switch (request.Type)
+            {
+                case "init":
+                case "restart":
+                    await ConfigureAsync(request, request.Type == "restart");
+                    break;
+                case "update":
+                    await UpdateAsync(request);
+                    break;
+                case "show":
+                    await ShowAsync(request);
+                    break;
+                default:
+                    await _channel!.FailAsync(request, "protocol_error", [new ViewerConfigError("unknown_message", "type", $"'{request.Type}' is not a message of the frame.")]);
+                    break;
+            }
+
+            StateHasChanged();
+        });
+    }
+
+    private async Task ConfigureAsync(FrameRequest request, bool restart)
+    {
+        if (request.Payload["config"] is not JsonObject config)
+        {
+            await _channel!.FailAsync(request, "config_error", [new ViewerConfigError("missing_option", "config", "The message carries no configuration object.")]);
+            return;
+        }
+
+        var text = config.ToJsonString();
+        var setup = ViewerAppConfigLoader.ParseBundle(text);
+
+        // A configuration that is not valid is refused and the visualizer that runs stays, with the configuration the host knows it has
+        if (setup.Errors.Count > 0 && _configText is not null)
+        {
+            await _channel!.FailAsync(request, "config_error", setup.Errors);
+            return;
+        }
+
+        if (restart)
+        {
+            await _channel!.PostAsync("restarting");
+        }
+
+        var otherServer = _setup is not null && _setup.Server?.BaseUrl != setup.Server?.BaseUrl;
+        await ApplyAsync(setup);
+        if (setup.Errors.Count > 0)
+        {
+            _configText = null;
+            await _channel!.FailAsync(request, "config_error", setup.Errors);
+            return;
+        }
+
+        _configText = text;
+        // A restart, or another server, starts with nothing shown: an address of one server means nothing on another
+        if (restart || otherServer)
+        {
+            await ClearAsync();
+        }
+
+        var ready = new JsonObject { ["server"] = setup.Server?.BaseUrl };
+        await _channel!.PostAsync("ready", ready);
+        await _channel.SucceedAsync(request, ready.DeepClone().AsObject());
+    }
+
+    private async Task UpdateAsync(FrameRequest request)
+    {
+        if (_configText is null)
+        {
+            await _channel!.FailAsync(request, "config_error", [new ViewerConfigError("not_ready", "config", "The frame has no configuration to update yet: send init or restart.")]);
+            return;
+        }
+
+        if (request.Payload["config"] is not JsonObject changes)
+        {
+            await _channel!.FailAsync(request, "config_error", [new ViewerConfigError("missing_option", "config", "The message carries no configuration object.")]);
+            return;
+        }
+
+        var result = ViewerConfigPatch.Apply(_configText, changes);
+        var setup = result.Error is null ? ViewerAppConfigLoader.ParseBundle(result.Text!) : null;
+        if (result.Error is not null || setup!.Errors.Count > 0)
+        {
+            await _channel!.FailAsync(request, "config_error", result.Error is null ? setup!.Errors : [result.Error]);
+            return;
+        }
+
+        _configText = result.Text;
+        await ApplyAsync(setup);
+        var applied = new JsonObject { ["applied"] = new JsonArray([.. result.Applied.Select(a => (JsonNode)JsonValue.Create(a))]) };
+        await _channel!.PostAsync("updated", applied);
+        await _channel.SucceedAsync(request, applied.DeepClone().AsObject());
+    }
+
+    // show { bundle } (an object, or a text of JSON or XML) or show { location } (absolute, or relative to the server); answered by OnLoad
+    private async Task ShowAsync(FrameRequest request)
+    {
+        if (_configText is null)
+        {
+            await _channel!.FailAsync(request, "config_error", [new ViewerConfigError("not_ready", "config", "The frame has no configuration yet: send init or restart.")]);
+            return;
+        }
+
+        var bundle = request.Payload["bundle"] switch
+        {
+            JsonObject json => json.ToJsonString(),
+            JsonValue value when value.TryGetValue<string>(out var text) && !string.IsNullOrWhiteSpace(text) => text,
+            _ => null
+        };
+        var location = request.Payload["location"] is JsonValue address && address.TryGetValue<string>(out var path) && !string.IsNullOrWhiteSpace(path) ? path.Trim() : null;
+        if (bundle is null && location is null)
+        {
+            await _channel!.FailAsync(request, BundleError, [new ViewerConfigError("missing_option", "bundle", "show needs a bundle (an object, or a text of JSON or XML) or a location.")]);
+            return;
+        }
+
+        if (bundle is null && !Uri.TryCreate(location, UriKind.Absolute, out _) && _setup?.Server is null)
+        {
+            await _channel!.FailAsync(request, BundleError, [new ViewerConfigError("missing_option", "server", $"'{location}' is relative: the configuration needs a server.")]);
+            return;
+        }
+
+        // The same Bundle again is answered as it came out when it was drawn, and loaded again when it was not (cancelled, failed)
+        if (bundle == _bundle && (bundle is not null || location == _location) && _shown is not null)
+        {
+            if (_shown.Succeeded || _visualizer is null)
+            {
+                await AnswerAsync(request, _shown);
+                return;
+            }
+
+            _showing = request;
+            _shown = null;
+            await _visualizer.ReloadAsync();
+            return;
+        }
+
+        await SupersedeAsync();
+        _showing = request;
+        _shown = null;
+        _bundle = bundle;
+        _location = bundle is null ? location : null;
+    }
+
+    private async Task OnLoadAsync(BundleLoad load)
+    {
+        _shown = load;
+        var showing = _showing;
+        _showing = null;
+        if (_channel is null)
+        {
+            return;
+        }
+
+        if (load.Succeeded)
+        {
+            await _channel.PostAsync("shown", Counts(load));
+        }
+
+        if (showing is not null)
+        {
+            await AnswerAsync(showing, load);
+        }
+        else if (!load.Succeeded)
+        {
+            await _channel.PostErrorsAsync(BundleError, [ErrorOf(load)]);
+        }
+    }
+
+    private async Task AnswerAsync(FrameRequest request, BundleLoad load)
+    {
+        if (load.Succeeded)
+        {
+            await _channel!.SucceedAsync(request, Counts(load));
+        }
+        else
+        {
+            await _channel!.FailAsync(request, BundleError, [ErrorOf(load)]);
+        }
+    }
+
+    private ViewerConfigError ErrorOf(BundleLoad load)
+    {
+        return new ViewerConfigError(load.Error!, _bundle is null ? "location" : "bundle", load.Message ?? load.Error!);
+    }
+
+    private static JsonObject Counts(BundleLoad load)
+    {
+        return new JsonObject { ["resources"] = load.Resources, ["references"] = load.References };
+    }
+
+    // A show still waiting when another comes, or when the frame starts anew, is refused: its Bundle will never be drawn
+    private async Task SupersedeAsync()
+    {
+        if (_showing is { } waiting)
+        {
+            _showing = null;
+            await _channel!.FailAsync(waiting, BundleError, [new ViewerConfigError("superseded", "bundle", "Another Bundle was shown before this one was drawn.")]);
+        }
+    }
+
+    private async Task ClearAsync()
+    {
+        await SupersedeAsync();
+        _bundle = null;
+        _location = null;
+        _shown = null;
+    }
+
+    private async Task OnSelectAsync(string? reference)
+    {
+        _selected = reference;
+        if (_channel is not null)
+        {
+            await _channel.PostAsync("select", new JsonObject { ["reference"] = reference });
+        }
+    }
+
+    private async Task ApplyAsync(ViewerAppSetup setup)
+    {
+        _setup = setup;
+        var culture = setup.Culture ?? s_browserCulture;
+        // Another language draws the visualizer anew: its sheet is closed
+        if (!culture.Equals(_culture) && _selected is not null)
+        {
+            await OnSelectAsync(null);
+        }
+
+        _culture = culture;
+        CultureInfo.DefaultThreadCurrentCulture = _culture;
+        CultureInfo.DefaultThreadCurrentUICulture = _culture;
+        CultureInfo.CurrentCulture = _culture;
+        CultureInfo.CurrentUICulture = _culture;
+        await Flox.Shared.Layout.DocumentDirection.ApplyAsync(JS, _culture);
+    }
+
+    private async Task ReportAsync(ViewerConfigError error)
+    {
+        if (_channel is not null)
+        {
+            await _channel.PostErrorsAsync("config_error", [error]);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_channel is not null)
+        {
+            await _channel.DisposeAsync();
+        }
+    }
+
+}

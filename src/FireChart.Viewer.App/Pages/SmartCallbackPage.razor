@@ -4,7 +4,7 @@
 @inject NavigationManager NavigationManager
 
 @* The way back of a SMART sign-in in the frame (redirect): the code is exchanged for a token; the patient of the launch context opens the patient summary,
-   else the frame returns where the sign-in began *@
+   else (and always in the frame of the Bundle Visualizer) the frame returns where the sign-in began *@
 <div class="p-4">
     @if (_failure is null)
     {
@@ -23,6 +23,12 @@
 
     public const string Route = "smart/callback";
 
+    // The sign-in of a component of the app: its flow, back to this page
+    public static SmartOptions OptionsOf(NavigationManager navigation, SmartFlow flow)
+    {
+        return new SmartOptions { Flow = flow, RedirectUri = navigation.ToAbsoluteUri(Route).ToString() };
+    }
+
     private string? _failure;
 
     protected override async Task OnInitializedAsync()
@@ -30,7 +36,9 @@
         try
         {
             var completion = await Authorizer.CompleteAsync(NavigationManager.Uri);
-            var target = completion.PatientId is { Length: > 0 } patient
+            // The frame of the Bundle Visualizer returns to itself (the SDK shows its Bundle again), whatever patient the launch chose
+            var bundleFrame = completion.ReturnUrl.TrimStart('/').StartsWith(BundleEmbedPage.Route, StringComparison.OrdinalIgnoreCase);
+            var target = completion.PatientId is { Length: > 0 } patient && !bundleFrame
                 ? EmbedPage.Prefix + new ViewerRoute(ViewerPage.Summary, "Patient", patient).Location
                 : completion.ReturnUrl.TrimStart('/');
             NavigationManager.NavigateTo(target, replace: true);

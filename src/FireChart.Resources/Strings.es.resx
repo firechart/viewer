@@ -420,9 +420,6 @@
   <data name="Conformance_NoElementsFound" xml:space="preserve">
     <value>Ningún elemento coincide.</value>
   </data>
-  <data name="Conformance_NotInDifferential" xml:space="preserve">
-    <value>No modificado por el perfil</value>
-  </data>
   <data name="Conformance_Description" xml:space="preserve">
     <value>Descripción</value>
   </data>
@@ -513,9 +510,6 @@
   <data name="Caption_TimesInDeviceZone" xml:space="preserve">
     <value>Las horas se muestran en la zona horaria de este dispositivo</value>
   </data>
-  <data name="Message_SectionsFailed" xml:space="preserve">
-    <value>Secciones que no se pudieron cargar: {0}</value>
-  </data>
   <data name="Caption_TrendValues" xml:space="preserve">
     <value>Valores</value>
   </data>
@@ -536,9 +530,6 @@
   </data>
   <data name="Caption_LoadingRecord" xml:space="preserve">
     <value>Cargando el registro</value>
-  </data>
-  <data name="Message_LoadingProgress" xml:space="preserve">
-    <value>{0} de {1} partes cargadas</value>
   </data>
   <data name="Message_LoadedRecords" xml:space="preserve">
     <value>Cargado: {0} ({1})</value>
@@ -561,14 +552,14 @@
   <data name="Caption_SearchCancelled" xml:space="preserve">
     <value>No cargado: la carga se canceló</value>
   </data>
-  <data name="Caption_PatientRecordSettings" xml:space="preserve">
-    <value>Historia del paciente</value>
-  </data>
   <data name="Caption_SummaryPageSize" xml:space="preserve">
     <value>Registros por solicitud</value>
   </data>
   <data name="Caption_SummaryLoadAll" xml:space="preserve">
     <value>Cargar el registro completo antes de mostrarlo</value>
+  </data>
+  <data name="Caption_ValueDecimals" xml:space="preserve">
+    <value>Precisión de los valores de observación</value>
   </data>
   <data name="Caption_Print" xml:space="preserve">
     <value>Imprimir</value>
@@ -587,9 +578,6 @@
   </data>
   <data name="PackageBase_Download" xml:space="preserve">
     <value>Descargar</value>
-  </data>
-  <data name="PackageBase_UpdateButton" xml:space="preserve">
-    <value>Actualizar</value>
   </data>
   <data name="PackageBase_Failed" xml:space="preserve">
     <value>La descarga falló: {0}</value>
@@ -633,9 +621,6 @@
   <data name="Message_NothingFound" xml:space="preserve">
     <value>No se encontró nada</value>
   </data>
-  <data name="Placeholder_TypeToFind" xml:space="preserve">
-    <value>Escriba para buscar</value>
-  </data>
   <data name="Caption_RangeFrom" xml:space="preserve">
     <value>{0}: desde</value>
   </data>
@@ -668,5 +653,77 @@
   </data>
   <data name="Caption_ShowResourceType" xml:space="preserve">
     <value>Mostrar {0}</value>
+  </data>
+  <data name="Caption_BundleGraph" xml:space="preserve">
+    <value>Grafo del Bundle</value>
+  </data>
+  <data name="Caption_BundleNeighbourhood" xml:space="preserve">
+    <value>Mostrar su entorno</value>
+  </data>
+  <data name="Caption_BundleCard" xml:space="preserve">
+    <value>Tarjeta</value>
+  </data>
+  <data name="Caption_BundleRefersTo" xml:space="preserve">
+    <value>Hace referencia a</value>
+  </data>
+  <data name="Caption_BundleReferredBy" xml:space="preserve">
+    <value>Referenciado por</value>
+  </data>
+  <data name="Caption_BundleTypes" xml:space="preserve">
+    <value>Tipos de recurso</value>
+  </data>
+  <data name="Caption_BundleShowAll" xml:space="preserve">
+    <value>Mostrar todo</value>
+  </data>
+  <data name="Caption_ZoomIn" xml:space="preserve">
+    <value>Acercar</value>
+  </data>
+  <data name="Caption_ZoomOut" xml:space="preserve">
+    <value>Alejar</value>
+  </data>
+  <data name="Caption_FitToView" xml:space="preserve">
+    <value>Ajustar a la vista</value>
+  </data>
+  <data name="Message_BundleNoSource" xml:space="preserve">
+    <value>No hay fuente que mostrar: el Bundle hace referencia a este recurso, pero no lo contiene, y el visualizador no lee nada que falte en el Bundle.</value>
+  </data>
+  <data name="Message_BundleNotInBundle" xml:space="preserve">
+    <value>El Bundle hace referencia a este recurso, pero no lo contiene.</value>
+  </data>
+  <data name="Message_BundleNone" xml:space="preserve">
+    <value>Pegue un Bundle o indique su dirección.</value>
+  </data>
+  <data name="Message_BundleEmpty" xml:space="preserve">
+    <value>El Bundle no contiene recursos.</value>
+  </data>
+  <data name="Message_BundleCounts" xml:space="preserve">
+    <value>{0} recursos, {1} referencias</value>
+  </data>
+  <data name="Message_BundleInvalid" xml:space="preserve">
+    <value>No es un Bundle de FHIR: {0}</value>
+  </data>
+  <data name="Message_BundleUnavailable" xml:space="preserve">
+    <value>No se pudo leer el Bundle desde su dirección.</value>
+  </data>
+  <data name="Caption_LoadingBundle" xml:space="preserve">
+    <value>Cargando el Bundle</value>
+  </data>
+  <data name="Message_BundleReading" xml:space="preserve">
+    <value>Leyéndolo de {0}</value>
+  </data>
+  <data name="Message_BundleResolving" xml:space="preserve">
+    <value>Resolviendo las referencias entre sus recursos</value>
+  </data>
+  <data name="Message_BundleCancelled" xml:space="preserve">
+    <value>Se canceló la carga.</value>
+  </data>
+  <data name="Message_ModifierExtensions" xml:space="preserve">
+    <value>Extensiones modificadoras: pueden cambiar el significado de este registro</value>
+  </data>
+  <data name="Message_NotShownAbove" xml:space="preserve">
+    <value>No se muestra arriba ({0}): {1}. Estos elementos figuran en «Otros datos» al final de la página.</value>
+  </data>
+  <data name="Caption_OtherData" xml:space="preserve">
+    <value>Otros datos</value>
   </data>
 </root>

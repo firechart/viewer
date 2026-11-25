@@ -1,0 +1,108 @@
+@using System.Globalization
+@using BlazorBlueprint.Components
+
+@* The dialog of a long loading (a record loaded at once, a Bundle read and drawn): its title, what it is doing now, how far it is (a bar with the
+   share when the parts are counted, a running bar when they are not), what came last, and Cancel when the host can stop it (Escape too). A modal
+   over the page, drawn with the tokens of the theme: nothing under it is used meanwhile, and it takes no room, so what is drawn hidden under it does
+   not move. A short wait over a part of a page is BusyOverlay *@
+<div @ref=_overlay class="fixed inset-0 z-[1000] grid place-items-center bg-background/70 p-4 backdrop-blur-[2px]" role="dialog" aria-modal="true"
+     aria-labelledby=@_titleId tabindex="-1" @onkeydown=@OnKeyAsync data-viewer="loading-overlay">
+    <div class="flex w-[min(28rem,100%)] flex-col gap-4 rounded-lg border border-line bg-card p-6 text-ink shadow-xl" role="status" aria-live="polite"
+         data-viewer="loading-panel">
+        <div class="flex items-center gap-3">
+            <BbSpinner Size="SpinnerSize.Small" Class="shrink-0 text-primary"/>
+            <h2 class="m-0 text-base" id=@_titleId>@(Title ?? Strings.Caption_Loading)</h2>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            @if (Total > 0)
+            {
+                <BbProgress Value=@Math.Min(Done, Total) Max=@Total Class="h-2"/>
+            }
+            else
+            {
+                <div class="h-2 w-full animate-pulse rounded-full bg-primary/30" data-viewer="loading-indeterminate"></div>
+            }
+
+            @if (MessageText is { } message)
+            {
+                <p class="m-0 text-sm" data-viewer="loading-message">@message</p>
+            }
+        </div>
+
+        @if (Messages.Count > 0)
+        {
+            <ul class="m-0 flex list-none flex-col gap-0.5 p-0 text-xs text-muted">
+                @foreach (var line in Messages.TakeLast(4))
+                {
+                    <li>@line</li>
+                }
+            </ul>
+        }
+
+        @if (OnCancel.HasDelegate)
+        {
+            <div class="flex justify-end">
+                <Button Variant="ButtonVariant.Outline" OnClick=@OnCancel data-viewer="cancel-loading">@Strings.Caption_Cancel</Button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+
+    private string? MessageText => Message ?? (Total > 0 ? string.Format(CultureInfo.CurrentCulture, Strings.Message_LoadingProgress, Done, Total) : null);
+
+    private readonly string _titleId = $"fx-loading-{Guid.NewGuid():N}";
+    private ElementReference _overlay;
+
+    /// <summary>The title of the dialog: what is loading (<c>Loading the record</c>); default <c>Loading…</c>.</summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>What the loading does now (<c>Reading the Bundle from r4.smarthealthit.org</c>); default: how many parts of <see cref="Total"/> have
+    /// come, when they are counted.</summary>
+    [Parameter]
+    public string? Message { get; set; }
+
+    /// <summary>The parts loaded so far.</summary>
+    [Parameter]
+    public int Done { get; set; }
+
+    /// <summary>The parts known so far (more may appear as they load); 0: a running bar, the share is not known.</summary>
+    [Parameter]
+    public int Total { get; set; }
+
+    /// <summary>What came last (<c>Loaded: Observation (240)</c>), newest last; the last four are shown.</summary>
+    [Parameter]
+    public IReadOnlyList<string> Messages { get; set; } = [];
+
+    /// <summary>Stops the loading; without it the dialog has no Cancel.</summary>
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    // The dialog takes the focus, so Escape reaches it and a reader announces it
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await _overlay.FocusAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                // not rendered in a browser (prerender, a test)
+            }
+        }
+    }
+
+    private async Task OnKeyAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape" && OnCancel.HasDelegate)
+        {
+            await OnCancel.InvokeAsync();
+        }
+    }
+
+}

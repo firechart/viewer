@@ -24,6 +24,143 @@ The host owns one catch-all route; the Viewer reads the rest of the address (`re
 **The routing is experimental.** The Viewer has its own small router instead of `@page` (a route is a compile-time constant: it cannot take a prefix or live
 in the address space of another application). It may change, or be replaced by `@page`, in a later version.
 
+## A Blazor WebAssembly host from scratch
+
+The component needs the client side of Flox set up by a bootstrapper. `src/FireChart.Viewer.App` is a complete working host; the
+steps below are the minimum taken from it. NuGet packages are planned but not published yet: reference the projects of the repository.
+
+**1. References** (your `.csproj`, Blazor WebAssembly):
+
+```xml
+<ItemGroup>
+  <ProjectReference Include="src/FireChart.Viewer/FireChart.Viewer.csproj" />
+  <ProjectReference Include="src/FireChart.Viewer.Core/FireChart.Viewer.Core.csproj" />
+  <ProjectReference Include="src/FireChart.Viewer.Library/FireChart.Viewer.Library.csproj" />
+  <ProjectReference Include="src/Flox.Core/Flox.Core.csproj" />
+  <ProjectReference Include="src/Flox.Shared/Flox.Shared.csproj" />
+</ItemGroup>
+<!-- Optional: the FHIR SDKs of releases other than R4 are downloaded only when a server of that release is opened -->
+<ItemGroup>
+  <BlazorWebAssemblyLazyLoad Include="Hl7.Fhir.STU3.wasm;Hl7.Fhir.R4B.wasm;Hl7.Fhir.R5.wasm;Hl7.Fhir.R6.wasm" />
+</ItemGroup>
+```
+
+**2. Services.** The Viewer is built on the client side of the Flox platform, set up by a bootstrapper. Copy into your project, from
+`src/FireChart.Viewer.App`: `ViewerAppBootstrapper.cs` (the Flox client without an application server: an anonymous user of your app, the
+Viewer's services), `wwwroot/appsettings.json` (the bootstrapper reads it at the
+start and stops without it: the levels of the log) and, if you lazy-load, `WasmReleaseAssemblyLoader.cs`. Then in `Program.cs`:
+
+```csharp
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
+
+new ViewerAppBootstrapper(builder.Services, builder.Configuration, builder.Logging,
+                          builder.HostEnvironment.BaseAddress, builder.HostEnvironment.Environment).Configure();
+builder.Services.AddSingleton<IReleaseAssemblyLoader, WasmReleaseAssemblyLoader>();   // after the bootstrapper
+// The background-task pages of Flox.Shared need an application server; without these lines Development fails its DI validation
+builder.Services.RemoveAll<Flox.Shared.Pages.BackgroundTask.BackgroundTasksState>();
+builder.Services.RemoveAll<Flox.Shared.Pages.BackgroundTask.BackgroundTaskViewState>();
+
+await builder.Build().RunAsync();
+```
+
+In the copied bootstrapper, remove the two registrations that belong to the application of this repository, not to yours:
+`Services.AddScoped<ViewerAppConfigLoader>()` (it reads `viewer.json`) and `Services.AddScoped<Sandbox.DemoPresets>()` (the playground), and
+rename the namespace.
+
+**3. Styles.** The Viewer takes the look of the host. In `wwwroot/index.html`, in this order:
+
+```html
+<link rel="stylesheet" href="_content/Flox.Shared/app.css" />
+<link rel="stylesheet" href="_content/Flox.Shared/theme.css" />
+<link rel="stylesheet" href="_content/BlazorBlueprint.Components/blazorblueprint.css" />
+<link rel="stylesheet" href="_content/Flox.Shared/css/Flox.Shared.Tailwind.css" />
+<link rel="stylesheet" href="_content/FireChart.Viewer/css/FireChart.Viewer.Tailwind.css" />
+<link rel="stylesheet" href="YourApp.styles.css" />
+```
+
+and in `App.razor`, before the router, the hosts of Blazor Blueprint: `<BbPortalHost/>`, `<BbDialogProvider/>` and `<BbToastProvider/>`.
+
+**4. A page.** The host owns one catch-all route; the Viewer navigates below `RoutePrefix`, so links and the Back button work:
+
+```razor
+@page "/viewer/{*Path}"
+@using FireChart.Viewer
+@using FireChart.Viewer.Appearance
+@using FireChart.Viewer.Smart
+@using FireChart.Viewer.Core.Fhir
+@inject NavigationManager NavigationManager
+
+<FhirViewer Server="_server"
+            RoutePrefix="viewer/"
+            Smart="@(new SmartOptions { RedirectUri = NavigationManager.ToAbsoluteUri("smart/callback").ToString(), Flow = SmartFlow.Redirect })"
+            Fhir="@(new FhirOptions { TerminologyServerUrl = "https://tx.fhir.org/r4" })"
+            Appearance="_appearance" />
+
+@code {
+    [Parameter] public string? Path { get; set; }
+
+    private readonly IViewerServer _server = new ViewerServer("https://r4.smarthealthit.org", "Test server");
+    private readonly ViewerAppearance _appearance = new() { Theme = ViewerTheme.Auto, Variables = { ["colorPrimary"] = "#0a7f5a" } };
+
+    private sealed record ViewerServer(string BaseUrl, string Name) : IViewerServer
+    {
+        public string Key => BaseUrl;                                   // the key of caches and sessions
+        public AuthenticationType AuthenticationType => AuthenticationType.None;   // OAuth2 for SMART
+        public Hl7.Fhir.Specification.FhirRelease? FhirRelease => null;   // read from /metadata
+        public int PageSize => 50;
+        // With SMART: AuthenticationType.OAuth2 and OAuth2ClientId, OAuth2Scope (optional: Authority, OAuth2ExtraParameters)
+    }
+}
+```
+
+| Parameter | Meaning |
+|---|---|
+| `Server` | The FHIR server (`IViewerServer`). **Required**; another server starts a new session |
+| `RoutePrefix` | The path of your catch-all route (`viewer/`) |
+| `Smart` | `SmartOptions` of a SMART sign-in: `RedirectUri` (your callback route for a redirect; without it a server that needs a sign-in can be read only by the popup), `Flow` (`Redirect`, the default, or `Popup`), `PopupRedirectUri` (the return page of the popup; default `_content/FireChart.Viewer/smart-callback.html` of your app) |
+| `Fhir` | `FhirOptions`, the FHIR settings: `TerminologyServerUrl` (words for bare codes; none: codes as they are), `PageSize` and `LoadAll` of a patient summary, `Decimals` (the most decimal places of a value, 2) |
+| `Appearance` | `ViewerAppearance`: `Theme` (`Inherit` by default: your app owns the theme; `Light`, `Dark`, `Auto` make the Viewer own it), `Variables`, `Rules`, `Fonts`, `AdvancedStylesheet` |
+| `ShowBreadcrumbs` | The chain server > type > id above the page (on by default) |
+| `OnConfigError` | Called for an appearance value that was left out |
+
+**5. The SMART callback** (only for servers that need a sign-in). Copy `Pages/SmartCallbackPage.razor` of the app and change its targets to
+your prefix: at `smart/callback` it completes the sign-in with `ISmartAuthorizer.CompleteAsync(NavigationManager.Uri)` and navigates to the
+patient summary of the patient of the launch context, or back where the sign-in began.
+
+## Bundle Visualizer
+
+`FhirBundleVisualizer` is the second component of the package: a FHIR Bundle drawn as the graph of the references between its resources. It needs no
+server and no route.
+
+```razor
+<FhirBundleVisualizer Bundle="@_pastedJsonOrXml" />
+<FhirBundleVisualizer Server="_server" Location="Patient/123/$everything" />
+```
+
+- `Bundle` is the text of a Bundle, JSON or XML (pasted, dropped, read by the host). A pasted Bundle stays in the browser: the resources it refers to
+  and does not hold are drawn dashed and are not read from anywhere.
+- `Location` is the address of a Bundle (a search, `$everything`, a document), absolute or relative to `Server`. It is read once as JSON; the credentials
+  of `Server` go only to its own origin. A `Server` with SMART (OAuth2) is signed in to first, with the panel of the Viewer: `Smart` as for
+  `FhirViewer` (the session of the tab is reused; a token the server refuses with 401 is forgotten and the sign-in asked again). A redirect leaves
+  the page: the host gives `Location` again when it comes back (the SDK does), or uses `SmartFlow.Popup`, which keeps the page.
+- The edges are the references of type `Reference` (also the one in a `CodeableReference`), found by the member `reference` of the JSON and
+  resolved as the specification says (*Resolving references in Bundles*): an absolute one or a `urn:uuid:` by the `fullUrl` of an entry, a relative
+  one against the base of the `fullUrl` of the entry that holds it, else by type and id. A reference to a contained resource is not an edge.
+  References of type `canonical` (`QuestionnaireResponse.questionnaire`, `instantiatesCanonical`, much used in R5) are not edges yet.
+- What refers to nothing (a Patient) is on top, what refers to it below; a long layer wraps into rows. A drag pans, the wheel and a pinch zoom, the
+  types of the toolbar hide and show their resources.
+- A click or a tap on a resource opens its sheet: **Card** (the record as the sheet of the Viewer shows it: `{Type}.page` of the library, else its banner and `{Type}.view`; its references read from the Bundle; and its references either way) and
+  **Source** (its JSON). The sheet can show the neighbourhood of the resource (two references either way); `OnSelect` tells the host what was chosen.
+- While it reads and resolves, the dialog of a long loading (`LoadingPanel` of `Flox.Shared`, the one of a record loaded at once) says what it does and has Cancel.
+  `OnLoad` reports every Bundle given once it is drawn or could not be (`BundleLoad`: the counts, or `invalid_bundle` / `unavailable` /
+  `cancelled` with the text shown); `ReloadAsync()` reads it anew (the same parameters given again do not); `Appearance` and `OnConfigError` are
+  those of the Viewer.
+
+The host needs the same services as for the Viewer; the Bundle Visualizer has its height from its parent (give the parent one). Another application
+embeds it as it embeds the Viewer: the frame `/embed-bundle` of `FireChart.Viewer.App` and `BundleVisualizer` of its JavaScript SDK.
+
 ## Styles
 
 The Viewer has no styles of its own beyond its utilities: it takes the look of the host. In a host that is not FireChart, link, in this order:
@@ -47,11 +184,12 @@ Blueprint into the root component. `FireChart.Viewer.App` (in the repository) is
 ## SMART sign-in
 
 A server with `AuthenticationType.OAuth2` asks for a SMART sign-in (authorization code with PKCE `S256`, a public client). The Viewer offers two ways
-for the browser to leave the page, chosen by the `SmartFlow` parameter:
+for the browser to leave the page, chosen by `Flow` of the parameter `Smart` (`SmartOptions`: `Flow`, `RedirectUri`, `PopupRedirectUri`; the same
+value for `FhirViewer` and `FhirBundleVisualizer`):
 
-| `SmartFlow` | What happens | Use it when |
+| `Flow` | What happens | Use it when |
 |---|---|---|
-| `Redirect` (default) | The page (or the frame) goes to the sign-in page of the authorization server and comes back to `SmartRedirectUri`, a route of the host | The Viewer owns its page: a Blazor WebAssembly host, MAUI, a frame whose authorization server allows to be framed |
+| `Redirect` (default) | The page (or the frame) goes to the sign-in page of the authorization server and comes back to `RedirectUri`, a route of the host | The Viewer owns its page: a Blazor WebAssembly host, MAUI, a frame whose authorization server allows to be framed |
 | `Popup` | The sign-in page opens in a window of its own; the page stays where it is and gets the result when the window closes | The Viewer is in a frame of another application (an EHR, a portal) and the authorization server refuses to be shown in a frame |
 
 ### Examples
@@ -61,19 +199,18 @@ A Blazor host with the redirect (the host owns the callback route and completes 
 ```razor
 <FhirViewer Server="_server"
             RoutePrefix="@($"server/{Id}/")"
-            SmartRedirectUri="@NavigationManager.ToAbsoluteUri("smart/callback").ToString()" />
+            Smart="@(new SmartOptions { RedirectUri = NavigationManager.ToAbsoluteUri("smart/callback").ToString() })" />
 ```
 
-The same with the popup. `SmartRedirectUri` stays: it is the way out when the window cannot be used (see *Fallbacks*).
+The same with the popup. `RedirectUri` stays: it is the way out when the window cannot be used (see *Fallbacks*).
 
 ```razor
 <FhirViewer Server="_server"
             RoutePrefix="@($"server/{Id}/")"
-            SmartRedirectUri="@NavigationManager.ToAbsoluteUri("smart/callback").ToString()"
-            SmartFlow="SmartFlow.Popup" />
+            Smart="@(new SmartOptions { RedirectUri = NavigationManager.ToAbsoluteUri("smart/callback").ToString(), Flow = SmartFlow.Popup })" />
 ```
 
-`SmartPopupRedirectUri` sets the return page of the window; by default it is `_content/FireChart.Viewer/smart-callback.html` below the base address of
+`PopupRedirectUri` sets the return page of the window; by default it is `_content/FireChart.Viewer/smart-callback.html` below the base address of
 the application (`<base href>`), a static page of this package. It must be on the origin of the Viewer.
 
 ### Registration at the authorization server
@@ -113,7 +250,7 @@ The popup never leaves the user stuck: when it cannot work the panel says why an
 | The window was closed before the end, the Viewer lost it (see COOP below), or 10 minutes passed | *The sign-in window was closed before the sign-in was complete ...* | the same |
 | The authorization server refused, or the token request failed | the text of the failure | the same |
 
-**Sign in here** is the redirect of the frame: it needs `SmartRedirectUri` and an authorization server that allows framing. Without them the user can
+**Sign in here** is the redirect of the frame: it needs `RedirectUri` and an authorization server that allows framing. Without them the user can
 only try the window again.
 
 ### Platforms
@@ -161,7 +298,7 @@ What to expect. Only the rows marked *verified* were tried; the rest follows fro
 | The SMART App Launcher answers `Invalid launch options: SyntaxError: Unexpected end of JSON input` | A standalone sign-in to the launcher without its launch settings | Add `launch=e30` to the OAuth2 extra parameters of the server (`e30` is `{}` in Base64) |
 | The window stays on *... choose "Sign in here"* | The return page has no opener: COOP somewhere in the chain, or the page was opened by hand | Close it and use **Sign in here**; look for COOP as above |
 | The window stays blank | The discovery or the authorization endpoint is slow or failing, or an in-app browser that never loads windows | The network tab of the frame (`.well-known/smart-configuration`); close the window, the panel offers the fallback |
-| The window closed, the panel did not move on | The message was dropped: the return page is on another origin than the Viewer (a `SmartPopupRedirectUri` on another host, `localhost` against `127.0.0.1`) | Put `SmartPopupRedirectUri` on the origin of the Viewer, not of the host page |
+| The window closed, the panel did not move on | The message was dropped: the return page is on another origin than the Viewer (a `PopupRedirectUri` on another host, `localhost` against `127.0.0.1`) | Put `PopupRedirectUri` on the origin of the Viewer, not of the host page |
 | *The answer of the sign-in server does not match the request* | The same sign-in was completed twice, or the frame reloaded while the window was open | Start again with one click |
 | *The server did not give an access token* | The token request from the frame failed: CORS of the token endpoint, or `invalid_grant` (the token request carries the popup redirect URI, which must be registered too) | The network tab of the frame, the request to the token endpoint |
 | The window shows HTTP 500 on `smart-callback.html`, only under Visual Studio | The browser refresh of Hot Reload (`Microsoft.AspNetCore.Watch.BrowserRefresh`) fails to unpack the precompressed static page to inject its script (`InvalidDataException: ... unsupported compression method` in the log); a tool of development, not in `dotnet run` or a published app | Turn off *Auto refresh browser* in Visual Studio (Tools → Options → Projects and Solutions → ASP.NET Core), or run with `dotnet run` |
@@ -173,7 +310,7 @@ the host page; and the console of the window before it closes (Chrome DevTools: 
 ### Test matrix
 
 Run it on each platform you support, with the SMART App Launcher (`https://launch.smarthealthit.org/v/r4/fhir`, any client id, extra parameters
-`launch=e30`) and a host page on another origin that frames the Viewer app (`samples`), with `SmartFlow.Popup`:
+`launch=e30`) and a host page on another origin that frames the Viewer app (`samples`), with `Flow = SmartFlow.Popup`:
 
 1. **Sign in** in the frame: a window (a tab on phones) opens with the sign-in of the launcher.
 2. Pick a provider and a patient: the window closes and the frame shows the patient summary of that patient.

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<!-- The Bundle Visualizer of the SDK on a plain page of another origin. Serve the repository root (python -m http.server 8090), run the Viewer with
+     this origin in its host.json (as for samples/viewer-sdk), open http://localhost:8090/samples/bundle-sdk/?viewer=http://localhost:8088/ -->
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FireChart Bundle Visualizer SDK sample</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 0; display: grid; grid-template-columns: 340px 1fr; height: 100vh; }
+        aside { padding: 12px; border-right: 1px solid #ddd; overflow: auto; }
+        main { min-width: 0; }
+        #bundle { height: 100%; }
+        textarea { width: 100%; height: 160px; font: 12px ui-monospace, monospace; box-sizing: border-box; }
+        input { width: 100%; box-sizing: border-box; }
+        button, select { margin: 2px 0; }
+        pre { font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+        @media (max-width: 720px) { body { grid-template-columns: 1fr; grid-template-rows: auto 70vh; height: auto; } }
+    </style>
+</head>
+<body>
+<aside>
+    <h3>Bundle Visualizer SDK sample</h3>
+    <p>Viewer app at <code id="url"></code></p>
+    <p><textarea id="text" placeholder="Paste a Bundle (JSON or XML)"></textarea></p>
+    <p>
+        <button id="show-text">Show the text</button>
+        <button id="show-object">Show a Bundle object</button>
+        <button id="invalid">Show a Patient (refused)</button>
+    </p>
+    <p><input id="location" value="Patient/13a00221-8417-4973-961e-e21b32ece95a/$everything?_count=50" /></p>
+    <p><button id="show-location">Read the address</button></p>
+    <p>
+        <button data-theme="light">Light</button>
+        <button data-theme="dark">Dark</button>
+        <select id="locale">
+            <option>auto</option><option>en</option><option>de</option><option>es</option><option>ru</option><option>zh-Hans</option>
+        </select>
+    </p>
+    <p>Selected: <code id="selected"></code></p>
+    <pre id="log"></pre>
+</aside>
+<main><div id="bundle"></div></main>
+<script type="module">
+    import { BundleVisualizer } from "../../src/FireChart.Viewer.App/wwwroot/sdk/viewer.js";
+
+    const url = new URLSearchParams(location.search).get("viewer") ?? "http://localhost:5280/";
+    document.getElementById("url").textContent = url;
+    const log = text => document.getElementById("log").textContent = `${new Date().toLocaleTimeString()} ${text}\n` + document.getElementById("log").textContent;
+
+    // The server is only for an address relative to it; a Bundle given as an object or a text stays in the browser
+    const visualizer = BundleVisualizer.create(
+        { server: { url: "https://r4.smarthealthit.org", name: "SMART Health IT R4" }, appearance: { theme: "inherit" }, locale: "inherit" },
+        { url, title: "Bundle" });
+    for (const event of ["ready", "shown", "select", "restarting", "updated", "error"]) {
+        visualizer.on(event, payload => {
+            log(`${event} ${JSON.stringify(payload)}`);
+            document.getElementById("selected").textContent = visualizer.selected ?? "";
+        });
+    }
+
+    visualizer.mount("#bundle");
+    window.visualizer = visualizer;
+
+    const run = async (name, action) => {
+        try {
+            log(`${name} -> ${JSON.stringify(await action())}`);
+        } catch (error) {
+            log(`${name} rejected: ${error.type} ${error.code} ${error.param}: ${error.message}`);
+        }
+    };
+
+    const example = {
+        resourceType: "Bundle", type: "collection",
+        entry: [
+            { fullUrl: "urn:uuid:p", resource: { resourceType: "Patient", id: "p", name: [{ family: "Example", given: ["Alex"] }], birthDate: "1980-04-02" } },
+            { fullUrl: "urn:uuid:e", resource: { resourceType: "Encounter", id: "e", status: "finished", class: { code: "AMB" }, subject: { reference: "urn:uuid:p" } } },
+            { fullUrl: "urn:uuid:o", resource: { resourceType: "Observation", id: "o", status: "final", code: { text: "Body weight" },
+                subject: { reference: "urn:uuid:p" }, encounter: { reference: "urn:uuid:e" }, valueQuantity: { value: 71.4, unit: "kg" } } }
+        ]
+    };
+
+    document.getElementById("show-text").onclick = () => run("show text", () => visualizer.show(document.getElementById("text").value));
+    document.getElementById("show-object").onclick = () => run("show object", () => visualizer.show(example));
+    document.getElementById("invalid").onclick = () => run("show patient", () => visualizer.show({ resourceType: "Patient", id: "p" }));
+    document.getElementById("show-location").onclick = () => run("show location", () => visualizer.show({ location: document.getElementById("location").value }));
+    for (const button of document.querySelectorAll("[data-theme]")) {
+        button.onclick = () => run("update theme", () => visualizer.update({ appearance: { theme: button.dataset.theme } }));
+    }
+
+    document.getElementById("locale").onchange = e => run("update locale", () => visualizer.update({ locale: e.target.value }));
+</script>
+</body>
+</html>

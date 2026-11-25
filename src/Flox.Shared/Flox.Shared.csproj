@@ -30,7 +30,6 @@
 	<ItemGroup>
 	  <!-- The licenses of the icon font for the lists of the applications (licenses.py), not a file of the application -->
 	  <Content Update="other-licenses.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
-	  <Content Remove="Components\RepositoryDataList.razor" />
 	</ItemGroup>
 
   <ItemGroup>
@@ -38,7 +37,6 @@
       <TreatAsUsed>true</TreatAsUsed>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" />
-    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables">
       <TreatAsUsed>true</TreatAsUsed>
     </PackageReference>

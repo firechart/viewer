@@ -19,7 +19,7 @@ internal static class ReportExpressions
     {
         try
         {
-            s_compiler.Compile(source);
+            s_cache.GetCompiledExpression(source);
             return null;
         }
         catch (Exception ex) when (ex is not OutOfMemoryException)

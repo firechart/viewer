@@ -43,7 +43,11 @@ public sealed record ValueSetExpansion(IReadOnlyList<SearchOption> Options, bool
     {
         ArgumentNullException.ThrowIfNull(json);
         using var document = JsonDocument.Parse(json);
-        var root = document.RootElement;
+        return Parse(document.RootElement, limit);
+    }
+
+    internal static ValueSetExpansion Parse(JsonElement root, int limit)
+    {
         if (root.ValueKind != JsonValueKind.Object || Text(root, "resourceType") != "ValueSet" || !root.TryGetProperty("expansion", out var expansion)
             || expansion.ValueKind != JsonValueKind.Object)
         {
@@ -54,7 +58,7 @@ public sealed record ValueSetExpansion(IReadOnlyList<SearchOption> Options, bool
         var seen = new HashSet<string>(StringComparer.Ordinal);
         var cut = false;
         Collect(expansion);
-        var total = expansion.TryGetProperty("total", out var t) && t.TryGetInt32(out var number) ? number : (int?)null;
+        var total = expansion.TryGetProperty("total", out var t) && t.ValueKind == JsonValueKind.Number && t.TryGetInt32(out var number) ? number : (int?)null;
         var complete = !cut && (total is { } all ? all <= options.Count : options.Count < limit);
         return new ValueSetExpansion(options, complete);
 
@@ -264,7 +268,7 @@ public sealed class ValueSetExpander(IHttpClientFactory httpClientFactory, IServ
         try
         {
             using var document = await FhirServerHttp.GetJsonAsync(httpClientFactory, url, credentials.GetAuthorization(server), FhirServerHttp.TimeoutOf(server), cancellationToken);
-            var expansion = Remember(key, ValueSetExpansion.Parse(document.RootElement.GetRawText(), Limit));
+            var expansion = Remember(key, ValueSetExpansion.Parse(document.RootElement, Limit));
             if (text is null)
             {
                 _whole[key] = expansion;
@@ -276,7 +280,13 @@ public sealed class ValueSetExpander(IHttpClientFactory httpClientFactory, IServ
         }
         catch (Exception ex) when (ex is HttpRequestException or JsonException or FormatException or TimeoutException)
         {
-            if (ex is not HttpRequestException { StatusCode: null or >= HttpStatusCode.InternalServerError and not HttpStatusCode.NotImplemented } and not TimeoutException)
+            // Remembered for the session only when the server says it does not expand the value set; credentials refused, a busy server and a
+            // filter it does not take pass
+            if (text is null && ex is JsonException or FormatException or HttpRequestException
+                {
+                    StatusCode: HttpStatusCode.BadRequest or HttpStatusCode.NotFound or HttpStatusCode.MethodNotAllowed or HttpStatusCode.Gone
+                    or HttpStatusCode.UnprocessableEntity or HttpStatusCode.NotImplemented
+                })
             {
                 _refused[key] = 0;
             }

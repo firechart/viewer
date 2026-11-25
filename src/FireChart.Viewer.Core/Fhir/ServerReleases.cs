@@ -25,7 +25,7 @@ public static class ServerReleases
         {
             return (await types.GetAsync(server)).Release;
         }
-        catch (Exception ex) when (ex is HttpRequestException or FloxException or System.Text.Json.JsonException)
+        catch (Exception ex) when (ex is HttpRequestException or FloxException or System.Text.Json.JsonException or TimeoutException)
         {
             return server.FhirRelease?.GetLiteral();
         }

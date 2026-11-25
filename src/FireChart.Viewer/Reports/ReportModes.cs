@@ -243,7 +243,7 @@ internal sealed class BannerBlock : ReportBlock
 // its page
 internal sealed class ShowBlock : ReportBlock
 {
-    private readonly List<Shown> _shown = [];
+    private List<Shown> _shown = [];
     private string _mode = "text";
 
     // Where a row of a tile leads, when the host decides (a section of a summary: a sheet over the page, the summary of the record); the page of the
@@ -261,25 +261,29 @@ internal sealed class ShowBlock : ReportBlock
         return same;
     }
 
+    // The rows are made apart and put in place whole: a block given new parameters while it still waits prepares again beside the first run
     protected override async Task PrepareAsync()
     {
-        _shown.Clear();
-        _mode = Text("mode");
+        var mode = Text("mode");
+        var shown = new List<Shown>();
         foreach (var given in Values.Nodes(Node.Attribute("value")!))
         {
             // A reference in a tile, a banner or a view is the record it points to, when it can be read
-            var node = given.Poco.TypeName == "Reference" && _mode is "tile" or "banner" or "view"
+            var node = given.Poco.TypeName == "Reference" && mode is "tile" or "banner" or "view"
                 ? await Scope.Runtime.Data.ResolveAsync(given) ?? given
                 : given;
             if (node == given && given.Poco.TypeName == "Reference" && Scope.Runtime.Data.MissingTypeOf(given) is { } missing)
             {
-                _shown.Add(new Shown(given, null, missing));
+                shown.Add(new Shown(given, null, missing));
                 continue;
             }
 
-            var component = _mode is "text" ? null : await Scope.Runtime.ModeAsync(node.Poco.TypeName, _mode);
-            _shown.Add(new Shown(node, component));
+            var component = mode is "text" ? null : await Scope.Runtime.ModeAsync(node.Poco.TypeName, mode);
+            shown.Add(new Shown(node, component));
         }
+
+        _mode = mode;
+        _shown = shown;
     }
 
     protected override void Build(RenderTreeBuilder builder)

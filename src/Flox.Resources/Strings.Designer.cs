@@ -78,15 +78,6 @@ namespace Flox.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to About platform.
-        /// </summary>
-        public static string Caption_AboutPlatform {
-            get {
-                return ResourceManager.GetString("Caption_AboutPlatform", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to About this application.
         /// </summary>
         public static string Caption_AboutThisApp {
@@ -381,15 +372,6 @@ namespace Flox.Resources {
         public static string Caption_Home {
             get {
                 return ResourceManager.GetString("Caption_Home", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Import task.
-        /// </summary>
-        public static string Caption_ImportTask {
-            get {
-                return ResourceManager.GetString("Caption_ImportTask", resourceCulture);
             }
         }
         
@@ -886,14 +868,6 @@ namespace Flox.Resources {
                 return ResourceManager.GetString("Settings_PageTitle", resourceCulture);
             }
         }
-        /// <summary>
-        ///   Looks up a localized string similar to More filters.
-        /// </summary>
-        public static string Caption_MoreFilters {
-            get {
-                return ResourceManager.GetString("Caption_MoreFilters", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Looks up a localized string similar to Any.
@@ -1150,7 +1124,6 @@ namespace Flox.Resources {
             }
         }
 
-
         /// <summary>
         ///   Looks up a localized string similar to View.
         /// </summary>
@@ -1168,14 +1141,6 @@ namespace Flox.Resources {
 
 
 
-        /// <summary>
-        ///   Looks up a localized string similar to Show the count.
-        /// </summary>
-        public static string Caption_ShowTotal {
-            get {
-                return ResourceManager.GetString("Caption_ShowTotal", resourceCulture);
-            }
-        }
 
 
 
@@ -1357,15 +1322,6 @@ namespace Flox.Resources {
                 return ResourceManager.GetString("Caption_WordWrap", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Bookmarked only.
-        /// </summary>
-        public static string Caption_BookmarkedOnly {
-            get {
-                return ResourceManager.GetString("Caption_BookmarkedOnly", resourceCulture);
-            }
-        }
 
         /// <summary>
         ///   Looks up a localized string similar to Expand all.
@@ -1458,6 +1414,51 @@ namespace Flox.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New version downloading: {0} of {1} files.
+        /// </summary>
+        public static string AppUpdate_Downloading {
+            get {
+                return ResourceManager.GetString("AppUpdate_Downloading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saving for offline use: {0} of {1} files.
+        /// </summary>
+        public static string AppUpdate_SavingOffline {
+            get {
+                return ResourceManager.GetString("AppUpdate_SavingOffline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A new version is ready.
+        /// </summary>
+        public static string AppUpdate_Ready {
+            get {
+                return ResourceManager.GetString("AppUpdate_Ready", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restart.
+        /// </summary>
+        public static string AppUpdate_Restart {
+            get {
+                return ResourceManager.GetString("AppUpdate_Restart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Later.
+        /// </summary>
+        public static string AppUpdate_Later {
+            get {
+                return ResourceManager.GetString("AppUpdate_Later", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Back.
         /// </summary>
         public static string Caption_Back {
@@ -1499,6 +1500,15 @@ namespace Flox.Resources {
         public static string Caption_MainNavigation {
             get {
                 return ResourceManager.GetString("Caption_MainNavigation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} of {1} parts loaded.
+        /// </summary>
+        public static string Message_LoadingProgress {
+            get {
+                return ResourceManager.GetString("Message_LoadingProgress", resourceCulture);
             }
         }
         

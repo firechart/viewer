@@ -207,9 +207,6 @@
   <data name="Caption_ImportTasks" xml:space="preserve">
     <value>משימות ייבוא</value>
   </data>
-  <data name="Caption_ImportTask" xml:space="preserve">
-    <value>משימת ייבוא</value>
-  </data>
   <data name="Caption_Properties" xml:space="preserve">
     <value>מאפיינים</value>
   </data>
@@ -300,9 +297,6 @@
   <data name="Caption_GeneralCategory" xml:space="preserve">
     <value>כללי</value>
   </data>
-  <data name="Caption_AboutPlatform" xml:space="preserve">
-    <value>אודות הפלטפורמה</value>
-  </data>
   <data name="Caption_ConfirmPurgeTasks" xml:space="preserve">
     <value>למחוק משימות שהושלמו?</value>
   </data>
@@ -329,9 +323,6 @@
   </data>
   <data name="Error_NetworkUnavailable" xml:space="preserve">
     <value>השרת אינו נגיש. בדוק את החיבור ונסה שוב.</value>
-  </data>
-  <data name="Caption_MoreFilters" xml:space="preserve">
-    <value>מסננים נוספים</value>
   </data>
   <data name="Caption_Any" xml:space="preserve">
     <value>כלשהו</value>
@@ -417,9 +408,6 @@
   <data name="Caption_View" xml:space="preserve">
     <value>תצוגה</value>
   </data>
-  <data name="Caption_ShowTotal" xml:space="preserve">
-    <value>הצגת הספירה</value>
-  </data>
   <data name="Caption_Connect" xml:space="preserve">
     <value>התחברות</value>
   </data>
@@ -473,9 +461,6 @@
   </data>
   <data name="Caption_WordWrap" xml:space="preserve">
     <value>גלישת שורות</value>
-  </data>
-  <data name="Caption_BookmarkedOnly" xml:space="preserve">
-    <value>רק מסומנים</value>
   </data>
   <data name="Caption_ExpandAll" xml:space="preserve">
     <value>הרחבת הכול</value>
@@ -644,5 +629,23 @@
   </data>
   <data name="Message_NotCopied" xml:space="preserve">
     <value>הדפדפן לא איפשר העתקה</value>
+  </data>
+  <data name="Message_LoadingProgress" xml:space="preserve">
+    <value>נטענו {0} מתוך {1} חלקים</value>
+  </data>
+  <data name="AppUpdate_Downloading" xml:space="preserve">
+    <value>גרסה חדשה בהורדה: {0} מתוך {1} קבצים</value>
+  </data>
+  <data name="AppUpdate_SavingOffline" xml:space="preserve">
+    <value>שמירה לשימוש ללא רשת: {0} מתוך {1} קבצים</value>
+  </data>
+  <data name="AppUpdate_Ready" xml:space="preserve">
+    <value>גרסה חדשה מוכנה</value>
+  </data>
+  <data name="AppUpdate_Restart" xml:space="preserve">
+    <value>הפעלה מחדש</value>
+  </data>
+  <data name="AppUpdate_Later" xml:space="preserve">
+    <value>מאוחר יותר</value>
   </data>
 </root>

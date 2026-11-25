@@ -10,7 +10,7 @@ namespace FireChart.Viewer.Smart;
 /// </remarks>
 /// <example>
 /// <code>
-/// &lt;FhirViewer Server="server" SmartRedirectUri="@callback" SmartFlow="SmartFlow.Popup"/&gt;
+/// &lt;FhirViewer Server="server" Smart=@(new SmartOptions { RedirectUri = callback, Flow = SmartFlow.Popup })/&gt;
 /// </code>
 /// </example>
 public enum SmartFlow

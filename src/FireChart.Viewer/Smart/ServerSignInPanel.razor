@@ -47,9 +47,22 @@
     private string? _failure;
     private IJSObjectReference? _popup;
 
-    /// <summary>The instance of the Viewer: the flow and the callback addresses.</summary>
+    /// <summary>The instance of the Viewer: its <see cref="ViewerSession.Smart"/>, unless <see cref="Smart"/> is given.</summary>
     [CascadingParameter]
-    public ViewerSession Session { get; set; } = null!;
+    public ViewerSession? Session { get; set; }
+
+    /// <summary>How the sign-in leaves the page and where it comes back, for a component without a session (the Bundle Visualizer); default: that of
+    /// <see cref="Session"/>.</summary>
+    [Parameter]
+    public SmartOptions? Smart { get; set; }
+
+    private SmartOptions Options => Smart ?? Session?.Smart ?? SmartOptions.Default;
+
+    private SmartFlow FlowOf => Options.Flow;
+
+    private string PopupRedirectOf => Options.PopupRedirectUri is { Length: > 0 } page
+        ? page
+        : NavigationManager.ToAbsoluteUri("_content/FireChart.Viewer/smart-callback.html").ToString();
 
     /// <summary>The server.</summary>
     [Parameter, EditorRequired]
@@ -66,7 +79,7 @@
     // The module is loaded before the click: the window must be opened in the click itself, before any wait, or the browser blocks it
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && Session.SmartFlow == SmartFlow.Popup)
+        if (firstRender && FlowOf == SmartFlow.Popup)
         {
             _popup = await JS.ImportModuleAsync("./_content/FireChart.Viewer/js/smart-popup.js");
         }
@@ -74,7 +87,7 @@
 
     private Task SignInAsync()
     {
-        return Session.SmartFlow == SmartFlow.Popup && _popup is not null ? PopupAsync(_popup) : RedirectAsync();
+        return FlowOf == SmartFlow.Popup && _popup is not null ? PopupAsync(_popup) : RedirectAsync();
     }
 
     private async Task RedirectAsync()
@@ -88,7 +101,7 @@
         _failure = null;
         try
         {
-            var redirect = Session.SmartRedirectUri ?? throw new SmartException(SmartFailure.ClientNotConfigured, "The host gave no callback address of the sign-in.");
+            var redirect = Options.RedirectUri ?? throw new SmartException(SmartFailure.ClientNotConfigured, "The host gave no callback address of the sign-in.");
             var url = await Authorizer.StartAsync(Server, redirect, ReturnUrl, null);
             NavigationManager.NavigateTo(url, forceLoad: true);
         }
@@ -120,7 +133,7 @@
         _waiting = true;
         try
         {
-            var url = await Authorizer.StartAsync(Server, Session.SmartPopupRedirectUri, ReturnUrl, null);
+            var url = await Authorizer.StartAsync(Server, PopupRedirectOf, ReturnUrl, null);
             await popup.InvokeVoidAsync("go", url);
             StateHasChanged();
             var result = await popup.InvokeAsync<PopupResult>("wait", (int)s_popupLimit.TotalMilliseconds);

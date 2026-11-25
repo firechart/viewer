@@ -25,6 +25,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
     <PackageReference Include="BlazorBlueprint.Components" />
     <PackageReference Include="BlazorBlueprint.Primitives" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" />
     <PackageReference Include="Lombiq.Tailwind.Targets" PrivateAssets="all" />
   </ItemGroup>
 

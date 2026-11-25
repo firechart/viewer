@@ -165,7 +165,7 @@
 
     private double Round(double value)
     {
-        return Decimals is { } places ? Math.Round(value, places) : value;
+        return DecimalText.Round(value, Decimals);
     }
 
     private string ValueFormat => Decimals is { } places ? "{0:0." + new string('#', places) + "}" : "{0}";

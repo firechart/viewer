@@ -207,9 +207,6 @@
   <data name="Caption_ImportTasks" xml:space="preserve">
     <value>Задачи импорта</value>
   </data>
-  <data name="Caption_ImportTask" xml:space="preserve">
-    <value>Задача импорта</value>
-  </data>
   <data name="Caption_Properties" xml:space="preserve">
     <value>Свойства</value>
   </data>
@@ -300,9 +297,6 @@
   <data name="Caption_GeneralCategory" xml:space="preserve">
     <value>Общие</value>
   </data>
-  <data name="Caption_AboutPlatform" xml:space="preserve">
-    <value>О платформе</value>
-  </data>
   <data name="Caption_ConfirmPurgeTasks" xml:space="preserve">
     <value>Удалить завершённые задачи?</value>
   </data>
@@ -329,9 +323,6 @@
   </data>
   <data name="Error_NetworkUnavailable" xml:space="preserve">
     <value>Сервер недоступен. Проверьте подключение и повторите попытку.</value>
-  </data>
-  <data name="Caption_MoreFilters" xml:space="preserve">
-    <value>Дополнительные фильтры</value>
   </data>
   <data name="Caption_Any" xml:space="preserve">
     <value>Любое</value>
@@ -417,9 +408,6 @@
   <data name="Caption_View" xml:space="preserve">
     <value>Просмотр</value>
   </data>
-  <data name="Caption_ShowTotal" xml:space="preserve">
-    <value>Показать количество</value>
-  </data>
   <data name="Caption_Connect" xml:space="preserve">
     <value>Подключиться</value>
   </data>
@@ -473,9 +461,6 @@
   </data>
   <data name="Caption_WordWrap" xml:space="preserve">
     <value>Перенос строк</value>
-  </data>
-  <data name="Caption_BookmarkedOnly" xml:space="preserve">
-    <value>Только закладки</value>
   </data>
   <data name="Caption_ExpandAll" xml:space="preserve">
     <value>Развернуть все</value>
@@ -644,5 +629,23 @@
   </data>
   <data name="Message_NotCopied" xml:space="preserve">
     <value>Браузер не разрешил копирование</value>
+  </data>
+  <data name="Message_LoadingProgress" xml:space="preserve">
+    <value>Загружено частей: {0} из {1}</value>
+  </data>
+  <data name="AppUpdate_Downloading" xml:space="preserve">
+    <value>Загружается новая версия, файлы: {0} из {1}</value>
+  </data>
+  <data name="AppUpdate_SavingOffline" xml:space="preserve">
+    <value>Сохранение для работы без сети, файлы: {0} из {1}</value>
+  </data>
+  <data name="AppUpdate_Ready" xml:space="preserve">
+    <value>Новая версия готова</value>
+  </data>
+  <data name="AppUpdate_Restart" xml:space="preserve">
+    <value>Перезапустить</value>
+  </data>
+  <data name="AppUpdate_Later" xml:space="preserve">
+    <value>Позже</value>
   </data>
 </root>

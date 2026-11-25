@@ -21,8 +21,13 @@ html:root[data-theme="dark"] {
 }
 
 /* The fields of Blueprint are transparent: on the beige page of the light theme they merged with it. They take the foam
-   of the cards; the dark theme keeps Blueprint's tint */
-html:root:not(.dark, [data-theme="dark"]) :is(input, textarea, [role="combobox"]).bb\:border-input.bb\:bg-transparent {
+   of the cards; the dark theme keeps Blueprint's tint. A field with an icon (an input group, the search) is framed by its group */
+html:root:not(.dark, [data-theme="dark"]) :is(input, textarea, [role="combobox"], [data-slot="input-group"]).bb\:border-input.bb\:bg-transparent {
+    background-color: var(--card);
+}
+
+/* The code editor (CodeMirror, the source of a record) is a field too: the foam of the cards, its gutter and panels with it */
+html:root:not(.dark, [data-theme="dark"]) :is(.cm-editor, .cm-gutters, .cm-panels) {
     background-color: var(--card);
 }
 

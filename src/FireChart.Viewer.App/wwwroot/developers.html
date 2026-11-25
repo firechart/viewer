@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!-- How to embed the Viewer (the page for developers): the addresses in the examples are those of this copy of the site (filled in by the script below) -->
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FireChart Viewer: embed it in your application</title>
+    <meta name="description" content="Embed FireChart Viewer or the Bundle Visualizer in any web page with one ES module: plain HTML, React, Angular, Vue." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://viewer.firechart.org/developers.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="FireChart" />
+    <meta property="og:url" content="https://viewer.firechart.org/developers.html" />
+    <meta property="og:title" content="Embed FireChart Viewer" />
+    <meta property="og:description" content="One ES module puts a FHIR® viewer into your page in a frame of its own. Plain HTML, React, Angular, Vue." />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="https://viewer.firechart.org/img/og-viewer.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The summary of a patient in FireChart Viewer" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Embed FireChart Viewer" />
+    <meta name="twitter:description" content="One ES module puts a FHIR® viewer into your page in a frame of its own. Plain HTML, React, Angular, Vue." />
+    <meta name="twitter:image" content="https://viewer.firechart.org/img/og-viewer.png" />
+    <link rel="icon" href="img/firechart-logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/site.css" />
+</head>
+<body>
+<header class="site-header">
+    <a class="brand" href="./"><img src="img/firechart-logo.svg" alt="FireChart" /></a>
+    <nav>
+        <a href="viewer.html">Viewer</a>
+        <a href="bundle.html">Bundle<span class="wide"> Visualizer</span></a>
+        <a href="developers.html" aria-current="page">Embed</a>
+    </nav>
+    <a class="github" href="https://github.com/firechart/viewer">GitHub</a>
+</header>
+
+<main class="page prose">
+    <h1>Embed it in your application</h1>
+    <p>
+        The Viewer is a web application of its own shown in an iframe. Your page needs one ES module, the SDK: it creates the frame, gives it the
+        configuration and turns its messages into events and promises. No framework, no build step.
+    </p>
+
+    <h2>Try it with this copy</h2>
+    <p>Save this as a file and open it from a local web server. This copy of the Viewer accepts commands from its own pages only, so run your own
+        copy for a page of another origin (below).</p>
+    <pre><code id="html"></code></pre>
+
+    <h2>Run your own copy</h2>
+    <p>The Docker image serves this whole site. <code>host.json</code> lists the origins of the pages that
+        may embed it.</p>
+    <pre><code>docker run -d -p 8080:8080 \
+  -v "$PWD/host.json:/usr/share/nginx/html/host.json:ro" \
+  ghcr.io/firechart/viewer:latest</code></pre>
+    <pre><code>{ "frameAncestors": ["'self'", "https://app.example.org"] }</code></pre>
+    <p>Or copy the folder of the site to any static web server: every address in it is relative.</p>
+
+    <h2>More</h2>
+    <p>
+        Components for React, Angular and Vue, recipes and troubleshooting:
+        <a href="https://github.com/firechart/viewer/blob/main/src/FireChart.Viewer.App/Sdk/HOWTO.md">HOWTO</a>.
+        The API of the SDK: <a href="https://github.com/firechart/viewer/blob/main/src/FireChart.Viewer.App/Sdk/README.md">README</a>.
+        Every option of the Viewer at work: the <a href="playground">playground</a>.
+    </p>
+</main>
+
+<footer class="site-footer">
+    FireChart Viewer is open source under the <a href="https://github.com/firechart/viewer/blob/main/LICENSE">MPL-2.0</a>.
+</footer>
+
+<script>
+    const app = new URL("./", location.href).href;
+    document.getElementById("html").textContent = `<div id="viewer" style="height: 80vh"></div>
+<script type="module">
+  import { Viewer } from "${app}sdk/viewer.js";
+
+  const viewer = Viewer.create(
+    { server: { url: "https://r4.smarthealthit.org" }, appearance: { theme: "auto" } },
+    { url: "${app}" }
+  ).mount("#viewer");
+
+  viewer.on("navigate", e => console.log("now at", e.location));
+</` + `script>`;
+</script>
+</body>
+</html>

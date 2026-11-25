@@ -2,6 +2,58 @@
 
 The changes of each published release of the FireChart Viewer and the public Flox libraries, newest first.
 
+## 0.95.12 - 2026-11-25
+
+### Bundle Visualizer (new)
+
+- A FHIR Bundle, pasted, opened from a file or read by its address, drawn as the graph of the references between its resources. A tap
+  opens a resource with its card (as the Viewer shows the record) and its source.
+- Edges are the references of type Reference, the one of a CodeableReference too, resolved as the specification says (fullUrl, relative
+  to the base of the entry, type and id). A resource the Bundle only refers to is drawn dashed: nothing is read to complete it, and its
+  Source says why it has none.
+- A Bundle read by its address from a server that needs a SMART sign-in is read after the sign-in. A long loading shows its progress
+  with Cancel.
+- The Blazor component `FhirBundleVisualizer`, and `BundleVisualizer` of the SDK in its own frame (`/embed-bundle`).
+
+### The site and the demos
+
+- The application is a site: a home page, live demos of the Viewer (`viewer.html`) and of the Bundle Visualizer (`bundle.html`), a page
+  for developers (`developers.html`) and the playground (`/playground`, formerly `/`). The same files run in the Docker image, on any
+  static web server and on GitHub Pages: https://firechart.github.io/viewer/
+- The demos embed the application through the SDK, keep the server, the place and the appearance (language, theme, style, names of
+  codes) in the address of the page, and fit the screen of a phone. The Bundle demo offers searches with their related resources
+  (`_include`) on the server you pick, a file, and Paste (Ctrl+V).
+
+### Viewer
+
+- The FHIR settings are one option, `fhir`: `terminologyServer`, `pageSize` and `loadAll` of a summary, and `decimals`. A value shows at
+  most two decimal places by default.
+- Back of the app bar is Back of the browser, and a navigation is answered at once by a bar under the app bar.
+- A reference field of a search form shows its records as the tiles of their type, can be cleared, and keeps the width of a phone.
+- On a phone the switch Record | Summary | Source shows icons and keeps the toolbar on one line.
+- Bookmarks are drawn as the other lists. In the light theme the search field and the code editor take the fill of the fields.
+- Fixes: a value chosen from the autofill of the browser no longer brings the error screen; a reference field whose form closes after
+  its text was erased no longer fails; quick moves between records end at the last one; a server that does not answer in time is a
+  failure, not an endless spinner; a terminology server that refuses a token or is busy is asked again.
+
+### Breaking changes
+
+- `viewer.json` and the SDK: the options `terminology` and `summary` are replaced by `fhir` (`terminologyServer`, `pageSize`,
+  `loadAll`, `decimals`).
+- `FhirViewer`: the parameters `TerminologyServer` and `Summary` are replaced by `Fhir` (`FhirOptions`), the SMART settings are one
+  value, `Smart` (`SmartOptions`: `Flow`, `RedirectUri`, `PopupRedirectUri`).
+- The playground of the application moved from `/` to `/playground`; `/` is the home page.
+
+### Platform (Flox)
+
+- An installed application finds a new version while it stays open, downloads it with its files counted, and Restart takes it.
+- `LoadingPanel`, the dialog of a long loading, is a component of `Flox.Shared`.
+
+### Build
+
+- A release is also a GitHub release with these notes, and the site goes to GitHub Pages.
+- The README says in one page what the Viewer is, how it works and how to embed it.
+
 ## 0.95.4 - 2026-11-24
 
 ### Viewer

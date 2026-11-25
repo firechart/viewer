@@ -119,6 +119,7 @@ internal sealed class ReportHost : ComponentBase, IDisposable
     // Words of codes have come: the tiles draw again
     private void OnWords(object? sender, EventArgs e)
     {
+        _scope?.Runtime.Invalidate();
         _ = InvokeAsync(StateHasChanged);
     }
 
@@ -136,7 +137,7 @@ internal sealed class ReportHost : ComponentBase, IDisposable
                 var model = await Models.GetAsync(await Types.ReleaseOfAsync(Session.Server), token);
                 var data = new ReportData(Reader, Session.Server, model, token);
                 var format = new ReportFormat(CultureInfo.CurrentCulture, TimeProvider.System.LocalTimeZone, Terminology.For(Session.TerminologyServer),
-                                              strings: await library.StringsAsync(CultureInfo.CurrentUICulture, token));
+                                              decimals: Session.Fhir.Decimals, strings: await library.StringsAsync(CultureInfo.CurrentUICulture, token));
                 runtime = new ReportRuntime(new Dictionary<string, ComponentDefinition>(), data, format, name => library.LoadAsync(name, token));
             }
             catch (OperationCanceledException) when (token.IsCancellationRequested)
@@ -227,6 +228,9 @@ internal sealed class RecordTile : ComponentBase
     private ReportScope? _rowScope;
     private ReportScope? _rowOf;
     private ResourceSummary? _rowItem;
+    // One delegate per address: a new one at every render would make the tile prepare again while it still waits
+    private Func<Hl7.Fhir.Model.PocoNode, string?>? _hrefOf;
+    private string? _hrefFor;
 
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
@@ -239,7 +243,13 @@ internal sealed class RecordTile : ComponentBase
             return;
         }
 
-        var href = Href;
+        if (_hrefOf is null || _hrefFor != Href)
+        {
+            var href = Href;
+            _hrefFor = href;
+            _hrefOf = _ => href;
+        }
+
         builder.OpenComponent<ShowBlock>(3);
         builder.AddComponentParameter(4, nameof(ReportBlock.Node), s_tile);
         if (!ReferenceEquals(_rowOf, Scope) || !ReferenceEquals(_rowItem, Item))
@@ -250,7 +260,65 @@ internal sealed class RecordTile : ComponentBase
         }
 
         builder.AddComponentParameter(5, nameof(ReportBlock.Scope), _rowScope);
-        builder.AddComponentParameter(6, nameof(ShowBlock.HrefOf), (Func<Hl7.Fhir.Model.PocoNode, string?>)(_ => href));
+        builder.AddComponentParameter(6, nameof(ShowBlock.HrefOf), _hrefOf);
         builder.CloseComponent();
+    }
+}
+
+// A record drawn whole, as the page of a record of the Viewer shows it: the component {Type}.page of the library, else its banner and its view (the
+// components of the types, else the built-in ones). The data of the scope serve what it refers to (the Bundle Visualizer: the Bundle, no server)
+internal sealed class RecordCard : ComponentBase
+{
+    private static readonly IReadOnlyList<ReportNode> s_page = ReportXml.Parse("""<Component name="Card"><Show value="{{%row}}" mode="page"/></Component>""").Body;
+
+    private static readonly IReadOnlyList<ReportNode> s_bannerAndView = ReportXml.Parse("""
+        <Component name="Card">
+          <Show value="{{%row}}" mode="banner"/>
+          <Show value="{{%row}}" mode="view"/>
+        </Component>
+        """).Body;
+
+    [CascadingParameter]
+    public ReportScope? Scope { get; set; }
+
+    [Parameter, EditorRequired]
+    public ResourceSummary Item { get; set; } = null!;
+
+    private ReportScope? _rowScope;
+    private ReportScope? _rowOf;
+    private ResourceSummary? _rowItem;
+    private IReadOnlyList<ReportNode>? _body;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Scope is null || Item.Json is null || (ReferenceEquals(_rowOf, Scope) && ReferenceEquals(_rowItem, Item)))
+        {
+            return;
+        }
+
+        _rowOf = Scope;
+        _rowItem = Item;
+        _rowScope = Scope.With("row", [Scope.Runtime.Data.NodeOf(Item)]);
+        _body = await Scope.Runtime.ModeAsync(Item.ResourceType, "page") is null ? s_bannerAndView : s_page;
+    }
+
+    protected override void BuildRenderTree(RenderTreeBuilder builder)
+    {
+        if (_rowScope is null || _body is null)
+        {
+            return;
+        }
+
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", "fx-root flex flex-col gap-2");
+        foreach (var node in _body)
+        {
+            builder.OpenComponent<ShowBlock>(2);
+            builder.AddComponentParameter(3, nameof(ReportBlock.Node), node);
+            builder.AddComponentParameter(4, nameof(ReportBlock.Scope), _rowScope);
+            builder.CloseComponent();
+        }
+
+        builder.CloseElement();
     }
 }

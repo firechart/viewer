@@ -1,16 +1,23 @@
 @* What the page of a record shows: the record, its summary (a type with the component {Type}.summary) or its JSON. The address says which one
    (resources/Patient/1, summary/Patient/1, resources/Patient/1?view=source), so Back, the bookmarks and the links keep it; a record in a sheet
-   switches to its JSON in place (SourceChanged) *@
+   switches to its JSON in place (SourceChanged). Each mode has an icon (the summary a sigma); its text goes where the toolbar, a size container,
+   is narrow *@
 @inject ViewerSummaries Summaries
 
 <BbToggleGroup TValue="string" Value=@Current ValueChanged=@((string? mode) => Switch(mode)) Variant="ToggleVariant.Outline" Size="ToggleSize.Small"
                Required="true" Class="fx-summary-switch print:hidden" data-viewer="summary-switch">
-    <BbToggleGroupItem TValue="string" Value=@RecordMode data-viewer="show-record">@Strings.Caption_Record</BbToggleGroupItem>
+    <BbToggleGroupItem TValue="string" Value=@RecordMode Class="gap-1.5" data-viewer="show-record" title=@Strings.Caption_Record>
+        <FloxIcon Icon="description" Size="1rem"/><span class=@NarrowHidden>@Strings.Caption_Record</span>
+    </BbToggleGroupItem>
     @if (_hasSummary)
     {
-        <BbToggleGroupItem TValue="string" Value=@SummaryMode data-viewer="show-summary">@Strings.Caption_Summary</BbToggleGroupItem>
+        <BbToggleGroupItem TValue="string" Value=@SummaryMode Class="gap-1.5" data-viewer="show-summary" title=@Strings.Caption_Summary>
+            <FloxIcon Icon="functions" Size="1rem"/><span class=@NarrowHidden>@Strings.Caption_Summary</span>
+        </BbToggleGroupItem>
     }
-    <BbToggleGroupItem TValue="string" Value=@SourceMode data-viewer="show-source">@FloxStrings.Caption_Source</BbToggleGroupItem>
+    <BbToggleGroupItem TValue="string" Value=@SourceMode Class="gap-1.5" data-viewer="show-source" title=@FloxStrings.Caption_Source>
+        <FloxIcon Icon="data_object" Size="1rem"/><span class=@NarrowHidden>@FloxStrings.Caption_Source</span>
+    </BbToggleGroupItem>
 </BbToggleGroup>
 
 @code {
@@ -18,6 +25,7 @@
     private const string RecordMode = "record";
     private const string SummaryMode = "summary";
     private const string SourceMode = "source";
+    private const string NarrowHidden = "@max-md:sr-only";
 
     private bool _hasSummary;
     private string? _checkedType;

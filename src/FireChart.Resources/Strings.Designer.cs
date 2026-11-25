@@ -88,15 +88,6 @@ namespace FireChart.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sections that could not be loaded: {0}.
-        /// </summary>
-        public static string Message_SectionsFailed {
-            get {
-                return ResourceManager.GetString("Message_SectionsFailed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Values.
         /// </summary>
         public static string Caption_TrendValues {
@@ -826,15 +817,6 @@ namespace FireChart.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Not changed by the profile.
-        /// </summary>
-        public static string Conformance_NotInDifferential {
-            get {
-                return ResourceManager.GetString("Conformance_NotInDifferential", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Only this branch.
         /// </summary>
         public static string Conformance_OnlyThisBranch {
@@ -1339,15 +1321,6 @@ namespace FireChart.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} of {1} parts loaded.
-        /// </summary>
-        public static string Message_LoadingProgress {
-            get {
-                return ResourceManager.GetString("Message_LoadingProgress", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Loaded: {0} ({1}).
         /// </summary>
         public static string Message_LoadedRecords {
@@ -1411,15 +1384,6 @@ namespace FireChart.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Patient record.
-        /// </summary>
-        public static string Caption_PatientRecordSettings {
-            get {
-                return ResourceManager.GetString("Caption_PatientRecordSettings", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Records per request.
         /// </summary>
         public static string Caption_SummaryPageSize {
@@ -1434,6 +1398,15 @@ namespace FireChart.Resources {
         public static string Caption_SummaryLoadAll {
             get {
                 return ResourceManager.GetString("Caption_SummaryLoadAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Precision of observation values.
+        /// </summary>
+        public static string Caption_ValueDecimals {
+            get {
+                return ResourceManager.GetString("Caption_ValueDecimals", resourceCulture);
             }
         }
 
@@ -1463,7 +1436,6 @@ namespace FireChart.Resources {
                 return ResourceManager.GetString("Message_PrintRefused", resourceCulture);
             }
         }
-
         
         /// <summary>
         ///   Looks up a localized string similar to Download.
@@ -1471,15 +1443,6 @@ namespace FireChart.Resources {
         public static string PackageBase_Download {
             get {
                 return ResourceManager.GetString("PackageBase_Download", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Update.
-        /// </summary>
-        public static string PackageBase_UpdateButton {
-            get {
-                return ResourceManager.GetString("PackageBase_UpdateButton", resourceCulture);
             }
         }
         
@@ -1610,15 +1573,6 @@ namespace FireChart.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type to find.
-        /// </summary>
-        public static string Placeholder_TypeToFind {
-            get {
-                return ResourceManager.GetString("Placeholder_TypeToFind", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to {0}: from.
         /// </summary>
         public static string Caption_RangeFrom {
@@ -1716,5 +1670,222 @@ namespace FireChart.Resources {
             }
         }
         
+    
+
+        /// <summary>
+        ///   Looks up a localized string similar to Graph of the Bundle.
+        /// </summary>
+        public static string Caption_BundleGraph {
+            get {
+                return ResourceManager.GetString("Caption_BundleGraph", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show its neighbourhood.
+        /// </summary>
+        public static string Caption_BundleNeighbourhood {
+            get {
+                return ResourceManager.GetString("Caption_BundleNeighbourhood", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Card.
+        /// </summary>
+        public static string Caption_BundleCard {
+            get {
+                return ResourceManager.GetString("Caption_BundleCard", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Refers to.
+        /// </summary>
+        public static string Caption_BundleRefersTo {
+            get {
+                return ResourceManager.GetString("Caption_BundleRefersTo", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Referred to by.
+        /// </summary>
+        public static string Caption_BundleReferredBy {
+            get {
+                return ResourceManager.GetString("Caption_BundleReferredBy", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Resource types.
+        /// </summary>
+        public static string Caption_BundleTypes {
+            get {
+                return ResourceManager.GetString("Caption_BundleTypes", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show all.
+        /// </summary>
+        public static string Caption_BundleShowAll {
+            get {
+                return ResourceManager.GetString("Caption_BundleShowAll", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Zoom in.
+        /// </summary>
+        public static string Caption_ZoomIn {
+            get {
+                return ResourceManager.GetString("Caption_ZoomIn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Zoom out.
+        /// </summary>
+        public static string Caption_ZoomOut {
+            get {
+                return ResourceManager.GetString("Caption_ZoomOut", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Fit to view.
+        /// </summary>
+        public static string Caption_FitToView {
+            get {
+                return ResourceManager.GetString("Caption_FitToView", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to There is no source to show: the Bundle refers to this resource but does not hold it, and the Visualizer reads nothing the Bundle lacks..
+        /// </summary>
+        public static string Message_BundleNoSource {
+            get {
+                return ResourceManager.GetString("Message_BundleNoSource", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The Bundle refers to this resource but does not hold it..
+        /// </summary>
+        public static string Message_BundleNotInBundle {
+            get {
+                return ResourceManager.GetString("Message_BundleNotInBundle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Paste a Bundle or give its address..
+        /// </summary>
+        public static string Message_BundleNone {
+            get {
+                return ResourceManager.GetString("Message_BundleNone", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The Bundle holds no resources..
+        /// </summary>
+        public static string Message_BundleEmpty {
+            get {
+                return ResourceManager.GetString("Message_BundleEmpty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} resources, {1} references.
+        /// </summary>
+        public static string Message_BundleCounts {
+            get {
+                return ResourceManager.GetString("Message_BundleCounts", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This is not a FHIR Bundle: {0}.
+        /// </summary>
+        public static string Message_BundleInvalid {
+            get {
+                return ResourceManager.GetString("Message_BundleInvalid", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Loading the Bundle.
+        /// </summary>
+        public static string Caption_LoadingBundle {
+            get {
+                return ResourceManager.GetString("Caption_LoadingBundle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reading it from {0}.
+        /// </summary>
+        public static string Message_BundleReading {
+            get {
+                return ResourceManager.GetString("Message_BundleReading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resolving the references between its resources.
+        /// </summary>
+        public static string Message_BundleResolving {
+            get {
+                return ResourceManager.GetString("Message_BundleResolving", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The loading was cancelled..
+        /// </summary>
+        public static string Message_BundleCancelled {
+            get {
+                return ResourceManager.GetString("Message_BundleCancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Bundle could not be read from its address..
+        /// </summary>
+        public static string Message_BundleUnavailable {
+            get {
+                return ResourceManager.GetString("Message_BundleUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Modifier extensions: they can change the meaning of this record.
+        /// </summary>
+        public static string Message_ModifierExtensions {
+            get {
+                return ResourceManager.GetString("Message_ModifierExtensions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not shown above ({0}): {1}. These elements are listed under “Other data” at the end of the page..
+        /// </summary>
+        public static string Message_NotShownAbove {
+            get {
+                return ResourceManager.GetString("Message_NotShownAbove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Other data.
+        /// </summary>
+        public static string Caption_OtherData {
+            get {
+                return ResourceManager.GetString("Caption_OtherData", resourceCulture);
+            }
+        }
     }
 }

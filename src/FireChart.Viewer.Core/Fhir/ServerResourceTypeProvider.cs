@@ -75,6 +75,7 @@ public sealed class ServerResourceTypeProvider(IHttpClientFactory httpClientFact
     };
 
     private readonly ConcurrentDictionary<string, ServerResourceTypes> _known = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, Lazy<Task<ServerResourceTypes>>> _asking = new(StringComparer.Ordinal);
 
     /// <inheritdoc/>
     public async Task<ServerResourceTypes> GetAsync(IViewerServer server, bool refresh = false, CancellationToken cancellationToken = default)
@@ -86,7 +87,24 @@ public sealed class ServerResourceTypeProvider(IHttpClientFactory httpClientFact
             return known;
         }
 
-        var result = await ReadAsync(server, cancellationToken);
+        // Several readers of a server not known yet (the tiles of a list, the page, the form) are one request
+        var asking = _asking.GetOrAdd(key, _ => new Lazy<Task<ServerResourceTypes>>(() => RememberAsync(server, key)));
+        try
+        {
+            return await asking.Value.WaitAsync(cancellationToken);
+        }
+        finally
+        {
+            if (asking.Value.IsCompleted)
+            {
+                _asking.TryRemove(new KeyValuePair<string, Lazy<Task<ServerResourceTypes>>>(key, asking));
+            }
+        }
+    }
+
+    private async Task<ServerResourceTypes> RememberAsync(IViewerServer server, string key)
+    {
+        var result = await ReadAsync(server, CancellationToken.None);
         _known[key] = result;
         return result;
     }
@@ -97,7 +115,7 @@ public sealed class ServerResourceTypeProvider(IHttpClientFactory httpClientFact
         {
             return await ReadMetadataAsync(server, cancellationToken);
         }
-        catch (Exception ex) when (ex is HttpRequestException or JsonException or FloxException or TaskCanceledException && !cancellationToken.IsCancellationRequested)
+        catch (Exception ex) when (ex is HttpRequestException or JsonException or FloxException or TimeoutException)
         {
             if (server.FhirRelease is not { } release)
             {

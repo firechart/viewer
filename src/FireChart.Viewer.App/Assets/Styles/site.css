@@ -2,4 +2,5 @@
 @import "../../../Flox.Shared/Assets/Styles/tokens.css";
 
 @source "../../Pages";
+@source "../../Sandbox";
 @source "../../App.razor";

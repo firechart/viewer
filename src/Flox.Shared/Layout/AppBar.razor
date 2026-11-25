@@ -1,6 +1,7 @@
 @using BlazorBlueprint.Components
 @using Microsoft.AspNetCore.Components.Sections
 @inject INavigationHistoryService NavigationHistory
+@inject IServiceProvider Services
 @implements IDisposable
 
 @* The bar on top of the page, across its whole width: back (or the main menu), the title, the commands and the menu of the page. As the navigation
@@ -26,6 +27,15 @@
         @* The menu of the page (PageMenu); the account is the first item of the main menu *@
         <SectionOutlet SectionName="appbar-menu"/>
     </div>
+    @* On the way to a page (NavigationProgress): a segment runs along the bottom edge, at once on Back and until the page has loaded. The track is
+       always there and over the edge (absolute): nothing below moves when the progress starts or ends *@
+    <div class="pointer-events-none absolute inset-x-0 -bottom-px h-0.5 overflow-hidden rtl:-scale-x-100" data-navigation-progress
+         role=@(Progress?.Active == true ? "progressbar" : null) aria-label=@(Progress?.Active == true ? Strings.Caption_Loading : null)>
+        @if (Progress?.Active == true)
+        {
+            <div class="h-full w-2/5 animate-navigation-progress bg-primary motion-reduce:w-full motion-reduce:animate-pulse"></div>
+        }
+    </div>
 </header>
 
 @code {
@@ -46,6 +56,11 @@
     protected override void OnInitialized()
     {
         NavigationHistory.HistoryChanged += OnHistoryChanged;
+        if (Progress is { } progress)
+        {
+            progress.Changed += OnProgressChanged;
+        }
+
         UpdateBackButtonVisibility();
         base.OnInitialized();
     }
@@ -53,6 +68,15 @@
     private void OnHistoryChanged(object? sender, EventArgs e)
     {
         UpdateBackButtonVisibility();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private NavigationProgress? Progress => _progress ??= Services.GetService<NavigationProgress>();
+
+    private NavigationProgress? _progress;
+
+    private void OnProgressChanged(object? sender, EventArgs e)
+    {
         InvokeAsync(StateHasChanged);
     }
 
@@ -65,6 +89,7 @@
     {
         if (_showBackButton)
         {
+            Progress?.Start();
             NavigationHistory.GoBack();
         }
         else
@@ -81,6 +106,10 @@
     public void Dispose()
     {
         NavigationHistory.HistoryChanged -= OnHistoryChanged;
+        if (_progress is not null)
+        {
+            _progress.Changed -= OnProgressChanged;
+        }
     }
 
 }

@@ -48,20 +48,31 @@ internal sealed partial class ReportLibrary(IViewerAssets assets, Func<string, s
         return await ResourcesAsync(string.Empty, cancellationToken) is { } texts ? texts.Keys.ToHashSet(StringComparer.Ordinal) : null;
     }
 
-    private Task<IReadOnlyDictionary<string, string>?> ResourcesAsync(string culture, CancellationToken cancellationToken)
+    private async Task<IReadOnlyDictionary<string, string>?> ResourcesAsync(string culture, CancellationToken cancellationToken)
     {
         // Read to the end whoever asked first: what is kept serves every later caller, a cancelled read would fail them all
-        return _resources.GetOrAdd(locate(ReportStrings.PathOf(culture)), address => new Lazy<Task<IReadOnlyDictionary<string, string>?>>(async () =>
+        var address = locate(ReportStrings.PathOf(culture));
+        var reading = _resources.GetOrAdd(address, _ => new Lazy<Task<IReadOnlyDictionary<string, string>?>>(async () =>
         {
             try
             {
                 return await assets.ReadTextAsync(address, CancellationToken.None) is { } text ? ReportStrings.ReadResx(text) : null;
             }
-            catch (Exception ex) when (ex is InvalidDataException or HttpRequestException)
+            catch (InvalidDataException)
             {
                 return null;
             }
-        })).Value.WaitAsync(cancellationToken);
+        }));
+        try
+        {
+            return await reading.Value.WaitAsync(cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            // Not kept: the next reader asks again
+            _resources.TryRemove(new KeyValuePair<string, Lazy<Task<IReadOnlyDictionary<string, string>?>>>(address, reading));
+            return null;
+        }
     }
 
     public static string PathOf(string name)
@@ -128,11 +139,22 @@ internal sealed partial class ReportLibrary(IViewerAssets assets, Func<string, s
     }
 
     // By the address of its file; read to the end whoever asked first (what is kept serves every later caller)
-    private Task<Loaded> FileAsync(string name, CancellationToken cancellationToken)
+    private async Task<Loaded> FileAsync(string name, CancellationToken cancellationToken)
     {
         var address = NameRegex().IsMatch(name) ? locate(PathOf(name)) : name;
-        return _files.GetOrAdd(address, _ => new Lazy<Task<Loaded>>(() => ReadAsync(name, CancellationToken.None))).Value.WaitAsync(cancellationToken);
+        var reading = _files.GetOrAdd(address, _ => new Lazy<Task<Loaded>>(() => ReadAsync(name, CancellationToken.None)));
+        try
+        {
+            return await reading.Value.WaitAsync(cancellationToken);
+        }
+        catch when (reading.Value.IsFaulted)
+        {
+            // A file that could not be read is not kept: the next reader asks again
+            _files.TryRemove(new KeyValuePair<string, Lazy<Task<Loaded>>>(address, reading));
+            throw;
+        }
     }
+
     private async Task<Loaded> ReadAsync(string name, CancellationToken cancellationToken)
     {
         if (!NameRegex().IsMatch(name))

@@ -23,16 +23,19 @@
     }
     else
     {
-        <div>
-            @foreach (var bookmark in _items)
-            {
-                var here = ViewerBookmarks.IsOf(bookmark, Session.Server);
-                var opens = here || OnOpenElsewhere.HasDelegate;
+        @* In the frame of every list, a line between the rows *@
+        <DataList TItem="UserBookmark" Items=@_items Layout="ListLayout.Content" ShowSearch="false">
+            <ItemTemplate Context="row">
+                @{
+                    var bookmark = row.Item;
+                    var here = ViewerBookmarks.IsOf(bookmark, Session.Server);
+                    var opens = here || OnOpenElsewhere.HasDelegate;
+                }
                 <ListTile TitleText=@bookmark.DisplayName SubtitleText=@SubtitleOf(bookmark, here) Icon=@(bookmark.Icon ?? "bookmark")
                           Disabled=@(!opens) Bookmarked="true" OnBookmark=@(() => RemoveAsync(bookmark)) OnClick=@(() => OpenAsync(bookmark, here))
                           Chevron=@opens/>
-            }
-        </div>
+            </ItemTemplate>
+        </DataList>
     }
 </div>
 
@@ -87,7 +90,7 @@
     {
         if (here || OnOpenElsewhere.HasDelegate)
         {
-            return here ? bookmark.Category : $"{bookmark.Category} · {bookmark.SourceName}";
+            return here ? bookmark.Category : $"{bookmark.Category} · {bookmark.SourceName ?? bookmark.SourceAddress}";
         }
 
         return string.Format(System.Globalization.CultureInfo.CurrentCulture, Strings.Message_BookmarkOnOtherServer, bookmark.SourceName ?? bookmark.SourceAddress);

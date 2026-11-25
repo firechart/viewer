@@ -207,9 +207,6 @@
   <data name="Caption_ImportTasks" xml:space="preserve">
     <value>导入任务</value>
   </data>
-  <data name="Caption_ImportTask" xml:space="preserve">
-    <value>导入任务</value>
-  </data>
   <data name="Caption_Properties" xml:space="preserve">
     <value>属性</value>
   </data>
@@ -299,9 +296,6 @@
   </data>
   <data name="Caption_GeneralCategory" xml:space="preserve">
     <value>常规</value>
-  </data>
-  <data name="Caption_AboutPlatform" xml:space="preserve">
-    <value>关于平台</value>
   </data>
   <data name="Caption_ConfirmPurgeTasks" xml:space="preserve">
     <value>删除已完成的任务？</value>
@@ -396,9 +390,6 @@
   <data name="Caption_View" xml:space="preserve">
     <value>查看</value>
   </data>
-  <data name="Caption_ShowTotal" xml:space="preserve">
-    <value>显示总数</value>
-  </data>
   <data name="Caption_Connect" xml:space="preserve">
     <value>连接</value>
   </data>
@@ -425,9 +416,6 @@
   </data>
   <data name="Error_NetworkUnavailable" xml:space="preserve">
     <value>无法连接到服务器。请检查网络连接后重试。</value>
-  </data>
-  <data name="Caption_MoreFilters" xml:space="preserve">
-    <value>更多筛选条件</value>
   </data>
   <data name="Caption_Any" xml:space="preserve">
     <value>任意</value>
@@ -473,9 +461,6 @@
   </data>
   <data name="Caption_WordWrap" xml:space="preserve">
     <value>自动换行</value>
-  </data>
-  <data name="Caption_BookmarkedOnly" xml:space="preserve">
-    <value>仅书签</value>
   </data>
   <data name="Caption_ExpandAll" xml:space="preserve">
     <value>全部展开</value>
@@ -644,5 +629,23 @@
   </data>
   <data name="Message_NotCopied" xml:space="preserve">
     <value>浏览器不允许复制</value>
+  </data>
+  <data name="Message_LoadingProgress" xml:space="preserve">
+    <value>已加载 {0}/{1} 部分</value>
+  </data>
+  <data name="AppUpdate_Downloading" xml:space="preserve">
+    <value>正在下载新版本：{0} / {1} 个文件</value>
+  </data>
+  <data name="AppUpdate_SavingOffline" xml:space="preserve">
+    <value>正在保存以供离线使用：{0} / {1} 个文件</value>
+  </data>
+  <data name="AppUpdate_Ready" xml:space="preserve">
+    <value>新版本已就绪</value>
+  </data>
+  <data name="AppUpdate_Restart" xml:space="preserve">
+    <value>重新启动</value>
+  </data>
+  <data name="AppUpdate_Later" xml:space="preserve">
+    <value>稍后</value>
   </data>
 </root>

@@ -420,9 +420,6 @@
   <data name="Conformance_NoElementsFound" xml:space="preserve">
     <value>没有匹配的元素。</value>
   </data>
-  <data name="Conformance_NotInDifferential" xml:space="preserve">
-    <value>配置文件未更改</value>
-  </data>
   <data name="Conformance_Description" xml:space="preserve">
     <value>描述</value>
   </data>
@@ -513,9 +510,6 @@
   <data name="Caption_TimesInDeviceZone" xml:space="preserve">
     <value>时间以此设备的时区显示</value>
   </data>
-  <data name="Message_SectionsFailed" xml:space="preserve">
-    <value>无法加载的部分：{0}</value>
-  </data>
   <data name="Caption_TrendValues" xml:space="preserve">
     <value>数值</value>
   </data>
@@ -536,9 +530,6 @@
   </data>
   <data name="Caption_LoadingRecord" xml:space="preserve">
     <value>正在加载记录</value>
-  </data>
-  <data name="Message_LoadingProgress" xml:space="preserve">
-    <value>已加载 {0}/{1} 部分</value>
   </data>
   <data name="Message_LoadedRecords" xml:space="preserve">
     <value>已加载：{0}（{1}）</value>
@@ -561,14 +552,14 @@
   <data name="Caption_SearchCancelled" xml:space="preserve">
     <value>未加载：加载已取消</value>
   </data>
-  <data name="Caption_PatientRecordSettings" xml:space="preserve">
-    <value>患者记录</value>
-  </data>
   <data name="Caption_SummaryPageSize" xml:space="preserve">
     <value>每次请求的记录数</value>
   </data>
   <data name="Caption_SummaryLoadAll" xml:space="preserve">
     <value>显示前加载完整记录</value>
+  </data>
+  <data name="Caption_ValueDecimals" xml:space="preserve">
+    <value>观察值精度</value>
   </data>
   <data name="Caption_Print" xml:space="preserve">
     <value>打印</value>
@@ -587,9 +578,6 @@
   </data>
   <data name="PackageBase_Download" xml:space="preserve">
     <value>下载</value>
-  </data>
-  <data name="PackageBase_UpdateButton" xml:space="preserve">
-    <value>更新</value>
   </data>
   <data name="PackageBase_Failed" xml:space="preserve">
     <value>下载失败：{0}</value>
@@ -633,9 +621,6 @@
   <data name="Message_NothingFound" xml:space="preserve">
     <value>未找到任何内容</value>
   </data>
-  <data name="Placeholder_TypeToFind" xml:space="preserve">
-    <value>输入以查找</value>
-  </data>
   <data name="Caption_RangeFrom" xml:space="preserve">
     <value>{0}：从</value>
   </data>
@@ -668,5 +653,77 @@
   </data>
   <data name="Caption_ShowResourceType" xml:space="preserve">
     <value>显示 {0}</value>
+  </data>
+  <data name="Caption_BundleGraph" xml:space="preserve">
+    <value>Bundle 图</value>
+  </data>
+  <data name="Caption_BundleNeighbourhood" xml:space="preserve">
+    <value>显示其邻近资源</value>
+  </data>
+  <data name="Caption_BundleCard" xml:space="preserve">
+    <value>卡片</value>
+  </data>
+  <data name="Caption_BundleRefersTo" xml:space="preserve">
+    <value>引用</value>
+  </data>
+  <data name="Caption_BundleReferredBy" xml:space="preserve">
+    <value>被引用于</value>
+  </data>
+  <data name="Caption_BundleTypes" xml:space="preserve">
+    <value>资源类型</value>
+  </data>
+  <data name="Caption_BundleShowAll" xml:space="preserve">
+    <value>全部显示</value>
+  </data>
+  <data name="Caption_ZoomIn" xml:space="preserve">
+    <value>放大</value>
+  </data>
+  <data name="Caption_ZoomOut" xml:space="preserve">
+    <value>缩小</value>
+  </data>
+  <data name="Caption_FitToView" xml:space="preserve">
+    <value>适合视图</value>
+  </data>
+  <data name="Message_BundleNoSource" xml:space="preserve">
+    <value>没有可显示的源代码：Bundle 引用了此资源，但不包含它，而可视化工具不会读取 Bundle 中缺少的内容。</value>
+  </data>
+  <data name="Message_BundleNotInBundle" xml:space="preserve">
+    <value>Bundle 引用了此资源，但不包含它。</value>
+  </data>
+  <data name="Message_BundleNone" xml:space="preserve">
+    <value>粘贴一个 Bundle 或提供其地址。</value>
+  </data>
+  <data name="Message_BundleEmpty" xml:space="preserve">
+    <value>该 Bundle 不包含任何资源。</value>
+  </data>
+  <data name="Message_BundleCounts" xml:space="preserve">
+    <value>{0} 个资源，{1} 个引用</value>
+  </data>
+  <data name="Message_BundleInvalid" xml:space="preserve">
+    <value>这不是 FHIR Bundle：{0}</value>
+  </data>
+  <data name="Message_BundleUnavailable" xml:space="preserve">
+    <value>无法从其地址读取该 Bundle。</value>
+  </data>
+  <data name="Caption_LoadingBundle" xml:space="preserve">
+    <value>正在加载 Bundle</value>
+  </data>
+  <data name="Message_BundleReading" xml:space="preserve">
+    <value>正在从 {0} 读取</value>
+  </data>
+  <data name="Message_BundleResolving" xml:space="preserve">
+    <value>正在解析资源之间的引用</value>
+  </data>
+  <data name="Message_BundleCancelled" xml:space="preserve">
+    <value>加载已取消。</value>
+  </data>
+  <data name="Message_ModifierExtensions" xml:space="preserve">
+    <value>修饰扩展：它们可能改变此记录的含义</value>
+  </data>
+  <data name="Message_NotShownAbove" xml:space="preserve">
+    <value>上方未显示（{0}）：{1}。这些元素列在页面末尾的“其他数据”中。</value>
+  </data>
+  <data name="Caption_OtherData" xml:space="preserve">
+    <value>其他数据</value>
   </data>
 </root>

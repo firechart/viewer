@@ -250,10 +250,13 @@ public sealed partial class FhirServerReader(IHttpClientFactory httpClientFactor
         }
     }
 
-    // A client error that a search without the order or the needs may not get; not the credentials and not a type the server does not have
+    // A client error that a search without the order or the needs may not get; not the credentials, not a type the server does not have and
+    // not a server that is busy (what is left out is remembered for the session)
     private static bool IsRefusal(HttpRequestException ex)
     {
-        return ex.StatusCode is { } status && (int)status is >= 400 and < 500 && status is not (HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden or HttpStatusCode.NotFound);
+        return ex.StatusCode is { } status && (int)status is >= 400 and < 500
+               && status is not (HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden or HttpStatusCode.NotFound or HttpStatusCode.RequestTimeout
+                   or HttpStatusCode.Conflict or HttpStatusCode.TooManyRequests);
     }
 
     private static string SearchUrl(IViewerServer server, string resourceType, FhirSearchState? search)

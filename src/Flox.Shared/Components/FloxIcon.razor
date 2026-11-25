@@ -1,6 +1,6 @@
 @if (!string.IsNullOrWhiteSpace(Icon))
 {
-    <i class=@($"flox-icon notranslate {Class}") style=@GetFontStyle() title=@Title aria-hidden=@(Title is null ? "true" : null)>@Icon</i>
+    <i class=@($"flox-icon notranslate {Class}") style=@GetFontStyle() title=@Title role=@(Title is null ? null : "img") aria-label=@Title aria-hidden=@(Title is null ? "true" : null)>@Icon</i>
 }
 
 @code {

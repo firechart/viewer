@@ -20,23 +20,15 @@ public sealed class ViewerSession
     /// </summary>
     /// <param name="server">The server.</param>
     /// <param name="location">The address of the Viewer.</param>
-    /// <param name="smartRedirectUri">The callback address of the host for a SMART sign-in, as registered with the authorization servers; none: no sign-in.</param>
-    /// <param name="smartFlow">How a SMART sign-in leaves the page.</param>
-    /// <param name="smartPopupRedirectUri">The return page of a sign-in in a popup (<c>_content/FireChart.Viewer/smart-callback.html</c>, absolute).</param>
-    /// <param name="terminologyServer">The terminology server for the displays of bare codes (<see cref="TerminologyResolver.AddressOf"/>); none: the
-    /// codes are shown as they are, nothing of a patient leaves for another server.</param>
+    /// <param name="smart">How a SMART sign-in leaves the page and where it comes back; none: <see cref="FireChart.Viewer.Smart.SmartOptions.Default"/>.</param>
     /// <exception cref="ArgumentNullException"><paramref name="server"/> or <paramref name="location"/> is <see langword="null"/>.</exception>
-    public ViewerSession(IViewerServer server, IViewerLocationStore location, string? smartRedirectUri = null, string? terminologyServer = null,
-                         FireChart.Viewer.Smart.SmartFlow smartFlow = FireChart.Viewer.Smart.SmartFlow.Redirect, string smartPopupRedirectUri = "")
+    public ViewerSession(IViewerServer server, IViewerLocationStore location, FireChart.Viewer.Smart.SmartOptions? smart = null)
     {
-        SmartFlow = smartFlow;
-        SmartPopupRedirectUri = smartPopupRedirectUri;
-        TerminologyServer = TerminologyResolver.AddressOf(terminologyServer);
         ArgumentNullException.ThrowIfNull(server);
         ArgumentNullException.ThrowIfNull(location);
         Server = server;
         Location = location;
-        SmartRedirectUri = smartRedirectUri;
+        Smart = smart ?? FireChart.Viewer.Smart.SmartOptions.Default;
         Remember();
     }
 
@@ -51,24 +43,15 @@ public sealed class ViewerSession
     public IViewerLocationStore Location { get; }
 
     /// <summary>
-    /// The callback address of the host for a SMART sign-in, or <see langword="null"/>.
+    /// How a SMART sign-in leaves the page and where it comes back.
     /// </summary>
-    public string? SmartRedirectUri { get; }
+    public FireChart.Viewer.Smart.SmartOptions Smart { get; }
 
     /// <summary>
-    /// How a SMART sign-in leaves the page.
+    /// The base address of the terminology server of <see cref="Fhir"/> (<see cref="TerminologyResolver.AddressOf"/>), or <see langword="null"/>: the
+    /// codes are shown as they are, nothing of a patient leaves for another server.
     /// </summary>
-    public FireChart.Viewer.Smart.SmartFlow SmartFlow { get; }
-
-    /// <summary>
-    /// The return page of a sign-in in a popup, absolute; register it with the authorization servers next to <see cref="SmartRedirectUri"/>.
-    /// </summary>
-    public string SmartPopupRedirectUri { get; }
-
-    /// <summary>
-    /// The base address of the terminology server, or <see langword="null"/>.
-    /// </summary>
-    public string? TerminologyServer { get; }
+    public string? TerminologyServer => TerminologyResolver.AddressOf(Fhir.TerminologyServerUrl);
 
     /// <summary>
     /// The pages show the star of a bookmark (when the host keeps bookmarks); <see langword="true"/> by default. A host whose own pages bookmark
@@ -82,14 +65,14 @@ public sealed class ViewerSession
     public bool Bookmarks { get; init; } = true;
 
     /// <summary>
-    /// How the summary and a report load their records: the page size of their searches and whether they are shown only once everything has come.
+    /// The FHIR settings of the instance: the terminology server, how the summary and a report load their records, the decimal places of a value.
     /// </summary>
     /// <example>
     /// <code>
-    /// var session = new ViewerSession(server, location) { Summary = new ViewerSummaryOptions { LoadAll = true } };
+    /// var session = new ViewerSession(server, location) { Fhir = new FhirOptions { LoadAll = true, Decimals = 1 } };
     /// </code>
     /// </example>
-    public ViewerSummaryOptions Summary { get; init; } = ViewerSummaryOptions.Default;
+    public FhirOptions Fhir { get; init; } = FhirOptions.Default;
 
     /// <summary>
     /// A page of the Viewer as an <c>href</c> of the document.

@@ -318,7 +318,7 @@ public class ResourceListViewState : State
     }
 
     // The records the reference fields of the search name (subject=Patient/123, patient=123), read for their line of text
-    private async Task DescribeReferencesAsync(IViewerServer server)
+    private async Task DescribeReferencesAsync(IViewerServer server, CancellationToken cancellationToken)
     {
         var references = Search.Parameters
                                .Where(row => row.Modifier is null && FieldOf(row) is { Control: SearchFieldControl.Reference })
@@ -330,24 +330,25 @@ public class ResourceListViewState : State
             return;
         }
 
-        var model = await _models.GetAsync(await _types.ReleaseOfAsync(server));
-        foreach (var (value, reference) in references)
+        var model = await _models.GetAsync(await _types.ReleaseOfAsync(server), cancellationToken);
+        // Read together: the page waits for its chips
+        await Task.WhenAll(references.Select(async pair =>
         {
             try
             {
-                var parts = reference!.Split('/');
-                var json = await _reader.ReadAsync(server, parts[0], parts[1]);
+                var parts = pair.Reference!.Split('/');
+                var json = await _reader.ReadAsync(server, parts[0], parts[1], cancellationToken);
                 var text = FireChart.Viewer.Core.Reports.ReportText.TitleOf(FireChart.Viewer.Core.Reports.ReportExpressions.Parse(json, model), CultureInfo.CurrentCulture);
                 if (!string.IsNullOrWhiteSpace(text))
                 {
-                    _references[value] = text;
+                    _references[pair.Value] = text;
                 }
             }
-            catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
+            catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException or TimeoutException)
             {
                 // the chip keeps the reference
             }
-        }
+        }));
 
         NotifyChanged();
     }
@@ -387,7 +388,11 @@ public class ResourceListViewState : State
         {
             await describing;
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (OperationCanceledException)
+        {
+            // of a load that a newer one replaced
+        }
+        catch (Exception ex)
         {
             Logger.LogDebug(ex, "A filter of the list of {Type} is not described", _key!.ResourceType);
         }
@@ -503,7 +508,7 @@ public class ResourceListViewState : State
                 }
 
                 Form = read;
-                await Task.WhenAll(QuietlyAsync(DescribeFiltersAsync(session.Server)), QuietlyAsync(DescribeReferencesAsync(session.Server)));
+                await Task.WhenAll(QuietlyAsync(DescribeFiltersAsync(session.Server)), QuietlyAsync(DescribeReferencesAsync(session.Server, cancellationToken)));
                 if (Current() && _neverSearched && Form is not null && SearchFormSearchMapping.Defaults(Form) is { Parameters.Count: > 0 } defaults)
                 {
                     await GoAsync(defaults, true);

@@ -169,8 +169,8 @@ internal sealed class ReportScope
             }
         }
 
-        // The rows of a section with decimals write their numbers with at most that many
-        return new ReportValues(resolved, Runtime.Format.WithDecimals(Options.Decimals));
+        // The rows of a section with decimals write their numbers with at most that many; the others by the FHIR settings of the Viewer
+        return new ReportValues(resolved, Options.Decimals is { } places ? Runtime.Format.WithDecimals(places) : Runtime.Format);
     }
 
     public RenderFragment Render(IEnumerable<ReportNode> nodes)

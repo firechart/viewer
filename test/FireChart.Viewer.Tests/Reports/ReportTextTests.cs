@@ -1,4 +1,5 @@
 using System.Globalization;
+using FireChart.Viewer.Core;
 using FireChart.Viewer.Core.Reports;
 using Hl7.Fhir.Model;
 
@@ -36,6 +37,27 @@ public class ReportTextTests
         var format = new ReportFormat(s_english, s_tokyo);
 
         Assert.That(Spaces(ReportText.Date(value, format)), Is.EqualTo(expected));
+    }
+
+    // One rule for every number (FhirOptions.Decimals, 2 by default): the digits of the record up to the limit, more rounded without the zeros
+    // the rounding leaves
+    [TestCase("3.0212296576478774", 2, "3.02")]
+    [TestCase("100.004", 2, "100")]
+    [TestCase("6.3999", 2, "6.4")]
+    [TestCase("1.30", 2, "1.30")]
+    [TestCase("104.72626848483829", 0, "105")]
+    [TestCase("81.51871045372631", null, "81.51871045372631")]
+    public void ADecimal_KeepsTheDigitsOfTheRecord_UpToTheLimit(string value, int? places, string expected)
+    {
+        Assert.That(DecimalText.Format(decimal.Parse(value, CultureInfo.InvariantCulture), places, CultureInfo.InvariantCulture), Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void AQuantity_IsWrittenByTheDecimalsOfTheFormat()
+    {
+        var format = new ReportFormat(s_english, s_tokyo, decimals: 2);
+
+        Assert.That(TextOf("value", """ "valueQuantity": { "value": 3.0212296576478774, "unit": "%" } """, format), Is.EqualTo("3.02 %"));
     }
 
     [Test]

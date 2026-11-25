@@ -68,6 +68,7 @@ internal static class CodeSnippets
         code.AppendLine("@page \"/viewer/{*Path}\"");
         if (smart)
         {
+            code.AppendLine("@using FireChart.Viewer.Smart");
             code.AppendLine("@inject NavigationManager NavigationManager");
         }
 
@@ -76,23 +77,36 @@ internal static class CodeSnippets
         code.Append("            RoutePrefix=\"viewer/\"");
         if (smart)
         {
-            code.AppendLine().Append("            SmartRedirectUri=\"@NavigationManager.ToAbsoluteUri(\"smart/callback\").ToString()\"");
+            var flow = setup.SmartFlow == SmartFlow.Popup ? ", Flow = SmartFlow.Popup" : string.Empty;
+            code.AppendLine().Append(CultureInfo.InvariantCulture, $"            Smart=\"@(new SmartOptions {{ RedirectUri = NavigationManager.ToAbsoluteUri(\"smart/callback\").ToString(){flow} }})\"");
         }
 
-        if (setup.SmartFlow == SmartFlow.Popup)
+        // The FHIR settings that differ from the defaults
+        var fhir = setup.Fhir;
+        var settings = new List<string>();
+        if (fhir.TerminologyServerUrl is { } terminology)
         {
-            code.AppendLine().Append("            SmartFlow=\"SmartFlow.Popup\"");
+            settings.Add($"TerminologyServerUrl = \"{terminology}\"");
         }
 
-        if (setup.TerminologyServer is { } terminology)
+        if (fhir.PageSize != FhirOptions.DefaultPageSize)
         {
-            code.AppendLine().Append(CultureInfo.InvariantCulture, $"            TerminologyServer=\"{terminology}\"");
+            settings.Add($"PageSize = {fhir.PageSize.ToString(CultureInfo.InvariantCulture)}");
         }
 
-        if (setup.Summary != ViewerSummaryOptions.Default)
+        if (fhir.LoadAll)
         {
-            var size = setup.Summary.PageSize is { } pageSize ? $"PageSize = {pageSize.ToString(CultureInfo.InvariantCulture)}, " : string.Empty;
-            code.AppendLine().Append(CultureInfo.InvariantCulture, $"            Summary=@(new ViewerSummaryOptions {{ {size}LoadAll = {(setup.Summary.LoadAll ? "true" : "false")} }})");
+            settings.Add("LoadAll = true");
+        }
+
+        if (fhir.Decimals != FhirOptions.DefaultDecimals)
+        {
+            settings.Add($"Decimals = {fhir.Decimals.ToString(CultureInfo.InvariantCulture)}");
+        }
+
+        if (settings.Count > 0)
+        {
+            code.AppendLine().Append(CultureInfo.InvariantCulture, $"            Fhir=@(new FhirOptions {{ {string.Join(", ", settings)} }})");
         }
 
         var appearance = setup.Appearance;

@@ -59,6 +59,11 @@ internal sealed class ViewerFrameChannel : IAsyncDisposable
     // A failed request: its promise in the SDK is rejected with the first error; without an id the errors are events
     public async ValueTask FailAsync(FrameRequest request, string type, IReadOnlyList<ViewerConfigError> errors)
     {
+        if (errors.Count == 0)
+        {
+            errors = [new ViewerConfigError("invalid_config", "$", "The request was refused.")];
+        }
+
         if (request.Id is null)
         {
             await PostErrorsAsync(type, errors);
@@ -108,7 +113,7 @@ internal sealed record FrameRequest(string Type, string? Id, JsonObject Payload)
 // update: the options that change without a restart (plan 4.8, live and reload) merged into the current configuration by key; server and smart need a restart
 internal static class ViewerConfigPatch
 {
-    private static readonly HashSet<string> s_updatable = new(["locale", "appearance", "terminology"], StringComparer.Ordinal);
+    private static readonly HashSet<string> s_updatable = new(["locale", "appearance", "fhir"], StringComparer.Ordinal);
 
     public static ViewerConfigPatchResult Apply(string current, JsonObject patch)
     {

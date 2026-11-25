@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
-  <!-- The application of the Viewer and the content of its Docker image: the sandbox at /, the frame /embed that another application embeds -->
+  <!-- The application of the Viewer and the content of its Docker image: the home page and the demos (plain HTML), the playground at /playground, the frame /embed that another application embeds -->
   <PropertyGroup>
     <TargetFramework>net11.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <!-- Inputs of the Tailwind build (Assets/Styles/site.css -> wwwroot/css/FireChart.Viewer.App.Tailwind.css): the utilities of the sandbox -->
-    <TailwindContentFiles Include="Pages/**/*.razor;App.razor;Assets/**/*.css;../Flox.Shared/Assets/Styles/*.css" />
+    <TailwindContentFiles Include="Pages/**/*.razor;Sandbox/**/*.razor;App.razor;Assets/**/*.css;../Flox.Shared/Assets/Styles/*.css" />
   </ItemGroup>
 
   <ItemGroup>

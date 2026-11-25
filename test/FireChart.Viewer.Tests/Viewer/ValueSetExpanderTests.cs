@@ -157,4 +157,22 @@ public class ValueSetExpanderTests
             Assert.That(handler.Requested, Has.Count.EqualTo(2), "then the server is asked again");
         });
     }
+
+    // A token that ran out is not "the server does not expand value sets": after the sign-in the field has its codes again
+    [TestCase(HttpStatusCode.Unauthorized)]
+    [TestCase(HttpStatusCode.TooManyRequests)]
+    public async Task A_server_that_refuses_the_caller_or_is_busy_is_asked_again_after_a_while(HttpStatusCode status)
+    {
+        var handler = new FakeHandler(status, "no");
+        var clock = new Clock();
+        var expander = Expander(handler, clock);
+        var server = new Server("https://fhir.example.test/r4");
+
+        var refused = await expander.ExpandAsync(server, "http://hl7.org/fhir/ValueSet/administrative-gender", null, null);
+        clock.Now += TimeSpan.FromMinutes(6);
+        await expander.ExpandAsync(server, "http://hl7.org/fhir/ValueSet/administrative-gender", null, null);
+
+        Assert.That(refused, Is.Null);
+        Assert.That(handler.Requested, Has.Count.EqualTo(2));
+    }
 }

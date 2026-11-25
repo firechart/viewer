@@ -207,9 +207,6 @@
   <data name="Caption_ImportTasks" xml:space="preserve">
     <value>Importaufgaben</value>
   </data>
-  <data name="Caption_ImportTask" xml:space="preserve">
-    <value>Importaufgabe</value>
-  </data>
   <data name="Caption_Properties" xml:space="preserve">
     <value>Eigenschaften</value>
   </data>
@@ -299,9 +296,6 @@
   </data>
   <data name="Caption_GeneralCategory" xml:space="preserve">
     <value>Allgemein</value>
-  </data>
-  <data name="Caption_AboutPlatform" xml:space="preserve">
-    <value>Über die Plattform</value>
   </data>
   <data name="Caption_ConfirmPurgeTasks" xml:space="preserve">
     <value>Abgeschlossene Aufgaben löschen?</value>
@@ -396,9 +390,6 @@
   <data name="Caption_View" xml:space="preserve">
     <value>Ansehen</value>
   </data>
-  <data name="Caption_ShowTotal" xml:space="preserve">
-    <value>Anzahl anzeigen</value>
-  </data>
   <data name="Caption_Connect" xml:space="preserve">
     <value>Verbinden</value>
   </data>
@@ -425,9 +416,6 @@
   </data>
   <data name="Error_NetworkUnavailable" xml:space="preserve">
     <value>Der Server ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.</value>
-  </data>
-  <data name="Caption_MoreFilters" xml:space="preserve">
-    <value>Weitere Filter</value>
   </data>
   <data name="Caption_Any" xml:space="preserve">
     <value>Beliebig</value>
@@ -473,9 +461,6 @@
   </data>
   <data name="Caption_WordWrap" xml:space="preserve">
     <value>Zeilenumbruch</value>
-  </data>
-  <data name="Caption_BookmarkedOnly" xml:space="preserve">
-    <value>Nur Lesezeichen</value>
   </data>
   <data name="Caption_ExpandAll" xml:space="preserve">
     <value>Alle aufklappen</value>
@@ -644,5 +629,23 @@
   </data>
   <data name="Message_NotCopied" xml:space="preserve">
     <value>Der Browser hat das Kopieren nicht erlaubt</value>
+  </data>
+  <data name="Message_LoadingProgress" xml:space="preserve">
+    <value>{0} von {1} Teilen geladen</value>
+  </data>
+  <data name="AppUpdate_Downloading" xml:space="preserve">
+    <value>Neue Version wird geladen: {0} von {1} Dateien</value>
+  </data>
+  <data name="AppUpdate_SavingOffline" xml:space="preserve">
+    <value>Wird für die Offline-Nutzung gespeichert: {0} von {1} Dateien</value>
+  </data>
+  <data name="AppUpdate_Ready" xml:space="preserve">
+    <value>Eine neue Version ist bereit</value>
+  </data>
+  <data name="AppUpdate_Restart" xml:space="preserve">
+    <value>Neu starten</value>
+  </data>
+  <data name="AppUpdate_Later" xml:space="preserve">
+    <value>Später</value>
   </data>
 </root>

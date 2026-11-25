@@ -41,15 +41,20 @@ public class ReferenceFieldEditorTests
                                                                              .Add(editor => editor.Server, new TestServer()).Add(editor => editor.Session, session));
     }
 
-    // The list of records of the field: the options the combobox of Blazor Blueprint is given (it draws them in a popover only while open)
+    // The combobox of Blazor Blueprint, and the items of its list (registered while closed, drawn in a popover while open)
     private static IRenderedComponent<BbCombobox<string>> Box(IRenderedComponent<ReferenceFieldEditor> editor)
     {
         return editor.FindComponents<BbCombobox<string>>()[^1];
     }
 
+    private static List<BbComboboxItem<string>> Items(IRenderedComponent<ReferenceFieldEditor> editor)
+    {
+        return [.. editor.FindComponents<BbComboboxItem<string>>().Select(item => item.Instance).DistinctBy(item => item.Value)];
+    }
+
     private static string[] Options(IRenderedComponent<ReferenceFieldEditor> editor)
     {
-        return [.. (Box(editor).Instance.Options ?? []).Select(option => option.Text)];
+        return [.. Items(editor).Select(item => item.Text)];
     }
 
     [Test]
@@ -75,7 +80,7 @@ public class ReferenceFieldEditorTests
 
         await editor.InvokeAsync(() => Box(editor).Instance.SearchQueryChanged.InvokeAsync("Smi"));
         editor.WaitForAssertion(() => Assert.That(Options(editor), Is.EqualTo(new[] { "Adolph Smith" })), TimeSpan.FromSeconds(10));
-        var chosen = Box(editor).Instance.Options!.Single().Value;
+        var chosen = Items(editor).Single().Value;
         await editor.InvokeAsync(() => Box(editor).Instance.ValueChanged.InvokeAsync(chosen));
 
         Assert.Multiple(() =>
@@ -83,6 +88,36 @@ public class ReferenceFieldEditorTests
             Assert.That(server.Searches, Is.EqualTo(new[] { "Patient?name=Smi&_count=10" }));
             Assert.That(value.Text, Is.EqualTo("Patient/p1"));
         });
+    }
+
+    // The combobox has no clear of its own: the button next to it lets the record go, and is there only while one is held
+    [Test]
+    public async Task TheRecordHeld_IsLetGoByTheClearButton()
+    {
+        await using var context = new BunitContext();
+        var value = new SearchFieldValue { Text = "Patient/p1" };
+        var editor = Render(context, value, new Server(), "resources/Encounter");
+
+        await editor.Find("[data-reference-clear]").ClickAsync(new());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(value.Text, Is.Null);
+            Assert.That(editor.FindAll("[data-reference-clear]"), Is.Empty);
+        });
+    }
+
+    // A text erased below the length of a search, then the form closed: the field had kept the search it stopped and failed on it
+    [Test]
+    public async Task AFieldClosed_AfterItsTextWasErased_ClosesQuietly()
+    {
+        await using var context = new BunitContext();
+        var editor = Render(context, new SearchFieldValue(), new Server(), "resources/Encounter");
+
+        await editor.InvokeAsync(() => Box(editor).Instance.SearchQueryChanged.InvokeAsync("Smi"));
+        await editor.InvokeAsync(() => Box(editor).Instance.SearchQueryChanged.InvokeAsync("S"));
+
+        Assert.That(() => editor.Instance.Dispose(), Throws.Nothing);
     }
 
     private sealed class FixedLocation(string location) : IViewerLocationStore

@@ -250,7 +250,7 @@ public sealed class SmartAuthorizer
             using var document = await FhirServerHttp.GetJsonAsync(httpClientFactory, url, null, cancellationToken);
             return SmartConfiguration.Parse(document.RootElement);
         }
-        catch (Exception ex) when (ex is HttpRequestException or JsonException)
+        catch (Exception ex) when (ex is HttpRequestException or JsonException or TimeoutException or InvalidOperationException)
         {
             throw new SmartException(SmartFailure.DiscoveryFailed, ex.Message);
         }

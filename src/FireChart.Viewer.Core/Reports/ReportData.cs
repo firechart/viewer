@@ -23,8 +23,6 @@ internal sealed partial class ReportData(IFhirServerReader reader, IViewerServer
 
     private readonly ConcurrentDictionary<string, Lazy<Task<IReadOnlyList<PocoNode>>>> _searches = new(StringComparer.Ordinal);
 
-    public ModelInspector Model => model;
-
     public IViewerServer Server => server;
 
     public Task<IReadOnlyList<PocoNode>> SearchAsync(string query, int max)
@@ -108,6 +106,22 @@ internal sealed partial class ReportData(IFhirServerReader reader, IViewerServer
         }
     }
 
+    // The entries of a Bundle: each known under its key, and its fullUrl (urn:uuid:..., an absolute address) leads to it, so a reference by the fullUrl
+    // resolves without asking the server
+    public void KnowEntries(IEnumerable<KnownEntry> entries)
+    {
+        foreach (var entry in entries)
+        {
+            KnowLazily(entry.Key, entry.Json);
+            if (entry.FullUrl is { } fullUrl)
+            {
+                _aliases.TryAdd(fullUrl, entry.Key);
+            }
+        }
+    }
+
+    private readonly ConcurrentDictionary<string, string> _aliases = new(StringComparer.Ordinal);
+
     private void KnowLazily(string key, string json)
     {
         var node = Lazily(key, json);
@@ -186,6 +200,11 @@ internal sealed partial class ReportData(IFhirServerReader reader, IViewerServer
 
     private string? KeyOf(string reference)
     {
+        if (_aliases.TryGetValue(reference.Split("/_history/", 2)[0], out var alias))
+        {
+            return alias;
+        }
+
         var local = reference.StartsWith(server.BaseUrl.TrimEnd('/') + "/", StringComparison.Ordinal) ? reference[(server.BaseUrl.TrimEnd('/').Length + 1)..] : reference;
         var match = Relative().Match(local.Split("/_history/", 2)[0]);
         return match.Success ? $"{match.Groups[1].Value}/{match.Groups[2].Value}" : null;
@@ -256,3 +275,6 @@ internal sealed partial class ReportData(IFhirServerReader reader, IViewerServer
         return found;
     }
 }
+
+// An entry of a Bundle known to a report: its key (Type/id), its JSON and the fullUrl a reference may name it by
+internal sealed record KnownEntry(string Key, string Json, string? FullUrl);

@@ -207,9 +207,6 @@
   <data name="Caption_ImportTasks" xml:space="preserve">
     <value>Tareas de importación</value>
   </data>
-  <data name="Caption_ImportTask" xml:space="preserve">
-    <value>Tarea de importación</value>
-  </data>
   <data name="Caption_Properties" xml:space="preserve">
     <value>Propiedades</value>
   </data>
@@ -299,9 +296,6 @@
   </data>
   <data name="Caption_GeneralCategory" xml:space="preserve">
     <value>General</value>
-  </data>
-  <data name="Caption_AboutPlatform" xml:space="preserve">
-    <value>Acerca de la plataforma</value>
   </data>
   <data name="Caption_ConfirmPurgeTasks" xml:space="preserve">
     <value>¿Eliminar las tareas completadas?</value>
@@ -396,9 +390,6 @@
   <data name="Caption_View" xml:space="preserve">
     <value>Ver</value>
   </data>
-  <data name="Caption_ShowTotal" xml:space="preserve">
-    <value>Mostrar el total</value>
-  </data>
   <data name="Caption_Connect" xml:space="preserve">
     <value>Conectar</value>
   </data>
@@ -425,9 +416,6 @@
   </data>
   <data name="Error_NetworkUnavailable" xml:space="preserve">
     <value>No se puede acceder al servidor. Compruebe su conexión e inténtelo de nuevo.</value>
-  </data>
-  <data name="Caption_MoreFilters" xml:space="preserve">
-    <value>Más filtros</value>
   </data>
   <data name="Caption_Any" xml:space="preserve">
     <value>Cualquiera</value>
@@ -473,9 +461,6 @@
   </data>
   <data name="Caption_WordWrap" xml:space="preserve">
     <value>Ajuste de línea</value>
-  </data>
-  <data name="Caption_BookmarkedOnly" xml:space="preserve">
-    <value>Solo marcadores</value>
   </data>
   <data name="Caption_ExpandAll" xml:space="preserve">
     <value>Expandir todo</value>
@@ -644,5 +629,23 @@
   </data>
   <data name="Message_NotCopied" xml:space="preserve">
     <value>El navegador no permitió copiar</value>
+  </data>
+  <data name="Message_LoadingProgress" xml:space="preserve">
+    <value>{0} de {1} partes cargadas</value>
+  </data>
+  <data name="AppUpdate_Downloading" xml:space="preserve">
+    <value>Descargando la nueva versión: {0} de {1} archivos</value>
+  </data>
+  <data name="AppUpdate_SavingOffline" xml:space="preserve">
+    <value>Guardando para usar sin conexión: {0} de {1} archivos</value>
+  </data>
+  <data name="AppUpdate_Ready" xml:space="preserve">
+    <value>Hay una nueva versión lista</value>
+  </data>
+  <data name="AppUpdate_Restart" xml:space="preserve">
+    <value>Reiniciar</value>
+  </data>
+  <data name="AppUpdate_Later" xml:space="preserve">
+    <value>Más tarde</value>
   </data>
 </root>

@@ -4,26 +4,143 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
     <meta name="color-scheme" content="light dark" />
-    <title>FireChart Viewer</title>
-    <base href="/" />
-    <link rel="icon" href="data:," />
-    <link rel="preload" href="_content/Flox.Shared/fonts/FloxSymbols.woff2" as="font" type="font/woff2" crossorigin />
-    <!-- The frame (/embed, inside another application) shows a quiet bar while the runtime downloads, the demo the splash of FireChart: told before
-         the body is drawn -->
-    <script>
-        if (/^\/embed(\/|$)/.test(location.pathname)) {
-            document.documentElement.classList.add('viewer-embed');
-        }
+    <title>FireChart Viewer: open-source FHIR® viewer and Bundle visualizer in the browser</title>
+    <meta name="description" content="FireChart Viewer is an open-source FHIR® viewer that runs in the browser: browse any FHIR® server (STU3, R4, R4B, R5, R6), search resources, read a patient summary, draw a FHIR® Bundle as a graph, sign in with SMART on FHIR and embed it in your application. MPL-2.0." />
+    <meta name="keywords" content="FHIR viewer, FHIR browser, FHIR client, FHIR Bundle visualizer, patient summary, SMART on FHIR, HL7 FHIR, R4, R5, open source, iframe SDK, Blazor" />
+    <meta name="author" content="FireChart" />
+    <meta name="robots" content="index, follow" />
+    <!-- Every copy of the site (GitHub Pages, an installation) names viewer.firechart.org as the original -->
+    <link rel="canonical" href="https://viewer.firechart.org/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="FireChart" />
+    <meta property="og:url" content="https://viewer.firechart.org/" />
+    <meta property="og:title" content="FireChart Viewer: FHIR® records in the browser" />
+    <meta property="og:description" content="Open-source FHIR® viewer: browse any FHIR® server, read a patient summary, draw a Bundle as a graph, embed it in your application. MPL-2.0." />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="https://viewer.firechart.org/img/og-viewer.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The summary of a patient in FireChart Viewer" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FireChart Viewer: FHIR® records in the browser" />
+    <meta name="twitter:description" content="Open-source FHIR® viewer and Bundle visualizer that runs in the browser. Live demo on public test servers." />
+    <meta name="twitter:image" content="https://viewer.firechart.org/img/og-viewer.png" />
+    <!-- What a search engine reads about the product and the questions below (schema.org) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "SoftwareApplication",
+                "@id": "https://viewer.firechart.org/#app",
+                "name": "FireChart Viewer",
+                "url": "https://viewer.firechart.org/",
+                "sameAs": ["https://github.com/firechart/viewer", "https://firechart.github.io/viewer/"],
+                "image": "https://viewer.firechart.org/img/og-viewer.png",
+                "applicationCategory": "HealthApplication",
+                "applicationSubCategory": "FHIR® viewer",
+                "operatingSystem": "Any web browser",
+                "browserRequirements": "A current browser with WebAssembly",
+                "description": "An open-source FHIR® viewer that runs in the browser: the resource types of a FHIR® server, searchable lists, each resource as a card or as its source, the summary of a patient, a FHIR® Bundle drawn as the graph of its references. SMART on FHIR sign-in, embedding with an iframe and a JavaScript SDK.",
+                "featureList": [
+                    "Browse any FHIR® server: STU3, R4, R4B, R5 and R6",
+                    "FHIR® search with forms generated from the specification",
+                    "Patient summary: problems, medications, allergies, results, encounters",
+                    "FHIR® Bundle Visualizer: the graph of the references of a Bundle",
+                    "SMART on FHIR sign-in with PKCE, by redirect or in a popup",
+                    "Embedding in any web page with an iframe and an ES module SDK",
+                    "Light and dark themes, six languages"
+                ],
+                "isAccessibleForFree": true,
+                "license": "https://www.mozilla.org/MPL/2.0/",
+                "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+                "publisher": { "@type": "Organization", "name": "FireChart", "url": "https://firechart.org/" }
+            },
+            {
+                "@type": "SoftwareSourceCode",
+                "name": "FireChart Viewer",
+                "codeRepository": "https://github.com/firechart/viewer",
+                "programmingLanguage": ["C#", "JavaScript"],
+                "runtimePlatform": ".NET, Blazor WebAssembly",
+                "license": "https://www.mozilla.org/MPL/2.0/",
+                "targetProduct": { "@id": "https://viewer.firechart.org/#app" }
+            },
+            {
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "Where does the patient data go?",
+                        "acceptedAnswer": { "@type": "Answer", "text": "Nowhere but the browser. The Viewer runs in the browser as WebAssembly and talks to the FHIR® server directly. The data and the access tokens never pass through a server of the Viewer or of the page that embeds it." }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Which FHIR® servers does it work with?",
+                        "acceptedAnswer": { "@type": "Answer", "text": "Any FHIR® server of the releases STU3, R4, R4B, R5 or R6 that allows the origin of the Viewer (CORS). Open servers work at once, and a server that needs a sign-in is opened with SMART on FHIR." }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "How do I put it into my application?",
+                        "acceptedAnswer": { "@type": "Answer", "text": "Serve the Viewer with its Docker image or copy its files to any static web server, then embed it with an iframe or with the JavaScript SDK, one ES module without dependencies. There are examples for plain HTML, React, Angular and Vue." }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Is it free?",
+                        "acceptedAnswer": { "@type": "Answer", "text": "Yes. FireChart Viewer is open source under the Mozilla Public License 2.0, commercial use included." }
+                    }
+                ]
+            }
+        ]
+    }
     </script>
-    <link rel="stylesheet" href="_content/Flox.Shared/app.css" />
-    <link rel="stylesheet" href="_content/Flox.Shared/flox-splash.css" />
-    <!-- Blazor Blueprint: its theme (the tokens of shadcn/ui), then its compiled styles -->
-    <link rel="stylesheet" href="_content/Flox.Shared/theme.css" />
-    <link rel="stylesheet" href="_content/BlazorBlueprint.Components/blazorblueprint.css" />
-    <link rel="stylesheet" href="_content/Flox.Shared/css/Flox.Shared.Tailwind.css" />
-    <link rel="stylesheet" href="_content/FireChart.Viewer/css/FireChart.Viewer.Tailwind.css" />
-    <link rel="stylesheet" href="css/FireChart.Viewer.App.Tailwind.css" />
+    <base href="/" />
+    <!-- This page is the home page of the site and the page of the application. The site works in any folder of any host (the root, a folder of
+         GitHub Pages): the base is the folder of this page, or the part before a route of the application (playground, embed, embed-bundle,
+         smart/callback). At the base itself the page is the home page, plain HTML without the runtime; on a route it loads the styles and the
+         runtime of the application. The frame (inside another application) shows a quiet bar while the runtime downloads, the playground the
+         splash of FireChart: told before the body is drawn -->
+    <script>
+        (function () {
+            var path = location.pathname;
+            var route = /^(.*?\/)(playground|embed|embed-bundle|smart\/callback)(\/|$)/.exec(path);
+            var base = route ? route[1] : path.replace(/[^\/]*$/, '');
+            document.querySelector('base').setAttribute('href', base);
+            var root = document.documentElement;
+            root.classList.add(!route && (path === base || path === base + 'index.html') ? 'viewer-site' : 'viewer-app');
+            if (route && route[2] !== 'playground') {
+                root.classList.add('viewer-embed');
+                // A frame is a part of another page, not a page to find
+                document.querySelector('meta[name="robots"]').setAttribute('content', 'noindex, nofollow');
+            }
+        })();
+    </script>
+    <template id="site-head">
+        <link rel="icon" href="img/firechart-logo.svg" type="image/svg+xml" />
+        <link rel="stylesheet" href="assets/site.css" />
+    </template>
+    <template id="app-head">
+        <link rel="icon" href="data:," />
+        <link rel="preload" href="_content/Flox.Shared/fonts/FloxSymbols.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="stylesheet" href="_content/Flox.Shared/app.css" />
+        <link rel="stylesheet" href="_content/Flox.Shared/flox-splash.css" />
+        <!-- Blazor Blueprint: its theme (the tokens of shadcn/ui), then its compiled styles -->
+        <link rel="stylesheet" href="_content/Flox.Shared/theme.css" />
+        <link rel="stylesheet" href="_content/BlazorBlueprint.Components/blazorblueprint.css" />
+        <link rel="stylesheet" href="_content/Flox.Shared/css/Flox.Shared.Tailwind.css" />
+        <link rel="stylesheet" href="_content/FireChart.Viewer/css/FireChart.Viewer.Tailwind.css" />
+        <link rel="stylesheet" href="css/FireChart.Viewer.App.Tailwind.css" />
+    </template>
+    <!-- Written by the parser, so the page waits for its styles as for any stylesheet of the head -->
+    <script>
+        document.write(document.getElementById(document.documentElement.classList.contains('viewer-site') ? 'site-head' : 'app-head').innerHTML);
+    </script>
     <style>
+        html.viewer-site #app,
+        html.viewer-app .viewer-site-page {
+            display: none;
+        }
+
         /* The bar of the frame: no brand and no background of its own (the page of the host shows through), the colour of the text */
         .viewer-embed .flox-splash {
             display: none;
@@ -71,7 +188,140 @@
     </style>
 </head>
 <body>
-    <!-- Blazor replaces both with the application: the splash of Flox.Shared (the demo) and the bar of the frame -->
+    <!-- The home page of the site -->
+    <div class="viewer-site-page">
+        <header class="site-header">
+            <a class="brand" href="./"><img src="img/firechart-logo.svg" alt="FireChart" /></a>
+            <nav>
+                <a href="viewer.html">Viewer</a>
+                <a href="bundle.html">Bundle<span class="wide"> Visualizer</span></a>
+                <a href="developers.html">Embed</a>
+            </nav>
+            <a class="github" href="https://github.com/firechart/viewer">GitHub</a>
+        </header>
+
+        <main class="page">
+            <section class="hero">
+                <h1>FHIR® records in the browser</h1>
+                <p>
+                    FireChart Viewer reads a FHIR® server straight from the browser: the resource types it has, searches, a record with its references,
+                    the summary of a patient. Nothing to install on the server, SMART on FHIR sign-in where the server needs it.
+                </p>
+                <div class="actions">
+                    <a class="button primary" href="viewer.html">Open a patient</a>
+                    <a class="button" href="bundle.html">Draw a Bundle</a>
+                    <a class="button" href="https://github.com/firechart/viewer">Source on GitHub</a>
+                </div>
+            </section>
+
+            <section class="cards">
+                <article class="card">
+                    <h2>Viewer</h2>
+                    <p>Lists with FHIR® search, a record and its source, the summary of a patient. R4, R4B, R5, STU3, light and dark, six languages.</p>
+                    <div class="actions"><a class="button primary" href="viewer.html">Try it</a></div>
+                </article>
+                <article class="card">
+                    <h2>Bundle Visualizer</h2>
+                    <p>A Bundle drawn as the graph of the references between its resources. Paste it, open a file or read it by its address. It stays in your browser.</p>
+                    <div class="actions"><a class="button primary" href="bundle.html">Try it</a></div>
+                </article>
+                <article class="card">
+                    <h2>Embed it</h2>
+                    <p>One ES module puts the Viewer or the Visualizer into your page in a frame of its own. Plain HTML, React, Angular, Vue.</p>
+                    <div class="actions"><a class="button" href="developers.html">How to embed</a></div>
+                </article>
+                <article class="card">
+                    <h2>FireChart Lite</h2>
+                    <p>FHIR® specification packages on your device: profiles, value sets and search parameters, offline once installed.</p>
+                    <div class="actions"><a class="button" href="https://lite.firechart.org/">Open Lite</a></div>
+                </article>
+            </section>
+
+            <section class="section">
+                <h2>What it does</h2>
+                <ul class="features">
+                    <li><strong>Any FHIR® server.</strong> The resource types the server has, lists with FHIR® search, each resource as a readable card or
+                        as its source in JSON or XML, the references between them. STU3, R4, R4B, R5 and R6.</li>
+                    <li><strong>The summary of a patient.</strong> Problems, medications, allergies, results with their trends, encounters and more on
+                        one page.</li>
+                    <li><strong>Search forms.</strong> Generated from the search parameters of the FHIR® release, with the codes from the terminology of
+                        the server and references found as you type.</li>
+                    <li><strong>Bundle Visualizer.</strong> A Bundle as the graph of the references between its resources: a document, a transaction,
+                        the result of <code>$everything</code>. Tap a resource for its card and its source.</li>
+                    <li><strong>SMART on FHIR.</strong> Sign-in with PKCE, by redirect or in a popup, so a protected server opens as well as an open
+                        one.</li>
+                    <li><strong>Your look.</strong> Light and dark themes, your colours and fonts. English, German, Spanish, Hebrew, Russian and Chinese.
+                        The forms of the records are XML components you can replace.</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Where the data goes</h2>
+                <p>
+                    The Viewer is static files. It runs in the browser as WebAssembly and talks to the FHIR® server directly: patient data and access
+                    tokens never pass through a server of the Viewer or of the page that embeds it, and the Viewer keeps no database. It only reads
+                    and never writes to the FHIR® server.
+                </p>
+            </section>
+
+            <section class="section">
+                <h2>Use it in your application</h2>
+                <p>
+                    Run the Docker image <code>ghcr.io/firechart/viewer</code> (linux/amd64 and linux/arm64) or copy the published files to any static
+                    web server, then put the Viewer into your page with an <code>&lt;iframe&gt;</code> or with the JavaScript SDK. The SDK is one ES
+                    module with TypeScript types: it creates the frame, passes the configuration and turns the messages of the frame into events and
+                    promises. Blazor applications can render the component <code>&lt;FhirViewer&gt;</code> directly.
+                </p>
+                <div class="actions">
+                    <a class="button" href="developers.html">How to embed</a>
+                    <a class="button" href="https://github.com/firechart/viewer#readme">Documentation</a>
+                    <a class="button" href="playground">Playground</a>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Questions</h2>
+                <details>
+                    <summary>Where does the patient data go?</summary>
+                    <p>Nowhere but the browser. The Viewer runs in the browser as WebAssembly and talks to the FHIR® server directly. The data and the
+                        access tokens never pass through a server of the Viewer or of the page that embeds it.</p>
+                </details>
+                <details>
+                    <summary>Which FHIR® servers does it work with?</summary>
+                    <p>Any FHIR® server of the releases STU3, R4, R4B, R5 or R6 that allows the origin of the Viewer (CORS). Open servers work at once,
+                        and a server that needs a sign-in is opened with SMART on FHIR.</p>
+                </details>
+                <details>
+                    <summary>How do I put it into my application?</summary>
+                    <p>Serve the Viewer with its Docker image or copy its files to any static web server, then embed it with an iframe or with the
+                        JavaScript SDK, one ES module without dependencies. There are examples for plain HTML, React, Angular and Vue.</p>
+                </details>
+                <details>
+                    <summary>Is it free?</summary>
+                    <p>Yes. FireChart Viewer is open source under the Mozilla Public License 2.0, commercial use included.</p>
+                </details>
+            </section>
+
+            <p class="notice">
+                The demos read public test servers with synthetic data. Do not enter real patient data there. FireChart Viewer is not a medical device.
+                FHIR® is the registered trademark of HL7 and is used with the permission of HL7.
+            </p>
+        </main>
+
+        <footer class="site-footer">
+            <nav class="footer-links" aria-label="More">
+                <a href="https://viewer.firechart.org/">viewer.firechart.org</a>
+                <a href="https://github.com/firechart/viewer">Source on GitHub</a>
+                <a href="https://github.com/firechart/viewer/releases">Releases</a>
+                <a href="https://github.com/firechart/viewer/pkgs/container/viewer">Docker image</a>
+                <a href="https://firechart.org/">FireChart</a>
+                <a href="https://lite.firechart.org/">FireChart Lite</a>
+            </nav>
+            FireChart Viewer is open source under the <a href="https://github.com/firechart/viewer/blob/main/LICENSE">MPL-2.0</a>.
+        </footer>
+    </div>
+
+    <!-- Blazor replaces both with the application: the splash of Flox.Shared (the playground) and the bar of the frame -->
     <div id="app">
         <div class="flox-splash flox-splash-early">
             <img class="flox-splash-logo" src="img/firechart-logo.svg" alt="" />
@@ -82,9 +332,17 @@
         </div>
         <div class="viewer-start-bar" role="progressbar" aria-label="Loading"></div>
     </div>
-    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <!-- The runtime only for the application, never for the home page -->
     <script>
-        Blazor.start({ configureRuntime: builder => builder.withConfig({ loadAllSatelliteResources: true }) });
+        if (document.documentElement.classList.contains('viewer-app')) {
+            var blazor = document.createElement('script');
+            blazor.src = '_framework/blazor.webassembly.js';
+            blazor.setAttribute('autostart', 'false');
+            blazor.onload = function () {
+                Blazor.start({ configureRuntime: builder => builder.withConfig({ loadAllSatelliteResources: true }) });
+            };
+            document.body.appendChild(blazor);
+        }
     </script>
 </body>
 </html>

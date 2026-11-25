@@ -255,7 +255,7 @@ redirect URIs of the Viewer at the authorization server: `https://viewer.example
 | Symptom | Cause | What to do |
 |---|---|---|
 | The frame is empty; the console says *Refused to frame ... frame-ancestors* | Your proxy sends CSP `frame-ancestors` without the origin of your page | Add it there |
-| The frame shows the Viewer of `viewer.json`, not your configuration, and no event comes | The frame does not obey an origin that is not in its `host.json` | Add it to `host.json`, reload |
+| The frame says *The Viewer does not obey ...*; the requests are rejected with `origin_not_allowed`, also the event `error` | The frame does not obey an origin that is not in its `host.json` | Add it to `host.json`, reload |
 | Nothing is visible at all | The element has no height (`height: "fill"`) | Give the element a height, or `height: "auto"` |
 | Two frames in development (React) | StrictMode mounts twice, the cleanup does not destroy | Return `() => viewer.destroy()` from the effect |
 | *Failed to fetch* inside the Viewer | The FHIR server does not allow the origin of the Viewer (CORS) | Allow `https://viewer.example.org` on the FHIR server |

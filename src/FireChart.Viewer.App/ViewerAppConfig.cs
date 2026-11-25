@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Components;
 namespace FireChart.Viewer.App;
 
 // viewer.json of the application, the keys of the plan (section 4.4) that the frame understands so far: one server, its SMART client, the language, the
-// terminology server, the theme and the variables of the appearance, how the summary loads. An unknown key is an error, not silence
+// FHIR settings (the terminology server, how the summary loads, the decimal places of a value), the theme and the variables of the appearance. An
+// unknown key is an error, not silence
 internal sealed record ViewerAppConfig
 {
     public required ServerConfig Server { get; init; }
@@ -19,19 +20,37 @@ internal sealed record ViewerAppConfig
 
     public string? Locale { get; init; }
 
-    public TerminologyConfig? Terminology { get; init; }
+    public FhirConfig? Fhir { get; init; }
 
     public AppearanceConfig? Appearance { get; init; }
-
-    public SummaryConfig? Summary { get; init; }
 }
 
-// How the summary loads: the page size of its searches, everything before it is shown
-internal sealed record SummaryConfig
+// The configuration of the frame of the Bundle Visualizer (/embed-bundle): the keys of viewer.json, the server only for a Bundle read by an address
+// (a pasted Bundle needs none), its SMART client for an address of a server that needs a sign-in
+internal sealed record BundleAppConfig
 {
+    public ServerConfig? Server { get; init; }
+
+    public SmartConfig? Smart { get; init; }
+
+    public string? Locale { get; init; }
+
+    public FhirConfig? Fhir { get; init; }
+
+    public AppearanceConfig? Appearance { get; init; }
+}
+
+// The FHIR settings (FhirOptions): the terminology server, the page size of the searches of a summary, everything before it is shown, the decimal
+// places of a value
+internal sealed record FhirConfig
+{
+    public string? TerminologyServer { get; init; }
+
     public int? PageSize { get; init; }
 
     public bool? LoadAll { get; init; }
+
+    public int? Decimals { get; init; }
 }
 
 internal sealed record ServerConfig
@@ -58,11 +77,6 @@ internal sealed record SmartConfig
     public string? Authority { get; init; }
 
     public string? ExtraParameters { get; init; }
-}
-
-internal sealed record TerminologyConfig
-{
-    public string? Server { get; init; }
 }
 
 internal sealed record AppearanceConfig
@@ -119,14 +133,14 @@ internal sealed class ConfiguredServer(ServerConfig server, SmartConfig? smart, 
 
 // What the frame shows: the Viewer with its options, or the errors of the configuration
 // Culture: none for "auto", the language of the browser
-internal sealed record ViewerAppSetup(IViewerServer? Server, SmartFlow SmartFlow, CultureInfo? Culture, string? TerminologyServer,
-                                      ViewerAppearance? Appearance, IReadOnlyList<ViewerConfigError> Errors)
+internal sealed record ViewerAppSetup(IViewerServer? Server, SmartFlow SmartFlow, CultureInfo? Culture, ViewerAppearance? Appearance,
+                                      IReadOnlyList<ViewerConfigError> Errors)
 {
-    public ViewerSummaryOptions Summary { get; init; } = ViewerSummaryOptions.Default;
+    public FhirOptions Fhir { get; init; } = FhirOptions.Default;
 
     public static ViewerAppSetup Failed(params IReadOnlyList<ViewerConfigError> errors)
     {
-        return new ViewerAppSetup(null, SmartFlow.Redirect, null, null, null, errors);
+        return new ViewerAppSetup(null, SmartFlow.Redirect, null, null, errors);
     }
 }
 
@@ -152,7 +166,22 @@ internal sealed class ViewerAppConfigLoader(IHttpClientFactory httpClientFactory
     // The languages of the texts of the Viewer
     public static readonly IReadOnlyList<string> Locales = ["en", "de", "es", "he", "ru", "zh-Hans"];
 
+    // viewer.json for the frame of the Bundle Visualizer
+    public async Task<ViewerAppSetup> LoadBundleAsync(CancellationToken cancellationToken = default)
+    {
+        var text = await ReadTextAsync(cancellationToken);
+        return text.Failed ?? ParseBundle(text.Text!);
+    }
+
     private async Task<ViewerAppSetup> ReadAsync(CancellationToken cancellationToken)
+    {
+        var text = await ReadTextAsync(cancellationToken);
+        return text.Failed ?? Parse(text.Text!);
+    }
+
+    private sealed record ConfigText(string? Text, ViewerAppSetup? Failed);
+
+    private async Task<ConfigText> ReadTextAsync(CancellationToken cancellationToken)
     {
         string text;
         try
@@ -163,52 +192,78 @@ internal sealed class ViewerAppConfigLoader(IHttpClientFactory httpClientFactory
             using var response = await http.SendAsync(request, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
-                return Failed("config_not_found", FileName, $"{FileName} could not be read: HTTP {(int)response.StatusCode}.");
+                return new ConfigText(null, Failed("config_not_found", FileName, $"{FileName} could not be read: HTTP {(int)response.StatusCode}."));
             }
 
             text = await response.Content.ReadAsStringAsync(cancellationToken);
         }
         catch (HttpRequestException ex)
         {
-            return Failed("config_not_found", FileName, ex.Message);
+            return new ConfigText(null, Failed("config_not_found", FileName, ex.Message));
         }
 
-        return Parse(text);
+        return new ConfigText(text, null);
     }
 
     // The same checks for viewer.json, a configuration the host of the frame sends and the editor of the sandbox
     public static ViewerAppSetup Parse(string text)
     {
-        ViewerAppConfig? config;
+        var config = Read<ViewerAppConfig>(text, out var failed);
+        if (failed is null && config!.Server is null)
+        {
+            // "server": null passes the check of the keys
+            return Failed("missing_option", "server", "The configuration needs a server.");
+        }
+
+        return failed ?? Validate(config!.Server, config.Smart, config.Locale, config.Fhir, config.Appearance);
+    }
+
+    // The configuration of the frame of the Bundle Visualizer: no server is no error (Server of the setup null, no errors)
+    public static ViewerAppSetup ParseBundle(string text)
+    {
+        var config = Read<BundleAppConfig>(text, out var failed);
+        if (failed is null && config!.Smart is not null && config.Server is null)
+        {
+            return Failed("missing_option", "server", "'smart' is the client of a server: the configuration needs one.");
+        }
+
+        return failed ?? Validate(config!.Server, config.Smart, config.Locale, config.Fhir, config.Appearance);
+    }
+
+    private static T? Read<T>(string text, out ViewerAppSetup? failed) where T : class
+    {
+        failed = null;
         try
         {
-            var keyErrors = ConfigKeys.Check(text);
+            var keyErrors = ConfigKeys.Check(text, typeof(T));
             if (keyErrors.Count > 0)
             {
-                return ViewerAppSetup.Failed(keyErrors);
+                failed = ViewerAppSetup.Failed(keyErrors);
+                return null;
             }
 
-            config = JsonSerializer.Deserialize<ViewerAppConfig>(text, s_json);
+            var config = JsonSerializer.Deserialize<T>(text, s_json);
+            failed = config is null ? Failed("invalid_config", "$", "The configuration is empty.") : null;
+            return config;
         }
         catch (JsonException ex)
         {
             // The messages of System.Text.Json are trimmed in the browser (resource keys only): the path says where
-            return Failed("invalid_value", (ex.Path ?? "$").TrimStart('$', '.'), "The value is not of the expected type, or the JSON is not well formed.");
+            failed = Failed("invalid_value", (ex.Path ?? "$").TrimStart('$', '.'), "The value is not of the expected type, or the JSON is not well formed.");
+            return null;
         }
-
-        return config is null ? Failed("invalid_config", "$", "The configuration is empty.") : Validate(config);
     }
 
-    private static ViewerAppSetup Validate(ViewerAppConfig config)
+    private static ViewerAppSetup Validate(ServerConfig? serverConfig, SmartConfig? smart, string? locale, FhirConfig? fhir, AppearanceConfig? look)
     {
         var errors = new List<ViewerConfigError>();
-        if (!Uri.TryCreate(config.Server.Url, UriKind.Absolute, out var url) || url.Scheme is not ("https" or "http"))
+        if (serverConfig is not null && (!Uri.TryCreate(serverConfig.Url, UriKind.Absolute, out var url) || url.Scheme is not ("https" or "http")))
         {
-            errors.Add(new ViewerConfigError("invalid_option", "server.url", $"'{config.Server.Url}' is not an absolute http(s) address."));
+            errors.Add(new ViewerConfigError("invalid_option", "server.url", $"'{serverConfig.Url}' is not an absolute http(s) address."));
         }
 
         FhirRelease? release = null;
-        if (config.Server.FhirRelease is { } literal)
+        if (serverConfig?.FhirRelease is { } literal)
         {
             if (Enum.TryParse<FhirRelease>(literal, true, out var parsed))
             {
@@ -221,13 +276,13 @@ internal sealed class ViewerAppConfigLoader(IHttpClientFactory httpClientFactory
         }
 
         var flow = SmartFlow.Redirect;
-        if (config.Smart?.Flow is { } flowName && !Enum.TryParse(flowName, true, out flow))
+        if (smart?.Flow is { } flowName && !Enum.TryParse(flowName, true, out flow))
         {
             errors.Add(new ViewerConfigError("invalid_option", "smart.flow", $"'{flowName}' is not a flow: redirect or popup."));
         }
 
         CultureInfo? culture = null;
-        if (config.Locale is { } locale && !locale.Equals("auto", StringComparison.OrdinalIgnoreCase))
+        if (locale is not null && !locale.Equals("auto", StringComparison.OrdinalIgnoreCase))
         {
             culture = CultureOf(locale);
             if (culture is null)
@@ -237,7 +292,7 @@ internal sealed class ViewerAppConfigLoader(IHttpClientFactory httpClientFactory
         }
 
         ViewerAppearance? appearance = null;
-        if (config.Appearance is { } look)
+        if (look is not null)
         {
             var theme = ViewerTheme.Auto;
             if (look.Theme is { } themeName && !Enum.TryParse(themeName, true, out theme))
@@ -255,17 +310,26 @@ internal sealed class ViewerAppConfigLoader(IHttpClientFactory httpClientFactory
             };
         }
 
-        if (config.Summary?.PageSize is { } pageSize and (< ViewerSummaryOptions.MinPageSize or > ViewerSummaryOptions.MaxPageSize))
+        if (fhir?.PageSize is { } pageSize and (< FhirOptions.MinPageSize or > FhirOptions.MaxPageSize))
         {
-            errors.Add(new ViewerConfigError("invalid_option", "summary.pageSize",
-                                             $"{pageSize} is not a page size: {ViewerSummaryOptions.MinPageSize} to {ViewerSummaryOptions.MaxPageSize}."));
+            errors.Add(new ViewerConfigError("invalid_option", "fhir.pageSize", $"{pageSize} is not a page size: {FhirOptions.MinPageSize} to {FhirOptions.MaxPageSize}."));
         }
 
-        var server = errors.Count == 0 ? new ConfiguredServer(config.Server, config.Smart, release) : null;
-        return new ViewerAppSetup(server, flow, culture, config.Terminology?.Server,
-                                  appearance ?? new ViewerAppearance { Theme = ViewerTheme.Auto }, errors)
+        if (fhir?.Decimals is { } decimals and (< 0 or > FhirOptions.MaxDecimals))
         {
-            Summary = new ViewerSummaryOptions { PageSize = config.Summary?.PageSize, LoadAll = config.Summary?.LoadAll ?? false }
+            errors.Add(new ViewerConfigError("invalid_option", "fhir.decimals", $"{decimals} is not a number of decimal places: 0 to {FhirOptions.MaxDecimals}."));
+        }
+
+        var server = errors.Count == 0 && serverConfig is not null ? new ConfiguredServer(serverConfig, smart, release) : null;
+        return new ViewerAppSetup(server, flow, culture, appearance ?? new ViewerAppearance { Theme = ViewerTheme.Auto }, errors)
+        {
+            Fhir = new FhirOptions
+            {
+                TerminologyServerUrl = fhir?.TerminologyServer,
+                PageSize = fhir?.PageSize ?? FhirOptions.DefaultPageSize,
+                LoadAll = fhir?.LoadAll ?? false,
+                Decimals = fhir?.Decimals ?? FhirOptions.DefaultDecimals
+            }
         };
     }
 
@@ -294,11 +358,11 @@ internal sealed class ViewerAppConfigLoader(IHttpClientFactory httpClientFactory
 // is named too. Done before the binding, whose messages say nothing in the browser
 internal static class ConfigKeys
 {
-    public static List<ViewerConfigError> Check(string json)
+    public static List<ViewerConfigError> Check(string json, Type? root = null)
     {
         var errors = new List<ViewerConfigError>();
         using var document = JsonDocument.Parse(json, new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true });
-        Walk(document.RootElement, typeof(ViewerAppConfig), string.Empty, errors);
+        Walk(document.RootElement, root ?? typeof(ViewerAppConfig), string.Empty, errors);
         return errors;
     }
 

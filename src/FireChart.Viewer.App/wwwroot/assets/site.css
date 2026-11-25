@@ -1,0 +1,539 @@
+/* The pages of the site of the Viewer (index.html, viewer/, bundle/, embed/): plain HTML, no build; the palette of FireChart (light: coffee,
+   dark: zinc with orange) */
+:root {
+    color-scheme: light dark;
+    --page: #e7d8c9;
+    --card: #f7f0e7;
+    --secondary: #dbc7b3;
+    --primary: #5b3f2e;
+    --on-primary: #f7f0e7;
+    --text: #2b1f17;
+    --muted: #6b5546;
+    --line: #cdb8a3;
+    --ring: #a38368;
+    --radius: 10px;
+    --header: 52px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --page: #09090b;
+        --card: #18181b;
+        --secondary: #27272a;
+        --primary: oklch(0.705 0.213 47.604);
+        --on-primary: #18181b;
+        --text: #fafafa;
+        --muted: #a1a1aa;
+        --line: #3f3f46;
+        --ring: #71717a;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--page);
+    color: var(--text);
+}
+
+a {
+    color: inherit;
+}
+
+h1, h2, h3 {
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+code, pre {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.875rem;
+}
+
+pre {
+    margin: 0;
+    padding: 12px 14px;
+    overflow-x: auto;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+/* The bar of every page */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: var(--header);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 16px;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+}
+
+.site-header .brand {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.site-header .brand img {
+    height: 24px;
+    width: auto;
+}
+
+.site-header nav {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.site-header nav a {
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    white-space: nowrap;
+    opacity: 0.85;
+}
+
+.site-header nav a:hover,
+.site-header nav a[aria-current="page"] {
+    opacity: 1;
+    background: var(--secondary);
+}
+
+.site-header .github {
+    flex: none;
+    margin-inline-start: auto;
+    white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+    .site-header {
+        gap: 4px;
+        padding: 0 10px;
+    }
+
+    .site-header nav a {
+        padding: 6px 7px;
+    }
+
+    .site-header .wide {
+        display: none;
+    }
+
+    .site-header .brand img {
+        height: 15px;
+    }
+}
+
+/* Buttons: a text button always has a border */
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background: var(--secondary);
+    color: var(--text);
+    font: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.button.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--on-primary);
+}
+
+.button:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+
+select, textarea, input {
+    font: inherit;
+    color: var(--text);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+}
+
+select {
+    min-height: 32px;
+    padding: 4px 8px;
+    max-width: 100%;
+    font-size: 0.875rem;
+    border-radius: 6px;
+}
+
+/* The home page */
+.page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 32px 16px 48px;
+}
+
+.hero h1 {
+    margin: 0 0 12px;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.hero p {
+    margin: 0 0 20px;
+    max-width: 680px;
+    font-size: 1.125rem;
+    color: var(--muted);
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 40px;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+.card h2 {
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+.card p {
+    margin: 0;
+    color: var(--muted);
+    flex: 1;
+}
+
+.card .actions {
+    margin-top: 8px;
+}
+
+.notice {
+    margin-top: 32px;
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+
+.site-footer {
+    padding: 20px 16px 32px;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+
+/* A page of a demo: the controls beside the frame on a wide screen, above it on a phone, the frame as high as the screen */
+.demo {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 16px;
+    padding: 16px;
+    height: calc(100dvh - var(--header));
+}
+
+/* Not a scrolling box: the menu of the examples opens over the frame */
+.demo aside {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.demo aside h1 {
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.demo aside p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.demo label:not(.button) {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.875rem;
+}
+
+.demo .frame {
+    min-height: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--card);
+}
+
+.demo .notice {
+    margin-top: auto;
+}
+
+@media (max-width: 860px) {
+    /* A phone: the controls in a line or two, the frame takes the rest of the screen, the page itself does not scroll */
+    .demo {
+        display: flex;
+        flex-direction: column;
+        padding: 8px 0 0;
+        gap: 8px;
+    }
+
+    .demo aside {
+        flex: none;
+        padding: 0 12px;
+        gap: 8px;
+        overflow: visible;
+    }
+
+    .demo aside h1,
+    .demo .intro,
+    .demo .wide,
+    .demo .notice,
+    .demo .label {
+        display: none;
+    }
+
+    .demo .frame {
+        flex: 1;
+        border-radius: 0;
+        border-inline-start: 0;
+        border-inline-end: 0;
+        border-bottom: 0;
+    }
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.row select {
+    flex: 1 1 140px;
+    min-width: 0;
+}
+
+/* The server and the icons beside it stay on one line */
+.demo .row select:has(+ .icon) {
+    flex: 1 1 0;
+}
+
+/* A button with an icon only */
+.button.icon {
+    flex: none;
+    width: 32px;
+    padding: 0;
+}
+
+/* A dialog of a demo page (the appearance of the Viewer) */
+.dialog {
+    width: min(360px, calc(100% - 32px));
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--text);
+}
+
+.dialog::backdrop {
+    background: rgb(0 0 0 / 0.45);
+}
+
+.dialog h2 {
+    margin: 0 0 16px;
+    font-size: 1.15rem;
+}
+
+.dialog label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+    font-size: 0.875rem;
+}
+
+.dialog .actions {
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 140px;
+    padding: 8px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.8125rem;
+}
+
+.message {
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+
+.message:empty {
+    display: none;
+}
+
+/* The page for developers */
+.prose {
+    max-width: 820px;
+}
+
+.prose h1 {
+    margin: 0 0 12px;
+}
+
+.prose h2 {
+    margin: 32px 0 8px;
+    font-size: 1.2rem;
+}
+
+.prose p {
+    color: var(--muted);
+}
+
+/* The sections of the home page below the cards */
+.section {
+    margin-top: 48px;
+    max-width: 820px;
+}
+
+.section h2 {
+    margin: 0 0 12px;
+    font-size: 1.35rem;
+}
+
+.section p {
+    color: var(--muted);
+}
+
+.features {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 12px;
+}
+
+.features li {
+    color: var(--muted);
+}
+
+.features strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.section details {
+    border-bottom: 1px solid var(--line);
+    padding: 10px 0;
+}
+
+.section details summary {
+    cursor: pointer;
+}
+
+.section details p {
+    margin: 8px 0 0;
+}
+
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 16px;
+    margin-bottom: 10px;
+}
+
+/* A menu of commands (the examples of the Bundle Visualizer): a details whose list opens below its line of commands, as wide as the line */
+.commands {
+    position: relative;
+    align-items: flex-start;
+}
+
+.menu summary {
+    list-style: none;
+}
+
+.menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.menu-list {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 4px);
+    inset-inline: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+}
+
+.menu-list button {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    width: 100%;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    color: var(--text);
+    font: inherit;
+    font-size: 0.875rem;
+    text-align: start;
+    cursor: pointer;
+}
+
+.menu-list button:hover,
+.menu-list button:focus-visible {
+    background: var(--secondary);
+    outline: none;
+}
+
+.menu-list code {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    color: var(--muted);
+}

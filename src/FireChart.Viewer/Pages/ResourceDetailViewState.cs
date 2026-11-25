@@ -32,6 +32,8 @@ public class ResourceDetailViewState : State
     private readonly IReleaseModels _models;
     private ResourceDetailKey? _key;
     private string? _release;
+    private CancellationTokenSource? _loading;
+    private int _loads;
 
     /// <summary>
     /// Creates the state.
@@ -100,9 +102,25 @@ public class ResourceDetailViewState : State
     }
 
 
+    // A load that a newer one replaced (another record before this one came) is cancelled and writes nothing, as in the list
     private async Task LoadAsync()
     {
-        var session = _key!.Session;
+        var key = _key!;
+        var session = key.Session;
+        if (_loading is not null)
+        {
+            await _loading.CancelAsync();
+            _loading.Dispose();
+        }
+
+        var loading = _loading = new CancellationTokenSource();
+        var cancellationToken = loading.Token;
+        bool Current()
+        {
+            return ReferenceEquals(_key, key) && !cancellationToken.IsCancellationRequested;
+        }
+
+        Interlocked.Increment(ref _loads);
         await RunAsync(async () =>
         {
             NotFound = false;
@@ -113,17 +131,26 @@ public class ResourceDetailViewState : State
             Server = session.Server;
             await ServiceProvider.GetRequiredService<ISmartAuthorizer>().RestoreAsync(session.Server);
 
-            if (Access != ServerAccess.Ready)
+            if (!Current() || Access != ServerAccess.Ready)
             {
                 return;
             }
 
             try
             {
-                var json = await _reader.ReadAsync(session.Server, _key.ResourceType, _key.ResourceId);
+                var json = await _reader.ReadAsync(session.Server, key.ResourceType, key.ResourceId, cancellationToken);
+                var release = await _types.ReleaseOfAsync(session.Server);
+                if (!Current())
+                {
+                    return;
+                }
+
                 Json = JsonUtil.Beautify(json);
-                _release = await _types.ReleaseOfAsync(session.Server);
+                _release = release;
                 Record = json;
+            }
+            catch (Exception) when (!Current())
+            {
             }
             catch (HttpRequestException ex) when (ex.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.Gone)
             {
@@ -142,6 +169,27 @@ public class ResourceDetailViewState : State
                 throw;
             }
         });
+
+        // A load replaced that ends while the newer one runs: its RunAsync has cleared the indicator the newer one still needs
+        if (Interlocked.Decrement(ref _loads) > 0)
+        {
+            IsBusy = true;
+            return;
+        }
+
         NotifyChanged();
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _loading?.Cancel();
+            _loading?.Dispose();
+            _loading = null;
+        }
+
+        base.Dispose(disposing);
     }
 }

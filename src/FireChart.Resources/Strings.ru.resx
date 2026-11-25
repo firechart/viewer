@@ -420,9 +420,6 @@
   <data name="Conformance_NoElementsFound" xml:space="preserve">
     <value>Ни один элемент не подходит.</value>
   </data>
-  <data name="Conformance_NotInDifferential" xml:space="preserve">
-    <value>Не изменён профилем</value>
-  </data>
   <data name="Conformance_Description" xml:space="preserve">
     <value>Описание</value>
   </data>
@@ -513,9 +510,6 @@
   <data name="Caption_TimesInDeviceZone" xml:space="preserve">
     <value>Время показано в часовом поясе этого устройства</value>
   </data>
-  <data name="Message_SectionsFailed" xml:space="preserve">
-    <value>Разделы, которые не удалось загрузить: {0}</value>
-  </data>
   <data name="Caption_TrendValues" xml:space="preserve">
     <value>Значения</value>
   </data>
@@ -536,9 +530,6 @@
   </data>
   <data name="Caption_LoadingRecord" xml:space="preserve">
     <value>Загрузка карты</value>
-  </data>
-  <data name="Message_LoadingProgress" xml:space="preserve">
-    <value>Загружено частей: {0} из {1}</value>
   </data>
   <data name="Message_LoadedRecords" xml:space="preserve">
     <value>Загружено: {0} ({1})</value>
@@ -561,14 +552,14 @@
   <data name="Caption_SearchCancelled" xml:space="preserve">
     <value>Не загружено: загрузка отменена</value>
   </data>
-  <data name="Caption_PatientRecordSettings" xml:space="preserve">
-    <value>Карта пациента</value>
-  </data>
   <data name="Caption_SummaryPageSize" xml:space="preserve">
     <value>Записей в одном запросе</value>
   </data>
   <data name="Caption_SummaryLoadAll" xml:space="preserve">
     <value>Загружать карту целиком перед показом</value>
+  </data>
+  <data name="Caption_ValueDecimals" xml:space="preserve">
+    <value>Точность значений наблюдений</value>
   </data>
   <data name="Caption_Print" xml:space="preserve">
     <value>Печать</value>
@@ -587,9 +578,6 @@
   </data>
   <data name="PackageBase_Download" xml:space="preserve">
     <value>Загрузить</value>
-  </data>
-  <data name="PackageBase_UpdateButton" xml:space="preserve">
-    <value>Обновить</value>
   </data>
   <data name="PackageBase_Failed" xml:space="preserve">
     <value>Загрузка не удалась: {0}</value>
@@ -633,9 +621,6 @@
   <data name="Message_NothingFound" xml:space="preserve">
     <value>Ничего не найдено</value>
   </data>
-  <data name="Placeholder_TypeToFind" xml:space="preserve">
-    <value>Начните вводить для поиска</value>
-  </data>
   <data name="Caption_RangeFrom" xml:space="preserve">
     <value>{0}: с</value>
   </data>
@@ -668,5 +653,77 @@
   </data>
   <data name="Caption_ShowResourceType" xml:space="preserve">
     <value>Показать {0}</value>
+  </data>
+  <data name="Caption_BundleGraph" xml:space="preserve">
+    <value>Граф Bundle</value>
+  </data>
+  <data name="Caption_BundleNeighbourhood" xml:space="preserve">
+    <value>Показать окрестность</value>
+  </data>
+  <data name="Caption_BundleCard" xml:space="preserve">
+    <value>Карточка</value>
+  </data>
+  <data name="Caption_BundleRefersTo" xml:space="preserve">
+    <value>Ссылается на</value>
+  </data>
+  <data name="Caption_BundleReferredBy" xml:space="preserve">
+    <value>На него ссылаются</value>
+  </data>
+  <data name="Caption_BundleTypes" xml:space="preserve">
+    <value>Типы ресурсов</value>
+  </data>
+  <data name="Caption_BundleShowAll" xml:space="preserve">
+    <value>Показать все</value>
+  </data>
+  <data name="Caption_ZoomIn" xml:space="preserve">
+    <value>Увеличить</value>
+  </data>
+  <data name="Caption_ZoomOut" xml:space="preserve">
+    <value>Уменьшить</value>
+  </data>
+  <data name="Caption_FitToView" xml:space="preserve">
+    <value>Вписать в окно</value>
+  </data>
+  <data name="Message_BundleNoSource" xml:space="preserve">
+    <value>Исходного кода нет: Bundle ссылается на этот ресурс, но не содержит его, а Visualizer не загружает то, чего нет в Bundle.</value>
+  </data>
+  <data name="Message_BundleNotInBundle" xml:space="preserve">
+    <value>Bundle ссылается на этот ресурс, но не содержит его.</value>
+  </data>
+  <data name="Message_BundleNone" xml:space="preserve">
+    <value>Вставьте Bundle или укажите его адрес.</value>
+  </data>
+  <data name="Message_BundleEmpty" xml:space="preserve">
+    <value>В Bundle нет ресурсов.</value>
+  </data>
+  <data name="Message_BundleCounts" xml:space="preserve">
+    <value>Ресурсов: {0}, ссылок: {1}</value>
+  </data>
+  <data name="Message_BundleInvalid" xml:space="preserve">
+    <value>Это не FHIR Bundle: {0}</value>
+  </data>
+  <data name="Message_BundleUnavailable" xml:space="preserve">
+    <value>Не удалось прочитать Bundle по его адресу.</value>
+  </data>
+  <data name="Caption_LoadingBundle" xml:space="preserve">
+    <value>Загрузка Bundle</value>
+  </data>
+  <data name="Message_BundleReading" xml:space="preserve">
+    <value>Чтение с {0}</value>
+  </data>
+  <data name="Message_BundleResolving" xml:space="preserve">
+    <value>Разбор ссылок между ресурсами</value>
+  </data>
+  <data name="Message_BundleCancelled" xml:space="preserve">
+    <value>Загрузка отменена.</value>
+  </data>
+  <data name="Message_ModifierExtensions" xml:space="preserve">
+    <value>Расширения-модификаторы: они могут менять смысл этой записи</value>
+  </data>
+  <data name="Message_NotShownAbove" xml:space="preserve">
+    <value>Не показано выше ({0}): {1}. Эти элементы перечислены в блоке «Прочие данные» в конце страницы.</value>
+  </data>
+  <data name="Caption_OtherData" xml:space="preserve">
+    <value>Прочие данные</value>
   </data>
 </root>

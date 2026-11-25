@@ -1,0 +1,190 @@
+@using BlazorBlueprint.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using FireChart.Viewer.Core.Fhir
+@inject IJSRuntime JS
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager Navigation
+@inject DemoPresets Demo
+
+@* The tab Bundle Visualizer of the sandbox: a Bundle pasted, opened from a file or read by its address from a public server (one with a SMART sign-in
+   too), drawn in the page itself (no frame). The state is the page's, so a switch of the tab keeps it; a sign-in by redirect comes back to an empty
+   tab, the demo servers sign in by popup *@
+<div class="grid grid-cols-12 gap-4" data-sandbox="bundle">
+    <div class="col-span-12 xl:col-span-4">
+        <div class="flex flex-col gap-3">
+            <h5 class="m-0 text-base font-semibold">FireChart Bundle Visualizer</h5>
+            <p class="m-0 text-sm">A FHIR Bundle as the graph of the references between its resources. Click or tap a resource for its card and its source.</p>
+
+            <div class="flex items-end">
+                <FormField Text="Source" Class="w-auto">
+                    <BbToggleGroup TValue="string" Value=@State.Mode ValueChanged=@((string? mode) => State.Mode = mode ?? BundleSandboxState.Paste) Variant="ToggleVariant.Outline"
+                                   Size="ToggleSize.Small" Required="true" data-sandbox="bundle-mode">
+                        <BbToggleGroupItem TValue="string" Value=@BundleSandboxState.Paste>Paste</BbToggleGroupItem>
+                        <BbToggleGroupItem TValue="string" Value=@BundleSandboxState.Address>Address</BbToggleGroupItem>
+                    </BbToggleGroup>
+                </FormField>
+            </div>
+
+            @if (State.Mode == BundleSandboxState.Paste)
+            {
+                <p class="m-0 text-sm">A pasted Bundle stays in the browser: nothing of it is sent anywhere.</p>
+                <FormField Text="Bundle (JSON or XML)" For="bundle-text">
+                    <BbTextarea Id="bundle-text" @bind-Value=State.Text rows="16" spellcheck="false" Class="min-h-72 max-h-[50vh] overflow-y-auto font-mono text-[0.8125rem]"
+                                placeholder="Paste a Bundle here" data-sandbox="bundle-text"/>
+                </FormField>
+                <div class="flex flex-wrap gap-2">
+                    <Button OnClick=@ShowText IconName="hub" Text="Show" data-sandbox="bundle-show"/>
+                    <Button Variant="ButtonVariant.Outline" OnClick=@PickAsync IconName="upload_file" Text="Open a file" data-sandbox="bundle-file"/>
+                    <Button Variant="ButtonVariant.Outline" OnClick=@ExampleAsync IconName="science" Text="Example" data-sandbox="bundle-example"/>
+                </div>
+                <InputFile @ref=@_file accept=".json,.xml,application/fhir+json,application/fhir+xml,application/json,application/xml" class="hidden" OnChange=@OpenAsync/>
+            }
+            else
+            {
+                <Alert Kind="AlertKind.Info">Public test servers with synthetic data. Do not upload real patient data to them. A server with a sign-in asks for it before the address is read.</Alert>
+                <FormField Text="Server">
+                    <BbSelect TValue="string" Options=@ServerOptions Value=@State.PresetId Placeholder="Select a server" AriaLabel="Server"
+                              ValueChanged=@((string? id) => SelectServer(id)) data-sandbox="bundle-server"/>
+                </FormField>
+                @* A form, so the browser keeps the addresses read in the autocomplete of the field: Enter reads; an example reads at once *@
+                <form @onsubmit=@ShowAddress @onsubmit:preventDefault="true" autocomplete="on" data-sandbox="bundle-address-form">
+                    <FormField Text="URL" For="bundle-address" Description="Any valid FHIR URL that returns a FHIR Bundle, relative to the server or absolute">
+                        <BbInput Id="bundle-address" @bind-Value=State.Location name="fhir-bundle-url" autocomplete="on" spellcheck="false"
+                                 Class="font-mono text-[0.8125rem]" data-sandbox="bundle-address"/>
+                    </FormField>
+                </form>
+                <div class="flex flex-col gap-1" data-sandbox="bundle-examples">
+                    <span class="text-sm text-muted">Examples for any server</span>
+                    <div class="grid grid-cols-2 gap-1">
+                        @foreach (var example in s_examples)
+                        {
+                            <Button Variant="ButtonVariant.Outline" Size="ButtonSize.Small" Class="justify-start" title=@example.Query
+                                    OnClick=@(() => ReadExample(example.Query)) Text=@example.Name/>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (State.Chosen is { } chosen)
+            {
+                <p class="m-0 text-sm" data-sandbox="bundle-chosen">Chosen: <code>@chosen</code></p>
+            }
+        </div>
+    </div>
+
+    <div class="col-span-12 h-[75vh] min-h-[480px] xl:col-span-8">
+        <FireChart.Viewer.Bundles.FhirBundleVisualizer @ref=_visualizer Bundle=@State.ShownText Location=@State.ShownLocation Server=@State.ShownServer
+                                                       Smart=@SmartCallbackPage.OptionsOf(Navigation, State.ShownFlow)
+                                                       OnSelect=@((string? reference) => State.Chosen = reference)/>
+    </div>
+</div>
+
+@code {
+
+    // Not under samples/: the image leaves every samples folder out of its build (.dockerignore), and the host answers a missing file with the page
+    private const string ExampleFile = "examples/bundle-example.json";
+
+    // Searches that hold for any server: a type with what it refers to (_include) and what refers to it (_revinclude). Checked by hand 2026-11-24 on the
+    // open SMART Health IT server, HAPI R4 and Firely R4: each a Bundle with references
+    private static readonly ExampleQuery[] s_examples =
+    [
+        new("A patient and its records", "Patient?_count=1&_revinclude=Observation:subject&_revinclude=Procedure:subject&_revinclude=Condition:subject"),
+        new("Encounters and their observations", "Encounter?_count=5&_include=Encounter:subject&_include=Encounter:participant&_revinclude=Observation:encounter"),
+        new("Observations in context", "Observation?_count=20&_include=Observation:subject&_include=Observation:encounter&_include=Observation:performer"),
+        new("Prescriptions", "MedicationRequest?_count=10&_include=MedicationRequest:subject&_include=MedicationRequest:requester&_include=MedicationRequest:encounter"),
+        new("Reports and their results", "DiagnosticReport?_count=5&_include=DiagnosticReport:subject&_include=DiagnosticReport:result&_include=DiagnosticReport:encounter")
+    ];
+
+    private sealed record ExampleQuery(string Name, string Query);
+    private const long MaxFileSize = 20 * 1024 * 1024;
+    private InputFile? _file;
+    private IJSObjectReference? _download;
+    private FireChart.Viewer.Bundles.FhirBundleVisualizer? _visualizer;
+
+    [Parameter, EditorRequired]
+    public BundleSandboxState State { get; set; } = null!;
+
+    private IReadOnlyList<DemoPreset> _presets = [];
+
+    private IEnumerable<DemoPreset> Presets => _presets;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _presets = await Demo.LoadAsync();
+    }
+
+    private IEnumerable<SelectOption<string>> ServerOptions => Presets.Select(preset => new SelectOption<string>(preset.Id, preset.Name));
+
+    private void SelectServer(string? id)
+    {
+        State.PresetId = id;
+    }
+
+    // An example goes into the field and is read at once
+    private void ReadExample(string query)
+    {
+        State.Location = query;
+        ShowAddress();
+    }
+
+    private void ShowText()
+    {
+        State.ShownLocation = null;
+        State.ShownServer = null;
+        State.ShownText = State.Text;
+    }
+
+    private void ShowAddress()
+    {
+        if (string.IsNullOrWhiteSpace(State.Location))
+        {
+            return;
+        }
+
+        var preset = Presets.FirstOrDefault(preset => preset.Id == State.PresetId);
+        State.ShownText = null;
+        var setup = preset is null ? null : ViewerAppConfigLoader.Parse(preset.Config.ToJsonString());
+        // The same address of the same server again: read anew (after a cancel, or for fresh data)
+        if (State.ShownText is null && State.ShownLocation == State.Location && State.ShownServer?.BaseUrl == setup?.Server?.BaseUrl && _visualizer is not null)
+        {
+            _ = _visualizer.ReloadAsync();
+            return;
+        }
+
+        State.ShownServer = setup?.Server;
+        State.ShownFlow = setup?.SmartFlow ?? FireChart.Viewer.Smart.SmartFlow.Redirect;
+        State.ShownLocation = State.Location;
+    }
+
+    private async Task ExampleAsync()
+    {
+        using var http = HttpClientFactory.CreateClient();
+        using var response = await http.GetAsync(Navigation.ToAbsoluteUri(ExampleFile));
+        // A host that answers a missing file with its page gives HTML: that is no example
+        if (!response.IsSuccessStatusCode || response.Content.Headers.ContentType?.MediaType is not ("application/json" or "application/fhir+json"))
+        {
+            return;
+        }
+
+        State.Text = await response.Content.ReadAsStringAsync();
+        ShowText();
+    }
+
+    private async Task PickAsync()
+    {
+        if (_file?.Element is { } element)
+        {
+            _download ??= await JS.ImportModuleAsync("./_content/Flox.Shared/flox-download.js");
+            await _download.InvokeVoidAsync("pick", element);
+        }
+    }
+
+    private async Task OpenAsync(InputFileChangeEventArgs args)
+    {
+        await using var stream = args.File.OpenReadStream(MaxFileSize);
+        using var reader = new StreamReader(stream);
+        State.Text = await reader.ReadToEndAsync();
+        ShowText();
+    }
+
+}

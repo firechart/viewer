@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<!-- The demo of the Bundle Visualizer: this application in a frame (embed-bundle) through its SDK. A Bundle opened or pasted stays in the browser,
+     an example is read from the server of the first line (?server=, the presets of demo-presets.json) -->
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content" />
+    <title>FireChart Bundle Visualizer: live demo</title>
+    <meta name="description" content="Draw a FHIR® Bundle as the graph of the references between its resources, in the browser. Open source, MPL-2.0." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://viewer.firechart.org/bundle.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="FireChart" />
+    <meta property="og:url" content="https://viewer.firechart.org/bundle.html" />
+    <meta property="og:title" content="FireChart Bundle Visualizer" />
+    <meta property="og:description" content="Paste a FHIR® Bundle and see the graph of its references, each resource as a card and its source. It stays in your browser." />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="https://viewer.firechart.org/img/og-bundle.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="A FHIR® Bundle drawn as a graph in FireChart Bundle Visualizer" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FireChart Bundle Visualizer" />
+    <meta name="twitter:description" content="Paste a FHIR® Bundle and see the graph of its references, each resource as a card and its source. It stays in your browser." />
+    <meta name="twitter:image" content="https://viewer.firechart.org/img/og-bundle.png" />
+    <link rel="icon" href="img/firechart-logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/site.css" />
+    <link rel="modulepreload" href="./sdk/viewer.js" />
+</head>
+<body>
+<header class="site-header">
+    <a class="brand" href="./"><img src="img/firechart-logo.svg" alt="FireChart" /></a>
+    <nav>
+        <a href="viewer.html">Viewer</a>
+        <a href="bundle.html" aria-current="page">Bundle<span class="wide"> Visualizer</span></a>
+        <a href="developers.html">Embed</a>
+    </nav>
+    <a class="github" href="https://github.com/firechart/viewer">GitHub</a>
+</header>
+
+<main class="demo">
+    <aside>
+        <h1>Bundle Visualizer</h1>
+        <p class="intro">
+            A FHIR® Bundle drawn as the graph of the references between its resources. Tap a resource to see its card and its source. A Bundle you
+            open or paste stays in your browser. An example is a search with its related resources on the server you pick.
+        </p>
+        <label>
+            <span class="label">Server</span>
+            <span class="row">
+                <select id="server" aria-label="Server"></select>
+                <button id="appearance-open" class="button icon" type="button" title="Appearance" aria-label="Appearance">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                </button>
+            </span>
+        </label>
+        <div class="row commands">
+            <label class="button" for="file" title="Open a Bundle from a file (JSON or XML)">File...</label>
+            <input id="file" type="file" accept=".json,.xml,application/fhir+json,application/fhir+xml,application/json,application/xml" hidden />
+            <button id="paste" class="button" type="button" title="Paste a Bundle (Ctrl+V)">Paste</button>
+            <details id="examples" class="menu">
+                <summary class="button">Examples
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+                </summary>
+                <div id="example-list" class="menu-list" role="menu"></div>
+            </details>
+        </div>
+        <p id="message" class="message" role="status"></p>
+        <p class="notice">Public test servers with synthetic data. Do not paste real patient data.</p>
+    </aside>
+    <div id="bundle" class="frame"></div>
+</main>
+
+<script type="module">
+    import { BundleVisualizer } from "./sdk/viewer.js";
+    import { bindAppearance } from "./assets/appearance.js";
+    import { loadPresets, rememberServer } from "./assets/presets.js";
+
+    // Searches from the leaves up: a few records of one type with the records they point to (_include only), so a Bundle has at most a few
+    // dozen resources and as many patients as records. Read from the server of the first line
+    const searches = [
+        ["Procedure + Patient + Encounter", "Procedure?_count=10&_include=Procedure:patient&_include=Procedure:encounter"],
+        ["Observation + Patient + Encounter", "Observation?_count=10&_include=Observation:patient&_include=Observation:encounter"],
+        ["Condition + Patient + Encounter", "Condition?_count=10&_include=Condition:patient&_include=Condition:encounter"],
+        ["MedicationRequest + Patient + Practitioner + Encounter",
+            "MedicationRequest?_count=10&_include=MedicationRequest:patient&_include=MedicationRequest:requester&_include=MedicationRequest:encounter"],
+        ["DiagnosticReport + Observation + Patient",
+            "DiagnosticReport?_count=5&_include=DiagnosticReport:patient&_include=DiagnosticReport:result&_include=DiagnosticReport:performer"],
+        ["CarePlan + CareTeam + Condition + Patient", "CarePlan?_count=5&_include=CarePlan:patient&_include=CarePlan:care-team&_include=CarePlan:condition"]
+    ];
+
+    const app = new URL("./", location.href).href;
+    const select = document.getElementById("server");
+    const message = document.getElementById("message");
+    const examples = document.getElementById("examples");
+    const list = document.getElementById("example-list");
+    const appearance = bindAppearance(document.getElementById("appearance-open"));
+    let { presets, selected: preset } = await loadPresets(app, select);
+    rememberServer(preset);
+
+    const visualizer = BundleVisualizer.create(appearance.apply(preset.config), { url: app, title: "FireChart Bundle Visualizer" }).mount("#bundle");
+    appearance.attach(visualizer);
+
+    // The last Bundle shown, shown again after the server changes (a restart shows nothing until the next show)
+    let last = null;
+    const show = async bundle => {
+        last = bundle;
+        message.textContent = "";
+        try {
+            await visualizer.show(bundle);
+        } catch (error) {
+            if (error.code !== "superseded" && error.code !== "cancelled") {
+                message.textContent = error.message;
+            }
+        }
+    };
+    const sample = async () => show(await (await fetch(new URL("examples/bundle-example.json", app))).json());
+
+    const item = (title, detail, action) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.setAttribute("role", "menuitem");
+        button.title = detail;
+        button.append(Object.assign(document.createElement("span"), { textContent: title }));
+        button.append(Object.assign(document.createElement("code"), { textContent: detail }));
+        button.onclick = () => {
+            examples.open = false;
+            action();
+        };
+        return button;
+    };
+    const fillExamples = () => {
+        list.replaceChildren(...searches.map(([title, location]) => item(title, location, () => show({ location }))));
+        if (preset.patient) {
+            const everything = `Patient/${preset.patient}/$everything?_count=30`;
+            list.append(item("Patient $everything (one page)", everything, () => show({ location: everything })));
+        }
+        list.append(item("Sample Bundle", "A document of one patient, built in", sample));
+    };
+    fillExamples();
+
+    select.onchange = async () => {
+        preset = presets.find(p => p.id === select.value) ?? presets[0];
+        rememberServer(preset);
+        fillExamples();
+        await visualizer.restart(appearance.apply(preset.config)).catch(console.error);
+        if (last) {
+            await show(last);
+        }
+    };
+
+    // The menu closes on a click elsewhere and on Escape
+    document.addEventListener("click", e => {
+        if (examples.open && !examples.contains(e.target)) {
+            examples.open = false;
+        }
+    });
+    examples.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+            examples.open = false;
+            examples.querySelector("summary").focus();
+        }
+    });
+
+    document.getElementById("file").onchange = async e => {
+        const file = e.target.files?.[0];
+        if (file) {
+            await show(await file.text());
+            e.target.value = "";
+        }
+    };
+
+    // Paste: the button reads the clipboard where the browser allows it, Ctrl+V (Cmd+V) outside a field works everywhere
+    document.getElementById("paste").onclick = async () => {
+        try {
+            const text = await navigator.clipboard.readText();
+            if (text.trim()) {
+                await show(text);
+            } else {
+                message.textContent = "The clipboard is empty. Copy a Bundle (JSON or XML) first.";
+            }
+        } catch {
+            message.textContent = "The browser does not let the page read the clipboard. Press Ctrl+V (Cmd+V) instead.";
+        }
+    };
+    document.addEventListener("paste", e => {
+        if (e.target.closest?.("input, textarea, select, [contenteditable]")) {
+            return;
+        }
+        const text = e.clipboardData?.getData("text") ?? "";
+        if (text.trim()) {
+            e.preventDefault();
+            show(text);
+        }
+    });
+
+    await sample();
+</script>
+</body>
+</html>

@@ -19,8 +19,6 @@ internal sealed record ReportNode(string Name, ImmutableDictionary<string, Repor
 // elements (a resource, a list); any other is a string
 internal sealed record ReportValue(string Source, ImmutableArray<ReportPart> Parts)
 {
-    public static readonly ReportValue Empty = new(string.Empty, []);
-
     public ReportExpression? Single => Parts is [ReportExpression expression] ? expression : null;
 
     // The expressions of the value, the arguments of its texts too

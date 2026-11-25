@@ -1,5 +1,5 @@
 using System.Globalization;
-using FireChart.Viewer.Components;
+using Flox.Shared.Components;
 using FireChart.Viewer.Core.Reports;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
@@ -42,6 +42,7 @@ internal sealed class ReportLoadingPanel : ComponentBase, IDisposable
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
         builder.OpenComponent<LoadingPanel>(0);
+        builder.AddComponentParameter(5, nameof(LoadingPanel.Title), Strings.Caption_LoadingRecord);
         builder.AddComponentParameter(1, nameof(LoadingPanel.Done), Progress.Finished);
         builder.AddComponentParameter(2, nameof(LoadingPanel.Total), Progress.Started);
         builder.AddComponentParameter(3, nameof(LoadingPanel.Messages),

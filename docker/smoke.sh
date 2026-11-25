@@ -37,7 +37,7 @@ until get / 2>/dev/null; do
 done
 
 # The files of the application
-for path in / /embed /viewer.json /host.json /_framework/blazor.webassembly.js /_content/Flox.Shared/css/Flox.Shared.Tailwind.css \
+for path in / /viewer.html /bundle.html /developers.html /assets/site.css /robots.txt /sitemap.xml /img/og-viewer.png /playground /embed /embed-bundle /viewer.json /host.json /_framework/blazor.webassembly.js /_content/Flox.Shared/css/Flox.Shared.Tailwind.css \
     /_content/FireChart.Viewer/css/FireChart.Viewer.Tailwind.css /sdk/viewer.js /library/firechart.project.json \
     /library/components/Patient.tile.xml; do
     get "$path" || fail "$path"
@@ -47,6 +47,8 @@ done
 # What the Viewer needs of its host
 get /embed - | grep -q '<base href="/"' || fail "/embed is not the shell"
 echo "ok   /embed is the shell"
+get /examples/bundle-example.json - | grep -q '"resourceType": "Bundle"' || fail "/examples/bundle-example.json is not the example Bundle of the playground"
+echo "ok   the example Bundle of the playground"
 headers / | grep -qi 'cache-control: no-cache' || fail "the page is not revalidated"
 headers /sdk/viewer.js | grep -qi 'access-control-allow-origin: \*' || fail "the SDK may not be imported by another origin"
 echo "ok   revalidated, the SDK open to every origin"

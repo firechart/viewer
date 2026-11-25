@@ -13,6 +13,15 @@ function resolve(theme) {
     return theme === "auto" ? (media.matches ? "dark" : "light") : theme;
 }
 
+// The Viewer is gone: the page is no longer changed when the operating system changes its scheme
+export function stop() {
+    if (media && listener) {
+        media.removeEventListener("change", listener);
+    }
+
+    listener = null;
+}
+
 export function setTheme(theme) {
     media ??= window.matchMedia("(prefers-color-scheme: dark)");
     if (listener) {

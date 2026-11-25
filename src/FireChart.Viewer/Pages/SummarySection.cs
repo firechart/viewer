@@ -7,7 +7,7 @@ namespace FireChart.Viewer.Pages;
 /// <param name="definition">The search of the form.</param>
 /// <param name="culture">The culture of the label of the order.</param>
 /// <param name="context">The record the summary grows from (<see cref="SummaryFormDefinition.Context"/>).</param>
-/// <param name="pageSize">The size of a page when the form does not give one (<see cref="ViewerSummaryOptions.PageSize"/>); <see cref="DefaultPageSize"/> when
+/// <param name="pageSize">The size of a page when the form does not give one (<see cref="FhirOptions.PageSize"/>); <see cref="DefaultPageSize"/> when
 /// <see langword="null"/>.</param>
 public sealed class SectionSearch(SummaryFormSearch definition, string culture, string context = SummaryContexts.Patient, int? pageSize = null)
 {
@@ -274,7 +274,7 @@ public static class SummarySections
     /// <param name="form">The form.</param>
     /// <param name="declaredTypes">The types the server says it has; null when it does not say (every search is tried).</param>
     /// <param name="culture">The culture of the titles.</param>
-    /// <param name="pageSize">The size of a page of a search whose form gives none (<see cref="ViewerSummaryOptions.PageSize"/>).</param>
+    /// <param name="pageSize">The size of a page of a search whose form gives none (<see cref="FhirOptions.PageSize"/>).</param>
     /// <returns>The visible blocks that have a search.</returns>
     public static IReadOnlyList<SummarySection> Build(SummaryFormDefinition form, IReadOnlyCollection<string>? declaredTypes, string culture, int? pageSize = null)
     {
