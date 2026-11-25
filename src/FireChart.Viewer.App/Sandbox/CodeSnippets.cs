@@ -94,9 +94,9 @@ internal static class CodeSnippets
             settings.Add($"PageSize = {fhir.PageSize.ToString(CultureInfo.InvariantCulture)}");
         }
 
-        if (fhir.LoadAll)
+        if (!fhir.LoadAll)
         {
-            settings.Add("LoadAll = true");
+            settings.Add("LoadAll = false");
         }
 
         if (fhir.Decimals != FhirOptions.DefaultDecimals)

@@ -9,15 +9,16 @@ namespace FireChart.Viewer;
 /// places a value shows (option <c>fhir</c> of the configuration). FireChart keeps them as its settings group FHIR settings (<c>fhir</c>).
 /// </summary>
 /// <remarks>
-/// A summary loads its blocks in parallel and draws each as it comes, so the blocks below move while those above fill. With <see cref="LoadAll"/> the
-/// page is drawn hidden behind a panel of progress (what has come, Cancel) and appears whole; Cancel shows what has come, marked incomplete. A larger
+/// A summary loads its blocks in parallel. With <see cref="LoadAll"/> (the default) the page is drawn hidden behind a panel of progress (what has
+/// come, Cancel) and appears whole; Cancel shows what has come, marked incomplete. Without it each block is drawn as it comes, so the blocks below
+/// move while those above fill. A larger
 /// <see cref="PageSize"/> asks the server fewer times; a page size of the summary form wins over it. A number is shown with the digits of the record
 /// up to <see cref="Decimals"/> places; one with more is rounded (<see cref="DecimalText.Format"/>). A <c>Feed</c> of a component may set its own
 /// <c>decimals</c>. Other options start a new session of the Viewer.
 /// </remarks>
 /// <example>
 /// <code>
-/// &lt;FhirViewer Server=@server Fhir=@(new FhirOptions { PageSize = 100, LoadAll = true, Decimals = 1, TerminologyServerUrl = "https://tx.fhir.org/r4" })/&gt;
+/// &lt;FhirViewer Server=@server Fhir=@(new FhirOptions { PageSize = 100, LoadAll = false, Decimals = 1, TerminologyServerUrl = "https://tx.fhir.org/r4" })/&gt;
 /// </code>
 /// </example>
 [FloxSettings("fhir")]
@@ -63,9 +64,12 @@ public sealed record FhirOptions
     [Setting(Control = SettingControl.Slider, Step = 10)]
     public int PageSize { get; set; } = DefaultPageSize;
 
-    /// <summary>Every record of every block of a summary is loaded before the page is shown, behind a panel of progress with Cancel.</summary>
+    /// <summary>
+    /// Every record of every block of a summary is loaded before the page is shown, behind a panel of progress with Cancel; on by default. Off, each
+    /// block is drawn as its records come.
+    /// </summary>
     [Display(Name = nameof(Strings.Caption_SummaryLoadAll), ResourceType = typeof(Strings), Order = 4)]
-    public bool LoadAll { get; set; }
+    public bool LoadAll { get; set; } = true;
 
     /// <summary>
     /// The most decimal places of a value (a quantity of an observation, any decimal); 2 by default. A value with more is rounded and loses the zeros

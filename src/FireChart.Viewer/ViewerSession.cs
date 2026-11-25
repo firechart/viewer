@@ -69,7 +69,7 @@ public sealed class ViewerSession
     /// </summary>
     /// <example>
     /// <code>
-    /// var session = new ViewerSession(server, location) { Fhir = new FhirOptions { LoadAll = true, Decimals = 1 } };
+    /// var session = new ViewerSession(server, location) { Fhir = new FhirOptions { LoadAll = false, Decimals = 1 } };
     /// </code>
     /// </example>
     public FhirOptions Fhir { get; init; } = FhirOptions.Default;

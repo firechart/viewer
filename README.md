@@ -11,11 +11,11 @@ references between its resources. Both are read-only, sign in with SMART on FHIR
 
 **SMART on FHIR support:** SMART App Launch with PKCE, by redirect or in a popup (works inside an iframe), with patient context
 (`launch/patient`): a protected server opens as well as an open one. Try it with the SMART Health IT launcher in the
-[demo](https://viewer.firechart.org/viewer.html?server=smart-launcher).
+[demo](https://firechart.github.io/viewer/viewer.html?server=smart-launcher).
 
-**Live demo:** <https://viewer.firechart.org> (the same site on [GitHub Pages](https://firechart.github.io/viewer/)): the
-[Viewer](https://viewer.firechart.org/viewer.html) and the [Bundle Visualizer](https://viewer.firechart.org/bundle.html) on public test servers
-with synthetic patients, and the [playground](https://viewer.firechart.org/playground) of every option with the code to copy.
+**Live demo:** <https://firechart.github.io/viewer/>: the
+[Viewer](https://firechart.github.io/viewer/viewer.html) and the [Bundle Visualizer](https://firechart.github.io/viewer/bundle.html) on public test servers
+with synthetic patients, and the [playground](https://firechart.github.io/viewer/playground) of every option with the code to copy.
 
 ![The summary of a patient in FireChart Viewer](src/FireChart.Viewer.App/wwwroot/img/og-viewer.png)
 
@@ -34,7 +34,7 @@ with synthetic patients, and the [playground](https://viewer.firechart.org/playg
 
 - **.NET 11 and Blazor WebAssembly**, the Firely .NET SDK for FHIR® (STU3, R4, R4B, R5, R6), Blazor Blueprint for the UI. No server code: the
   publish is static files that any web server can serve.
-- **Browsers:** current Chrome, Edge, Firefox and Safari, desktop and mobile. The first visit downloads about 16 MB (Brotli) and is cached after.
+- **Browsers:** current Chrome, Edge, Firefox and Safari, desktop and mobile. The first visit downloads about 13 MB (compressed) and is cached after.
 - **Languages:** English, German, Spanish, Hebrew (right to left), Russian, Chinese. Light and dark themes.
 - **License:** MPL-2.0, for open and closed applications alike.
 
@@ -68,7 +68,8 @@ docker run -d -p 8080:8080 \
   ghcr.io/firechart/viewer:latest
 ```
 
-- `host.json`: the origins of the pages that may drive the frame, `{ "frameAncestors": ["'self'", "https://emr.example.org"] }`.
+- `host.json`: the origins of the pages that may drive the frame, `{ "frameAncestors": ["'self'", "https://emr.example.org"] }`. The image
+  allows any page (`*`) so a first try works; for real data list your origins.
 - `viewer.json`: the configuration of a frame used without the SDK (below). Both are read at every load: a change needs no restart.
 - In front of it: HTTPS, and CSP `frame-ancestors` with the same list as `host.json`. The FHIR® server must allow the origin of the Viewer (CORS).
 
@@ -77,11 +78,11 @@ docker run -d -p 8080:8080 \
 ```html
 <div id="viewer" style="height: 80vh"></div>
 <script type="module">
-  import { Viewer } from "https://viewer.firechart.org/sdk/viewer.js";
+  import { Viewer } from "https://firechart.github.io/viewer/sdk/viewer.js";
 
   const viewer = Viewer.create(
     { server: { url: "https://r4.smarthealthit.org" }, appearance: { theme: "inherit" }, locale: "inherit" },
-    { url: "https://viewer.firechart.org/", urlParam: "fhir" }
+    { url: "https://firechart.github.io/viewer/", urlParam: "fhir" }
   ).mount("#viewer");
 
   viewer.on("navigate", e => console.log("now at", e.location));
@@ -92,13 +93,13 @@ docker run -d -p 8080:8080 \
 The Bundle Visualizer, from the same module:
 
 ```js
-import { BundleVisualizer } from "https://viewer.firechart.org/sdk/viewer.js";
+import { BundleVisualizer } from "https://firechart.github.io/viewer/sdk/viewer.js";
 
-const bundles = BundleVisualizer.create({ appearance: { theme: "auto" } }, { url: "https://viewer.firechart.org/" }).mount("#graph");
+const bundles = BundleVisualizer.create({ appearance: { theme: "auto" } }, { url: "https://firechart.github.io/viewer/" }).mount("#graph");
 await bundles.show(bundleJsonOrXmlOrObject);          // or { location: "Encounter?_count=5&_include=Encounter:patient" } with a server
 ```
 
-Without JavaScript, a plain frame shows the server of `viewer.json`: `<iframe src="https://viewer.firechart.org/embed" style="width:100%;height:800px;border:0"></iframe>`.
+Without JavaScript, a plain frame shows the server of `viewer.json`: `<iframe src="https://firechart.github.io/viewer/embed" style="width:100%;height:800px;border:0"></iframe>`.
 
 Components for **React, Angular and Vue** (a dozen lines each), recipes and troubleshooting: [HOWTO](src/FireChart.Viewer.App/Sdk/HOWTO.md).
 Every member of the SDK: [SDK README](src/FireChart.Viewer.App/Sdk/README.md). Working pages: [`samples/`](samples).
@@ -137,7 +138,7 @@ The same object is `viewer.json` of an instance and the `config` of the SDK. Onl
 | `server.url`, `.name`, `.fhirRelease`, `.pageSize`, `.timeoutSeconds` | The FHIR® API (required); its name in the breadcrumbs; the release when `/metadata` does not say it; resources per page (50); seconds per request (60) |
 | `smart.clientId`, `.scopes`, `.flow`, `.authority`, `.extraParameters` | A public SMART client with PKCE (no secret); `redirect` (default) or `popup`; the OpenID authority when SMART discovery does not find it; more parameters of the request |
 | `locale` | `auto`, `en`, `de`, `es`, `he`, `ru`, `zh-Hans` (a region may follow: `de-AT`); in the SDK also `inherit` (the `lang` of your page) |
-| `fhir.terminologyServer`, `.pageSize`, `.loadAll`, `.decimals` | Words for bare codes (none: codes as they are); records per search of a summary (20); load a whole summary first; decimal places (2) |
+| `fhir.terminologyServer`, `.pageSize`, `.loadAll`, `.decimals` | Words for bare codes (none: codes as they are); records per search of a summary (20); load a whole summary first (on; `false` draws each section as it comes); decimal places (2) |
 | `appearance.theme`, `.style`, `.fonts`, `.variables`, `.rules` | `light`, `dark`, `auto` (in the SDK also `inherit`); a theme of the library (`fluent`, `compact` or your own); fonts, tokens (`colorPrimary`, `fontFamily`, `borderRadius`, ...) and rules for `.Banner`, `.Tile`, `.Badge`, `.Card`, `.Table` |
 
 A wrong key or value stops the Viewer with its path and a hint (`'apperance' is not an option. Did you mean 'appearance'?`).

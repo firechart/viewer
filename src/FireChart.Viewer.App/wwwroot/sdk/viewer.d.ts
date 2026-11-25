@@ -35,7 +35,7 @@ export interface ViewerConfig {
         terminologyServer?: string;
         /** The page size (_count) of the searches of a summary whose form gives none: 1 to 500; default 20. */
         pageSize?: number;
-        /** Load every record before the summary is shown, behind a panel of progress with Cancel; default false. */
+        /** Load every record before the summary is shown, behind a panel of progress with Cancel; default true. false draws each section as it comes. */
         loadAll?: boolean;
         /** The most decimal places of a value: 0 to 10; default 2. More are rounded, without the zeros the rounding leaves (100.004 is 100). */
         decimals?: number;

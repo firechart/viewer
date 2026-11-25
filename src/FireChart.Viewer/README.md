@@ -120,7 +120,7 @@ and in `App.razor`, before the router, the hosts of Blazor Blueprint: `<BbPortal
 | `Server` | The FHIR server (`IViewerServer`). **Required**; another server starts a new session |
 | `RoutePrefix` | The path of your catch-all route (`viewer/`) |
 | `Smart` | `SmartOptions` of a SMART sign-in: `RedirectUri` (your callback route for a redirect; without it a server that needs a sign-in can be read only by the popup), `Flow` (`Redirect`, the default, or `Popup`), `PopupRedirectUri` (the return page of the popup; default `_content/FireChart.Viewer/smart-callback.html` of your app) |
-| `Fhir` | `FhirOptions`, the FHIR settings: `TerminologyServerUrl` (words for bare codes; none: codes as they are), `PageSize` and `LoadAll` of a patient summary, `Decimals` (the most decimal places of a value, 2) |
+| `Fhir` | `FhirOptions`, the FHIR settings: `TerminologyServerUrl` (words for bare codes; none: codes as they are), `PageSize` and `LoadAll` of a patient summary (`LoadAll` is on: the summary appears whole; off, each section is drawn as it comes), `Decimals` (the most decimal places of a value, 2) |
 | `Appearance` | `ViewerAppearance`: `Theme` (`Inherit` by default: your app owns the theme; `Light`, `Dark`, `Auto` make the Viewer own it), `Variables`, `Rules`, `Fonts`, `AdvancedStylesheet` |
 | `ShowBreadcrumbs` | The chain server > type > id above the page (on by default) |
 | `OnConfigError` | Called for an appearance value that was left out |

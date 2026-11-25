@@ -1,15 +1,12 @@
-# FireChart Viewer: https://viewer.firechart.org/ (the same site on GitHub Pages: https://firechart.github.io/viewer/)
+# FireChart Viewer: https://firechart.github.io/viewer/. A crawler reads only the robots.txt at the root of a host: on GitHub Pages that is
+# the one of firechart.github.io (the repository of the organization); this file serves a copy at the root of its own host (the Docker image).
 # The home page, the demos and the playground are for everyone. The frames are parts of other pages; the files of the application stay
 # open, as a crawler that renders a page needs them.
 
 User-agent: *
 Allow: /
-Allow: /viewer.html
-Allow: /bundle.html
-Allow: /developers.html
-Allow: /playground
 Disallow: /embed
 Disallow: /embed-bundle
 Disallow: /smart/
 
-Sitemap: https://viewer.firechart.org/sitemap.xml
+Sitemap: https://firechart.github.io/viewer/sitemap.xml

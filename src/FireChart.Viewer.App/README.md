@@ -25,7 +25,7 @@ image is built from the `Dockerfile` of that folder (below).
   "server": { "url": "https://fhir.example.org/r4", "name": "Our FHIR server", "fhirRelease": "R4", "pageSize": 50 },
   "smart": { "clientId": "viewer", "scopes": "launch/patient patient/*.rs openid fhirUser", "flow": "redirect" },
   "locale": "auto",
-  "fhir": { "terminologyServer": "https://tx.fhir.org/r4", "pageSize": 100, "loadAll": true, "decimals": 2 },
+  "fhir": { "terminologyServer": "https://tx.fhir.org/r4", "pageSize": 100, "loadAll": false, "decimals": 2 },
   "appearance": { "theme": "auto", "variables": { "colorPrimary": "#0a7f5a" } }
 }
 ```
@@ -37,8 +37,9 @@ its path (`'apperance' is not an option. Did you mean 'appearance'?`); the Viewe
 
 `fhir` is the FHIR settings of the Viewer (`FhirOptions`), the group FHIR settings of FireChart. `fhir.terminologyServer` turns bare codes into
 words. `fhir.pageSize` is the page size of the searches of a patient summary whose summary form gives none (1 to 500, default 20; it is not
-`server.pageSize`, the page of a list). With `fhir.loadAll` the summary loads every record of every section before it is shown, behind a panel
-of progress with Cancel (what has come is then shown, marked incomplete), so it does not move as the sections fill. `fhir.decimals` is the
+`server.pageSize`, the page of a list). With `fhir.loadAll` (default `true`) the summary loads every record of every section before it is
+shown, behind a panel of progress with Cancel (what has come is then shown, marked incomplete), so it does not move as the sections fill;
+`false` draws each section as it comes. `fhir.decimals` is the
 most decimal places of a value (0 to 10, default 2): a value with more is rounded, without the zeros the rounding leaves (`100.004` is `100`),
 one with fewer keeps the digits of the record (`1.30`). `fhir` changes without a restart (`update`), as `locale` and `appearance` do.
 
@@ -53,7 +54,7 @@ docker run -d --name fhir-viewer -p 8080:8080   -v "$PWD/viewer.json:/usr/share/
 ```
 
 `viewer.json` is the configuration (read at every load of the page), `host.json` the origins that may drive the frame (below); without them
-the image has the files of the sources: the open SMART Health IT server, `'self'` only. `/` is the home page, `/playground` the playground, `/embed` the frame.
+the image has the files of the sources: the open SMART Health IT server, any page may drive the frame (`*`, as the public demo). `/` is the home page, `/playground` the playground, `/embed` the frame.
 
 **Your own components, forms and style.** The vendor library is the folder `/usr/share/nginx/html/library` of the image (the package
 `library` with its manifest `firechart.project.json`, which says its version). A project of the FireChart FHIR Designer mounted at
@@ -106,8 +107,8 @@ are as above, and instead of `navigate`:
 | | | `ready` | `{ server }` (`null` without one) |
 
 **Who may drive the frame:** only a parent whose origin is in `host.json` (`{ "frameAncestors": ["'self'", "https://emr.example.org"] }`), the
-same syntax as CSP `frame-ancestors` (put the same list into that header of your proxy). The file of the published app allows `'self'` only;
-replace it with a volume (above). `*.example.org` wildcards
+same syntax as CSP `frame-ancestors` (put the same list into that header of your proxy). The file of the published app allows any page (`*`,
+for the public demo and a first try); for real data replace it with a volume (above) that lists your origins. `*.example.org` wildcards
 and `*` work as in CSP. `hello` goes to any parent and carries nothing; the events and the results go only to the origin that sent the first
 accepted message.
 

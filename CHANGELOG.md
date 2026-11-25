@@ -2,6 +2,19 @@
 
 The changes of each published release of the FireChart Viewer and the public Flox libraries, newest first.
 
+## 0.95.14 - 2026-11-25
+
+### Viewer
+
+- A patient summary is shown whole by default: every record of every section loads behind a panel of progress with Cancel before the page
+  appears. `FhirOptions.LoadAll = false` (`fhir.loadAll: false` in `viewer.json` and the SDK) draws each section as it comes.
+- The public demo is on GitHub Pages: https://firechart.github.io/viewer/. The pages name it as their address, and the README and the SDK
+  examples load the SDK from there.
+- The demo opens a server on its resource types (Bookmarks, Patient and the other types), at the start, when another server is chosen
+  and by the home button.
+- The frame of the Viewer app obeys any page by default (`host.json` allows `"*"`), so the demo and the examples work when embedded anywhere.
+  An installation with real data mounts its own list of allowed pages.
+
 ## 0.95.12 - 2026-11-25
 
 ### Bundle Visualizer (new)

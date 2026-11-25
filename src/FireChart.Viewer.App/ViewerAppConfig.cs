@@ -327,7 +327,7 @@ internal sealed class ViewerAppConfigLoader(IHttpClientFactory httpClientFactory
             {
                 TerminologyServerUrl = fhir?.TerminologyServer,
                 PageSize = fhir?.PageSize ?? FhirOptions.DefaultPageSize,
-                LoadAll = fhir?.LoadAll ?? false,
+                LoadAll = fhir?.LoadAll ?? FhirOptions.Default.LoadAll,
                 Decimals = fhir?.Decimals ?? FhirOptions.DefaultDecimals
             }
         };
